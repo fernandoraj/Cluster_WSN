@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0044)http://db.csail.mit.edu/labdata/labdata.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Intel Lab Data</title>
+  </head>
+
+  <body>
+    <h1>Intel Lab Data</h1>
+
+    This page contains information about data collected from 54 sensors deployed 
+in the <a href="http://www.intel-research.net/berkeley/index.asp">Intel Berkeley Research lab</a> between February 28th and April 5th, 2004.
+<p>
+<a href="http://www.xbow.com/Products/productsdetails.aspx?sid=73">Mica2Dot</a>
+sensors with <a href="http://www.xbow.com/Products/productsdetails.aspx?sid=84">weather
+boards</a> collected timestamped topology information, along with
+humidity, temperature, light and voltage values once every 31 seconds.
+Data was collected using the <a href="http://telegraph.cs.berkeley.edu/tinydb">TinyDB</a> in-network
+query processing system, built on the <a href="http://webs.cs.berkeley.edu/tos/">TinyOS</a>
+platform.
+</p><p>
+The sensors were arranged in the lab according to the diagram shown below:
+<img src="./Intel Lab Data - Descrição_files/lab.png" width="600">.</p><p>
+The x and y coordinates of sensors (in meters relative to the upper right corner
+of the lab)
+are given in <a href="http://db.csail.mit.edu/labdata/mote_locs.txt" t="">this file</a>.  The three columns correspond
+to mote id, x location, and y location.
+</p><p>
+<a href="http://db.csail.mit.edu/labdata/data.txt.gz">This file</a> includes a log of about 2.3 million readings collected
+from these sensors.  The file is 34MB gzipped, 150MB uncopressed.  The schema is as follows:
+
+</p><p>
+<table border="1">
+<tbody><tr>
+<td>date:yyyy-mm-dd</td>
+<td>time:hh:mm:ss.xxx</td>
+<td>epoch:int</td>
+<td>moteid:int</td>
+<td>temperature:real</td>
+<td>humidity:real</td>
+<td>light:real</td>
+<td>voltage:real</td>
+</tr></tbody></table>
+</p><p>
+
+In this case, epoch is a monotonically increasing sequence number from
+each mote.  Two readings from the same epoch number were produced from
+different motes at the same time.  There are some missing epochs in
+this data set.  Moteids range from 1-54; data from some motes may be
+missing or truncated. Temperature is in degrees Celsius.  Humidity is
+temperature corrected relative humidity, ranging from 0-100%.  Light
+is in Lux (a value of 1 Lux corresponds to moonlight, 400 Lux to a bright 
+office, and 100,000 Lux to
+full sunlight.)  Voltage is expressed in volts, ranging from 2-3; the
+batteries in this case were lithium ion cells which maintain a fairly
+constant voltage over their lifetime; note that variations in voltage
+are highly correlated with temperature.
+</p><p>
+Finally, we have <a href="http://db.csail.mit.edu/labdata/connectivity.txt">aggregate connectivity data</a>
+ averaged over all time.  This data consists of sender id, receiver id, and
+probability of a message from a sender successfully reaching a receiver.
+Note that this is not a symmetric relationship -- sensor A may hear B better than B
+hears A.
+
+
+</p><h2> Acknowledgments </h2>
+
+Data presented on this page was collected through the hard work of:
+Peter Bodik, Wei Hong, Carlos Guestrin, Sam Madden, Mark Paskin, and Romain
+Thibaux.  Mark aggregated the raw connectivity information over time
+and generated the beautiful network layout diagram.  Sam and Wei
+wrote TinyDB and other software for logging data.  Intel Berkeley provided hardware.
+The TinyOS team, in particular Joe Polastre and Rob Szewczyk, provided the
+software infrastructure and hardware designs that made this deployment
+possible.
+<p>
+Permission is granted to use or reproduce this data in any format or venue, although we request that you acknowledge our hard efforts in any published work.  
+</p><p>
+We make no warranties as to the quality or accuracy of any of the data 
+linked from this page. 
+
+    </p><hr>
+    <address><a href="mailto:madden@csail.mit.edu">Samuel Madden</a></address>
+<!-- Created: Wed May 26 14:19:42 EDT 2004 -->
+<!-- hhmts start -->
+Last modified: Tue Jun 2 17:45:14 EDT 2004
+<!-- hhmts end -->
+  
+
+</body></html>
