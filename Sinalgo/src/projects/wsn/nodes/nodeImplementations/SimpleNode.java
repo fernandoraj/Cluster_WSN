@@ -67,7 +67,7 @@ public class SimpleNode extends Node {
 	@NodePopupMethod(menuText="Construir Arvore de Roteamento")
 	public void construirRoteamento(){
 		this.proximoNoAteEstacaoBase = this;
-		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0);
+		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0); //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo
 		WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
 		timer.startRelative(1, this);
 	}
