@@ -1,5 +1,6 @@
 package projects.wsn.nodes.nodeImplementations;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,7 +10,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import projects.wsn.nodes.messages.WsnMsg;
-import projects.wsn.nodes.timers.WsnMessageTimer;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
@@ -22,10 +22,10 @@ public class SimpleNode extends Node
 	private Date data;
 
 	//Armazenar o nó que será usado para alcançar a Estação-Base
-	private Node proximoNoAteEstacaoBase;
+	protected Node proximoNoAteEstacaoBase;
 	
 	//Armazena o número de sequencia da última mensagem recebida
-	private Integer sequenceNumber = 0;
+	protected Integer sequenceNumber = 0;
 	
 	@Override
 	public void handleMessages(Inbox inbox) {
@@ -34,11 +34,13 @@ public class SimpleNode extends Node
 			if (message instanceof WsnMsg){
 				Boolean encaminhar = Boolean.TRUE;
 				WsnMsg wsnMessage = (WsnMsg) message;
-				if (wsnMessage.forwardingHop.equals(this)){ // A mensagem voltou. O nó deve descarta-la
+				if (wsnMessage.forwardingHop.equals(this)) // A mensagem voltou. O nó deve descarta-la
+				{ 
 					encaminhar = Boolean.FALSE;
 				}
 				else if (wsnMessage.tipoMsg == 0)// A mensagem é um flood. Devemos atualizar a rota
 				{ 
+					this.setColor(Color.BLUE);
 					if (proximoNoAteEstacaoBase == null)
 					{
 						proximoNoAteEstacaoBase = inbox.getSender();
@@ -71,18 +73,7 @@ public class SimpleNode extends Node
 
 	}
 */
-	
-	@NodePopupMethod(menuText="Definir Sink Node - Raiz de Roteamento")
-	public void construirRoteamento(){
-		this.proximoNoAteEstacaoBase = this;
-		//WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0); //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo
-		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, 100, "t"); //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo
-		WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
-		SinkNode sink = new SinkNode();
-		//sink = this;
-		timer.startRelative(1, this);
-	}
-	
+		
 	@Override
 	public void preStep() {
 		// TODO Auto-generated method stub
