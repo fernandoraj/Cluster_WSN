@@ -15,15 +15,16 @@ import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 
-public class SimpleNode extends Node {
+public class SimpleNode extends Node 
+{
 	
 	private double value;
 	private Date data;
 
-	//Armazenar o n� que sera usado para alcan�ar a Estacao-Base
+	//Armazenar o nó que será usado para alcançar a Estação-Base
 	private Node proximoNoAteEstacaoBase;
 	
-	//Armazena o n�mero de sequencia da �ltima mensagem recebida
+	//Armazena o número de sequencia da última mensagem recebida
 	private Integer sequenceNumber = 0;
 	
 	@Override
@@ -33,18 +34,25 @@ public class SimpleNode extends Node {
 			if (message instanceof WsnMsg){
 				Boolean encaminhar = Boolean.TRUE;
 				WsnMsg wsnMessage = (WsnMsg) message;
-				if (wsnMessage.forwardingHop.equals(this)){ // A mensagem voltou. O n� deve descarta-la
+				if (wsnMessage.forwardingHop.equals(this)){ // A mensagem voltou. O nó deve descarta-la
 					encaminhar = Boolean.FALSE;
-				}else if (wsnMessage.tipoMsg == 0){ // A mensagem � um flood. Devemos atualizar a rota
-					if (proximoNoAteEstacaoBase == null){
+				}
+				else if (wsnMessage.tipoMsg == 0)// A mensagem é um flood. Devemos atualizar a rota
+				{ 
+					if (proximoNoAteEstacaoBase == null)
+					{
 						proximoNoAteEstacaoBase = inbox.getSender();
 						sequenceNumber = wsnMessage.sequenceID;
-					}else if (sequenceNumber < wsnMessage.sequenceID){ 
+					}
+					else if (sequenceNumber < wsnMessage.sequenceID)
+					{ 
 					//Recurso simples para evitar loop.
-					//Exemplo: Noh A transmite em brodcast. N� B recebe a msg e retransmite em broadcast.
-					//Consequentemente, n� A ir� receber a msg. Sem esse condicional, n� A iria retransmitir novamente, gerando um loop.
+					//Exemplo: Nó A transmite em brodcast. Nó B recebe a msg e retransmite em broadcast.
+					//Consequentemente, nó A irá receber a msg. Sem esse condicional, nó A iria retransmitir novamente, gerando um loop.
 						sequenceNumber = wsnMessage.sequenceID;
-					}else{
+					}
+					else
+					{
 						encaminhar = Boolean.FALSE;
 					}
 				} //if (wsnMessage.tipoMsg == 0)
@@ -64,11 +72,14 @@ public class SimpleNode extends Node {
 	}
 */
 	
-	@NodePopupMethod(menuText="Construir Arvore de Roteamento")
+	@NodePopupMethod(menuText="Definir Sink Node - Raiz de Roteamento")
 	public void construirRoteamento(){
 		this.proximoNoAteEstacaoBase = this;
-		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0); //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo
+		//WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0); //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo
+		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, 100, "t"); //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo
 		WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
+		SinkNode sink = new SinkNode();
+		//sink = this;
 		timer.startRelative(1, this);
 	}
 	
@@ -123,7 +134,7 @@ public class SimpleNode extends Node {
 		return false;
 	}
 	
-	private  boolean roundNumber(String data,  int round){
+	private  boolean roundNumber(String data, int round){
 		if(!data.equals("")){
 			int roundReceived = Integer.parseInt(data);
 			if (round == roundReceived)
@@ -165,7 +176,7 @@ public class SimpleNode extends Node {
 		return 0;
 	}
 	
-	private  Date parserCalendarHoras(String AnoMesDia, String hora){
+	private Date parserCalendarHoras(String AnoMesDia, String hora){
 		String[] datas = AnoMesDia.split("-");
 		String[] horas = hora.split(":");
 		String certo = "";
