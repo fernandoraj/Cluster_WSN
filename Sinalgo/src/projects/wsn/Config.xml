@@ -188,10 +188,10 @@
 		<showMessageAnimations value="true" />
 
 		<!--Width of the envelope (when the message animation is enabled)-->
-		<messageAnimationEnvelopeWidth value="30.0" />
+		<messageAnimationEnvelopeWidth value="1.0" />
 
 		<!--Height of the envelope (when the message animation is enabled)-->
-		<messageAnimationEnvelopeHeight value="20.0" />
+		<messageAnimationEnvelopeHeight value="1.0" />
 
 		<!--Color of the envelope (when the message animation is enabled)-->
 		<messageAnimationEnvelopeColor value="r=255,g=255,b=0" />
