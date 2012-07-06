@@ -5,37 +5,64 @@ import sinalgo.nodes.messages.Message;
 
 public class WsnMsg extends Message {
 	
-	//Identificador da mensagem
+	/**
+	 *  Identificador da mensagem
+	 */
 	public Integer sequenceID;
 	
-	//Tempo de vida do Pacote
+	/**
+	 * Tempo de vida do Pacote
+	 */
 	public Integer ttl;
 	
-	//No de destino
+	/**
+	 * No de destino
+	 */
 	public Node destino;
 	
-	//No de origem
+	/**
+	 * No de origem
+	 */
 	public Node origem;
 	
-	//No que vai reencaminhar a mensagem
+	/**
+	 * No que vai reencaminhar a mensagem
+	 */
 	public Node forwardingHop;
 	
-	//Numero de saltos até o destino
+	/**
+	 * Numero de saltos até o destino
+	 */
 	public Integer saltosAteDestino;
 	
-	//Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
+	/**
+	 * Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
+	 */
 	public Integer tipoMsg = 0;
 	
-	//Numero de dados sensoreados por time slot (Tamanho do time slot) 
+	/**
+	 * Numero de dados sensoreados por time slot (Tamanho do time slot) 
+	 */
 	public Integer sizeTimeSlot = 0;
 	
-	//Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
-	public String typeDataSensed = null;
+	/**
+	 * Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
+	 */
+	public String dataSensedType = null;
 	
-	//Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro)
+	/**
+	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro)
+	 */
 	public double thresholdError = 0.0;
 	
-	//Construtor básico da Classe
+	/**
+	 * Construtor básico da Classe
+	 * @param seqID Identificador da mensagem
+	 * @param origem No de origem
+	 * @param destino No de destino
+	 * @param forwardingHop No que vai reencaminhar a mensagem
+	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
+	 */
 	public WsnMsg(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo) {
 		this.sequenceID = seqID;
 		this.origem = origem;
@@ -44,26 +71,45 @@ public class WsnMsg extends Message {
 		this.tipoMsg = tipo;
 	}
 
-	//Construtor mediano da Classe
-	public WsnMsg(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String typeDS) {
+	/**
+	 * Construtor mediano da Classe //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer
+	 * @param seqID Identificador da mensagem
+	 * @param origem No de origem
+	 * @param destino No de destino
+	 * @param forwardingHop No que vai reencaminhar a mensagem
+	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
+	 * @param sizeTS Numero de dados sensoreados por time slot (Tamanho do time slot)
+	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
+	 */
+	public WsnMsg(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType) {
 		this.sequenceID = seqID;
 		this.origem = origem;
 		this.destino = destino;
 		this.forwardingHop = forwardingHop;
 		this.tipoMsg = tipo;
 		this.sizeTimeSlot = sizeTS;
-		this.typeDataSensed = typeDS;
+		this.dataSensedType = dataSensedType;
 	}
 
-	//Construtor estendido da Classe
-	public WsnMsg(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String typeDS, double thresholdEr) {
+	/**
+	 * Construtor estendido da Classe
+	 * @param seqID Identificador da mensagem
+	 * @param origem No de origem
+	 * @param destino No de destino
+	 * @param forwardingHop No que vai reencaminhar a mensagem
+	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
+	 * @param sizeTS Numero de dados sensoreados por time slot (Tamanho do time slot)
+	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
+	 * @param thresholdEr Limiar de erro aceitavel
+	 */
+	public WsnMsg(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType, double thresholdEr) {
 		this.sequenceID = seqID;
 		this.origem = origem;
 		this.destino = destino;
 		this.forwardingHop = forwardingHop;
 		this.tipoMsg = tipo;
 		this.sizeTimeSlot = sizeTS;
-		this.typeDataSensed = typeDS;
+		this.dataSensedType = dataSensedType;
 		this.thresholdError = thresholdEr;
 	}
 	
@@ -74,7 +120,7 @@ public class WsnMsg extends Message {
 		msg.ttl = this.ttl;
 		msg.saltosAteDestino = this.saltosAteDestino;
 		msg.sizeTimeSlot = this.sizeTimeSlot;
-		msg.typeDataSensed = this.typeDataSensed;
+		msg.dataSensedType = this.dataSensedType;
 		msg.thresholdError = this.thresholdError;
 		return msg;
 	}
