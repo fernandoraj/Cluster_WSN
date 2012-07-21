@@ -67,8 +67,8 @@ import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 import sinalgo.nodes.messages.NackBox;
 import sinalgo.nodes.messages.Packet;
-import sinalgo.nodes.messages.PacketCollection;
 import sinalgo.nodes.messages.Packet.PacketType;
+import sinalgo.nodes.messages.PacketCollection;
 import sinalgo.nodes.timers.Timer;
 import sinalgo.runtime.GUIRuntime;
 import sinalgo.runtime.Global;
@@ -1304,6 +1304,13 @@ public abstract class Node implements DoublyLinkedListEntry{
 		}
 	}
 	
+	public void teleTransporte(Message msg, Node target)
+	{
+		Edge e = target.getEdge();
+		Packet sentP = sendMessage(msg, e, e.startNode, e.endNode, intensity);
+		sentP.type = PacketType.DUMMY;
+	}
+	
 	/**
 	 * Sends a message in the asynchronous simulation mode
 	 * @param msg The message to be sent
@@ -1471,5 +1478,13 @@ public abstract class Node implements DoublyLinkedListEntry{
 	public DLLFingerList getDoublyLinkedListFinger() {
 		 // <b>This method is framework internal and should not be used by the project developer.</b> 
 		return dllFingerList;
+	}
+	
+	public Edge getEdge() {
+		edgeIteratorInstance.reset();
+		while( edgeIteratorInstance.hasNext()){
+			return edgeIteratorInstance.next();
+		}
+		return null;
 	}
 }
