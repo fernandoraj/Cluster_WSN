@@ -56,6 +56,65 @@ public class WsnMsg extends Message {
 	public double thresholdError = 0.0;
 	
 	/**
+	 * Representa os coeficientes (A e B) da equação (de regressão) a serem enviados para o nó correspondente
+	 * @author Fernando
+	 */
+	public class coefEquation
+	{
+		double coefA;
+		double coefB;
+	}
+	
+	/**
+	 * Indica se a mensagem teve seus coeficientes da equação de regressão configurados
+	 */
+	private boolean hasCoefs = false;
+	
+	/**
+	 * Método "get" para o parâmetro hasCoefs
+	 * @return Valor de hasCoefs, indicando se a mensagem já teve seus coeficientes configurados
+	 */
+	public boolean isCoefs()
+	{
+		return hasCoefs;
+	}
+	
+	/**
+	 * Armazena os coeficientes (A e B) da equação (de regressão)
+	 */
+	private coefEquation coefs;
+	
+	/**
+	 * Lê o coeficiente A da equação
+	 * @return valor do coeficiente A
+	 */
+	public double getCoefA()
+	{
+		return coefs.coefA;
+	}
+	
+	/**
+	 * Lê o coeficiente B da equação
+	 * @return valor do coeficiente B
+	 */
+	public double getCoefB()
+	{
+		return coefs.coefB;
+	}
+	
+	/**
+	 * Configura os valores dos coeficientes (A e B) da equação
+	 * @param A valor do coeficiente A
+	 * @param B valor do coeficiente B
+	 */
+	public void setCoefs(double A, double B)
+	{
+		hasCoefs = true;
+		coefs.coefA = A;
+		coefs.coefB = B;
+	}
+
+	/**
 	 * Construtor básico da Classe
 	 * @param seqID Identificador da mensagem
 	 * @param origem No de origem

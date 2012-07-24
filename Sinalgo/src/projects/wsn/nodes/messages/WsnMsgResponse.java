@@ -1,9 +1,11 @@
 package projects.wsn.nodes.messages;
 
+import java.util.Vector;
+
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 
-public class WsnMsgResponse extends WsnMsg {
+public class WsnMsgResponse extends Message {
 	
 	/**
 	 *  Identificador da mensagem
@@ -54,6 +56,90 @@ public class WsnMsgResponse extends WsnMsg {
 	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro)
 	 */
 	public double thresholdError = 0.0;
+	
+	private boolean naoLido = true;
+	
+	private double[] values;
+	
+	private double[] times;
+	
+	private char[] types;
+	
+	public class DataRecord
+	{
+		char type;
+		double value;
+		double time;
+	}
+	
+	public Vector<DataRecord> dataRecordItens;
+	
+	public void addDataRecordItens(char typ, double val, double tim)
+	{
+		if (this.dataRecordItens == null)
+		{
+			this.dataRecordItens = new Vector<DataRecord>();
+		}
+		DataRecord dr = new DataRecord();
+		
+		dr.type = typ;
+		dr.value = val;
+		dr.time = tim;
+		
+		dataRecordItens.add(dr);
+		naoLido = true;
+	}
+	
+	private void lerDados()
+	{
+		if (naoLido)
+		{
+			int tam = 0;
+			if (dataRecordItens != null)
+			{
+				tam = dataRecordItens.size();
+			}
+			values = new double[tam];
+			times = new double[tam];
+			types = new char[tam];
+			
+			for (int i=0; i<tam; i++)
+			{
+				if (dataRecordItens.get(i) != null)
+				{
+					values[i] = ((DataRecord)dataRecordItens.get(i)).value;
+					times[i] = ((DataRecord)dataRecordItens.get(i)).time;
+					types[i] = ((DataRecord)dataRecordItens.get(i)).type;
+				}
+				else
+				{
+					values[i] = 0.0;
+					times[i] = 0.0;
+					types[i] = ' ';
+				}
+			}
+			
+			naoLido = false;
+		}
+	}
+	
+	public double[] getDataRecordValues()
+	{
+		lerDados();
+		return values;
+	}
+
+	public double[] getDataRecordTimes()
+	{
+		lerDados();
+		return times;
+	}
+
+	public char[] getDataRecordTypes()
+	{
+		lerDados();
+		return types;
+	}
 	
 	/**
 	 * Construtor básico da Classe
@@ -115,7 +201,6 @@ public class WsnMsgResponse extends WsnMsg {
 	
 	@Override
 	public Message clone() {
-		// TODO Auto-generated method stub
 		WsnMsgResponse msg = new WsnMsgResponse(this.sequenceID, this.origem, this.destino, this.forwardingHop, this.tipoMsg);
 		msg.ttl = this.ttl;
 		msg.saltosAteDestino = this.saltosAteDestino;
