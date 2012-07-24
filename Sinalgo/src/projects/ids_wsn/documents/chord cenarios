@@ -1,0 +1,44 @@
+1) 10 monitores, 100 normal nodes, 30 simpleEvent e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\1baseStation.pos) 
+             -gen 90 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\100basicnodes.pos) 
+             -gen 30 ids_wsn:SimpleEvent PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\30simpleevents.pos)
+             -gen 10 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\10MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComEventosEMonitores    
+             			
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+1) 10 monitores, 90 normal nodes, 30 simpleEvent e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\1baseStation.pos) 
+             -gen 90 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\100basicnodes.pos) 
+             -gen 30 ids_wsn:SimpleEvent PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\30simpleevents.pos)
+             -gen 10 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\10MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComEventosEMonitores    
+             			
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+1) 10 monitores, 100 normal nodes, 30 simpleEvent e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\1baseStation.pos) 
+             -gen 90 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\100basicnodes.pos) 
+             -gen 30 ids_wsn:SimpleEvent PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\30simpleevents.pos)
+             -gen 10 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\10MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComEventosEMonitores    
+             			
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+1) 10 monitores, 100 normal nodes, 30 simpleEvent e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\1baseStation.pos) 
+             -gen 90 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\100basicnodes.pos) 
+             -gen 30 ids_wsn:SimpleEvent PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\30simpleevents.pos)
+             -gen 10 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\10MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComEventosEMonitores    
+             			
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			

@@ -1,0 +1,147 @@
+Number of nodes: 10
+
+------------------------------------------------------
+General Config
+------------------------------------------------------
+Command Line arguments: -project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\4basestation.pos) -gen 100 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\100basicnodes.pos) -gen 30 ids_wsn:SimpleEvent PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\30simpleevents.pos) -gen 10 ids_wsn:MonitorNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\10monitors.pos) -overwrite dimX=700 dimY=700 NetworkLayer/UseFuzzyRouting=no NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV SimulationName=rede100nosSemFuzzy 
+Java VM arguments: -Xmx800m -Dfile.encoding=Cp1252 
+Class path: D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\binaries\bin;D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\binaries\jdom.jar;D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\jFuzzyLogic_2.0.6.jar
+------------------------------------------------------
+Configuration settings
+------------------------------------------------------
+ Simulation Area
+    dimensions = 2
+    dimX = 700
+    dimY = 700
+    dimZ = 500
+ Simulation
+    asynchronousMode = false
+    mobility = false
+    interference = false
+    interferenceIsAdditive = true
+    canReceiveWhileSending = true
+    canReceiveMultiplePacketsInParallel = true
+    edgeType = sinalgo.nodes.edges.Edge
+    exitOnTerminationInGUI = false
+    initializeConnectionsOnStartup = false
+    refreshRate = 1
+    generateNAckMessages = false
+    handleEmptyEventQueue = true
+    javaCmd = java
+    javaVMmaxMem = 500
+ Random number generators
+    useSameSeedAsInPreviousRun = false
+    useFixedSeed = false
+    fixedSeed = 5457667746235628611
+ Logging
+    logFileName = logfile.txt
+    outputToConsole = true
+    logToTimeDirectory = true
+    logConfiguration = true
+    eagerFlush = false
+ GUI
+    extendedControl = true
+    drawArrows = false
+    zoomStep = 1.2
+    wheelZoomStep = 1.05
+    minZoomFactor = 0.05
+    draw3DGraphNodesInProperOrder = true
+    usePerspectiveView = true
+    perspectiveViewDistance = 40
+ Background map in 2D
+    useMap = false
+    map = images/map.jpg
+ Models
+    DefaultMessageTransmissionModel = ConstantTime
+    DefaultConnectivityModel = UDG
+    DefaultDistributionModel = Random
+    DefaultInterferenceModel = NoInterference
+    DefaultMobilityModel = NoMobility
+    DefaultReliabilityModel = ReliableDelivery
+    DefaultNodeImplementation = DummyNode
+    showModelsOfAllProjects = false
+ Node storage, position transformation
+    guiPositionTransformation2D = sinalgo.gui.transformation.Transformation2D
+    guiPositionTransformation3D = sinalgo.gui.transformation.Transformation3D
+    nodeCollection2D = sinalgo.runtime.nodeCollection.Geometric2DNodeCollection
+    nodeCollection3D = sinalgo.runtime.nodeCollection.Geometric3DNodeCollection
+ Export Settings
+    epsToPdfCommand = epstopdf %s
+    epsDrawDeploymentAreaBoundingBox = true
+    epsDrawBackgroundWhite = true
+ Animation Settings
+    showMessageAnimations = false
+    messageAnimationEnvelopeWidth = 30.0
+    messageAnimationEnvelopeHeight = 20.0
+    messageAnimationEnvelopeColor = r=255,g=255,b=0
+ Diverse Settings
+    showOptimizationHints = true
+    drawEdges = true
+    drawNodes = true
+    shownEventQueueSize = 10
+    outputTextFieldHeight = 200
+    arrowLength = 8
+    arrowWidth = 1
+    defaultRoundNumber = 1
+------------------------------------------------------
+Custom settings
+------------------------------------------------------
+ attack/exhaustion/quantity = 10
+ attack/exhaustion/timer = 1
+ attack/repetition/quantity = 1
+ energy/energymodel = projects.ids_wsn.nodeDefinitions.energy.simple.SimpleEnergy
+ geometricnodecollection/rmax = 100
+ logfiles/deadnodes = deadnodes
+ logfiles/general = idswsn
+ messagetransmission/constanttime = 1
+ monitor/chord/ring/size = 4
+ monitor/inference/internalbuffer = 30
+ monitor/inference/numberofpackets = 10
+ monitor/rules/interval/max = 4
+ monitor/rules/interval/min = 2
+ networklayer/multipathbalanced = no
+ networklayer/numbersofroutesfuzzy = 3
+ networklayer/routingprotocolname = projects.ids_wsn.nodeDefinitions.routing.DSDV
+ networklayer/usefuzzyrouting = no
+ node/defaultsize = 10
+ qudg/connectionprobability = 0.6
+ qudg/probabilitytype = constant
+ qudg/rmax = 50
+ qudg/rmin = 30
+ randomdirection/movetime/distribution = Uniform
+ randomdirection/movetime/max = 20
+ randomdirection/movetime/min = 5
+ randomdirection/nodespeed/distribution = Gaussian
+ randomdirection/nodespeed/mean = 10
+ randomdirection/nodespeed/variance = 20
+ randomdirection/waitingtime/distribution = Poisson
+ randomdirection/waitingtime/lambda = 10
+ randomwaypoint/speed/distribution = Gaussian
+ randomwaypoint/speed/mean = 10
+ randomwaypoint/speed/variance = 20
+ randomwaypoint/waitingtime/distribution = Poisson
+ randomwaypoint/waitingtime/lambda = 10
+ simulationname = rede100nosSemFuzzy
+ sinr/alpha = 2
+ sinr/beta = 0.7
+ sinr/noise = 0
+ udg/rmax = 100
+------------------------------------------------------
+Seed for Random Number Generators
+------------------------------------------------------
+ Randomly selected seed: 5457667746235628611
+------------------------------------------------------
+End of settings
+------------------------------------------------------
+
+#####----- start of node posiitons -----#####
+298.741935483871, 183.31891495601175, 0.0
+446.98130498533726, 148.23936950146629, 0.0
+544.2987536656892, 370.0326246334311, 0.0
+182.69794721407624, 122.14076246334311, 0.0
+519.4035923753667, 530.7195747800587, 0.0
+129.00219941348973, 238.76722873900295, 0.0
+409.6385630498534, 492.24523460410563, 0.0
+129.00219941348973, 371.1642228739003, 0.0
+152.76576246334312, 594.0890762463343, 0.0
+325.900293255132, 360.97983870967744, 0.0

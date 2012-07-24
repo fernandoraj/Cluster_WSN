@@ -1,0 +1,132 @@
+Number of nodes: 4
+
+------------------------------------------------------
+General Config
+------------------------------------------------------
+Command Line arguments: -project ids_wsn -gen 1 ids_wsn:BaseStation Random 
+Java VM arguments: -agentlib:jdwp=transport=dt_socket,suspend=y,address=localhost:49392 -Xmx800m -Dfile.encoding=UTF-8 
+Class path: /home/marvin/Documents/Aulas/mestrado/ferramentas/sinalgo/binaries/bin:/home/marvin/Documents/Aulas/mestrado/ferramentas/sinalgo/binaries/jdom.jar:/home/marvin/Documents/Aulas/mestrado/ferramentas/sinalgo/lib/jFuzzyLogic_2.0.6.jar
+------------------------------------------------------
+Configuration settings
+------------------------------------------------------
+ Simulation Area
+    dimensions = 2
+    dimX = 700
+    dimY = 700
+    dimZ = 500
+ Simulation
+    asynchronousMode = false
+    mobility = false
+    interference = false
+    interferenceIsAdditive = true
+    canReceiveWhileSending = true
+    canReceiveMultiplePacketsInParallel = true
+    edgeType = sinalgo.nodes.edges.Edge
+    exitOnTerminationInGUI = false
+    initializeConnectionsOnStartup = false
+    refreshRate = 1
+    generateNAckMessages = false
+    handleEmptyEventQueue = true
+    javaCmd = java
+    javaVMmaxMem = 500
+ Random number generators
+    useSameSeedAsInPreviousRun = false
+    useFixedSeed = false
+    fixedSeed = -3174118058225887049
+ Logging
+    logFileName = logfile.txt
+    outputToConsole = true
+    logToTimeDirectory = true
+    logConfiguration = true
+    eagerFlush = false
+ GUI
+    extendedControl = true
+    drawArrows = false
+    zoomStep = 1.2
+    wheelZoomStep = 1.05
+    minZoomFactor = 0.05
+    draw3DGraphNodesInProperOrder = true
+    usePerspectiveView = true
+    perspectiveViewDistance = 40
+ Background map in 2D
+    useMap = false
+    map = images/map.jpg
+ Models
+    DefaultMessageTransmissionModel = ConstantTime
+    DefaultConnectivityModel = UDG
+    DefaultDistributionModel = Random
+    DefaultInterferenceModel = NoInterference
+    DefaultMobilityModel = NoMobility
+    DefaultReliabilityModel = ReliableDelivery
+    DefaultNodeImplementation = DummyNode
+    showModelsOfAllProjects = false
+ Node storage, position transformation
+    guiPositionTransformation2D = sinalgo.gui.transformation.Transformation2D
+    guiPositionTransformation3D = sinalgo.gui.transformation.Transformation3D
+    nodeCollection2D = sinalgo.runtime.nodeCollection.Geometric2DNodeCollection
+    nodeCollection3D = sinalgo.runtime.nodeCollection.Geometric3DNodeCollection
+ Export Settings
+    epsToPdfCommand = epstopdf %s
+    epsDrawDeploymentAreaBoundingBox = true
+    epsDrawBackgroundWhite = true
+ Animation Settings
+    showMessageAnimations = false
+    messageAnimationEnvelopeWidth = 30.0
+    messageAnimationEnvelopeHeight = 20.0
+    messageAnimationEnvelopeColor = r=255,g=255,b=0
+ Diverse Settings
+    showOptimizationHints = true
+    drawEdges = true
+    drawNodes = true
+    shownEventQueueSize = 10
+    outputTextFieldHeight = 200
+    arrowLength = 8
+    arrowWidth = 1
+    defaultRoundNumber = 1
+------------------------------------------------------
+Custom settings
+------------------------------------------------------
+ attack/repetition/quantity = 1
+ energy/energymodel = projects.ids_wsn.nodeDefinitions.energy.simple.SimpleEnergy
+ geometricnodecollection/rmax = 100
+ logfiles/deadnodes = deadnodes.log
+ logfiles/general = idswsn.log
+ messagetransmission/constanttime = 1
+ monitor/inference/internalbuffer = 5
+ monitor/inference/numberofpackets = 10
+ networklayer/routingprotocol = projects.ids_wsn.nodeDefinitions.routing.fuzzy.FuzzyRouting
+ node/defaultsize = 10
+ qudg/connectionprobability = 0.6
+ qudg/probabilitytype = constant
+ qudg/rmax = 50
+ qudg/rmin = 30
+ randomdirection/movetime/distribution = Uniform
+ randomdirection/movetime/max = 20
+ randomdirection/movetime/min = 5
+ randomdirection/nodespeed/distribution = Gaussian
+ randomdirection/nodespeed/mean = 10
+ randomdirection/nodespeed/variance = 20
+ randomdirection/waitingtime/distribution = Poisson
+ randomdirection/waitingtime/lambda = 10
+ randomwaypoint/speed/distribution = Gaussian
+ randomwaypoint/speed/mean = 10
+ randomwaypoint/speed/variance = 20
+ randomwaypoint/waitingtime/distribution = Poisson
+ randomwaypoint/waitingtime/lambda = 10
+ sinr/alpha = 2
+ sinr/beta = 0.7
+ sinr/noise = 0
+ udg/rmax = 100
+------------------------------------------------------
+Seed for Random Number Generators
+------------------------------------------------------
+ Randomly selected seed: -3174118058225887049
+------------------------------------------------------
+End of settings
+------------------------------------------------------
+
+#####----- start of node posiitons -----#####
+73.36244541484716, 85.58951965065502, 0.0
+86.60844250363901, 619.505094614265, 0.0
+611.353711790393, 627.6564774381368, 0.0
+614.410480349345, 92.72197962154294, 0.0

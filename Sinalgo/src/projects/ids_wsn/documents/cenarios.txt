@@ -1,0 +1,51 @@
+1) REDE OPERANDO NORMALMENTE SEM MONITORES
+
+-project ids_wsn -gen 4 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn4basestation.pos) 
+             -gen 100 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn100basicnodes.pos) 
+             -gen 30 ids_wsn:SimpleEvent PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn30simpleevents.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=yes
+             		    NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.fuzzy.FuzzyRouting
+                        SimulationName=rede100nosComFuzzy
+             
+-project ids_wsn -gen 4 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn4basestation_area2.pos) 
+             -gen 200 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn200basicnodes.pos) 
+             -gen 30 ids_wsn:SimpleEvent PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn30simpleevents.pos)
+             -overwrite dimX=900 dimY=900 NetworkLayer/UseFuzzyRouting=yes SimulationName=rede200nosComFuzzy
+             
+
+-project ids_wsn -gen 4 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn4basestation_area3.pos) 
+             -gen 500 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn500basicnodes.pos) 
+             -gen 30 ids_wsn:SimpleEvent Random
+             -overwrite dimX=1200 dimY=1200 NetworkLayer/UseFuzzyRouting=yes      
+             
+             
+2) Sem Fuzzy
+
+-project ids_wsn -gen 4 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\4basestation.pos) 
+             -gen 100 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\100basicnodes.pos) 
+             -gen 30 ids_wsn:SimpleEvent PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\30simpleevents.pos)
+             -gen 10 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\10MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=rede100nosSemFuzzy    
+             			
+ 3) Multi-Path Balanceado
+ -project ids_wsn -gen 4 ids_wsn:BaseStation PositionFile (/home/marvin/Documents/Aulas/mestrado/ferramentas/sinalgo/src/projects/ids_wsn/4basestation.pos) 
+             -gen 100 ids_wsn:NormalNode PositionFile (/home/marvin/Documents/Aulas/mestrado/ferramentas/sinalgo/src/projects/ids_wsn/100basicnodes.pos) 
+             -gen 30 ids_wsn:SimpleEvent PositionFile  (/home/marvin/Documents/Aulas/mestrado/ferramentas/sinalgo/src/projects/ids_wsn/30simpleevents.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=yes
+             		    NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.fuzzy.FuzzyRouting
+             		    NetworkLayer/MultiPathBalanced=yes
+                        SimulationName=rede100nosComFuzzy   
+                        
+                        --- Utilizar nó 15 
+                        --- quando for testar o roteamento com fuzzy, configurar a estação base
+                        para utilizar o tempo 700 para retransmitir a mensagem de sinalização 
+                        
+-project wsn -gen 54 wsn:SimpleNode PositionFile (C:\Users\Fernando\Documents\My Classes\UFC\Doutorado\Doutorado - PPGIA\Artigos\Redes de Sensores\Ferramentas\data\mote_locs_formatado.txt) 
+             -gen 1 wsn:SinkNode Random  
+             -overwrite dimX=40 dimY=30 
+                        SimulationName=WsnClusterWithIntelLabsDataset
