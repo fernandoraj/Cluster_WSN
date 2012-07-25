@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import projects.wsn.nodes.messages.WsnMsg;
 import projects.wsn.nodes.messages.WsnMsgResponse;
 import projects.wsn.nodes.timers.WsnMessageTimer;
+import projects.wsn.utils.FileHandler;
 import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
@@ -48,6 +49,11 @@ public class SinkNode extends SimpleNode
 		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedType); 
 		WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
 		timer.startRelative(1, this);
+	}
+	
+	@NodePopupMethod(menuText="Load Sensor Readings from File")
+	public void loadSensorReadingsFromFile(){
+		FileHandler.loadFileLines();
 	}
 	
 	@Override
