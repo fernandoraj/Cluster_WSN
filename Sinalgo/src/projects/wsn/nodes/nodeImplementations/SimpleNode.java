@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import projects.wsn.nodes.messages.WsnMsg;
@@ -171,6 +170,16 @@ public class SimpleNode extends Node
 		return false;
 	}
 	
+	private boolean isGreaterSensorId(String data, int sensor)
+	{
+		if(!data.equals("")){
+			int idReceived = Integer.parseInt(data);
+			if (idReceived > sensor)
+				return true;
+		}
+		return false;
+	}
+	
 //	private boolean isBetween(String data, int round)
 //	{
 //		if(!data.equals("")){
@@ -191,6 +200,16 @@ public class SimpleNode extends Node
 		return false;
 	}
 
+	private boolean isGreaterRoundNumber(String data, int maxRound)
+	{
+		if(!data.equals("")){
+			int roundRead = Integer.parseInt(data);
+			if (roundRead > maxRound)
+				return true;
+		}
+		return false;
+	}
+	
 	public class DataRecord
 	{
 		double value;
@@ -220,18 +239,26 @@ public class SimpleNode extends Node
 		}
 		while ((linha != null) && (cont<sizeTimeSlot))
 		{
-			System.out.println("Entrou no while ((linha != null) && (!found)): linha ="+linha);
+//			System.out.println("Entrou no while ((linha != null) && (!found)): linha = "+linha);
 			String linhas[] = linha.split(" ");
-			System.out.println("round = "+round);
-			System.out.println("sensorId = "+sensorId);
-			System.out.println("");
+//			System.out.println("round = "+round);
+//			System.out.println("sensorId = "+sensorId);
+//			System.out.println("ultimoRoundLido = "+ultimoRoundLido);
+//			System.out.println("(ultimoRoundLido + sizeTimeSlot) = "+(ultimoRoundLido + sizeTimeSlot));
+//			System.out.println("cont = "+cont);
+//			System.out.println("");
 			if (linhas.length > 4 && comparaSensorId(linhas[3], sensorId) && isBetweenRoundNumber(linhas[2], ultimoRoundLido, (ultimoRoundLido + sizeTimeSlot)))
 			{
-				System.out.println("Entrou no if (linhas.length > 4 ...");
+//				System.out.println("Entrou no if (linhas.length > 4 ...");
 				cont++;
 				value = Double.parseDouble(linhas[medida]);
 				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
 				wsnMsgResp.addDataRecordItens(type, value, quantTime);
+			}
+			if (isGreaterSensorId(linhas[3], sensorId) || (comparaSensorId(linhas[3], sensorId) && isGreaterRoundNumber(linhas[2], (ultimoRoundLido + sizeTimeSlot))))
+			{
+				System.out.println("\n ENTROU NO BREAK !!! \n");
+				break;
 			}
 			linha = leitura.readLine();
 		}
@@ -271,25 +298,27 @@ public class SimpleNode extends Node
 		return 0;
 	}
 	
-	private Date parserCalendarHoras(String AnoMesDia, String hora){
-		String[] datas = AnoMesDia.split("-");
-		String[] horas = hora.split(":");
-		String certo = "";
-		String millesegundos = "";
-		for (String mille : horas){
-			if(mille.contains(".")){
-				String correto = mille.substring(0,mille.indexOf("."));
-				millesegundos = mille.substring(mille.indexOf(".")+1, mille.length());
-				certo = correto;
-			}
-		}
-		horas[2] = certo;
-		GregorianCalendar gc = new GregorianCalendar(Integer.parseInt(datas[0]), Integer.parseInt(datas[1]) -1, Integer.parseInt(datas[2]),Integer.parseInt(horas[0]),Integer.parseInt(horas[1]), Integer.parseInt(horas[2]));
-		Date data = new Date(gc.getTimeInMillis() + Long.parseLong(millesegundos)/1000);
-		return data;
-	}
+//	private Date parserCalendarHoras(String AnoMesDia, String hora)
+//	{
+//		String[] datas = AnoMesDia.split("-");
+//		String[] horas = hora.split(":");
+//		String certo = "";
+//		String millesegundos = "";
+//		for (String mille : horas){
+//			if(mille.contains(".")){
+//				String correto = mille.substring(0,mille.indexOf("."));
+//				millesegundos = mille.substring(mille.indexOf(".")+1, mille.length());
+//				certo = correto;
+//			}
+//		}
+//		horas[2] = certo;
+//		GregorianCalendar gc = new GregorianCalendar(Integer.parseInt(datas[0]), Integer.parseInt(datas[1]) -1, Integer.parseInt(datas[2]),Integer.parseInt(horas[0]),Integer.parseInt(horas[1]), Integer.parseInt(horas[2]));
+//		Date data = new Date(gc.getTimeInMillis() + Long.parseLong(millesegundos)/1000);
+//		return data;
+//	}
 
-	private long parseCalendarHoras(String AnoMesDia, String hora){
+	private long parseCalendarHoras(String AnoMesDia, String hora)
+	{
 		String[] datas = AnoMesDia.split("-");
 		String[] horas = hora.split(":");
 		String certo = "";
@@ -305,5 +334,12 @@ public class SimpleNode extends Node
 		GregorianCalendar gc = new GregorianCalendar(Integer.parseInt(datas[0]), Integer.parseInt(datas[1]) -1, Integer.parseInt(datas[2]),Integer.parseInt(horas[0]),Integer.parseInt(horas[1]), Integer.parseInt(horas[2]));
 		long quantTime = (gc.getTimeInMillis() + Long.parseLong(millesegundos)/1000);
 		return quantTime;
+	}
+	
+	private double fazerPredicao(double A, double B, double tempo)
+	{
+		double time;
+		time = A + B*tempo;
+		return time;
 	}
 }
