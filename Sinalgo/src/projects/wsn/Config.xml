@@ -225,28 +225,41 @@
 
 	</Framework>
 	<Custom>
-<MessageTransmission ConstantTime="1"/>
+		<!--***********************************************************************-->
+		<!--  Sinalgo Custom Settings                                              -->
+		<!--***********************************************************************-->
+		<MessageTransmission ConstantTime="1"/>
+		
+		<Node defaultSize="1" />
 	
-<Node defaultSize="1" />
+		<GeometricNodeCollection rMax="10"/>
+	
+		<UDG rMax="7"/>
+	
+		<SINR alpha="2" beta="0.7" noise="0"/>
+	
+		<RandomWayPoint>
+			<Speed distribution="Gaussian" mean="10" variance="20" />
+			<WaitingTime distribution="Poisson" lambda="10" />
+		</RandomWayPoint>
+	
+		<RandomDirection>
+			<NodeSpeed distribution="Gaussian" mean="10" variance="20" />
+			<WaitingTime distribution="Poisson" lambda="10" />
+			<MoveTime distribution="Uniform" min="5" max="20" />
+		</RandomDirection>
+	
+		<QUDG rMin="4" rMax="6" ProbabilityType="constant" connectionProbability="0.6"/>
 
-<GeometricNodeCollection rMax="10"/>
-
-<UDG rMax="7"/>
-
-<SINR alpha="2" beta="0.7" noise="0"/>
-
-<RandomWayPoint>
-	<Speed distribution="Gaussian" mean="10" variance="20" />
-	<WaitingTime distribution="Poisson" lambda="10" />
-</RandomWayPoint>
-
-<RandomDirection>
-	<NodeSpeed distribution="Gaussian" mean="10" variance="20" />
-	<WaitingTime distribution="Poisson" lambda="10" />
-	<MoveTime distribution="Uniform" min="5" max="20" />
-</RandomDirection>
-
-<QUDG rMin="4" rMax="6" ProbabilityType="constant" connectionProbability="0.6"/>
-				</Custom>
+		<!--***********************************************************************-->
+		<!--  My Own Settings                                                      -->
+		<!--***********************************************************************-->
+		<ExternalFilesPath>
+			<SensorReadingsFilePath value="data/data.txt"/> <!-- file containing the sensor readings from the Intel Lab WSN -->
+		</ExternalFilesPath>
+		
+		<SensorReadingsLoadBlockSize value = "1"/> <!-- amount sensor readings (file lines) to be loaded from the file to the memory of the node -->
+		
+	</Custom>
 </Document>
 
