@@ -16,7 +16,6 @@ import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
-import sinalgo.runtime.Global;
 
 public class SimpleNode extends Node 
 {
@@ -166,8 +165,64 @@ public class SimpleNode extends Node
 	 */
 	private void prepararMensagem(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 	{
-		double timeAtual = Global.currentTime;
-		int roundAtual = (int)timeAtual;
+		
+		int medida = 0;
+		if (dataSensedType != null)
+		{
+			medida = identificarTipo(dataSensedType);
+		}
+		String dataLine = performSensorReading();
+		int cont = 0, i=0;
+		while (i<sizeTimeSlot && dataLine != null)
+		{
+			i++;
+			if (dataLine != null && dataSensedType != null && medida != 0)
+			{
+				String linhas[] = dataLine.split(" ");
+				double value;
+				double quantTime;
+				System.out.println("sensorID = "+this.ID);
+				System.out.println("dataSensedType = "+dataSensedType);
+				System.out.println("medida = "+medida);
+//				System.out.println("(ultimoRoundLido + sizeTimeSlot) = "+(ultimoRoundLido + sizeTimeSlot));
+//				System.out.println("cont = "+cont);
+				System.out.println("");
+				if (linhas.length > 4)
+				{
+					System.out.println("Entrou no if (linhas.length > 4) : dataLine = "+dataLine);
+					System.out.println("\ncont = "+cont+"\n");
+					cont++;
+/*
+					if (this.ID == 5)
+					{
+						for (int l=0; l<linhas.length; l++)
+						{
+							System.out.println("linhas["+l+"] = "+linhas[l]);
+						}
+//						break;
+					}
+*/
+					if (linhas[medida] == null || linhas[medida].equals(""))
+					{
+						value = 0.0;
+					}
+					else
+					{
+						try
+						{
+							value = Double.parseDouble(linhas[medida]);
+						}//try
+						catch (NumberFormatException e)
+						{
+							value = 0.0;
+						}//catch
+					}//else
+					quantTime = parseCalendarHoras(linhas[0], linhas[1]);
+					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
+				}//if (linhas.length > 4)
+			}//if (dataLine != null && dataSensedType != null && medida != 0)
+			dataLine = performSensorReading();
+		}//while (i<sizeTimeSlot && dataLine != null)
 
 /*		
 		try
@@ -179,6 +234,9 @@ public class SimpleNode extends Node
 			// Tratar exceção
 		}
 */
+//		double timeAtual = Global.currentTime;
+//		int roundAtual = (int)timeAtual;
+
 //		for (int i=roundAtual; i<(roundAtual+sizeTimeSlot); i++)
 //		{
 			//wsnMsgResp.addDataRecordItens(type, dr.value, dr.time);
@@ -186,7 +244,7 @@ public class SimpleNode extends Node
 		
 		// PAREI AQUI!!!
 		
-	}
+	}//private void prepararMensagem(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 	
 	/**
 	 * Verifies whether the sensor ID passed as parameter is equal to the ID of this node.
@@ -211,10 +269,20 @@ public class SimpleNode extends Node
 	 * <p>In the case that the list is
 	 * empty, it is filled with sensor readings loaded from the sensor readings file.</p>
 	 */
-	public String performSensorReading(){
+	public String performSensorReading()
+	{
 		//TODO Implementar método para simular o sensoriamento de dados físicos
 		//se a lista estiver vazia, carregar leituras do arquivo
 		//entao coletar proxima leitura da lista
+		if (sensorReadingsLoadedFromFile != null && sensorReadingsLoadedFromFile.isEmpty())
+		{
+			loadSensorReadingsFromFile();
+		}
+		if (sensorReadingsLoadedFromFile != null && !sensorReadingsLoadedFromFile.isEmpty())
+		{
+			String data = sensorReadingsLoadedFromFile.remove();
+			return data;
+		}
 		return null;
 	}
 	
@@ -286,7 +354,8 @@ public class SimpleNode extends Node
 		return bufferedReader;
 	}
 
-	private int identificarTipo(String tipo) {
+	private int identificarTipo(String tipo) 
+	{
 		if (tipo.equals("t"))
 			return 4;
 		else if (tipo.equals("h"))
