@@ -10,6 +10,11 @@ import java.util.LinkedList;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 
+/**
+ * Class responsible for managing the data text files.
+ * @author Alex Lacerda
+ *
+ */
 public class FileHandler {
 	/**
 	 * Stores all the lines of the sensor readings file
