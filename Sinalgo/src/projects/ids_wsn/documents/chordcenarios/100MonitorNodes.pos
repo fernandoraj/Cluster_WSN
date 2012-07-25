@@ -1,0 +1,238 @@
+Number of nodes: 100
+
+------------------------------------------------------
+General Config
+------------------------------------------------------
+Command Line arguments: -project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) -gen 10 ids_wsn:MonitorNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\10MonitorNodes.pos) -overwrite dimX=700 dimY=700 NetworkLayer/UseFuzzyRouting=no NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV SimulationName=redeComSensoresEMonitores 
+Java VM arguments: -Xmx1024m -Dfile.encoding=Cp1252 
+Class path: D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\binaries\bin;D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\binaries\jdom.jar;D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\jFuzzyLogic_2.0.6.jar
+------------------------------------------------------
+Configuration settings
+------------------------------------------------------
+ Simulation Area
+    dimensions = 2
+    dimX = 700
+    dimY = 700
+    dimZ = 500
+ Simulation
+    asynchronousMode = false
+    mobility = false
+    interference = false
+    interferenceIsAdditive = true
+    canReceiveWhileSending = true
+    canReceiveMultiplePacketsInParallel = true
+    edgeType = sinalgo.nodes.edges.Edge
+    exitOnTerminationInGUI = false
+    initializeConnectionsOnStartup = false
+    refreshRate = 1
+    generateNAckMessages = false
+    handleEmptyEventQueue = true
+    javaCmd = java
+    javaVMmaxMem = 500
+ Random number generators
+    useSameSeedAsInPreviousRun = false
+    useFixedSeed = false
+    fixedSeed = -3600066242942314297
+ Logging
+    logFileName = logfile.txt
+    outputToConsole = true
+    logToTimeDirectory = true
+    logConfiguration = true
+    eagerFlush = false
+ GUI
+    extendedControl = true
+    drawArrows = false
+    zoomStep = 1.2
+    wheelZoomStep = 1.05
+    minZoomFactor = 0.05
+    draw3DGraphNodesInProperOrder = true
+    usePerspectiveView = true
+    perspectiveViewDistance = 40
+ Background map in 2D
+    useMap = false
+    map = images/map.jpg
+ Models
+    DefaultMessageTransmissionModel = ConstantTime
+    DefaultConnectivityModel = UDG
+    DefaultDistributionModel = Random
+    DefaultInterferenceModel = NoInterference
+    DefaultMobilityModel = NoMobility
+    DefaultReliabilityModel = ReliableDelivery
+    DefaultNodeImplementation = DummyNode
+    showModelsOfAllProjects = false
+ Node storage, position transformation
+    guiPositionTransformation2D = sinalgo.gui.transformation.Transformation2D
+    guiPositionTransformation3D = sinalgo.gui.transformation.Transformation3D
+    nodeCollection2D = sinalgo.runtime.nodeCollection.Geometric2DNodeCollection
+    nodeCollection3D = sinalgo.runtime.nodeCollection.Geometric3DNodeCollection
+ Export Settings
+    epsToPdfCommand = epstopdf %s
+    epsDrawDeploymentAreaBoundingBox = true
+    epsDrawBackgroundWhite = true
+ Animation Settings
+    showMessageAnimations = false
+    messageAnimationEnvelopeWidth = 30.0
+    messageAnimationEnvelopeHeight = 20.0
+    messageAnimationEnvelopeColor = r=255,g=255,b=0
+ Diverse Settings
+    showOptimizationHints = true
+    drawEdges = true
+    drawNodes = true
+    shownEventQueueSize = 10
+    outputTextFieldHeight = 200
+    arrowLength = 8
+    arrowWidth = 1
+    defaultRoundNumber = 1
+------------------------------------------------------
+Custom settings
+------------------------------------------------------
+ attack/exhaustion/quantity = 10
+ attack/exhaustion/timer = 1
+ attack/repetition/quantity = 1
+ energy/energymodel = projects.ids_wsn.nodeDefinitions.energy.simple.SimpleEnergy
+ geometricnodecollection/rmax = 100
+ logfiles/deadnodes = deadnodes
+ logfiles/general = idswsn
+ messagetransmission/constanttime = 1
+ monitor/chord/ring/size = 7
+ monitor/inference/internalbuffer = 30
+ monitor/inference/numberofpackets = 10
+ monitor/inference/signaturesbuffer = 3
+ monitor/rules/interval/max = 4
+ monitor/rules/interval/min = 2
+ networklayer/multipathbalanced = no
+ networklayer/numbersofroutesfuzzy = 3
+ networklayer/routingprotocolname = projects.ids_wsn.nodeDefinitions.routing.DSDV
+ networklayer/usefuzzyrouting = no
+ node/defaultsize = 10
+ qudg/connectionprobability = 0.6
+ qudg/probabilitytype = constant
+ qudg/rmax = 50
+ qudg/rmin = 30
+ randomdirection/movetime/distribution = Uniform
+ randomdirection/movetime/max = 20
+ randomdirection/movetime/min = 5
+ randomdirection/nodespeed/distribution = Gaussian
+ randomdirection/nodespeed/mean = 10
+ randomdirection/nodespeed/variance = 20
+ randomdirection/waitingtime/distribution = Poisson
+ randomdirection/waitingtime/lambda = 10
+ randomwaypoint/speed/distribution = Gaussian
+ randomwaypoint/speed/mean = 10
+ randomwaypoint/speed/variance = 20
+ randomwaypoint/waitingtime/distribution = Poisson
+ randomwaypoint/waitingtime/lambda = 10
+ simulationname = redeComSensoresEMonitores
+ sinr/alpha = 2
+ sinr/beta = 0.7
+ sinr/noise = 0
+ udg/rmax = 100
+------------------------------------------------------
+Seed for Random Number Generators
+------------------------------------------------------
+ Randomly selected seed: -3600066242942314297
+------------------------------------------------------
+End of settings
+------------------------------------------------------
+
+#####----- start of node posiitons -----#####
+298.741935483871, 183.31891495601175, 0.0
+446.98130498533726, 148.23936950146629, 0.0
+544.2987536656892, 370.0326246334311, 0.0
+182.69794721407624, 122.14076246334311, 0.0
+519.4035923753667, 530.7195747800587, 0.0
+129.00219941348973, 238.76722873900295, 0.0
+409.6385630498534, 492.24523460410563, 0.0
+129.00219941348973, 371.1642228739003, 0.0
+152.76576246334312, 594.0890762463343, 0.0
+325.900293255132, 360.97983870967744, 0.0
+545.3857791225416, 245.68835098335856, 0.0
+45.79801569015929, 605.3537673528157, 0.0
+628.0492514063518, 575.3174178367287, 0.0
+403.608191027609, 411.81687535088196, 0.0
+547.5643782064442, 587.0015647341302, 0.0
+360.36485787850506, 248.0628277910415, 0.0
+244.97491309760545, 442.2170531751548, 0.0
+123.90317700453858, 498.78971255673224, 0.0
+331.4674735249622, 585.6278366111951, 0.0
+26.4750378214826, 303.9334341906203, 0.0
+305.3456807302748, 118.86994164895238, 0.0
+647.060298438974, 163.98763930436252, 0.0
+407.25388813990594, 450.5195266999446, 0.0
+684.9420929065186, 199.73256176320123, 0.0
+267.807829003089, 115.44428546877242, 0.0
+217.02662061728518, 675.6827365520162, 0.0
+76.11478777434621, 111.06216371306674, 0.0
+171.2640595155874, 610.020989247902, 0.0
+642.7723860593167, 460.75755544189343, 0.0
+93.29497560156103, 35.4573556883781, 0.0
+631.2824646095248, 412.88317539640303, 0.0
+485.6368215356828, 212.68828728076306, 0.0
+589.7386069061665, 469.4387447937987, 0.0
+334.9480105943805, 570.2595673569239, 0.0
+541.7688711983068, 329.652764206498, 0.0
+143.33313653219432, 314.21361010902774, 0.0
+33.89854459281899, 292.9712133930133, 0.0
+53.77415161254695, 483.6168856168808, 0.0
+21.55644011090372, 547.1094629094902, 0.0
+630.7686992215642, 232.65269091818362, 0.0
+507.8818935576674, 669.8505265936251, 0.0
+525.1272184114043, 496.4297865700991, 0.0
+428.2980147039896, 498.17585291809297, 0.0
+116.62729451814283, 345.99670488086235, 0.0
+499.5006993955665, 265.0916016403046, 0.0
+289.84434194553677, 558.2669691320206, 0.0
+324.07110150013926, 273.1658349994256, 0.0
+56.97383510731131, 418.6498939178239, 0.0
+161.3531146710731, 664.3197275278447, 0.0
+296.83163845260304, 238.14656723535487, 0.0
+341.5459849704678, 57.81778485627994, 0.0
+131.46490061307364, 602.510638365472, 0.0
+313.1456542125026, 562.6795678591852, 0.0
+210.9269612541902, 478.7880260417916, 0.0
+473.9270916588647, 426.8880955851203, 0.0
+522.7661372656962, 84.14004793409184, 0.0
+442.593489375831, 63.79670737853792, 0.0
+85.64911656015002, 373.3186271878843, 0.0
+182.02680543928275, 696.0393717131185, 0.0
+626.2856813972401, 424.5026789201591, 0.0
+585.7576975264025, 479.0260655552395, 0.0
+75.44297389384198, 298.41932870177624, 0.0
+686.8313346761404, 409.75762557073324, 0.0
+252.33318993303953, 512.7634969955719, 0.0
+242.67951212189655, 592.2215657865361, 0.0
+137.02977919364832, 512.8941706026304, 0.0
+590.9178174330773, 118.0329336721748, 0.0
+457.8137715921321, 330.62577076824755, 0.0
+259.1702340896003, 330.2613575178945, 0.0
+444.4720125462746, 605.6475519563932, 0.0
+647.0821872690248, 569.5379716605489, 0.0
+619.5662611487222, 98.69402065234466, 0.0
+480.6167716503421, 554.5631415266445, 0.0
+617.562322869679, 452.05404241685767, 0.0
+67.53707442874224, 324.0385256269751, 0.0
+436.45503137495865, 451.34651527251503, 0.0
+158.6618082835514, 463.8237026975063, 0.0
+238.14574068516956, 12.704674162617213, 0.0
+542.0391345816181, 361.77082080839483, 0.0
+322.32497798714775, 361.60167463373176, 0.0
+566.618143537879, 573.2173309209725, 0.0
+503.98460220379235, 383.51444505915566, 0.0
+8.305210301048682, 642.5195725033286, 0.0
+126.92880441539941, 212.46272103431613, 0.0
+354.4765245216355, 510.2872813817534, 0.0
+44.77567271389913, 281.17528666564317, 0.0
+393.0766809303484, 342.13138637863045, 0.0
+496.9361426261038, 86.22496303073855, 0.0
+249.36638239232246, 642.7647410365912, 0.0
+499.9286260784812, 522.9388158985811, 0.0
+517.1914633969743, 369.19792933173835, 0.0
+164.13390280296449, 318.2301733861649, 0.0
+282.32876560247894, 628.5496350878803, 0.0
+532.7154361294397, 534.7133169418971, 0.0
+133.02277449691738, 639.6430443411086, 0.0
+122.92700739131767, 336.55226377209914, 0.0
+197.2610146062813, 53.08775589861406, 0.0
+530.3999775833516, 496.45928786185715, 0.0
+637.6443727659591, 161.9483295620541, 0.0
+634.2491891588155, 384.0988684018793, 0.0

@@ -1,0 +1,185 @@
+10% de 100 nós são monitores
+1) 10 monitores, 90 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 90 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1000normalNodes.pos) 
+             -gen 10 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\100MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+20% de 100 nós são monitores
+2) 20 monitores, 80 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 80 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1000normalNodes.pos) 
+             -gen 20 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\100MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+30% de 100 nós são monitores
+3) 30 monitores, 70 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 70 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1000normalNodes.pos) 
+             -gen 30 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\100MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+10% de 300 nós são monitores
+4) 30 monitores, 270 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 270 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1000normalNodes.pos) 
+             -gen 30 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\100MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+20% de 300 nós são monitores
+5) 60 monitores, 240 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 240 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1000normalNodes.pos) 
+             -gen 60 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\100MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+30% de 300 nós são monitores
+6) 90 monitores, 210 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 210 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1000normalNodes.pos) 
+             -gen 90 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\100MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+
+10% de 500 nós são monitores
+7) 50 monitores, 450 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 450 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1000normalNodes.pos) 
+             -gen 50 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\100MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+20% de 500 nós são monitores
+8) 100 monitores, 400 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 400 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1000normalNodes.pos) 
+             -gen 100 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\100MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+
+30% de 500 nós são monitores
+9) 150 monitores, 350 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 350 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1000normalNodes.pos) 
+             -gen 150 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\600MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+10% de 1000 nós são monitores
+10) 100 monitores, 900 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 900 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1000normalNodes.pos) 
+             -gen 100 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\600MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+
+20% de 1000 nós são monitores
+11) 200 monitores, 800 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 800 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1000normalNodes.pos) 
+             -gen 200 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\600MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+
+30% de 1000 nós são monitores
+12) 300 monitores, 700 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 700 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1000normalNodes.pos) 
+             -gen 300 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\600MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+10% de 2000 nós são monitores
+13) 200 monitores, 1800 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 1800 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\2000normalNodes.pos) 
+             -gen 200 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\600MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+
+20% de 2000 nós são monitores
+14) 400 monitores, 1600 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 1600 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\2000normalNodes.pos) 
+             -gen 400 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\600MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+
+30% de 2000 nós são monitores
+15) 600 monitores, 1400 normal nodes e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\1baseStation.pos) 
+             -gen 1400 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\2000normalNodes.pos) 
+             -gen 600 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\chordcenarios\600MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComSensoresEMonitores
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------             			
+
+
+
+BACKUP:
+10 monitores, 100 normal nodes, 30 simpleEvent e 1 baseStation
+-project ids_wsn -gen 1 ids_wsn:BaseStation PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\1baseStation.pos) 
+             -gen 100 ids_wsn:NormalNode PositionFile (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\100basicnodes.pos) 
+             -gen 30 ids_wsn:SimpleEvent PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\30simpleevents.pos)
+             -gen 10 ids_wsn:MonitorNode PositionFile  (D:\DOCUMENTOS\ANALISE E DESENVOLVIMENTO DE SISTEMAS\MOD V\Analise de sistemas IFPI\MARVIN\workspace\sinalgo\src\projects\ids_wsn\documents\10MonitorNodes.pos)
+             -overwrite dimX=700 dimY=700 
+             			NetworkLayer/UseFuzzyRouting=no 
+             			NetworkLayer/RoutingProtocolName=projects.ids_wsn.nodeDefinitions.routing.DSDV
+             			SimulationName=redeComEventosEMonitores
