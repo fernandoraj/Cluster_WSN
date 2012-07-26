@@ -1,5 +1,7 @@
 package projects.wsn.nodes.messages;
 
+import java.util.Stack;
+
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 
@@ -112,6 +114,24 @@ public class WsnMsg extends Message {
 		hasCoefs = true;
 		coefs.coefA = A;
 		coefs.coefB = B;
+	}
+
+	/**
+	 * Caminho de nós do nó que envia a mensagem de resposta até o sink node, em forma de pilha
+	 */
+	private Stack<Integer> pathToSenderNode;
+	
+	/**
+	 * Desempilha um nó do caminho de nós
+	 * @return Nó desempilhado
+	 */
+	public Integer popFromPath()
+	{
+		if (pathToSenderNode == null || pathToSenderNode.isEmpty())
+		{
+			return null;
+		}
+		return pathToSenderNode.pop();
 	}
 
 	/**

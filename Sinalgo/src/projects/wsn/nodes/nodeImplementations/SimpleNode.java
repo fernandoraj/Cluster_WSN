@@ -114,35 +114,37 @@ public class SimpleNode extends Node
 					}
 				} //if (wsnMessage.tipoMsg == 0)
 				else if (wsnMessage.tipoMsg == 1)// A mensagem é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
-					{ 
-						this.setColor(Color.YELLOW);
-						if (wsnMessage.destino == this)
-						{
-
-						}
-						else if (sequenceNumber < wsnMessage.sequenceID)
-						{ 
-						//Recurso simples para evitar loop.
-						//Exemplo: Nó A transmite em brodcast. Nó B recebe a msg e retransmite em broadcast.
-						//Consequentemente, nó A irá receber a msg. Sem esse condicional, nó A iria retransmitir novamente, gerando um loop.
-							sequenceNumber = wsnMessage.sequenceID;
-						}
-						else
-						{
-							encaminhar = Boolean.FALSE;
-						}
-					} //if (wsnMessage.tipoMsg == 0)
-					if (encaminhar && wsnMessage.tipoMsg == 1)
+				{ 
+					this.setColor(Color.YELLOW);
+					if (wsnMessage.destino == this)
 					{
-						wsnMessage.forwardingHop = this; 
-						broadcast(wsnMessage);
+
 					}
+					else if (sequenceNumber < wsnMessage.sequenceID)
+					{ 
+					//Recurso simples para evitar loop.
+					//Exemplo: Nó A transmite em brodcast. Nó B recebe a msg e retransmite em broadcast.
+					//Consequentemente, nó A irá receber a msg. Sem esse condicional, nó A iria retransmitir novamente, gerando um loop.
+						sequenceNumber = wsnMessage.sequenceID;
+					}
+					else
+					{
+						encaminhar = Boolean.FALSE;
+					}
+				} //if (wsnMessage.tipoMsg == 0)
+				
+				if (encaminhar && wsnMessage.tipoMsg == 1)
+				{
+					wsnMessage.forwardingHop = this; 
+					broadcast(wsnMessage);
+				}
 				else if (encaminhar)
 				{
-					
 					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 100, "t"); 
 
 					prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
+					
+					addThisNodeToPath(wsnMsgResp);
 					
 					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
 					
@@ -158,6 +160,8 @@ public class SimpleNode extends Node
 			{
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
 				
+				addThisNodeToPath(wsnMsgResp);
+				
 				WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
 				
 				timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
@@ -165,10 +169,15 @@ public class SimpleNode extends Node
 		} //while (inbox.hasNext())
 	} //public void handleMessages
 	
+	private void addThisNodeToPath(WsnMsgResponse wsnMsgResp)
+	{
+		wsnMsgResp.pushToPath(this.ID);
+	}
+	
 	/**
 	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual
 	 * @param wsnMsgResp Mensagem a ser preparada para envio
-	 * @param sizeTimeSlot Tamanho do slot de tempo (intervalo) a ser lido pelo nó sensor
+	 * @param sizeTimeSlot Tamanho do slot de tempo (intervalo) a ser lido pelo nó sensor, ou tamanho da quantidade de dados a ser enviado para o sink
 	 * @param dataSensedType Tipo de dado (temperatura, humidade, luminosidade, etc) a ser sensoreado (lido) pelo nó sensor
 	 */
 	private void prepararMensagem(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
@@ -189,16 +198,16 @@ public class SimpleNode extends Node
 				String linhas[] = dataLine.split(" ");
 				double value;
 				double quantTime;
-				System.out.println("sensorID = "+this.ID);
-				System.out.println("dataSensedType = "+dataSensedType);
-				System.out.println("medida = "+medida);
-//				System.out.println("(ultimoRoundLido + sizeTimeSlot) = "+(ultimoRoundLido + sizeTimeSlot));
-//				System.out.println("cont = "+cont);
-				System.out.println("");
+				Utils.printForDebug("sensorID = "+this.ID);
+				Utils.printForDebug("dataSensedType = "+dataSensedType);
+				Utils.printForDebug("medida = "+medida);
+//				Utils.printForDebug("(ultimoRoundLido + sizeTimeSlot) = "+(ultimoRoundLido + sizeTimeSlot));
+//				Utils.printForDebug("cont = "+cont);
+				Utils.printForDebug("");
 				if (linhas.length > 4)
 				{
-					System.out.println("Entrou no if (linhas.length > 4) : dataLine = "+dataLine);
-					System.out.println("\ncont = "+cont+"\n");
+					Utils.printForDebug("Entrou no if (linhas.length > 4) : dataLine = "+dataLine);
+					Utils.printForDebug("\ncont = "+cont+"\n");
 					cont++;
 /*
 					if (this.ID == 5)
@@ -380,6 +389,23 @@ public class SimpleNode extends Node
 		return bufferedReader;
 	}
 
+	/**
+	 * Identifica o tipo de dados a ser lido (posição na linha) de acordo com a string passada, conforme o exemplo abaixo:
+	 * 				2004-03-21 19:02:26.792489 65528 4 87.383 45.4402 5.52 2.31097
+	 * Posição          [1]         [2]         [3] [4]  [5]    [6]    [7]   [8]
+	 * Tipo de dado    Data         Hora       Round ID  Temp   Hum    Lum   Volt
+	 * 
+	 * Onde: Data e Hora são a data e o horário em que ocorreu a leitura dos valores sensoreados
+	 *       Round é o número da rodada (execução) da leitura, que ocorre a cada 31 segundos
+	 *       ID é o número identificador do sensor
+	 *       Temp é a medida (grandeza) da temperatura aferida
+	 *       Hum é a medida (grandeza) da humidade aferida
+	 *       Lum é a medida (grandeza) da luminosidade aferida
+	 *       Volt é a medida (grandeza) do nível de bateria do sensor (voltagem aferida)
+	 * 
+	 * @param tipo Pode ser t: temperatura, h: humidade, l: luminosidade ou v: voltagem
+	 * @return Posição correspondente do tipo de dado a ser aferido na string lida do arquivo de dados (data.txt)
+	 */
 	private int identificarTipo(String tipo) 
 	{
 		if (tipo.equals("t"))
@@ -393,6 +419,12 @@ public class SimpleNode extends Node
 		return 0;
 	}
 	
+	/**
+	 * Transforma os valores de data (AnoMesDia) e hora (hora) passados em uma grandeza inteira com a quantidade de milisegundos total
+	 * @param AnoMesDia String no formato AAAA-MM-DD representando a data da leitura do valor pelo sensor (A-Ano, M-Mes, D-Dia)
+	 * @param hora String no formato HH:MM:SS.LLLLL representando a hora da leitura do valor pelo sensor (H-Hora, M-Minuto, S-Segundo, L-Milisegundo)
+	 * @return Quantidade de milisegundos total representando aquele instante de tempo (Data + Hora) segundo o padrão do Java 
+	 */
 	private long parseCalendarHoras(String AnoMesDia, String hora)
 	{
 		String[] datas = AnoMesDia.split("-");
@@ -412,6 +444,13 @@ public class SimpleNode extends Node
 		return quantTime;
 	}
 	
+	/**
+	 * Faz o cálculo da predição do valor sensoreados de acordo com os coeficientes (A e B) informados e o parâmetro de tempo
+	 * @param A Coeficiente A (interceptor) da equação de regressão, dada por S(t) = A + B.t 
+	 * @param B Coeficiente B (slope, inclinação) da equação de regressão, dada por S(t) = A + B.t
+	 * @param tempo Parâmetro de tempo a ter o valor da grandeza predito 
+	 * @return Valor predito para o parâmetro sensoreado no tempo dado
+	 */
 	private double fazerPredicao(double A, double B, double tempo)
 	{
 		double time;

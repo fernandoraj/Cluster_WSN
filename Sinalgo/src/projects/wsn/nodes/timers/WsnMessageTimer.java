@@ -1,21 +1,38 @@
 package projects.wsn.nodes.timers;
 
-import sinalgo.nodes.timers.Timer;
 import projects.wsn.nodes.messages.WsnMsg;
-import projects.wsn.nodes.nodeImplementations.*;
+import projects.wsn.nodes.nodeImplementations.SimpleNode;
+import sinalgo.nodes.Node;
+import sinalgo.nodes.timers.Timer;
 
 public class WsnMessageTimer extends Timer {
 	
 	private WsnMsg message = null;
+	private Node nextNode = null;
 	
-	public WsnMessageTimer(WsnMsg message){
+	public WsnMessageTimer(WsnMsg message)
+	{
 		this.message = message;
 	}
 
+	public WsnMessageTimer(WsnMsg message, Node nextNode)
+	{
+		this.message = message;
+		this.nextNode = nextNode;
+	}
+	
 	@Override
-	public void fire() {
-		// Metodo para disparar o temporizador (Timer)
-		((SimpleNode)node).broadcast(message);
+	public void fire()
+	{
+		if (nextNode != null)
+		{
+			((SimpleNode)node).send(message, node);
+		}
+		else
+		{
+			// Metodo para disparar o temporizador (Timer)
+			((SimpleNode)node).broadcast(message);
+		}
 	}
 
 }

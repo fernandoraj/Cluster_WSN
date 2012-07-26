@@ -1,5 +1,6 @@
 package projects.wsn.nodes.messages;
 
+import java.util.Stack;
 import java.util.Vector;
 
 import sinalgo.nodes.Node;
@@ -56,6 +57,34 @@ public class WsnMsgResponse extends Message {
 	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro)
 	 */
 	public double thresholdError = 0.0;
+	
+	/**
+	 * Caminho de nós do nó que envia a mensagem de resposta até o sink node, em forma de pilha
+	 */
+	private Stack<Integer> pathToSenderNode;
+	
+	/**
+	 * Empilha um nó no caminho de nós
+	 * @param no Nó a ser empilhado
+	 */
+	public void pushToPath(Integer no)
+	{
+		if (pathToSenderNode == null)
+		{
+			pathToSenderNode = new Stack<Integer>();
+		}
+		pathToSenderNode.push(no);
+	}
+	
+	/**
+	 * Retorna o path para o nó que enviou a mensagem de resposta
+	 * @return Caminho para o nó sender
+	 */
+	public Stack<Integer> clonePath()
+	{
+		return pathToSenderNode;
+//		return (Stack<Node>)pathToSenderNode.clone();
+	}
 	
 	private boolean naoLido = true;
 	
