@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
+import java.util.List;
 
 import projects.wsn.nodes.messages.WsnMsg;
 import projects.wsn.nodes.messages.WsnMsgResponse;
@@ -17,6 +18,14 @@ import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 
+/**
+ * Class that represents an ordinary sensor node that is able to sense natural phenomena
+ * (e.g. temperature, pressure, humidity) and send to sink nodes.
+ * In our simulation, this node is also able to do in-networking data prediction using 
+ * regression models.
+ * @author Fernando Rodrigues / Alex Lacerda
+ *
+ */
 public class SimpleNode extends Node 
 {
 	
@@ -33,15 +42,43 @@ public class SimpleNode extends Node
 	 * A linked list is being used here because as the readings are being performed 
 	 * (being read from this list) by this sensor node they are discarded.
 	 */
-	private LinkedList<String> sensorReadingsLoadedFromFile = new LinkedList<String>();
+	private LinkedList<String> sensorReadingsQueue = new LinkedList<String>();
 	
 	/**
 	 * Stores the value referring to the last line loaded from the sensor readings file in order that
-	 * when the <code>SensorReadingsLoadedFromFile</code> list is empty and a new load from the file has to be
+	 * when the <code>sensorReadingsQueue</code> is empty and a new load from the file has to be
 	 * executed to fill the <code>SensorReadingsLoadedFromFile</code> list, the loading starts from the last
 	 * line read from the file.
 	 */
 	private int lastLineLoadedFromSensorReadingsFile;
+
+	/**
+	 * Indicates whether the sensor readings must be loaded from the file or from the memory.
+	 * If this attribute is true, the node must load the sensor readings direct from the
+	 * sensor readings file. Otherwise, it must load the sensor readings from the memory, 
+	 * that is, from the list of the sensor readings from all nodes that is loaded in memory 
+	 * beforehand by the {@link FileHandler} class. This procedure is necessary because the sensor 
+	 * readings file is very large and may take too long to be loaded depending on the computer 
+	 * configuration. For the cases that loading all the sensor readings to the memory 
+	 * (on the <code>FileHandler</code>) is not possible, the sensor readings are loaded from the
+	 * file on demand by each node.
+	 */
+	private boolean loadSensorReadingsFromFile;
+	
+	@Override
+	public void preStep() {}
+
+	@Override
+	public void init() {}
+
+	@Override
+	public void neighborhoodChange() {}
+
+	@Override
+	public void postStep() {}
+
+	@Override
+	public void checkRequirements() throws WrongConfigurationException {}
 	
 	@Override
 	public void handleMessages(Inbox inbox) {
@@ -126,36 +163,6 @@ public class SimpleNode extends Node
 			} // else if (message instanceof WsnMsgResponse)
 		} //while (inbox.hasNext())
 	} //public void handleMessages
-		
-	@Override
-	public void preStep() {
-
-	}
-
-	@Override
-	public void init() {
-//		FileHandler.printForDebug("nodeID: " + this.ID + " loading sensor readings from file");
-//		long initTime = System.currentTimeMillis();
-//		loadSensorReadingsFromFile();
-//		long finishTime = System.currentTimeMillis();
-//		long totalTime = finishTime - initTime; 
-//		FileHandler.printForDebug("nodeID: " + this.ID + " " + sensorReadingsLoadedFromFile.size() + " lines loading process in " + (totalTime) + " millis.");
-	}
-
-	@Override
-	public void neighborhoodChange() {
-
-	}
-
-	@Override
-	public void postStep() {
-
-	}
-
-	@Override
-	public void checkRequirements() throws WrongConfigurationException {
-
-	}
 	
 	/**
 	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual
@@ -223,28 +230,7 @@ public class SimpleNode extends Node
 			}//if (dataLine != null && dataSensedType != null && medida != 0)
 			dataLine = performSensorReading();
 		}//while (i<sizeTimeSlot && dataLine != null)
-
-/*		
-		try
-		{
-			parserTxtToNode(roundAtual, sizeTimeSlot, dataSensedType, wsnMsgResp);
-		}
-		catch(IOException ex)
-		{
-			// Tratar exceção
-		}
-*/
-//		double timeAtual = Global.currentTime;
-//		int roundAtual = (int)timeAtual;
-
-//		for (int i=roundAtual; i<(roundAtual+sizeTimeSlot); i++)
-//		{
-			//wsnMsgResp.addDataRecordItens(type, dr.value, dr.time);
-//		}
-		
-		// PAREI AQUI!!!
-		
-	}//private void prepararMensagem(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
+	}
 	
 	/**
 	 * Verifies whether the sensor ID passed as parameter is equal to the ID of this node.
@@ -265,29 +251,44 @@ public class SimpleNode extends Node
 	 * <p>Simulates a physical sensor data reading performed for all the sensing devices available in this
 	 * node (e.g. temperature, pressure, humidity).</p>
 	 * <p>In fact, a real sensor data reading is not done by this node. Instead, a sensor reading is
-	 * collected from the <code>SensorReadingsLoadedFromFile</code> list. </p>
-	 * <p>In the case that the list is
-	 * empty, it is filled with sensor readings loaded from the sensor readings file.</p>
+	 * collected from its <code>sensorReadingsQueue</code> attribute. </p>
+	 * <p>In the case that the list is empty, it is filled with sensor readings loaded from the 
+	 * sensor readings file.</p>
 	 */
 	public String performSensorReading()
 	{
-		//TODO Implementar método para simular o sensoriamento de dados físicos
-		//se a lista estiver vazia, carregar leituras do arquivo
-		//entao coletar proxima leitura da lista
-		if (sensorReadingsLoadedFromFile != null && sensorReadingsLoadedFromFile.isEmpty())
+		if (sensorReadingsQueue != null && sensorReadingsQueue.isEmpty())
 		{
-			loadSensorReadingsFromFile();
+			loadSensorReadings();
 		}
-		if (sensorReadingsLoadedFromFile != null && !sensorReadingsLoadedFromFile.isEmpty())
+		if (sensorReadingsQueue != null && !sensorReadingsQueue.isEmpty())
 		{
-			String data = sensorReadingsLoadedFromFile.remove();
+			String data = sensorReadingsQueue.remove();
 			return data;
 		}
 		return null;
 	}
+
+	/**
+	 * Loads the sensor readings to the <code>sensorReadingsQueue</code>
+	 * If the attribute <code>loadSensorReadingsFromFile</code> is true, the node must load the sensor readings direct from the sensor readings file.
+	 * Otherwise, it must load the sensor readings from the memory, that is, from the list of the sensor readings from
+	 * all nodes that is loaded in memory beforehand by the {@link FileHandler} class.
+	 * This procedure is necessary because the sensor readings file is very large and may take
+	 * too long to be loaded depending on the computer configuration. For the cases that loading
+	 * all the sensor readings to the memory (on the <code>FileHandler</code>) is not possible,
+	 * the sensor readings are loaded from the file on demand by each node.
+	 */
+	private void loadSensorReadings() {
+		if (loadSensorReadingsFromFile) {
+			loadSensorReadingsFromFile();
+		} else {
+			loadSensorReadingsFromMemory();
+		}
+	}
 	
 	/**
-	 * Fills the <code>SensorReadingsLoadedFromFile</code> list with sensor readings from the file.
+	 * Fills the <code>sensorReadingsQueue</code> with sensor readings from the file.
 	 * The amount of readings (file lines) to be loaded is informed in the <code>Config.xml</code> file (<code>SensorReadingsLoadBlockSize</code>) tag.
 	 */
 	public void loadSensorReadingsFromFile(){
@@ -304,7 +305,7 @@ public class SimpleNode extends Node
 				String lineValues[] = line.split(" ");
 				if (lineValues.length > 4 && this.isMyID(lineValues[3])) { //if the line corresponds to data from this node it enters, otherwise it passes to the next line
 					for (int loadedLinesCount = 0; ((line != null) && (loadedLinesCount < sensorReadingsLoadBlockSize)); loadedLinesCount++) { //if the specified number of lines to be loaded was not yet satisfied or if there are no more lines, it enters
-						sensorReadingsLoadedFromFile.add(line); //loads the line to the memory
+						sensorReadingsQueue.add(line); //loads the line to the memory
 						line = bufferedReader.readLine();
 						lineCounter++;
 					}
@@ -314,9 +315,9 @@ public class SimpleNode extends Node
 				line = bufferedReader.readLine();
 			}			
 			bufferedReader.close();
-		if (sensorReadingsLoadedFromFile.size() < sensorReadingsLoadBlockSize) {
+		if (sensorReadingsQueue.size() < sensorReadingsLoadBlockSize) {
 			System.err.println("NodeID: " + this.ID + " has already read all the sensor readings of the file. " +
-					"\n It has only " + sensorReadingsLoadedFromFile.size() + " readings in its memory (sensorReadingsLoadedFromFile list)");
+					"\n It has only " + sensorReadingsQueue.size() + " readings in its memory (sensorReadingsLoadedFromFile list)");
 		}
 
 		lastLineLoadedFromSensorReadingsFile = lastLineLoadedFromSensorReadingsFile + lineCounter; //updates the last line read from the file
@@ -327,6 +328,19 @@ public class SimpleNode extends Node
 		} catch (IOException e) {
 			System.out.println("Problems while reading lines (fileReader.readLine()) from  sensorReadingsFilePath at simpleNode.loadSensorReadingFromFile()");
 			e.printStackTrace();
+		}
+	}
+	/**
+	 * Fills the <code>sensorReadingsQueue</code> list with sensor readings from the {@link FileHandler}.
+	 */
+	private void loadSensorReadingsFromMemory() {
+		List<String> nodesSensorReadingsQueue = FileHandler.getNodesSensorReadingsQueue();
+		for (String sensorReading : nodesSensorReadingsQueue) {
+			String sensorReadingsValues[] = sensorReading.split(" ");
+			if (sensorReadingsValues.length > 4 && this.isMyID(sensorReadingsValues[3])) {
+				nodesSensorReadingsQueue.remove(sensorReading);
+				sensorReadingsQueue.add(sensorReading);
+			}
 		}
 	}
 	
@@ -392,157 +406,4 @@ public class SimpleNode extends Node
 		time = A + B*tempo;
 		return time;
 	}
-
-	
-	public class DataRecord
-	{
-		double value;
-		double time;
-	}
-	
-	private boolean isBetweenRoundNumber(String data, int minRound, int maxRound)
-	{
-		if(!data.equals("")){
-			int roundRead = Integer.parseInt(data);
-			if (roundRead >= minRound && roundRead < maxRound)
-				return true;
-		}
-		return false;
-	}
-
-	private boolean isGreaterRoundNumber(String data, int maxRound)
-	{
-		if(!data.equals("")){
-			int roundRead = Integer.parseInt(data);
-			if (roundRead > maxRound)
-				return true;
-		}
-		return false;
-	}
-	
-//	private boolean comparaSensorId(String data, int sensor)
-//	{
-//		if(!data.equals("")){
-//			int idReceived = Integer.parseInt(data);
-//			if (sensor == idReceived && idReceived < 55)
-//				return true;
-//		}
-//		return false;
-//	}
-
-//	private boolean isGreaterSensorId(String data, int sensor)
-//	{
-//		if(!data.equals("")){
-//			int idReceived = Integer.parseInt(data);
-//			if (idReceived > sensor)
-//				return true;
-//		}
-//		return false;
-//	}
-	
-//	private boolean isBetween(String data, int round)
-//	{
-//		if(!data.equals("")){
-//			int roundReceived = Integer.parseInt(data);
-//			if (round == roundReceived)
-//				return true;
-//		}
-//		return false;
-//	}
-	
-//	private Date parserCalendarHoras(String AnoMesDia, String hora)
-//	{
-//		String[] datas = AnoMesDia.split("-");
-//		String[] horas = hora.split(":");
-//		String certo = "";
-//		String millesegundos = "";
-//		for (String mille : horas){
-//			if(mille.contains(".")){
-//				String correto = mille.substring(0,mille.indexOf("."));
-//				millesegundos = mille.substring(mille.indexOf(".")+1, mille.length());
-//				certo = correto;
-//			}
-//		}
-//		horas[2] = certo;
-//		GregorianCalendar gc = new GregorianCalendar(Integer.parseInt(datas[0]), Integer.parseInt(datas[1]) -1, Integer.parseInt(datas[2]),Integer.parseInt(horas[0]),Integer.parseInt(horas[1]), Integer.parseInt(horas[2]));
-//		Date data = new Date(gc.getTimeInMillis() + Long.parseLong(millesegundos)/1000);
-//		return data;
-//	}
-
-	//public synchronized void parserTxtToNode(int round, Integer sizeTimeSlot, String tipo, WsnMsgResponse wsnMsgResp) throws IOException
-//	public void parserTxtToNode(int round, Integer sizeTimeSlot, String tipo, WsnMsgResponse wsnMsgResp) throws IOException
-//	{
-//		System.out.println("ID do noh: "+this.ID);
-//		BufferedReader leitura = getBufferedReader("C:/Users/Fernando/Documents/My Classes/UFC/Doutorado/Doutorado - PPGIA/Artigos/Redes de Sensores/Ferramentas/data/data.txt");
-//		String linha = leitura.readLine();
-//		int sensorId = this.ID;
-//		int medida = identificarTipo(tipo);
-//		ultimoRoundLido = round;
-//		double value;
-//		double quantTime;
-//		int cont = 0;
-//		char type;
-//		if (tipo!=null && !tipo.equals(""))
-//		{
-//			type = tipo.charAt(0);
-//		}
-//		else
-//		{
-//			type = ' ';
-//		}
-//		while ((linha != null) && (cont<sizeTimeSlot))
-//		{
-//			System.out.println("Entrou no while ((linha != null) && (!found)): linha = "+linha);
-//			String linhas[] = linha.split(" ");
-//			System.out.println("round = "+round);
-//			System.out.println("sensorId = "+sensorId);
-//			System.out.println("ultimoRoundLido = "+ultimoRoundLido);
-//			System.out.println("(ultimoRoundLido + sizeTimeSlot) = "+(ultimoRoundLido + sizeTimeSlot));
-//			System.out.println("cont = "+cont);
-//			System.out.println("");
-//			if (linhas.length > 4 && comparaSensorId(linhas[3], sensorId) && isBetweenRoundNumber(linhas[2], ultimoRoundLido, (ultimoRoundLido + sizeTimeSlot)))
-//			{
-//				System.out.println("Entrou no if (linhas.length > 4 ...");
-//				cont++;
-//				value = Double.parseDouble(linhas[medida]);
-//				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
-//				wsnMsgResp.addDataRecordItens(type, value, quantTime);
-//			}
-//			if (isGreaterSensorId(linhas[3], sensorId) || (comparaSensorId(linhas[3], sensorId) && isGreaterRoundNumber(linhas[2], (ultimoRoundLido + sizeTimeSlot))))
-//			{
-//				System.out.println("\n ENTROU NO BREAK !!! \n");
-//				break;
-//			}
-//			linha = leitura.readLine();
-//		}
-		
-//		if ((found) && (linha != null))
-//		{
-//			System.out.println("\nEntrou no if ((found) && (linha != null)) ***\n");
-//			int maxRound = (round + sizeTimeSlot);
-//			
-//			String linhas[] = linha.split(" ");
-//			while (linhas.length > 4 && comparaSensorId(linhas[3], sensorId) && (menorQueRoundNumber(linhas[2], maxRound)))
-//			{
-//				System.out.println("Entrou no while ... (menorQueRoundNumber(linhas[2], maxRound), maxRound = "+maxRound);
-//				value = Double.parseDouble(linhas[medida]);
-//				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
-//				wsnMsgResp.addDataRecordItens(type, value, quantTime);
-//				cont++;
-//				linha = leitura.readLine();
-//				linhas = linha.split(" ");
-//			}
-//		}
-//		//CASO ELE NAO TENHA NADA NESTE ROUND.
-//		if (cont==0)
-//			System.out.println("Nao existe leitura neste round.");
-//		leitura.close();
-//	}
-	
-/*	
-	@Override
-	public void handleMessages(Inbox inbox) {
-	}
-*/
-
 }
