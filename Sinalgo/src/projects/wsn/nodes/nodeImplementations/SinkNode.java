@@ -10,7 +10,6 @@ import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 
-
 public class SinkNode extends SimpleNode 
 {
 
