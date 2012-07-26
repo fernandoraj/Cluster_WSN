@@ -23,18 +23,13 @@ public class FileHandler {
 	 * The sensor readings file contains sensor readings from all sensor nodes of the network.
 	 */
 	private static List<String> nodesSensorReadingsList = new ArrayList<String>();
-	
-	/**
-	 * the mode of debug is used to print debug messages that are spread throughout the project.
-	 */
-	private static boolean inDebugMode = true;
-	
+
 	/**
 	 * Loads all the lines of the sensor readings file into the memory (<code>nodesSensorReadingsList</code> static variable).
 	 * The sensor readings file contains sensor readings from all sensor nodes of the network.
 	 */
 	private static void loadNodesSensorReadingsFromFile(){
-		FileHandler.printForDebug("staring loading sensor readings file lines...");
+		Utils.printForDebug("staring loading sensor readings file lines...");
 		long initTime = System.currentTimeMillis();
 		try {
 			String sensorReadingsFilePath = Configuration.getStringParameter("ExternalFilesPath/SensorReadingsFilePath");
@@ -46,8 +41,7 @@ public class FileHandler {
 			}
 			bufferedReader.close();
 			long finishTime = System.currentTimeMillis();
-			long totalTimeInSecs = (finishTime - initTime)/1000;
-			FileHandler.printForDebug("all " + nodesSensorReadingsList.size() + " sensor readings successfully loaded to memory in " + totalTimeInSecs + " second(s)");
+			Utils.printForDebug("all " + nodesSensorReadingsList.size() + " sensor readings successfully loaded to memory in " + Utils.getTimeIntervalMessage(initTime, finishTime));
 		} catch (CorruptConfigurationEntryException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -73,16 +67,6 @@ public class FileHandler {
 			e.printStackTrace();
 		}
 		return null;
-	}
-	
-	/**
-	 * Print debug messages only if the <code>inDebugMode</code> static variable is <code>true</code>.
-	 * @param message Message to be printed in the console.
-	 */
-	public static void printForDebug(String message) {
-		if (inDebugMode) {
-			System.out.println("inDebugMode: " + message);
-		}
 	}
 	
 	/**

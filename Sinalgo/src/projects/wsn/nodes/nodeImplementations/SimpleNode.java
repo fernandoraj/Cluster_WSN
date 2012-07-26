@@ -11,6 +11,7 @@ import projects.wsn.nodes.messages.WsnMsg;
 import projects.wsn.nodes.messages.WsnMsgResponse;
 import projects.wsn.nodes.timers.WsnMessageResponseTimer;
 import projects.wsn.utils.FileHandler;
+import projects.wsn.utils.Utils;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.configuration.WrongConfigurationException;
@@ -291,8 +292,9 @@ public class SimpleNode extends Node
 	 * Fills the <code>sensorReadingsQueue</code> with sensor readings from the file.
 	 * The amount of readings (file lines) to be loaded is informed in the <code>Config.xml</code> file (<code>SensorReadingsLoadBlockSize</code>) tag.
 	 */
-	public void loadSensorReadingsFromFile(){
+	private void loadSensorReadingsFromFile(){
 		try {
+			long initTime = System.currentTimeMillis();
 			int sensorReadingsLoadBlockSize = Configuration.getIntegerParameter("SensorReadingsLoadBlockSize"); //amout of readings to be loaded
 			String sensorReadingsFilePath = Configuration.getStringParameter("ExternalFilesPath/SensorReadingsFilePath");
 			BufferedReader bufferedReader = FileHandler.getBufferedReader(sensorReadingsFilePath);
@@ -305,9 +307,13 @@ public class SimpleNode extends Node
 				String lineValues[] = line.split(" ");
 				if (lineValues.length > 4 && this.isMyID(lineValues[3])) { //if the line corresponds to data from this node it enters, otherwise it passes to the next line
 					for (int loadedLinesCount = 0; ((line != null) && (loadedLinesCount < sensorReadingsLoadBlockSize)); loadedLinesCount++) { //if the specified number of lines to be loaded was not yet satisfied or if there are no more lines, it enters
-						sensorReadingsQueue.add(line); //loads the line to the memory
-						line = bufferedReader.readLine();
-						lineCounter++;
+						if (lineValues.length > 4 && this.isMyID(lineValues[3])) {
+							sensorReadingsQueue.add(line); //loads the line to the memory
+							line = bufferedReader.readLine();
+							lineCounter++;
+						} else {
+							break;
+						}
 					}
 					break;
 				}
@@ -321,6 +327,8 @@ public class SimpleNode extends Node
 		}
 
 		lastLineLoadedFromSensorReadingsFile = lastLineLoadedFromSensorReadingsFile + lineCounter; //updates the last line read from the file
+		long finishTime = System.currentTimeMillis();
+		Utils.printForDebug("Node ID " + this.ID + " successfully loaded " + sensorReadingsQueue.size() + " sensor readings from the file in " + Utils.getTimeIntervalMessage(initTime, finishTime));
 		
 		} catch (CorruptConfigurationEntryException e) {
 			System.out.println("Problems while loading variable sensorReadingsFilePath at simpleNode.loadSensorReadingFromFile()");
@@ -333,15 +341,19 @@ public class SimpleNode extends Node
 	/**
 	 * Fills the <code>sensorReadingsQueue</code> list with sensor readings from the {@link FileHandler}.
 	 */
-	private void loadSensorReadingsFromMemory() {
+	synchronized private void loadSensorReadingsFromMemory() {
+		long initTime = System.currentTimeMillis();
 		List<String> nodesSensorReadingsQueue = FileHandler.getNodesSensorReadingsQueue();
 		for (String sensorReading : nodesSensorReadingsQueue) {
 			String sensorReadingsValues[] = sensorReading.split(" ");
 			if (sensorReadingsValues.length > 4 && this.isMyID(sensorReadingsValues[3])) {
-				nodesSensorReadingsQueue.remove(sensorReading);
+//				nodesSensorReadingsQueue.remove(sensorReading);
 				sensorReadingsQueue.add(sensorReading);
 			}
 		}
+		long finishTime = System.currentTimeMillis();
+		Utils.printForDebug("Node ID " + this.ID + " successfully loaded " + sensorReadingsQueue.size() + " sensor readings from the memory in " + Utils.getTimeIntervalMessage(initTime, finishTime));
+		System.out.println("");
 	}
 	
 	/**

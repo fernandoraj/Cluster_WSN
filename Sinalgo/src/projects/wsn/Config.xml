@@ -252,13 +252,13 @@
 		<QUDG rMin="4" rMax="6" ProbabilityType="constant" connectionProbability="0.6"/>
 
 		<!--***********************************************************************-->
-		<!--  My Own Settings                                                      -->
+		<!--  Our Own Settings                                                      -->
 		<!--***********************************************************************-->
 		<ExternalFilesPath>
 			<SensorReadingsFilePath value="data/data.txt"/> <!-- file containing the sensor readings from the Intel Lab WSN -->
 		</ExternalFilesPath>
 		
-		<SensorReadingsLoadBlockSize value = "1"/> <!-- amount sensor readings (file lines) to be loaded from the file to the memory of the node -->
+		<SensorReadingsLoadBlockSize value = "200"/> <!-- amount sensor readings (file lines) to be loaded from the file to the memory of the node -->
 		
 	</Custom>
 </Document>
