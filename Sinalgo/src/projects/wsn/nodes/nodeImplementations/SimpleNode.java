@@ -63,7 +63,7 @@ public class SimpleNode extends Node
 	 * (on the <code>FileHandler</code>) is not possible, the sensor readings are loaded from the
 	 * file on demand by each node.
 	 */
-	private boolean loadSensorReadingsFromFile;
+	private boolean loadSensorReadingsFromFile = true;
 	
 	@Override
 	public void preStep() {}
