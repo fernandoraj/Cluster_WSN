@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
@@ -78,6 +80,58 @@ public class FileHandler {
 			loadNodesSensorReadingsFromFile();
 		} 
 		return nodesSensorReadingsList;
+	}
+	
+	public static void generatePercentageFile(String filePath, Float percentage, Integer minQuantity) {
+		SortedMap<Integer, List<String>> sensorReadingsMap = getSensorReadingsMap(filePath);
+		for (Integer sensorID : sensorReadingsMap.keySet()) {
+			List<String> sensorReadingsList = sensorReadingsMap.get(sensorID);
+			Float sizeLimit = sensorReadingsList.size()*percentage/100;
+			if (sizeLimit.intValue() < minQuantity) {
+				sizeLimit = sensorReadingsList.size() < minQuantity ? sensorReadingsList.size() : minQuantity.floatValue();
+			}
+			System.out.println("Node " + sensorID + " has " +sizeLimit.intValue() + " sensor readings.");
+			for (int i = 0; i < sizeLimit.intValue(); i++) {
+				String sensorReading = sensorReadingsList.get(i);
+//				System.out.println("\t" + sensorReading); escrever no arquivo
+			}
+		}
+	}
+
+	public static SortedMap<Integer, List<String>> getSensorReadingsMap(String filePath) {
+		System.out.println("Loading sensor readings map...");
+		long initTime = System.currentTimeMillis();
+		SortedMap<Integer, List<String>> sensorReadingsMap = new TreeMap<Integer, List<String>>();
+		BufferedReader bufferedReader = getBufferedReader(filePath);
+		try {
+			String sensorReading = bufferedReader.readLine();
+			while (sensorReading != null) {
+				String[] sensorReadingValues = sensorReading.split(" ");
+				if (sensorReadingValues.length > 4) { //evita linhas quebradas que estão no final do arquivo
+					Integer sensorID = Integer.parseInt(sensorReadingValues[3]);
+					if (sensorID <= 54) {
+						List<String> sensorReadingsList = sensorReadingsMap.get(sensorID);
+						if (sensorReadingsList == null) {
+							sensorReadingsList = new ArrayList<String>();
+						}
+						
+						sensorReadingsList.add(sensorReading);
+						sensorReadingsMap.put(sensorID, sensorReadingsList);
+						
+					}
+				}
+				sensorReading = bufferedReader.readLine();
+			}
+			long finishTime = System.currentTimeMillis();
+			System.out.println("Sensor readings map successfully loaded in " + Utils.getTimeIntervalMessage(initTime, finishTime));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return sensorReadingsMap;
+	}
+	
+	public static void main(String[] args) {
+		FileHandler.generatePercentageFile("data/sensor_readings/all_nodes_sensor_readings.txt", 0.5f, 200);
 	}
 	
 }
