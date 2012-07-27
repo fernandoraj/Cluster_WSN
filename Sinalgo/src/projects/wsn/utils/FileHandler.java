@@ -24,7 +24,7 @@ public class FileHandler {
 	/**
 	 * Number of sensor nodes in the simulation (Intel Lab Data).
 	 */
-	private static final Integer NUMBER_OF_SENSOR_NODES = 54;
+	public static final Integer NUMBER_OF_SENSOR_NODES = 54;
 	
 	/**
 	 * Stores all the lines of the sensor readings file.
