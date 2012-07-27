@@ -250,7 +250,7 @@ public class SimpleNode extends Node
 	private boolean isMyID(String sensorID) {
 		if(!sensorID.equals("")){
 			int intSensorID = Integer.parseInt(sensorID);
-			if (this.ID == intSensorID && intSensorID < 55){
+			if (this.ID == intSensorID && intSensorID <= FileHandler.NUMBER_OF_SENSOR_NODES){
 				return true;
 			}
 		}
@@ -316,13 +316,12 @@ public class SimpleNode extends Node
 				String lineValues[] = line.split(" ");
 				if (lineValues.length > 4 && this.isMyID(lineValues[3])) { //if the line corresponds to data from this node it enters, otherwise it passes to the next line
 					for (int loadedLinesCount = 0; ((line != null) && (loadedLinesCount < sensorReadingsLoadBlockSize)); loadedLinesCount++) { //if the specified number of lines to be loaded was not yet satisfied or if there are no more lines, it enters
+						lineValues = line.split(" ");
 						if (lineValues.length > 4 && this.isMyID(lineValues[3])) {
 							sensorReadingsQueue.add(line); //loads the line to the memory
 							line = bufferedReader.readLine();
 							lineCounter++;
-						} else {
-							break;
-						}
+						} else break;
 					}
 					break;
 				}
@@ -350,7 +349,7 @@ public class SimpleNode extends Node
 	/**
 	 * Fills the <code>sensorReadingsQueue</code> list with sensor readings from the {@link FileHandler}.
 	 */
-	synchronized private void loadSensorReadingsFromMemory() {
+	private void loadSensorReadingsFromMemory() {
 		long initTime = System.currentTimeMillis();
 		List<String> nodesSensorReadingsQueue = FileHandler.getNodesSensorReadingsQueue();
 		for (String sensorReading : nodesSensorReadingsQueue) {
