@@ -198,16 +198,16 @@ public class SimpleNode extends Node
 				String linhas[] = dataLine.split(" ");
 				double value;
 				double quantTime;
-				Utils.printForDebug("sensorID = "+this.ID);
-				Utils.printForDebug("dataSensedType = "+dataSensedType);
-				Utils.printForDebug("medida = "+medida);
+				//Utils.printForDebug("sensorID = "+this.ID);
+				//Utils.printForDebug("dataSensedType = "+dataSensedType);
+				//Utils.printForDebug("medida = "+medida);
 //				Utils.printForDebug("(ultimoRoundLido + sizeTimeSlot) = "+(ultimoRoundLido + sizeTimeSlot));
 //				Utils.printForDebug("cont = "+cont);
-				Utils.printForDebug("");
+				//Utils.printForDebug("");
 				if (linhas.length > 4)
 				{
-					Utils.printForDebug("Entrou no if (linhas.length > 4) : dataLine = "+dataLine);
-					Utils.printForDebug("\ncont = "+cont+"\n");
+					//Utils.printForDebug("Entrou no if (linhas.length > 4) : dataLine = "+dataLine);
+					//Utils.printForDebug("\ncont = "+cont+"\n");
 					cont++;
 /*
 					if (this.ID == 5)
