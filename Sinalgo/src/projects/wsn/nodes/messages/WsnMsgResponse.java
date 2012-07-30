@@ -82,7 +82,9 @@ public class WsnMsgResponse extends Message {
 	 */
 	public Stack<Integer> clonePath()
 	{
-		return pathToSenderNode;
+		Stack<Integer> temp = pathToSenderNode;
+		pathToSenderNode = null;
+		return temp;
 //		return (Stack<Node>)pathToSenderNode.clone();
 	}
 	

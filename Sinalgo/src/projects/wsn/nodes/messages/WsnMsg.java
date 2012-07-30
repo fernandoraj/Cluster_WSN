@@ -133,6 +133,11 @@ public class WsnMsg extends Message {
 		}
 		return pathToSenderNode.pop();
 	}
+	
+	public void setPathToSenderNode(Stack<Integer> pathToSenderNode)
+	{
+		this.pathToSenderNode = pathToSenderNode;
+	}
 
 	/**
 	 * Construtor básico da Classe

@@ -157,6 +157,7 @@ public class SinkNode extends SimpleNode
 	{
 		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.origem , this, 1, 1, dataSensedType);
 		wsnMessage.setCoefs(coeficienteA, coeficienteB);
+		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath());
 		WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
 		timer.startRelative(1, this);
 	}
