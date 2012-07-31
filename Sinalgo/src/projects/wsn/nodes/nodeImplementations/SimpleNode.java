@@ -116,9 +116,10 @@ public class SimpleNode extends Node
 				else if (wsnMessage.tipoMsg == 1)// A mensagem é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
 				{ 
 					this.setColor(Color.YELLOW);
-					if (wsnMessage.destino == this)
+					Integer nextNode = wsnMessage.popFromPath();
+					if (nextNode != null && wsnMessage.destino != this)
 					{
-
+						//Definir roteamento de mensagem.
 					}
 					else if (sequenceNumber < wsnMessage.sequenceID)
 					{ 

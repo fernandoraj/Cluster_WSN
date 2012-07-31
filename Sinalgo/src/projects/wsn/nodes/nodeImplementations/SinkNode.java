@@ -158,7 +158,13 @@ public class SinkNode extends SimpleNode
 		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.origem , this, 1, 1, dataSensedType);
 		wsnMessage.setCoefs(coeficienteA, coeficienteB);
 		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath());
+		Integer nextNode = wsnMessage.popFromPath();
 		WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
+		if (nextNode != null)
+		{
+			//Node no = this.getNodeByID(nextNode);
+			timer = new WsnMessageTimer(wsnMessage);
+		}
 		timer.startRelative(1, this);
 	}
 }
