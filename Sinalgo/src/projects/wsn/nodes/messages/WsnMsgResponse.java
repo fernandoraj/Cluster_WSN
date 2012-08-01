@@ -238,6 +238,8 @@ public class WsnMsgResponse extends Message {
 		msg.sizeTimeSlot = this.sizeTimeSlot;
 		msg.dataSensedType = this.dataSensedType;
 		msg.thresholdError = this.thresholdError;
+		msg.dataRecordItens = this.dataRecordItens;
+		msg.pathToSenderNode = this.pathToSenderNode;
 		return msg;
 	}
 
