@@ -506,7 +506,7 @@ public class SimpleNode extends Node
 		triggerPredictions(wsnMessage.dataSensedType, coefA, coefB, maxError);
 //		setCoefs(coeficienteA, coeficienteB);
 //		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath());
-		sendToNextNodeInPath(wsnMessage);
+//		sendToNextNodeInPath(wsnMessage);
 	}
 	
 	protected void triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError)
@@ -543,9 +543,13 @@ public class SimpleNode extends Node
 				double predictionValue = makePrediction(coefA, coefB, quantTime);
 				if (isValuePredictInValueReading(value, predictionValue, maxError))
 				{
-					
+					Utils.printForDebug("O valor predito estah dentro da margem de erro do valor lido!");
 				}
-				
+				else
+				{
+					Utils.printForDebug("O valor predito NAO estah dentro da margem de erro do valor lido!");
+				}
+				Utils.printForDebug("Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
 			}//if (linhas.length > 4)
 		}//if (sensorReading != null && medida != 0)
 	}
@@ -553,16 +557,6 @@ public class SimpleNode extends Node
 	protected boolean isValuePredictInValueReading(double value, double predictionValue, double maxError)
 	{
 		boolean hit;
-/*
-		if (maxError >= ((value - predictionValue)/value))
-		{
-			hit = true;
-		}
-		else
-		{
-			hit = false;
-		}
-*/
 		if (predictionValue >= (value - value*maxError) && predictionValue <= (value + value*maxError))
 		{
 			hit = true;
