@@ -55,7 +55,12 @@ public class WsnMsg extends Message {
 	/**
 	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro)
 	 */
-	public double thresholdError = 0.0;
+	private double thresholdError = 0.0;
+	
+	public double getThresholdError()
+	{
+		return thresholdError;
+	}
 	
 	/**
 	 * Representa os coeficientes (A e B) da equação (de regressão) a serem enviados para o nó correspondente
@@ -199,7 +204,6 @@ public class WsnMsg extends Message {
 	
 	@Override
 	public Message clone() {
-		// TODO Auto-generated method stub
 		WsnMsg msg = new WsnMsg(this.sequenceID, this.origem, this.destino, this.forwardingHop, this.tipoMsg);
 		msg.ttl = this.ttl;
 		msg.saltosAteDestino = this.saltosAteDestino;
