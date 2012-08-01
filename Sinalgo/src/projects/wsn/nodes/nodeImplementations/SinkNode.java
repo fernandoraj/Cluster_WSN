@@ -24,7 +24,7 @@ public class SinkNode extends SimpleNode
 	private String dataSensedType = "t";
 	
 	/**
-	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro)
+	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 */
 	private double thresholdError = 0.1;
 	
@@ -59,13 +59,13 @@ public class SinkNode extends SimpleNode
 			{
 				this.setColor(Color.GREEN);
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
-				receberMensagem(wsnMsgResp, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedType);
+				receiveMessage(wsnMsgResp, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedType);
 				
 			} //if (message instanceof WsnMsg)
 		} //while (inbox.hasNext())
 	} //public void handleMessages
 	
-	private void receberMensagem(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
+	private void receiveMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 	{
 		if (wsnMsgResp != null && wsnMsgResp.dataRecordItens != null)
 		{
@@ -94,7 +94,7 @@ public class SinkNode extends SimpleNode
 			//Cálculos dos coeficientes de regressão linear com os vetores acima
 			coeficienteB = calculaB(valores, tempos, mediaValores, mediaTempos);
 			coeficienteA = calculaA(mediaValores, mediaTempos, coeficienteB);
-			enviarCoeficientes(wsnMsgResp, coeficienteA, coeficienteB);
+			sendCoefficients(wsnMsgResp, coeficienteA, coeficienteB);
 		}
 	}
 	
@@ -153,18 +153,11 @@ public class SinkNode extends SimpleNode
 		return (mediaValores - B*mediaTempos);
 	}
 	
-	private void enviarCoeficientes(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB)
+	private void sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB)
 	{
-		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.origem , this, 1, 1, dataSensedType);
+		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.origem , this, 1, 1, dataSensedType, thresholdError);
 		wsnMessage.setCoefs(coeficienteA, coeficienteB);
 		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath());
-		Integer nextNode = wsnMessage.popFromPath();
-		WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
-		if (nextNode != null)
-		{
-			//Node no = this.getNodeByID(nextNode);
-			timer = new WsnMessageTimer(wsnMessage);
-		}
-		timer.startRelative(1, this);
+		sendToNextNodeInPath(wsnMessage);
 	}
 }
