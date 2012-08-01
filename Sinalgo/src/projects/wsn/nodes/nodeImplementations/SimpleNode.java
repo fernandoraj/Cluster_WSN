@@ -10,6 +10,7 @@ import java.util.List;
 import projects.wsn.nodes.messages.WsnMsg;
 import projects.wsn.nodes.messages.WsnMsgResponse;
 import projects.wsn.nodes.timers.WsnMessageResponseTimer;
+import projects.wsn.nodes.timers.WsnMessageTimer;
 import projects.wsn.utils.FileHandler;
 import projects.wsn.utils.Utils;
 import sinalgo.configuration.Configuration;
@@ -18,6 +19,7 @@ import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
+import sinalgo.tools.Tools;
 
 /**
  * Class that represents an ordinary sensor node that is able to sense natural phenomena
@@ -89,17 +91,21 @@ public class SimpleNode extends Node
 			{
 				Boolean encaminhar = Boolean.TRUE;
 				WsnMsg wsnMessage = (WsnMsg) message;
+				Utils.printForDebug("* Entrou em if (message instanceof WsnMsg) * NoID = "+this.ID);
 				if (wsnMessage.forwardingHop.equals(this)) // A mensagem voltou. O nó deve descarta-la
 				{ 
 					encaminhar = Boolean.FALSE;
+					Utils.printForDebug("** Entrou em if (wsnMessage.forwardingHop.equals(this)) ** NoID = "+this.ID);
 				}
 				else if (wsnMessage.tipoMsg == 0)// A mensagem é um flood. Devemos atualizar a rota
 				{ 
 					this.setColor(Color.BLUE);
+					Utils.printForDebug("*** Entrou em else if (wsnMessage.tipoMsg == 0) *** NoID = "+this.ID);
 					if (proximoNoAteEstacaoBase == null)
 					{
 						proximoNoAteEstacaoBase = inbox.getSender();
 						sequenceNumber = wsnMessage.sequenceID;
+						Utils.printForDebug("**** Entrou em if (proximoNoAteEstacaoBase == null) **** NoID = "+this.ID);
 					}
 					else if (sequenceNumber < wsnMessage.sequenceID)
 					{ 
@@ -107,26 +113,31 @@ public class SimpleNode extends Node
 					//Exemplo: Nó A transmite em brodcast. Nó B recebe a msg e retransmite em broadcast.
 					//Consequentemente, nó A irá receber a msg. Sem esse condicional, nó A iria retransmitir novamente, gerando um loop.
 						sequenceNumber = wsnMessage.sequenceID;
+						Utils.printForDebug("***** Entrou em else if (sequenceNumber < wsnMessage.sequenceID) ***** NoID = "+this.ID);
 					}
 					else
 					{
 						encaminhar = Boolean.FALSE;
+						Utils.printForDebug("****** Entrou em encaminhar = Boolean.FALSE; ****** NoID = "+this.ID);
 					}
 				} //if (wsnMessage.tipoMsg == 0)
 				else if (wsnMessage.tipoMsg == 1)// A mensagem é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
 				{ 
 					this.setColor(Color.YELLOW);
-					Integer nextNode = wsnMessage.popFromPath();
-					if (nextNode != null && wsnMessage.destino != this)
+					Integer nextNodeId = wsnMessage.popFromPath();
+					Utils.printForDebug("@ Entrou em else if (wsnMessage.tipoMsg == 1) @ NoID = "+this.ID+" nextNodeId = "+nextNodeId);
+					//Definir roteamento de mensagem
+					if (nextNodeId != null && wsnMessage.destino != this)
 					{
-						//Definir roteamento de mensagem.
+						Utils.printForDebug("@@ Entrou em if (nextNodeId != null && wsnMessage.destino != this) @@ NoID = "+this.ID);
+						sendToNextNodeInPath(wsnMessage);
 					}
-					else if (sequenceNumber < wsnMessage.sequenceID)
+					else if (wsnMessage.destino == this && nextNodeId == null)
 					{ 
-					//Recurso simples para evitar loop.
-					//Exemplo: Nó A transmite em brodcast. Nó B recebe a msg e retransmite em broadcast.
-					//Consequentemente, nó A irá receber a msg. Sem esse condicional, nó A iria retransmitir novamente, gerando um loop.
-						sequenceNumber = wsnMessage.sequenceID;
+//						sequenceNumber = wsnMessage.sequenceID;
+						this.setColor(Color.RED);
+						Utils.printForDebug("@@@ Entrou em else if (wsnMessage.destino == this && nextNodeId == null) @@@ NoID = "+this.ID);
+						receiveCoefficients(wsnMessage);
 					}
 					else
 					{
@@ -141,9 +152,13 @@ public class SimpleNode extends Node
 				}
 				else if (encaminhar)
 				{
-					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 100, "t"); 
-
-					prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
+					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, "t");
+					
+					if (wsnMessage != null)
+					{
+						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType); 
+						prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
+					}
 					
 					addThisNodeToPath(wsnMsgResp);
 					
@@ -236,7 +251,10 @@ public class SimpleNode extends Node
 						}//catch
 					}//else
 					quantTime = parseCalendarHoras(linhas[0], linhas[1]);
+
+					// TESTAR PORQUE OS DATARECORDITENS NÃO ESTÃO SENDO PASSADOS!!! 
 					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
+					
 				}//if (linhas.length > 4)
 			}//if (dataLine != null && dataSensedType != null && medida != 0)
 			dataLine = performSensorReading();
@@ -451,10 +469,108 @@ public class SimpleNode extends Node
 	 * @param tempo Parâmetro de tempo a ter o valor da grandeza predito 
 	 * @return Valor predito para o parâmetro sensoreado no tempo dado
 	 */
-	private double fazerPredicao(double A, double B, double tempo)
+	private double makePrediction(double A, double B, double tempo)
 	{
 		double time;
 		time = A + B*tempo;
 		return time;
+	}
+	
+	protected void sendToNextNodeInPath(WsnMsg wsnMessage)
+	{
+		Integer nextNodeId = wsnMessage.popFromPath();
+		WsnMessageTimer timer = null;
+//		WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
+		Node nextNode = null;
+		if (nextNodeId != null)
+		{
+			nextNode = Tools.getNodeByID(nextNodeId);
+			timer = new WsnMessageTimer(wsnMessage, nextNode);
+			timer.startRelative(1, this);
+		}
+/*		
+		else //if (nextNode == null)
+		{
+			timer = new WsnMessageTimer(wsnMessage);
+ 			timer.startRelative(1, this);
+		}
+*/
+	}
+	
+	protected void receiveCoefficients(WsnMsg wsnMessage)
+	{
+//		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.origem , this, 1, 1, dataSensedType);
+		double coefA = wsnMessage.getCoefA();
+		double coefB = wsnMessage.getCoefB();
+		double maxError = wsnMessage.getThresholdError();
+		triggerPredictions(wsnMessage.dataSensedType, coefA, coefB, maxError);
+//		setCoefs(coeficienteA, coeficienteB);
+//		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath());
+		sendToNextNodeInPath(wsnMessage);
+	}
+	
+	protected void triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError)
+	{
+		int medida = 0;
+		if (dataSensedType != null)
+		{
+			medida = identificarTipo(dataSensedType);
+		}
+		String sensorReading = performSensorReading();
+		if (sensorReading != null && medida != 0)
+		{
+			String linhas[] = sensorReading.split(" ");
+			double value;
+			double quantTime;
+			if (linhas.length > 4)
+			{
+				if (linhas[medida] == null || linhas[medida].equals(""))
+				{
+					value = 0.0;
+				}
+				else
+				{
+					try
+					{
+						value = Double.parseDouble(linhas[medida]);
+					}//try
+					catch (NumberFormatException e)
+					{
+						value = 0.0;
+					}//catch
+				}//else
+				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
+				double predictionValue = makePrediction(coefA, coefB, quantTime);
+				if (isValuePredictInValueReading(value, predictionValue, maxError))
+				{
+					
+				}
+				
+			}//if (linhas.length > 4)
+		}//if (sensorReading != null && medida != 0)
+	}
+	
+	protected boolean isValuePredictInValueReading(double value, double predictionValue, double maxError)
+	{
+		boolean hit;
+/*
+		if (maxError >= ((value - predictionValue)/value))
+		{
+			hit = true;
+		}
+		else
+		{
+			hit = false;
+		}
+*/
+		if (predictionValue >= (value - value*maxError) && predictionValue <= (value + value*maxError))
+		{
+			hit = true;
+		}
+		else
+		{
+			hit = false;
+		}
+		return hit;
 	}
 }
