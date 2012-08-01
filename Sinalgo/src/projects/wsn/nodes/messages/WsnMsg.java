@@ -68,8 +68,8 @@ public class WsnMsg extends Message {
 	 */
 	public class coefEquation
 	{
-		double coefA;
-		double coefB;
+		Double coefA;
+		Double coefB;
 	}
 	
 	/**
@@ -95,18 +95,26 @@ public class WsnMsg extends Message {
 	 * Lê o coeficiente A da equação
 	 * @return valor do coeficiente A
 	 */
-	public double getCoefA()
+	public Double getCoefA()
 	{
-		return coefs.coefA;
+		if (coefs != null)
+		{
+			return coefs.coefA;
+		}
+		return null;
 	}
 	
 	/**
 	 * Lê o coeficiente B da equação
 	 * @return valor do coeficiente B
 	 */
-	public double getCoefB()
+	public Double getCoefB()
 	{
-		return coefs.coefB;
+		if (coefs != null)
+		{
+			return coefs.coefB;
+		}
+		return null;
 	}
 	
 	/**
@@ -114,8 +122,12 @@ public class WsnMsg extends Message {
 	 * @param A valor do coeficiente A
 	 * @param B valor do coeficiente B
 	 */
-	public void setCoefs(double A, double B)
+	public void setCoefs(Double A, Double B)
 	{
+		if (coefs == null)
+		{
+			coefs = new coefEquation();
+		}
 		hasCoefs = true;
 		coefs.coefA = A;
 		coefs.coefB = B;
@@ -210,6 +222,8 @@ public class WsnMsg extends Message {
 		msg.sizeTimeSlot = this.sizeTimeSlot;
 		msg.dataSensedType = this.dataSensedType;
 		msg.thresholdError = this.thresholdError;
+		msg.coefs = this.coefs;
+		msg.pathToSenderNode = this.pathToSenderNode;
 		return msg;
 	}
 
