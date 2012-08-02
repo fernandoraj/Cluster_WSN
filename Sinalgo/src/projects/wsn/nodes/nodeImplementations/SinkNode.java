@@ -57,10 +57,9 @@ public class SinkNode extends SimpleNode
 			Message message = inbox.next();
 			if (message instanceof WsnMsgResponse)
 			{
-				this.setColor(Color.GREEN);
+				this.setColor(Color.YELLOW);
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
 				receiveMessage(wsnMsgResp, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedType);
-				
 			} //if (message instanceof WsnMsg)
 		} //while (inbox.hasNext())
 	} //public void handleMessages
@@ -73,14 +72,6 @@ public class SinkNode extends SimpleNode
 			double[] valores = new double[size];
 			double[] tempos = new double[size];
 			char[] tipos = new char[size];
-	/*
-			char type;
-			if (dataSensedType != null && !dataSensedType.equals("")) {
-				type = dataSensedType.charAt(0);
-			} else {
-				type = ' ';
-			}
-	*/
 			//Dados lidos do sensor correspondente
 			valores = wsnMsgResp.getDataRecordValues();
 			tempos = wsnMsgResp.getDataRecordTimes();
