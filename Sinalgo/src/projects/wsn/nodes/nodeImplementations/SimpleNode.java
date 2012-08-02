@@ -32,13 +32,30 @@ import sinalgo.tools.Tools;
 public class SimpleNode extends Node 
 {
 	
-	//Armazenar o nó que será usado para alcançar a Estação-Base
+	/**
+	 * Armazenar o nó que será usado para alcançar a Estação-Base
+	 */
 	protected Node proximoNoAteEstacaoBase;
 	
-	//Armazena o número de sequencia da última mensagem recebida
+	/**
+	 * Armazena o número de sequencia da última mensagem recebida
+	 */
 	protected Integer sequenceNumber = 0;
 	
+	/**
+	 * Valor do último round em que houve leitura do sensor (que teve valor lido do arquivo) 
+	 */
 	protected int ultimoRoundLido;
+	
+	/**
+	 * Valor (grandeza/magnitude) da última leitura do sensor 
+	 */
+	protected double lastValueRead;
+	
+	/**
+	 * Tempo (data/hora em milisegundos) da última leitura do sensor 
+	 */
+	protected double lastTimeRead;
 	
 	/**
 	 * Stores sensor readings of this node loaded from the sensor readings file.
@@ -87,25 +104,31 @@ public class SimpleNode extends Node
 	public void handleMessages(Inbox inbox) {
 		while (inbox.hasNext()){
 			Message message = inbox.next();
-			if (message instanceof WsnMsg)
+			if (message instanceof WsnMsg) //Mensagem que vai do sink para os nós sensores 
 			{
 				Boolean encaminhar = Boolean.TRUE;
 				WsnMsg wsnMessage = (WsnMsg) message;
-				Utils.printForDebug("* Entrou em if (message instanceof WsnMsg) * NoID = "+this.ID);
+				
+//				Utils.printForDebug("* Entrou em if (message instanceof WsnMsg) * NoID = "+this.ID);
+				
 				if (wsnMessage.forwardingHop.equals(this)) // A mensagem voltou. O nó deve descarta-la
 				{ 
 					encaminhar = Boolean.FALSE;
-					Utils.printForDebug("** Entrou em if (wsnMessage.forwardingHop.equals(this)) ** NoID = "+this.ID);
+					
+//					Utils.printForDebug("** Entrou em if (wsnMessage.forwardingHop.equals(this)) ** NoID = "+this.ID);
 				}
-				else if (wsnMessage.tipoMsg == 0)// A mensagem é um flood. Devemos atualizar a rota
+				else if (wsnMessage.tipoMsg == 0)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
 				{ 
 					this.setColor(Color.BLUE);
-					Utils.printForDebug("*** Entrou em else if (wsnMessage.tipoMsg == 0) *** NoID = "+this.ID);
+
+//					Utils.printForDebug("*** Entrou em else if (wsnMessage.tipoMsg == 0) *** NoID = "+this.ID);
+					
 					if (proximoNoAteEstacaoBase == null)
 					{
 						proximoNoAteEstacaoBase = inbox.getSender();
 						sequenceNumber = wsnMessage.sequenceID;
-						Utils.printForDebug("**** Entrou em if (proximoNoAteEstacaoBase == null) **** NoID = "+this.ID);
+						
+//						Utils.printForDebug("**** Entrou em if (proximoNoAteEstacaoBase == null) **** NoID = "+this.ID);
 					}
 					else if (sequenceNumber < wsnMessage.sequenceID)
 					{ 
@@ -113,35 +136,42 @@ public class SimpleNode extends Node
 					//Exemplo: Nó A transmite em brodcast. Nó B recebe a msg e retransmite em broadcast.
 					//Consequentemente, nó A irá receber a msg. Sem esse condicional, nó A iria retransmitir novamente, gerando um loop.
 						sequenceNumber = wsnMessage.sequenceID;
-						Utils.printForDebug("***** Entrou em else if (sequenceNumber < wsnMessage.sequenceID) ***** NoID = "+this.ID);
+						
+//						Utils.printForDebug("***** Entrou em else if (sequenceNumber < wsnMessage.sequenceID) ***** NoID = "+this.ID);
 					}
 					else
 					{
 						encaminhar = Boolean.FALSE;
-						Utils.printForDebug("****** Entrou em encaminhar = Boolean.FALSE; ****** NoID = "+this.ID);
+						
+//						Utils.printForDebug("****** Entrou em encaminhar = Boolean.FALSE; ****** NoID = "+this.ID);
 					}
 				} //if (wsnMessage.tipoMsg == 0)
-				else if (wsnMessage.tipoMsg == 1)// A mensagem é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
+				else if (wsnMessage.tipoMsg == 1)// Mensagem que vai do sink para os nós sensores e é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
 				{ 
-					this.setColor(Color.YELLOW);
-					Integer nextNodeId = wsnMessage.popFromPath();
-					Utils.printForDebug("@ Entrou em else if (wsnMessage.tipoMsg == 1) @ NoID = "+this.ID+" nextNodeId = "+nextNodeId);
+//					this.setColor(Color.YELLOW);
+//					Integer nextNodeId = wsnMessage.popFromPath();
+					
+//					Utils.printForDebug("@ Entrou em else if (wsnMessage.tipoMsg == 1) @ NoID = "+this.ID+" nextNodeId = "+nextNodeId);
+
+					encaminhar = Boolean.FALSE;
+					
 					//Definir roteamento de mensagem
-					if (nextNodeId != null && wsnMessage.destino != this)
+					if (wsnMessage.destino != this)
 					{
-						Utils.printForDebug("@@ Entrou em if (nextNodeId != null && wsnMessage.destino != this) @@ NoID = "+this.ID);
+//						Utils.printForDebug("@@ Entrou em if (nextNodeId != null && wsnMessage.destino != this) @@ NoID = "+this.ID);
+						
 						sendToNextNodeInPath(wsnMessage);
 					}
-					else if (wsnMessage.destino == this && nextNodeId == null)
+					else if (wsnMessage.destino == this) //Se este for o nó de destino da mensagem...
 					{ 
 //						sequenceNumber = wsnMessage.sequenceID;
 						this.setColor(Color.RED);
-						Utils.printForDebug("@@@ Entrou em else if (wsnMessage.destino == this && nextNodeId == null) @@@ NoID = "+this.ID);
+						
+//						Utils.printForDebug("@@@ Entrou em else if (wsnMessage.destino == this && nextNodeId == null) @@@ NoID = "+this.ID);
+						
+						//...então o nó deve receber os coeficientes enviados pelo sink e...
 						receiveCoefficients(wsnMessage);
-					}
-					else
-					{
-						encaminhar = Boolean.FALSE;
+						//...não deve mais encaminhar esta mensagem
 					}
 				} //if (wsnMessage.tipoMsg == 0)
 				
@@ -150,7 +180,7 @@ public class SimpleNode extends Node
 					wsnMessage.forwardingHop = this; 
 					broadcast(wsnMessage);
 				}
-				else if (encaminhar)
+				else if (encaminhar) //Nó sensor recebe uma mensagem de flooding (com wsnMessage) e deve responder ao sink com uma WsnMsgResponse... (continua em "...além de") 
 				{
 					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, "t");
 					
@@ -159,7 +189,6 @@ public class SimpleNode extends Node
 						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType); 
 						prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
 					}
-					
 					addThisNodeToPath(wsnMsgResp);
 					
 					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
@@ -168,13 +197,16 @@ public class SimpleNode extends Node
 					
 					//Devemos alterar o campo forwardingHop(da mensagem) para armazenar o noh que vai encaminhar a mensagem.
 					wsnMessage.forwardingHop = this; 
+					//...além de repassar a wsnMessage para os próximos nós
 					broadcast(wsnMessage);
 					
 				} //if (encaminhar)
 			} //if (message instanceof WsnMsg)
-			else if (message instanceof WsnMsgResponse)
+			else if (message instanceof WsnMsgResponse) //Mensagem de resposta dos nós sensores para o sink que deve ser repassada para o "proximoNoAteEstacaoBase"
 			{
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
+				
+//				this.setColor(Color.YELLOW);
 				
 				addThisNodeToPath(wsnMsgResp);
 				
@@ -214,27 +246,12 @@ public class SimpleNode extends Node
 				String linhas[] = dataLine.split(" ");
 				double value;
 				double quantTime;
-				//Utils.printForDebug("sensorID = "+this.ID);
-				//Utils.printForDebug("dataSensedType = "+dataSensedType);
-				//Utils.printForDebug("medida = "+medida);
 //				Utils.printForDebug("(ultimoRoundLido + sizeTimeSlot) = "+(ultimoRoundLido + sizeTimeSlot));
 //				Utils.printForDebug("cont = "+cont);
-				//Utils.printForDebug("");
 				if (linhas.length > 4)
 				{
-					//Utils.printForDebug("Entrou no if (linhas.length > 4) : dataLine = "+dataLine);
-					//Utils.printForDebug("\ncont = "+cont+"\n");
 					cont++;
-/*
-					if (this.ID == 5)
-					{
-						for (int l=0; l<linhas.length; l++)
-						{
-							System.out.println("linhas["+l+"] = "+linhas[l]);
-						}
-//						break;
-					}
-*/
+					ultimoRoundLido = Integer.parseInt(linhas[2]); //Número do round 
 					if (linhas[medida] == null || linhas[medida].equals(""))
 					{
 						value = 0.0;
@@ -251,13 +268,18 @@ public class SimpleNode extends Node
 						}//catch
 					}//else
 					quantTime = parseCalendarHoras(linhas[0], linhas[1]);
+					
+					lastValueRead = value;
+					lastTimeRead = quantTime;
 
-					// TESTAR PORQUE OS DATARECORDITENS NÃO ESTÃO SENDO PASSADOS!!! 
 					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
 					
 				}//if (linhas.length > 4)
 			}//if (dataLine != null && dataSensedType != null && medida != 0)
-			dataLine = performSensorReading();
+			if (i<sizeTimeSlot) //Impede que seja perdida uma leitura do sensor
+			{
+				dataLine = performSensorReading();
+			}//if (i<sizeTimeSlot)
 		}//while (i<sizeTimeSlot && dataLine != null)
 	}
 	
@@ -488,13 +510,6 @@ public class SimpleNode extends Node
 			timer = new WsnMessageTimer(wsnMessage, nextNode);
 			timer.startRelative(1, this);
 		}
-/*		
-		else //if (nextNode == null)
-		{
-			timer = new WsnMessageTimer(wsnMessage);
- 			timer.startRelative(1, this);
-		}
-*/
 	}
 	
 	protected void receiveCoefficients(WsnMsg wsnMessage)
@@ -543,11 +558,11 @@ public class SimpleNode extends Node
 				double predictionValue = makePrediction(coefA, coefB, quantTime);
 				if (isValuePredictInValueReading(value, predictionValue, maxError))
 				{
-					Utils.printForDebug("O valor predito estah dentro da margem de erro do valor lido!");
+					Utils.printForDebug("\n@ @ O valor predito ESTA dentro da margem de erro do valor lido! NoID = "+this.ID);
 				}
 				else
 				{
-					Utils.printForDebug("O valor predito NAO estah dentro da margem de erro do valor lido!");
+					Utils.printForDebug("\n* * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
 				}
 				Utils.printForDebug("Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
 			}//if (linhas.length > 4)
