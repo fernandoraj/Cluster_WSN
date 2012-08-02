@@ -26,7 +26,7 @@ public class WsnMessageTimer extends Timer {
 	{
 		if (nextNode != null)
 		{
-			((SimpleNode)node).send(message, node);
+			((SimpleNode)node).send(message, nextNode);
 		}
 		else
 		{
