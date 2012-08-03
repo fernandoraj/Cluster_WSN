@@ -9,6 +9,7 @@ import java.util.List;
 
 import projects.wsn.nodes.messages.WsnMsg;
 import projects.wsn.nodes.messages.WsnMsgResponse;
+import projects.wsn.nodes.timers.PredictionTimer;
 import projects.wsn.nodes.timers.WsnMessageResponseTimer;
 import projects.wsn.nodes.timers.WsnMessageTimer;
 import projects.wsn.utils.FileHandler;
@@ -558,15 +559,53 @@ public class SimpleNode extends Node
 				double predictionValue = makePrediction(coefA, coefB, quantTime);
 				if (isValuePredictInValueReading(value, predictionValue, maxError))
 				{
-					Utils.printForDebug("\n@ @ O valor predito ESTA dentro da margem de erro do valor lido! NoID = "+this.ID);
+					ultimoRoundLido = Integer.parseInt(linhas[2]);
+					lastValueRead = value;
+					lastTimeRead = quantTime;
+					
+					PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError);
+					newPredictionTimer.startRelative(1, this);
+					
+					Utils.printForDebug(" @ @ O valor predito ESTA dentro da margem de erro do valor lido! NoID = "+this.ID);
+					Utils.printForDebug("Round = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
+					
+					System.out.println(" @ @ O valor predito ESTA dentro da margem de erro do valor lido! NoID = "+this.ID);
+					System.out.println("Round = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
 				}
 				else
 				{
-					Utils.printForDebug("\n* * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
+					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 1, 2, dataSensedType);
+					//Adiciona os últimos valores lidos anteriormente a mensagem que vai para o sink
+					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), lastValueRead, lastTimeRead);
+					//Adiciona os valores lidos (NOVIDADE) na mensagem que vai para o sink
+					ultimoRoundLido = Integer.parseInt(linhas[2]);
+					lastValueRead = value;
+					lastTimeRead = quantTime;
+					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), lastValueRead, lastTimeRead);
+					
+					//Caso queira se passar X novas leituras do sensor para recalcular os coeficientes, pode-se usar o código abaixo para substituir a linha acima
+//					Integer x = X;
+//					prepararMensagem(wsnMsgResp, x, dataSensedType);
+					
+					addThisNodeToPath(wsnMsgResp);
+					
+					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
+					
+					timer.startRelative(1, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+					
+					Utils.printForDebug("\n\n * * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
+					Utils.printForDebug("\nRound = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
+					System.out.println("\n\n * * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
+					System.out.println("\nRound = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
 				}
-				Utils.printForDebug("Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
+				
 			}//if (linhas.length > 4)
 		}//if (sensorReading != null && medida != 0)
+	}
+	
+	public final void triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
+	{
+		triggerPredictions(dataSensedType, coefA, coefB, maxError);
 	}
 	
 	protected boolean isValuePredictInValueReading(double value, double predictionValue, double maxError)
