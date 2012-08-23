@@ -103,6 +103,26 @@ public class Global {
 	public static int numberOfMessagesOverAll = 0;
 	
 	/**
+	 * Global information about the number of hits (correct predictions) in this round.
+	 */
+	public static int numberOfHitsInThisRound = 0;
+	
+	/**
+	 * Global information about the number of hits (correct predictions) in all previous rounds.
+	 */	
+	public static int numberOfHitsOverAll = 0;
+	
+	/**
+	 * Global information about the number of misses (incorrect predictions) in this round.
+	 */
+	public static int numberOfMissesInThisRound = 0;
+	
+	/**
+	 * Global information about the number of misses (incorrect predictions) in all previous rounds.
+	 */	
+	public static int numberOfMissesOverAll = 0;
+	
+	/**
 	 * The current time of the simulation.
 	 * <p>
 	 * In synchronous simulation, this time is incremented by 1 at the end of every round, in
