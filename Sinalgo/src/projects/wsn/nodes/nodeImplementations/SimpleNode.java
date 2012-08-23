@@ -20,6 +20,7 @@ import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
+import sinalgo.runtime.Global;
 import sinalgo.tools.Tools;
 
 /**
@@ -183,7 +184,7 @@ public class SimpleNode extends Node
 				}
 				else if (encaminhar) //Nó sensor recebe uma mensagem de flooding (com wsnMessage) e deve responder ao sink com uma WsnMsgResponse... (continua em "...além de") 
 				{
-					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, "t");
+					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, "");
 					
 					if (wsnMessage != null)
 					{
@@ -486,7 +487,7 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Faz o cálculo da predição do valor sensoreados de acordo com os coeficientes (A e B) informados e o parâmetro de tempo
+	 * Faz o cálculo da predição do valor sensoreado de acordo com os coeficientes (A e B) informados e o parâmetro de tempo
 	 * @param A Coeficiente A (interceptor) da equação de regressão, dada por S(t) = A + B.t 
 	 * @param B Coeficiente B (slope, inclinação) da equação de regressão, dada por S(t) = A + B.t
 	 * @param tempo Parâmetro de tempo a ter o valor da grandeza predito 
@@ -499,11 +500,14 @@ public class SimpleNode extends Node
 		return time;
 	}
 	
+	/**
+	 * It starts a timer to send the message passed to the next node in path to destination node 
+	 * @param wsnMessage Message to be sended to destination node
+	 */
 	protected void sendToNextNodeInPath(WsnMsg wsnMessage)
 	{
 		Integer nextNodeId = wsnMessage.popFromPath();
 		WsnMessageTimer timer = null;
-//		WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
 		Node nextNode = null;
 		if (nextNodeId != null)
 		{
@@ -513,18 +517,25 @@ public class SimpleNode extends Node
 		}
 	}
 	
+	/**
+	 * Get the coefficients from the Regression Equation and the threshold error from the message passed by and trigger the predictions for this node 
+	 * @param wsnMessage Message to have the coefficients read
+	 */
 	protected void receiveCoefficients(WsnMsg wsnMessage)
 	{
-//		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.origem , this, 1, 1, dataSensedType);
 		double coefA = wsnMessage.getCoefA();
 		double coefB = wsnMessage.getCoefB();
 		double maxError = wsnMessage.getThresholdError();
 		triggerPredictions(wsnMessage.dataSensedType, coefA, coefB, maxError);
-//		setCoefs(coeficienteA, coeficienteB);
-//		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath());
-//		sendToNextNodeInPath(wsnMessage);
 	}
 	
+	/**
+	 * Read the next value from present sensor, make the prediction and, according with the predition (hit or miss), trigges the next action 
+	 * @param dataSensedType Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
+	 * @param coefA Coefficient A from the Regression Equation for this sensor
+	 * @param coefB Coefficient B from the Regression Equation for this sensor
+	 * @param maxError Threshold error to the calculation of prediction for this sensor
+	 */
 	protected void triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError)
 	{
 		int medida = 0;
@@ -565,12 +576,10 @@ public class SimpleNode extends Node
 					
 					PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError);
 					newPredictionTimer.startRelative(1, this);
-					
+/*					
 					Utils.printForDebug(" @ @ O valor predito ESTA dentro da margem de erro do valor lido! NoID = "+this.ID);
 					Utils.printForDebug("Round = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
-					
-					System.out.println(" @ @ O valor predito ESTA dentro da margem de erro do valor lido! NoID = "+this.ID);
-					System.out.println("Round = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
+*/
 				}
 				else
 				{
@@ -595,28 +604,42 @@ public class SimpleNode extends Node
 					
 					Utils.printForDebug("\n\n * * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
 					Utils.printForDebug("\nRound = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
-					System.out.println("\n\n * * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
-					System.out.println("\nRound = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
 				}
 				
 			}//if (linhas.length > 4)
 		}//if (sensorReading != null && medida != 0)
 	}
 	
+	/**
+	 * Calls the method triggerPredictions
+	 * @param dataSensedType Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
+	 * @param coefA Coefficient A from the Regression Equation for this sensor
+	 * @param coefB Coefficient B from the Regression Equation for this sensor
+	 * @param maxError Threshold error to the calculation of prediction for this sensor
+	 */
 	public final void triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
 	{
 		triggerPredictions(dataSensedType, coefA, coefB, maxError);
 	}
 	
+	/**
+	 * Compares the read value('value') to the predict value('predictionValue') using 'maxError' as threshold error
+	 * @param value Value read from the sensor
+	 * @param predictionValue Value predict to be compared
+	 * @param maxError Threshold error to the calculation of prediction for this sensor
+	 * @return True if the sensed (read) value is in the predicted value (more or less the threshold error) ou False, otherwise
+	 */
 	protected boolean isValuePredictInValueReading(double value, double predictionValue, double maxError)
 	{
 		boolean hit;
-		if (predictionValue >= (value - value*maxError) && predictionValue <= (value + value*maxError))
+		if (value >= (predictionValue - value*maxError) && value <= (predictionValue + value*maxError))
 		{
+			Global.numberOfHitsInThisRound++;
 			hit = true;
 		}
 		else
 		{
+			Global.numberOfMissesInThisRound++;
 			hit = false;
 		}
 		return hit;
