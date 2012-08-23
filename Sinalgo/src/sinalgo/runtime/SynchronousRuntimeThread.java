@@ -39,6 +39,7 @@ package sinalgo.runtime;
 
 import java.util.Date;
 
+import projects.wsn.utils.Utils;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.nodes.Node;
@@ -87,7 +88,8 @@ public class SynchronousRuntimeThread extends Thread {
 		
 		Global.startTime = new Date();
 		
-		for(long i = 0; i < numberOfRounds; i++){
+		for(long i = 0; i < numberOfRounds; i++)
+		{
 			// In GUI-mode, check whether ABORT was pressed.
 			if(runtime != null && runtime.abort){
 				runtime.abort = false;
@@ -100,7 +102,7 @@ public class SynchronousRuntimeThread extends Thread {
 			
 			Global.startTimeOfRound = new Date();
 			Global.numberOfMessagesInThisRound = 0;
-
+			
 			Global.customGlobal.preRound();
 			Global.customGlobal.handleGlobalTimers();
 			
@@ -167,6 +169,32 @@ public class SynchronousRuntimeThread extends Thread {
 			}
 			
 			Global.numberOfMessagesOverAll += Global.numberOfMessagesInThisRound;
+			
+			Global.numberOfHitsOverAll += Global.numberOfHitsInThisRound;
+			Global.numberOfMissesOverAll += Global.numberOfMissesInThisRound;
+			
+			if (Global.numberOfHitsInThisRound > 0)
+			{
+				System.out.println("\n");
+				Utils.printForDebug("The number of Hits (in round "+Global.currentTime+") is "+ Global.numberOfHitsInThisRound);
+			}
+			if (Global.numberOfMissesInThisRound > 0)
+			{
+				Utils.printForDebug("The number of Misses (in round "+Global.currentTime+") is "+ Global.numberOfMissesInThisRound);
+			}
+			if (Global.numberOfHitsOverAll > 0)
+			{
+				System.out.println("\n");
+				Utils.printForDebug(" * * The number TOTAL of Hits (in round "+Global.currentTime+") is "+Global.numberOfHitsOverAll);
+			}
+			if (Global.numberOfMissesOverAll > 0)
+			{
+				Utils.printForDebug(" * * The number TOTAL of Misses (in round "+Global.currentTime+") is "+Global.numberOfMissesOverAll);
+			}
+			
+			Global.numberOfHitsInThisRound = 0;
+			Global.numberOfMissesInThisRound = 0;
+
 			
 			if(LogL.ROUND_DETAIL){
 				Global.log.logln("Round "+(Global.currentTime)+" finished");
