@@ -77,10 +77,10 @@
 		<!--  Logging                                                              -->
 		<!--***********************************************************************-->
 		<!--Name of the default log file, used by the system, but also for use by the end-user. (This log file is stored under sinalgo.runtime.Global.log.)-->
-		<logFileName value="logfile.txt" />
+		<logFileName value="logfile" />
 
 		<!--Redirects the default log file to the console. No logfile will be created if set to true.-->
-		<outputToConsole value="true" />
+		<outputToConsole value="false" />
 
 		<!--Indicates whether all log-files of the current simulation  are stored in a new directory. The name of the new directory is given by the string-representation of the date when the simulation starts.-->
 		<logToTimeDirectory value="true" />
@@ -238,6 +238,8 @@
 	
 		<SINR alpha="2" beta="0.7" noise="0"/>
 	
+		<SimulationName value="RMSEtest"/>
+		
 		<RandomWayPoint>
 			<Speed distribution="Gaussian" mean="10" variance="20" />
 			<WaitingTime distribution="Poisson" lambda="10" />
@@ -255,10 +257,10 @@
 		<!--  Our Own Settings                                                      -->
 		<!--***********************************************************************-->
 		<ExternalFilesPath>
-			<SensorReadingsFilePath value="data/sensor_readings/data_0.5_percent_min_200.txt"/> <!-- file containing the sensor readings from the Intel Lab WSN -->
+			<SensorReadingsFilePath value="data/sensor_readings/data_0.0_percent_min_500.txt"/> <!-- file containing the sensor readings from the Intel Lab WSN -->
 		</ExternalFilesPath>
 		
-		<SensorReadingsLoadBlockSize value = "200"/> <!-- amount sensor readings (file lines) to be loaded from the file to the memory of the node -->
+		<SensorReadingsLoadBlockSize value = "500"/> <!-- amount of sensor readings (file lines) to be loaded from the file to the memory of the node -->
 		
 	</Custom>
 </Document>
