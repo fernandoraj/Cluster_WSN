@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 import projects.wsn.nodes.messages.WsnMsg;
 import projects.wsn.nodes.messages.WsnMsgResponse;
@@ -33,6 +34,11 @@ import sinalgo.tools.Tools;
  */
 public class SimpleNode extends Node 
 {
+	/**
+	 * Indicates the size of Sliding Window from sensor readings to be send to sink node 
+	 * when there is a "novelty".
+	 */
+	protected static int slidingWindowSize = 4;
 	
 	/**
 	 * Armazenar o nó que será usado para alcançar a Estação-Base
@@ -87,6 +93,7 @@ public class SimpleNode extends Node
 	 */
 	private boolean loadSensorReadingsFromFile = true;
 	
+
 	@Override
 	public void preStep() {}
 
@@ -273,6 +280,7 @@ public class SimpleNode extends Node
 					
 					lastValueRead = value;
 					lastTimeRead = quantTime;
+					addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
 
 					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
 					
@@ -568,11 +576,14 @@ public class SimpleNode extends Node
 				}//else
 				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
 				double predictionValue = makePrediction(coefA, coefB, quantTime);
+				
+				addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
+				
 				if (isValuePredictInValueReading(value, predictionValue, maxError))
 				{
 					ultimoRoundLido = Integer.parseInt(linhas[2]);
-					lastValueRead = value;
-					lastTimeRead = quantTime;
+//					lastValueRead = value;
+//					lastTimeRead = quantTime;
 					
 					PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError);
 					newPredictionTimer.startRelative(1, this);
@@ -584,6 +595,7 @@ public class SimpleNode extends Node
 				else
 				{
 					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 1, 2, dataSensedType);
+/*					
 					//Adiciona os últimos valores lidos anteriormente a mensagem que vai para o sink
 					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), lastValueRead, lastTimeRead);
 					//Adiciona os valores lidos (NOVIDADE) na mensagem que vai para o sink
@@ -591,10 +603,12 @@ public class SimpleNode extends Node
 					lastValueRead = value;
 					lastTimeRead = quantTime;
 					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), lastValueRead, lastTimeRead);
-					
-					//Caso queira se passar X novas leituras do sensor para recalcular os coeficientes, pode-se usar o código abaixo para substituir a linha acima
-//					Integer x = X;
-//					prepararMensagem(wsnMsgResp, x, dataSensedType);
+*/					
+					//Adds the last values ​​previously read to the message that goes to the sink
+					for(int cont=0; cont<dataRecordItens.size(); cont++) //for(int cont=0; cont<slidingWindowSize; cont++)
+					{
+						wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).type, dataRecordItens.get(cont).value, dataRecordItens.get(cont).time); 
+					}
 					
 					addThisNodeToPath(wsnMsgResp);
 					
@@ -631,6 +645,8 @@ public class SimpleNode extends Node
 	 */
 	protected boolean isValuePredictInValueReading(double value, double predictionValue, double maxError)
 	{
+		Global.predictionsCount++;
+		Global.squaredError += Math.pow((predictionValue - value), 2);
 		boolean hit;
 		if (value >= (predictionValue - value*maxError) && value <= (predictionValue + value*maxError))
 		{
@@ -643,5 +659,34 @@ public class SimpleNode extends Node
 			hit = false;
 		}
 		return hit;
+	}
+	
+	public class DataRecord
+	{
+		char type;
+		double value;
+		double time;
+	}
+	
+	public Vector<DataRecord> dataRecordItens;
+	
+	public void addDataRecordItens(char typ, double val, double tim)
+	{
+		if (this.dataRecordItens == null)
+		{
+			this.dataRecordItens = new Vector<DataRecord>();
+		}
+		DataRecord dr = new DataRecord();
+		
+		dr.type = typ;
+		dr.value = val;
+		dr.time = tim;
+		
+		dataRecordItens.add(dr);
+		//Implements a FIFO structure with the vector 'dataRecordItens' with at most 'slidingWindowSize' elements
+		while (dataRecordItens.size() > slidingWindowSize)
+		{
+			dataRecordItens.removeElementAt(0);
+		}
 	}
 }
