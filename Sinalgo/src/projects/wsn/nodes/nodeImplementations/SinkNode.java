@@ -6,9 +6,11 @@ import java.awt.Graphics;
 import projects.wsn.nodes.messages.WsnMsg;
 import projects.wsn.nodes.messages.WsnMsgResponse;
 import projects.wsn.nodes.timers.WsnMessageTimer;
+import projects.wsn.utils.Utils;
 import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
+import sinalgo.runtime.Global;
 
 public class SinkNode extends SimpleNode 
 {
@@ -21,17 +23,28 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 */
-	private String dataSensedType = "t";
+	private String dataSensedType = "h";
 	
 	/**
 	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 */
-	private double thresholdError = 0.1;
+	private double thresholdError = 0.01;
 	
 	public SinkNode()
 	{
 		super();
 		this.setColor(Color.RED);
+		Utils.printForDebug("The size of time slot is "+sizeTimeSlot);
+		Utils.printForDebug("The type of data sensed is "+dataSensedType);
+		Utils.printForDebug("The threshold of error (max error) is "+thresholdError);
+		Utils.printForDebug("The size of sliding window is "+SimpleNode.slidingWindowSize);
+		
+//		if(LogL.ROUND_DETAIL){
+			Global.log.logln("\nThe size of time slot is "+sizeTimeSlot);
+			Global.log.logln("The type of data sensed is "+dataSensedType);
+			Global.log.logln("The threshold of error (max error) is "+thresholdError);
+			Global.log.logln("The size of sliding window is "+SimpleNode.slidingWindowSize+"\n");
+//		}
 	}
 
 	@Override
