@@ -249,9 +249,17 @@ public class FileHandler {
 		return null;		
 	}
 
+	
+	/**
+	 * Run the program, creating a new data file, using as a basis the past 3 parameters: 
+	 * 1) the path of the original data, 
+	 * 2) the percentage of data from each sensor to be copied to the new file, and 
+	 * 3) the minimum amount of readings from each sensor to be copied to the new file.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		try {
-			FileHandler.generatePercentageFile("data/sensor_readings/data.txt", 0.5f, 200);
+			FileHandler.generatePercentageFile("data/sensor_readings/data.txt", null, 500);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
