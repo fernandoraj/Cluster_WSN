@@ -123,6 +123,16 @@ public class Global {
 	public static int numberOfMissesOverAll = 0;
 	
 	/**
+	 * Global variable to store the sum of square error(SE) used to calculate the RMSE (Root mean square error) 
+	 */
+	public static double squaredError = 0;
+	
+	/**
+	 * Global counter of the number of predictions
+	 */
+	public static int predictionsCount = 0;
+	
+	/**
 	 * The current time of the simulation.
 	 * <p>
 	 * In synchronous simulation, this time is incremented by 1 at the end of every round, in
