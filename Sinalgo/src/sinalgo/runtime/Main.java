@@ -47,9 +47,9 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.JOptionPane;
 
 import sinalgo.Run;
+import sinalgo.configuration.AppConfig;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
-import sinalgo.configuration.AppConfig;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.gui.GUI;
 import sinalgo.gui.ProjectSelector;
@@ -233,6 +233,8 @@ public class Main{
 				Global.log.logln(LogL.ALWAYS, "> The seed for the random number generator is "+ Distribution.getSeed());
 			}
 			Global.log.logln(LogL.ALWAYS, "> Starting the Simulation.\n");
+			
+			Global.log.logln(LogL.ALWAYS, "Round; RMSE\n");
 			
 			runtime.preRun();
 
