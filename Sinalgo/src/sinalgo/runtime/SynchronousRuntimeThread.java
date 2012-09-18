@@ -192,16 +192,46 @@ public class SynchronousRuntimeThread extends Thread {
 				Utils.printForDebug(" * * The number TOTAL of Misses (in round "+Global.currentTime+") is "+Global.numberOfMissesOverAll);
 			}
 			
-			Global.numberOfHitsInThisRound = 0;
-			Global.numberOfMissesInThisRound = 0;
-
-			
+		
 			if(LogL.ROUND_DETAIL){
 				Global.log.logln("Round "+(Global.currentTime)+" finished");
 				Global.log.logln("In this round "+Global.numberOfMessagesInThisRound+" Messages were sent");
 				Global.log.logln("Overall "+Global.numberOfMessagesOverAll+" Messages were sent\n");
+				if (Global.numberOfHitsInThisRound > 0)
+				{
+					Global.log.logln("The number of Hits (in round "+Global.currentTime+") is "+ Global.numberOfHitsInThisRound);
+				}
+				if (Global.numberOfMissesInThisRound > 0)
+				{
+					Global.log.logln("The number of Misses (in round "+Global.currentTime+") is "+ Global.numberOfMissesInThisRound);
+				}
+				if (Global.numberOfHitsOverAll > 0)
+				{
+					Global.log.logln("The number TOTAL of Hits (until this round "+Global.currentTime+") is "+Global.numberOfHitsOverAll);
+				}
+				if (Global.numberOfMissesOverAll > 0)
+				{
+					Global.log.logln("The number TOTAL of Misses (until this round "+Global.currentTime+") is "+Global.numberOfMissesOverAll+"\n");
+				}
+			}
+
+			Global.numberOfHitsInThisRound = 0;
+			Global.numberOfMissesInThisRound = 0;
+
+		}
+		
+		if(Global.predictionsCount > 0)
+		{
+			double RMSE = Math.sqrt(Global.squaredError / Global.predictionsCount);
+			Utils.printForDebug("# # The Global RMSE is "+RMSE+" # #");
+			
+			Global.log.logln(Global.currentTime+"; "+RMSE);
+			
+			if(LogL.ROUND_DETAIL){
+				Global.log.logln("# # The Global RMSE is "+RMSE+"\n");
 			}
 		}
+		
 		
 		if(Global.isGuiMode) {
 			runtime.getGUI().redrawGUINow();
