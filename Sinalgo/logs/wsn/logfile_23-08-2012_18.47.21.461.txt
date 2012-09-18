@@ -1,0 +1,160 @@
+> Starting SINALGO in GUI-Mode for project wsn.
+
+The size of TimeSlot is 100
+The type of data sensed is h
+The threshold of error (max error) is 0.01
+
+> Initialisation terminated.
+
+------------------------------------------------------
+General Config
+------------------------------------------------------
+Command Line arguments: -project wsn -gen 54 wsn:SimpleNode PositionFile (C:\Users\Fernando\Documents\My Classes\UFC\Doutorado\Doutorado - PPGIA\Artigos\Redes de Sensores\Ferramentas\data\mote_locs_formatado.txt) -gen 1 wsn:SinkNode Random -overwrite SimulationName=WsnClusterWithIntelLabsDataset 
+Java VM arguments: -Xmx500m 
+Class path: binaries\bin;binaries\jdom.jar
+------------------------------------------------------
+Configuration settings
+------------------------------------------------------
+ Simulation Area
+    dimensions = 2
+    dimX = 45
+    dimY = 35
+    dimZ = 500
+ Simulation
+    asynchronousMode = false
+    mobility = false
+    interference = false
+    interferenceIsAdditive = true
+    canReceiveWhileSending = true
+    canReceiveMultiplePacketsInParallel = true
+    edgeType = sinalgo.nodes.edges.BidirectionalEdge
+    exitOnTerminationInGUI = false
+    initializeConnectionsOnStartup = false
+    refreshRate = 1
+    generateNAckMessages = false
+    handleEmptyEventQueue = true
+    javaCmd = java
+    javaVMmaxMem = 500
+ Random number generators
+    useSameSeedAsInPreviousRun = false
+    useFixedSeed = false
+    fixedSeed = -5506356220598161444
+ Logging
+    logFileName = logfile
+    outputToConsole = false
+    logToTimeDirectory = true
+    logConfiguration = true
+    eagerFlush = false
+ GUI
+    extendedControl = true
+    drawArrows = false
+    zoomStep = 1.2
+    wheelZoomStep = 1.05
+    minZoomFactor = 0.05
+    draw3DGraphNodesInProperOrder = true
+    usePerspectiveView = true
+    perspectiveViewDistance = 40
+ Background map in 2D
+    useMap = false
+    map = images/map.jpg
+ Models
+    DefaultMessageTransmissionModel = ConstantTime
+    DefaultConnectivityModel = UDG
+    DefaultDistributionModel = Random
+    DefaultInterferenceModel = NoInterference
+    DefaultMobilityModel = NoMobility
+    DefaultReliabilityModel = ReliableDelivery
+    DefaultNodeImplementation = wsn:SimpleNode
+    showModelsOfAllProjects = false
+ Node storage, position transformation
+    guiPositionTransformation2D = sinalgo.gui.transformation.Transformation2D
+    guiPositionTransformation3D = sinalgo.gui.transformation.Transformation3D
+    nodeCollection2D = sinalgo.runtime.nodeCollection.Geometric2DNodeCollection
+    nodeCollection3D = sinalgo.runtime.nodeCollection.Geometric3DNodeCollection
+ Export Settings
+    epsToPdfCommand = epstopdf %s
+    epsDrawDeploymentAreaBoundingBox = true
+    epsDrawBackgroundWhite = true
+ Animation Settings
+    showMessageAnimations = true
+    messageAnimationEnvelopeWidth = 1.0
+    messageAnimationEnvelopeHeight = 1.0
+    messageAnimationEnvelopeColor = r=255,g=255,b=0
+ Diverse Settings
+    showOptimizationHints = true
+    drawEdges = true
+    drawNodes = true
+    shownEventQueueSize = 10
+    outputTextFieldHeight = 200
+    arrowLength = 8
+    arrowWidth = 1
+    defaultRoundNumber = 1
+------------------------------------------------------
+Custom settings
+------------------------------------------------------
+ externalfilespath/sensorreadingsfilepath = data/sensor_readings/data_0.0_percent_min_500.txt
+ geometricnodecollection/rmax = 10
+ messagetransmission/constanttime = 1
+ node/defaultsize = 1
+ qudg/connectionprobability = 0.6
+ qudg/probabilitytype = constant
+ qudg/rmax = 6
+ qudg/rmin = 4
+ randomdirection/movetime/distribution = Uniform
+ randomdirection/movetime/max = 20
+ randomdirection/movetime/min = 5
+ randomdirection/nodespeed/distribution = Gaussian
+ randomdirection/nodespeed/mean = 10
+ randomdirection/nodespeed/variance = 20
+ randomdirection/waitingtime/distribution = Poisson
+ randomdirection/waitingtime/lambda = 10
+ randomwaypoint/speed/distribution = Gaussian
+ randomwaypoint/speed/mean = 10
+ randomwaypoint/speed/variance = 20
+ randomwaypoint/waitingtime/distribution = Poisson
+ randomwaypoint/waitingtime/lambda = 10
+ sensorreadingsloadblocksize = 500
+ simulationname = WsnClusterWithIntelLabsDataset
+ sinr/alpha = 2
+ sinr/beta = 0.7
+ sinr/noise = 0
+ udg/rmax = 7
+------------------------------------------------------
+Seed for Random Number Generators
+------------------------------------------------------
+ Randomly selected seed: -5506356220598161444
+------------------------------------------------------
+End of settings
+------------------------------------------------------
+
+> Starting the Simulation.
+
+110.0; 0.22953027615133645
+120.0; 0.2083325935114041
+130.0; 0.2183042342223511
+140.0; 0.28500517621449145
+150.0; 0.27030859363147985
+160.0; 0.26044129948049816
+170.0; 0.2527778804370791
+180.0; 0.2887410174384247
+190.0; 0.2807720852651971
+200.0; 0.27523167104175794
+210.0; 0.27029891725084043
+220.0; 0.2703107596043938
+230.0; 0.26824970407105003
+240.0; 0.26400890012123723
+250.0; 0.25819945592813964
+260.0; 0.25423899518804083
+270.0; 0.2517993103050662
+280.0; 0.2510137224221022
+290.0; 0.24919869041710768
+300.0; 0.24804545088577726
+320.0; 0.2454416283403755
+340.0; 137.71561209330858
+360.0; 132.75846047745594
+380.0; 127.90964786694869
+400.0; 123.39922030675568
+450.0; 114.30841071365933
+500.0; 117.57174062599273
+550.0; 111.74069178470208
+600.0; 106.5663150857118

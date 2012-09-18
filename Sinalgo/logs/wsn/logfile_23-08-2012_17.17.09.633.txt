@@ -1,0 +1,4923 @@
+> Starting SINALGO in GUI-Mode for project wsn.
+
+The size of TimeSlot is 100
+The type of data sensed is t
+The threshold of error (max error) is 0.01
+
+> Initialisation terminated.
+
+------------------------------------------------------
+General Config
+------------------------------------------------------
+Command Line arguments: -project wsn -gen 54 wsn:SimpleNode PositionFile (C:\Users\Fernando\Documents\My Classes\UFC\Doutorado\Doutorado - PPGIA\Artigos\Redes de Sensores\Ferramentas\data\mote_locs_formatado.txt) -gen 1 wsn:SinkNode Random -overwrite SimulationName=WsnClusterWithIntelLabsDataset 
+Java VM arguments: -Xmx500m 
+Class path: binaries\bin;binaries\jdom.jar
+------------------------------------------------------
+Configuration settings
+------------------------------------------------------
+ Simulation Area
+    dimensions = 2
+    dimX = 45
+    dimY = 35
+    dimZ = 500
+ Simulation
+    asynchronousMode = false
+    mobility = false
+    interference = false
+    interferenceIsAdditive = true
+    canReceiveWhileSending = true
+    canReceiveMultiplePacketsInParallel = true
+    edgeType = sinalgo.nodes.edges.BidirectionalEdge
+    exitOnTerminationInGUI = false
+    initializeConnectionsOnStartup = false
+    refreshRate = 1
+    generateNAckMessages = false
+    handleEmptyEventQueue = true
+    javaCmd = java
+    javaVMmaxMem = 500
+ Random number generators
+    useSameSeedAsInPreviousRun = false
+    useFixedSeed = false
+    fixedSeed = -6688325471497945379
+ Logging
+    logFileName = logfile
+    outputToConsole = false
+    logToTimeDirectory = true
+    logConfiguration = true
+    eagerFlush = false
+ GUI
+    extendedControl = true
+    drawArrows = false
+    zoomStep = 1.2
+    wheelZoomStep = 1.05
+    minZoomFactor = 0.05
+    draw3DGraphNodesInProperOrder = true
+    usePerspectiveView = true
+    perspectiveViewDistance = 40
+ Background map in 2D
+    useMap = false
+    map = images/map.jpg
+ Models
+    DefaultMessageTransmissionModel = ConstantTime
+    DefaultConnectivityModel = UDG
+    DefaultDistributionModel = Random
+    DefaultInterferenceModel = NoInterference
+    DefaultMobilityModel = NoMobility
+    DefaultReliabilityModel = ReliableDelivery
+    DefaultNodeImplementation = wsn:SimpleNode
+    showModelsOfAllProjects = false
+ Node storage, position transformation
+    guiPositionTransformation2D = sinalgo.gui.transformation.Transformation2D
+    guiPositionTransformation3D = sinalgo.gui.transformation.Transformation3D
+    nodeCollection2D = sinalgo.runtime.nodeCollection.Geometric2DNodeCollection
+    nodeCollection3D = sinalgo.runtime.nodeCollection.Geometric3DNodeCollection
+ Export Settings
+    epsToPdfCommand = epstopdf %s
+    epsDrawDeploymentAreaBoundingBox = true
+    epsDrawBackgroundWhite = true
+ Animation Settings
+    showMessageAnimations = true
+    messageAnimationEnvelopeWidth = 1.0
+    messageAnimationEnvelopeHeight = 1.0
+    messageAnimationEnvelopeColor = r=255,g=255,b=0
+ Diverse Settings
+    showOptimizationHints = true
+    drawEdges = true
+    drawNodes = true
+    shownEventQueueSize = 10
+    outputTextFieldHeight = 200
+    arrowLength = 8
+    arrowWidth = 1
+    defaultRoundNumber = 1
+------------------------------------------------------
+Custom settings
+------------------------------------------------------
+ externalfilespath/sensorreadingsfilepath = data/sensor_readings/data_0.0_percent_min_500.txt
+ geometricnodecollection/rmax = 10
+ messagetransmission/constanttime = 1
+ node/defaultsize = 1
+ qudg/connectionprobability = 0.6
+ qudg/probabilitytype = constant
+ qudg/rmax = 6
+ qudg/rmin = 4
+ randomdirection/movetime/distribution = Uniform
+ randomdirection/movetime/max = 20
+ randomdirection/movetime/min = 5
+ randomdirection/nodespeed/distribution = Gaussian
+ randomdirection/nodespeed/mean = 10
+ randomdirection/nodespeed/variance = 20
+ randomdirection/waitingtime/distribution = Poisson
+ randomdirection/waitingtime/lambda = 10
+ randomwaypoint/speed/distribution = Gaussian
+ randomwaypoint/speed/mean = 10
+ randomwaypoint/speed/variance = 20
+ randomwaypoint/waitingtime/distribution = Poisson
+ randomwaypoint/waitingtime/lambda = 10
+ sensorreadingsloadblocksize = 500
+ simulationname = WsnClusterWithIntelLabsDataset
+ sinr/alpha = 2
+ sinr/beta = 0.7
+ sinr/noise = 0
+ udg/rmax = 7
+------------------------------------------------------
+Seed for Random Number Generators
+------------------------------------------------------
+ Randomly selected seed: -6688325471497945379
+------------------------------------------------------
+End of settings
+------------------------------------------------------
+
+> Starting the Simulation.
+
+Round 1.0 finished
+In this round 4 Messages were sent
+Overall 4 Messages were sent
+
+Round 2.0 finished
+In this round 20 Messages were sent
+Overall 24 Messages were sent
+
+Round 3.0 finished
+In this round 24 Messages were sent
+Overall 48 Messages were sent
+
+Round 4.0 finished
+In this round 43 Messages were sent
+Overall 91 Messages were sent
+
+Round 5.0 finished
+In this round 45 Messages were sent
+Overall 136 Messages were sent
+
+Round 6.0 finished
+In this round 38 Messages were sent
+Overall 174 Messages were sent
+
+Round 7.0 finished
+In this round 29 Messages were sent
+Overall 203 Messages were sent
+
+Round 8.0 finished
+In this round 15 Messages were sent
+Overall 218 Messages were sent
+
+Round 9.0 finished
+In this round 10 Messages were sent
+Overall 228 Messages were sent
+
+Round 10.0 finished
+In this round 2 Messages were sent
+Overall 230 Messages were sent
+
+Round 11.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 12.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 13.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 14.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 15.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 16.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 17.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 18.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 19.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 20.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 21.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 22.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 23.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 24.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 25.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 26.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 27.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 28.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 29.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 30.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 31.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 32.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 33.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 34.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 35.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 36.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 37.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 38.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 39.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 40.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 41.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 42.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 43.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 44.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 45.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 46.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 47.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 48.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 49.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 50.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 51.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 52.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 53.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 54.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 55.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 56.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 57.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 58.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 59.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 60.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 61.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 62.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 63.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 64.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 65.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 66.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 67.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 68.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 69.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 70.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 71.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 72.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 73.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 74.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 75.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 76.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 77.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 78.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 79.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 80.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 81.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 82.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 83.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 84.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 85.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 86.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 87.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 88.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 89.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 90.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 91.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 92.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 93.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 94.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 95.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 96.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 97.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 98.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 99.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 100.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 101.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 102.0 finished
+In this round 4 Messages were sent
+Overall 234 Messages were sent
+
+Round 103.0 finished
+In this round 5 Messages were sent
+Overall 239 Messages were sent
+
+Round 104.0 finished
+In this round 12 Messages were sent
+Overall 251 Messages were sent
+
+Round 105.0 finished
+In this round 15 Messages were sent
+Overall 266 Messages were sent
+
+The number of Hits (in round 105.0) is 1
+The number of Misses (in round 105.0) is 3
+The number TOTAL of Hits (until this round 105.0) is 1
+The number TOTAL of Misses (until this round 105.0) is 3
+
+Round 106.0 finished
+In this round 20 Messages were sent
+Overall 286 Messages were sent
+
+The number of Hits (in round 106.0) is 1
+The number TOTAL of Hits (until this round 106.0) is 2
+The number TOTAL of Misses (until this round 106.0) is 3
+
+Round 107.0 finished
+In this round 24 Messages were sent
+Overall 310 Messages were sent
+
+The number of Hits (in round 107.0) is 1
+The number TOTAL of Hits (until this round 107.0) is 3
+The number TOTAL of Misses (until this round 107.0) is 3
+
+Round 108.0 finished
+In this round 25 Messages were sent
+Overall 335 Messages were sent
+
+The number of Misses (in round 108.0) is 1
+The number TOTAL of Hits (until this round 108.0) is 3
+The number TOTAL of Misses (until this round 108.0) is 4
+
+Round 109.0 finished
+In this round 28 Messages were sent
+Overall 363 Messages were sent
+
+The number of Hits (in round 109.0) is 3
+The number TOTAL of Hits (until this round 109.0) is 6
+The number TOTAL of Misses (until this round 109.0) is 4
+
+Round 110.0 finished
+In this round 23 Messages were sent
+Overall 386 Messages were sent
+
+The number of Hits (in round 110.0) is 6
+The number of Misses (in round 110.0) is 1
+The number TOTAL of Hits (until this round 110.0) is 12
+The number TOTAL of Misses (until this round 110.0) is 5
+
+# # The Global RMSE is 0.2676551181594538
+
+Round 111.0 finished
+In this round 24 Messages were sent
+Overall 410 Messages were sent
+
+The number of Hits (in round 111.0) is 6
+The number TOTAL of Hits (until this round 111.0) is 18
+The number TOTAL of Misses (until this round 111.0) is 5
+
+Round 112.0 finished
+In this round 23 Messages were sent
+Overall 433 Messages were sent
+
+The number of Hits (in round 112.0) is 7
+The number TOTAL of Hits (until this round 112.0) is 25
+The number TOTAL of Misses (until this round 112.0) is 5
+
+Round 113.0 finished
+In this round 23 Messages were sent
+Overall 456 Messages were sent
+
+The number of Hits (in round 113.0) is 7
+The number TOTAL of Hits (until this round 113.0) is 32
+The number TOTAL of Misses (until this round 113.0) is 5
+
+Round 114.0 finished
+In this round 23 Messages were sent
+Overall 479 Messages were sent
+
+The number of Hits (in round 114.0) is 7
+The number TOTAL of Hits (until this round 114.0) is 39
+The number TOTAL of Misses (until this round 114.0) is 5
+
+Round 115.0 finished
+In this round 23 Messages were sent
+Overall 502 Messages were sent
+
+The number of Hits (in round 115.0) is 13
+The number of Misses (in round 115.0) is 2
+The number TOTAL of Hits (until this round 115.0) is 52
+The number TOTAL of Misses (until this round 115.0) is 7
+
+# # The Global RMSE is 0.16070153064576737
+
+Round 116.0 finished
+In this round 17 Messages were sent
+Overall 519 Messages were sent
+
+The number of Hits (in round 116.0) is 12
+The number of Misses (in round 116.0) is 1
+The number TOTAL of Hits (until this round 116.0) is 64
+The number TOTAL of Misses (until this round 116.0) is 8
+
+Round 117.0 finished
+In this round 24 Messages were sent
+Overall 543 Messages were sent
+
+The number of Hits (in round 117.0) is 12
+The number TOTAL of Hits (until this round 117.0) is 76
+The number TOTAL of Misses (until this round 117.0) is 8
+
+Round 118.0 finished
+In this round 17 Messages were sent
+Overall 560 Messages were sent
+
+The number of Hits (in round 118.0) is 13
+The number TOTAL of Hits (until this round 118.0) is 89
+The number TOTAL of Misses (until this round 118.0) is 8
+
+Round 119.0 finished
+In this round 23 Messages were sent
+Overall 583 Messages were sent
+
+The number of Hits (in round 119.0) is 13
+The number TOTAL of Hits (until this round 119.0) is 102
+The number TOTAL of Misses (until this round 119.0) is 8
+
+Round 120.0 finished
+In this round 17 Messages were sent
+Overall 600 Messages were sent
+
+The number of Hits (in round 120.0) is 22
+The number of Misses (in round 120.0) is 2
+The number TOTAL of Hits (until this round 120.0) is 124
+The number TOTAL of Misses (until this round 120.0) is 10
+
+# # The Global RMSE is 0.12310734503417337
+
+Round 121.0 finished
+In this round 14 Messages were sent
+Overall 614 Messages were sent
+
+The number of Hits (in round 121.0) is 21
+The number of Misses (in round 121.0) is 1
+The number TOTAL of Hits (until this round 121.0) is 145
+The number TOTAL of Misses (until this round 121.0) is 11
+
+Round 122.0 finished
+In this round 18 Messages were sent
+Overall 632 Messages were sent
+
+The number of Hits (in round 122.0) is 21
+The number TOTAL of Hits (until this round 122.0) is 166
+The number TOTAL of Misses (until this round 122.0) is 11
+
+Round 123.0 finished
+In this round 14 Messages were sent
+Overall 646 Messages were sent
+
+The number of Hits (in round 123.0) is 20
+The number of Misses (in round 123.0) is 1
+The number TOTAL of Hits (until this round 123.0) is 186
+The number TOTAL of Misses (until this round 123.0) is 12
+
+Round 124.0 finished
+In this round 19 Messages were sent
+Overall 665 Messages were sent
+
+The number of Hits (in round 124.0) is 20
+The number TOTAL of Hits (until this round 124.0) is 206
+The number TOTAL of Misses (until this round 124.0) is 12
+
+Round 125.0 finished
+In this round 14 Messages were sent
+Overall 679 Messages were sent
+
+The number of Hits (in round 125.0) is 23
+The number of Misses (in round 125.0) is 6
+The number TOTAL of Hits (until this round 125.0) is 229
+The number TOTAL of Misses (until this round 125.0) is 18
+
+# # The Global RMSE is 0.116340495809676
+
+Round 126.0 finished
+In this round 16 Messages were sent
+Overall 695 Messages were sent
+
+The number of Hits (in round 126.0) is 22
+The number of Misses (in round 126.0) is 1
+The number TOTAL of Hits (until this round 126.0) is 251
+The number TOTAL of Misses (until this round 126.0) is 19
+
+Round 127.0 finished
+In this round 15 Messages were sent
+Overall 710 Messages were sent
+
+The number of Hits (in round 127.0) is 23
+The number of Misses (in round 127.0) is 1
+The number TOTAL of Hits (until this round 127.0) is 274
+The number TOTAL of Misses (until this round 127.0) is 20
+
+Round 128.0 finished
+In this round 15 Messages were sent
+Overall 725 Messages were sent
+
+The number of Hits (in round 128.0) is 23
+The number TOTAL of Hits (until this round 128.0) is 297
+The number TOTAL of Misses (until this round 128.0) is 20
+
+Round 129.0 finished
+In this round 15 Messages were sent
+Overall 740 Messages were sent
+
+The number of Hits (in round 129.0) is 24
+The number TOTAL of Hits (until this round 129.0) is 321
+The number TOTAL of Misses (until this round 129.0) is 20
+
+Round 130.0 finished
+In this round 14 Messages were sent
+Overall 754 Messages were sent
+
+The number of Hits (in round 130.0) is 28
+The number of Misses (in round 130.0) is 5
+The number TOTAL of Hits (until this round 130.0) is 349
+The number TOTAL of Misses (until this round 130.0) is 25
+
+# # The Global RMSE is 0.11807244560128037
+
+Round 131.0 finished
+In this round 11 Messages were sent
+Overall 765 Messages were sent
+
+The number of Hits (in round 131.0) is 29
+The number TOTAL of Hits (until this round 131.0) is 378
+The number TOTAL of Misses (until this round 131.0) is 25
+
+Round 132.0 finished
+In this round 13 Messages were sent
+Overall 778 Messages were sent
+
+The number of Hits (in round 132.0) is 28
+The number of Misses (in round 132.0) is 1
+The number TOTAL of Hits (until this round 132.0) is 406
+The number TOTAL of Misses (until this round 132.0) is 26
+
+Round 133.0 finished
+In this round 12 Messages were sent
+Overall 790 Messages were sent
+
+The number of Hits (in round 133.0) is 27
+The number of Misses (in round 133.0) is 1
+The number TOTAL of Hits (until this round 133.0) is 433
+The number TOTAL of Misses (until this round 133.0) is 27
+
+Round 134.0 finished
+In this round 14 Messages were sent
+Overall 804 Messages were sent
+
+The number of Hits (in round 134.0) is 27
+The number TOTAL of Hits (until this round 134.0) is 460
+The number TOTAL of Misses (until this round 134.0) is 27
+
+Round 135.0 finished
+In this round 12 Messages were sent
+Overall 816 Messages were sent
+
+The number of Hits (in round 135.0) is 28
+The number of Misses (in round 135.0) is 4
+The number TOTAL of Hits (until this round 135.0) is 488
+The number TOTAL of Misses (until this round 135.0) is 31
+
+# # The Global RMSE is 0.19963734300990796
+
+Round 136.0 finished
+In this round 13 Messages were sent
+Overall 829 Messages were sent
+
+The number of Hits (in round 136.0) is 29
+The number of Misses (in round 136.0) is 1
+The number TOTAL of Hits (until this round 136.0) is 517
+The number TOTAL of Misses (until this round 136.0) is 32
+
+Round 137.0 finished
+In this round 11 Messages were sent
+Overall 840 Messages were sent
+
+The number of Hits (in round 137.0) is 27
+The number of Misses (in round 137.0) is 2
+The number TOTAL of Hits (until this round 137.0) is 544
+The number TOTAL of Misses (until this round 137.0) is 34
+
+Round 138.0 finished
+In this round 15 Messages were sent
+Overall 855 Messages were sent
+
+The number of Hits (in round 138.0) is 26
+The number of Misses (in round 138.0) is 1
+The number TOTAL of Hits (until this round 138.0) is 570
+The number TOTAL of Misses (until this round 138.0) is 35
+
+Round 139.0 finished
+In this round 12 Messages were sent
+Overall 867 Messages were sent
+
+The number of Hits (in round 139.0) is 27
+The number TOTAL of Hits (until this round 139.0) is 597
+The number TOTAL of Misses (until this round 139.0) is 35
+
+Round 140.0 finished
+In this round 14 Messages were sent
+Overall 881 Messages were sent
+
+The number of Hits (in round 140.0) is 28
+The number of Misses (in round 140.0) is 3
+The number TOTAL of Hits (until this round 140.0) is 625
+The number TOTAL of Misses (until this round 140.0) is 38
+
+# # The Global RMSE is 0.24495474874797268
+
+Round 141.0 finished
+In this round 11 Messages were sent
+Overall 892 Messages were sent
+
+The number of Hits (in round 141.0) is 29
+The number TOTAL of Hits (until this round 141.0) is 654
+The number TOTAL of Misses (until this round 141.0) is 38
+
+Round 142.0 finished
+In this round 13 Messages were sent
+Overall 905 Messages were sent
+
+The number of Hits (in round 142.0) is 30
+The number TOTAL of Hits (until this round 142.0) is 684
+The number TOTAL of Misses (until this round 142.0) is 38
+
+Round 143.0 finished
+In this round 10 Messages were sent
+Overall 915 Messages were sent
+
+The number of Hits (in round 143.0) is 29
+The number of Misses (in round 143.0) is 1
+The number TOTAL of Hits (until this round 143.0) is 713
+The number TOTAL of Misses (until this round 143.0) is 39
+
+Round 144.0 finished
+In this round 14 Messages were sent
+Overall 929 Messages were sent
+
+The number of Hits (in round 144.0) is 28
+The number of Misses (in round 144.0) is 2
+The number TOTAL of Hits (until this round 144.0) is 741
+The number TOTAL of Misses (until this round 144.0) is 41
+
+Round 145.0 finished
+In this round 11 Messages were sent
+Overall 940 Messages were sent
+
+The number of Hits (in round 145.0) is 35
+The number of Misses (in round 145.0) is 1
+The number TOTAL of Hits (until this round 145.0) is 776
+The number TOTAL of Misses (until this round 145.0) is 42
+
+Round 146.0 finished
+In this round 7 Messages were sent
+Overall 947 Messages were sent
+
+The number of Hits (in round 146.0) is 33
+The number of Misses (in round 146.0) is 2
+The number TOTAL of Hits (until this round 146.0) is 809
+The number TOTAL of Misses (until this round 146.0) is 44
+
+Round 147.0 finished
+In this round 13 Messages were sent
+Overall 960 Messages were sent
+
+The number of Hits (in round 147.0) is 32
+The number of Misses (in round 147.0) is 1
+The number TOTAL of Hits (until this round 147.0) is 841
+The number TOTAL of Misses (until this round 147.0) is 45
+
+Round 148.0 finished
+In this round 8 Messages were sent
+Overall 968 Messages were sent
+
+The number of Hits (in round 148.0) is 33
+The number TOTAL of Hits (until this round 148.0) is 874
+The number TOTAL of Misses (until this round 148.0) is 45
+
+Round 149.0 finished
+In this round 12 Messages were sent
+Overall 980 Messages were sent
+
+The number of Hits (in round 149.0) is 33
+The number TOTAL of Hits (until this round 149.0) is 907
+The number TOTAL of Misses (until this round 149.0) is 45
+
+Round 150.0 finished
+In this round 8 Messages were sent
+Overall 988 Messages were sent
+
+The number of Hits (in round 150.0) is 31
+The number of Misses (in round 150.0) is 2
+The number TOTAL of Hits (until this round 150.0) is 938
+The number TOTAL of Misses (until this round 150.0) is 47
+
+# # The Global RMSE is 0.20678406979277555
+
+Round 151.0 finished
+In this round 14 Messages were sent
+Overall 1002 Messages were sent
+
+The number of Hits (in round 151.0) is 30
+The number of Misses (in round 151.0) is 1
+The number TOTAL of Hits (until this round 151.0) is 968
+The number TOTAL of Misses (until this round 151.0) is 48
+
+Round 152.0 finished
+In this round 9 Messages were sent
+Overall 1011 Messages were sent
+
+The number of Hits (in round 152.0) is 30
+The number TOTAL of Hits (until this round 152.0) is 998
+The number TOTAL of Misses (until this round 152.0) is 48
+
+Round 153.0 finished
+In this round 14 Messages were sent
+Overall 1025 Messages were sent
+
+The number of Hits (in round 153.0) is 29
+The number of Misses (in round 153.0) is 1
+The number TOTAL of Hits (until this round 153.0) is 1027
+The number TOTAL of Misses (until this round 153.0) is 49
+
+Round 154.0 finished
+In this round 10 Messages were sent
+Overall 1035 Messages were sent
+
+The number of Hits (in round 154.0) is 34
+The number of Misses (in round 154.0) is 1
+The number TOTAL of Hits (until this round 154.0) is 1061
+The number TOTAL of Misses (until this round 154.0) is 50
+
+Round 155.0 finished
+In this round 9 Messages were sent
+Overall 1044 Messages were sent
+
+The number of Hits (in round 155.0) is 35
+The number TOTAL of Hits (until this round 155.0) is 1096
+The number TOTAL of Misses (until this round 155.0) is 50
+
+Round 156.0 finished
+In this round 9 Messages were sent
+Overall 1053 Messages were sent
+
+The number of Hits (in round 156.0) is 35
+The number of Misses (in round 156.0) is 1
+The number TOTAL of Hits (until this round 156.0) is 1131
+The number TOTAL of Misses (until this round 156.0) is 51
+
+Round 157.0 finished
+In this round 9 Messages were sent
+Overall 1062 Messages were sent
+
+The number of Hits (in round 157.0) is 35
+The number TOTAL of Hits (until this round 157.0) is 1166
+The number TOTAL of Misses (until this round 157.0) is 51
+
+Round 158.0 finished
+In this round 9 Messages were sent
+Overall 1071 Messages were sent
+
+The number of Hits (in round 158.0) is 37
+The number TOTAL of Hits (until this round 158.0) is 1203
+The number TOTAL of Misses (until this round 158.0) is 51
+
+Round 159.0 finished
+In this round 7 Messages were sent
+Overall 1078 Messages were sent
+
+The number of Hits (in round 159.0) is 37
+The number TOTAL of Hits (until this round 159.0) is 1240
+The number TOTAL of Misses (until this round 159.0) is 51
+
+Round 160.0 finished
+In this round 9 Messages were sent
+Overall 1087 Messages were sent
+
+The number of Hits (in round 160.0) is 37
+The number of Misses (in round 160.0) is 1
+The number TOTAL of Hits (until this round 160.0) is 1277
+The number TOTAL of Misses (until this round 160.0) is 52
+
+# # The Global RMSE is 0.18197984359946742
+
+Round 161.0 finished
+In this round 7 Messages were sent
+Overall 1094 Messages were sent
+
+The number of Hits (in round 161.0) is 37
+The number of Misses (in round 161.0) is 1
+The number TOTAL of Hits (until this round 161.0) is 1314
+The number TOTAL of Misses (until this round 161.0) is 53
+
+Round 162.0 finished
+In this round 9 Messages were sent
+Overall 1103 Messages were sent
+
+The number of Hits (in round 162.0) is 37
+The number TOTAL of Hits (until this round 162.0) is 1351
+The number TOTAL of Misses (until this round 162.0) is 53
+
+Round 163.0 finished
+In this round 7 Messages were sent
+Overall 1110 Messages were sent
+
+The number of Hits (in round 163.0) is 42
+The number of Misses (in round 163.0) is 1
+The number TOTAL of Hits (until this round 163.0) is 1393
+The number TOTAL of Misses (until this round 163.0) is 54
+
+Round 164.0 finished
+In this round 4 Messages were sent
+Overall 1114 Messages were sent
+
+The number of Hits (in round 164.0) is 40
+The number of Misses (in round 164.0) is 2
+The number TOTAL of Hits (until this round 164.0) is 1433
+The number TOTAL of Misses (until this round 164.0) is 56
+
+Round 165.0 finished
+In this round 9 Messages were sent
+Overall 1123 Messages were sent
+
+The number of Hits (in round 165.0) is 39
+The number of Misses (in round 165.0) is 1
+The number TOTAL of Hits (until this round 165.0) is 1472
+The number TOTAL of Misses (until this round 165.0) is 57
+
+Round 166.0 finished
+In this round 5 Messages were sent
+Overall 1128 Messages were sent
+
+The number of Hits (in round 166.0) is 40
+The number TOTAL of Hits (until this round 166.0) is 1512
+The number TOTAL of Misses (until this round 166.0) is 57
+
+Round 167.0 finished
+In this round 8 Messages were sent
+Overall 1136 Messages were sent
+
+The number of Hits (in round 167.0) is 40
+The number TOTAL of Hits (until this round 167.0) is 1552
+The number TOTAL of Misses (until this round 167.0) is 57
+
+Round 168.0 finished
+In this round 5 Messages were sent
+Overall 1141 Messages were sent
+
+The number of Hits (in round 168.0) is 41
+The number TOTAL of Hits (until this round 168.0) is 1593
+The number TOTAL of Misses (until this round 168.0) is 57
+
+Round 169.0 finished
+In this round 7 Messages were sent
+Overall 1148 Messages were sent
+
+The number of Hits (in round 169.0) is 42
+The number TOTAL of Hits (until this round 169.0) is 1635
+The number TOTAL of Misses (until this round 169.0) is 57
+
+Round 170.0 finished
+In this round 4 Messages were sent
+Overall 1152 Messages were sent
+
+The number of Hits (in round 170.0) is 40
+The number of Misses (in round 170.0) is 3
+The number TOTAL of Hits (until this round 170.0) is 1675
+The number TOTAL of Misses (until this round 170.0) is 60
+
+# # The Global RMSE is 2.4916109607916126
+
+Round 171.0 finished
+In this round 9 Messages were sent
+Overall 1161 Messages were sent
+
+The number of Hits (in round 171.0) is 39
+The number of Misses (in round 171.0) is 1
+The number TOTAL of Hits (until this round 171.0) is 1714
+The number TOTAL of Misses (until this round 171.0) is 61
+
+Round 172.0 finished
+In this round 5 Messages were sent
+Overall 1166 Messages were sent
+
+The number of Hits (in round 172.0) is 40
+The number of Misses (in round 172.0) is 1
+The number TOTAL of Hits (until this round 172.0) is 1754
+The number TOTAL of Misses (until this round 172.0) is 62
+
+Round 173.0 finished
+In this round 8 Messages were sent
+Overall 1174 Messages were sent
+
+The number of Hits (in round 173.0) is 40
+The number TOTAL of Hits (until this round 173.0) is 1794
+The number TOTAL of Misses (until this round 173.0) is 62
+
+Round 174.0 finished
+In this round 5 Messages were sent
+Overall 1179 Messages were sent
+
+The number of Hits (in round 174.0) is 37
+The number of Misses (in round 174.0) is 4
+The number TOTAL of Hits (until this round 174.0) is 1831
+The number TOTAL of Misses (until this round 174.0) is 66
+
+Round 175.0 finished
+In this round 11 Messages were sent
+Overall 1190 Messages were sent
+
+The number of Hits (in round 175.0) is 36
+The number of Misses (in round 175.0) is 1
+The number TOTAL of Hits (until this round 175.0) is 1867
+The number TOTAL of Misses (until this round 175.0) is 67
+
+Round 176.0 finished
+In this round 6 Messages were sent
+Overall 1196 Messages were sent
+
+The number of Hits (in round 176.0) is 34
+The number of Misses (in round 176.0) is 3
+The number TOTAL of Hits (until this round 176.0) is 1901
+The number TOTAL of Misses (until this round 176.0) is 70
+
+Round 177.0 finished
+In this round 13 Messages were sent
+Overall 1209 Messages were sent
+
+The number of Hits (in round 177.0) is 34
+The number TOTAL of Hits (until this round 177.0) is 1935
+The number TOTAL of Misses (until this round 177.0) is 70
+
+Round 178.0 finished
+In this round 6 Messages were sent
+Overall 1215 Messages were sent
+
+The number of Hits (in round 178.0) is 32
+The number of Misses (in round 178.0) is 3
+The number TOTAL of Hits (until this round 178.0) is 1967
+The number TOTAL of Misses (until this round 178.0) is 73
+
+Round 179.0 finished
+In this round 15 Messages were sent
+Overall 1230 Messages were sent
+
+The number of Hits (in round 179.0) is 33
+The number TOTAL of Hits (until this round 179.0) is 2000
+The number TOTAL of Misses (until this round 179.0) is 73
+
+Round 180.0 finished
+In this round 5 Messages were sent
+Overall 1235 Messages were sent
+
+The number of Hits (in round 180.0) is 33
+The number TOTAL of Hits (until this round 180.0) is 2033
+The number TOTAL of Misses (until this round 180.0) is 73
+
+# # The Global RMSE is 3.200653634929415
+
+Round 181.0 finished
+In this round 15 Messages were sent
+Overall 1250 Messages were sent
+
+The number of Hits (in round 181.0) is 33
+The number of Misses (in round 181.0) is 1
+The number TOTAL of Hits (until this round 181.0) is 2066
+The number TOTAL of Misses (until this round 181.0) is 74
+
+Round 182.0 finished
+In this round 5 Messages were sent
+Overall 1255 Messages were sent
+
+The number of Hits (in round 182.0) is 32
+The number of Misses (in round 182.0) is 2
+The number TOTAL of Hits (until this round 182.0) is 2098
+The number TOTAL of Misses (until this round 182.0) is 76
+
+Round 183.0 finished
+In this round 16 Messages were sent
+Overall 1271 Messages were sent
+
+The number of Hits (in round 183.0) is 31
+The number of Misses (in round 183.0) is 1
+The number TOTAL of Hits (until this round 183.0) is 2129
+The number TOTAL of Misses (until this round 183.0) is 77
+
+Round 184.0 finished
+In this round 6 Messages were sent
+Overall 1277 Messages were sent
+
+The number of Hits (in round 184.0) is 32
+The number TOTAL of Hits (until this round 184.0) is 2161
+The number TOTAL of Misses (until this round 184.0) is 77
+
+Round 185.0 finished
+In this round 15 Messages were sent
+Overall 1292 Messages were sent
+
+The number of Hits (in round 185.0) is 33
+The number TOTAL of Hits (until this round 185.0) is 2194
+The number TOTAL of Misses (until this round 185.0) is 77
+
+Round 186.0 finished
+In this round 5 Messages were sent
+Overall 1297 Messages were sent
+
+The number of Hits (in round 186.0) is 31
+The number of Misses (in round 186.0) is 3
+The number TOTAL of Hits (until this round 186.0) is 2225
+The number TOTAL of Misses (until this round 186.0) is 80
+
+Round 187.0 finished
+In this round 17 Messages were sent
+Overall 1314 Messages were sent
+
+The number of Hits (in round 187.0) is 31
+The number TOTAL of Hits (until this round 187.0) is 2256
+The number TOTAL of Misses (until this round 187.0) is 80
+
+Round 188.0 finished
+In this round 5 Messages were sent
+Overall 1319 Messages were sent
+
+The number of Hits (in round 188.0) is 32
+The number of Misses (in round 188.0) is 1
+The number TOTAL of Hits (until this round 188.0) is 2288
+The number TOTAL of Misses (until this round 188.0) is 81
+
+Round 189.0 finished
+In this round 16 Messages were sent
+Overall 1335 Messages were sent
+
+The number of Hits (in round 189.0) is 32
+The number of Misses (in round 189.0) is 1
+The number TOTAL of Hits (until this round 189.0) is 2320
+The number TOTAL of Misses (until this round 189.0) is 82
+
+Round 190.0 finished
+In this round 5 Messages were sent
+Overall 1340 Messages were sent
+
+The number of Hits (in round 190.0) is 33
+The number of Misses (in round 190.0) is 1
+The number TOTAL of Hits (until this round 190.0) is 2353
+The number TOTAL of Misses (until this round 190.0) is 83
+
+# # The Global RMSE is 2.976146033422954
+
+Round 191.0 finished
+In this round 15 Messages were sent
+Overall 1355 Messages were sent
+
+The number of Hits (in round 191.0) is 33
+The number TOTAL of Hits (until this round 191.0) is 2386
+The number TOTAL of Misses (until this round 191.0) is 83
+
+Round 192.0 finished
+In this round 5 Messages were sent
+Overall 1360 Messages were sent
+
+The number of Hits (in round 192.0) is 35
+The number TOTAL of Hits (until this round 192.0) is 2421
+The number TOTAL of Misses (until this round 192.0) is 83
+
+Round 193.0 finished
+In this round 13 Messages were sent
+Overall 1373 Messages were sent
+
+The number of Hits (in round 193.0) is 35
+The number of Misses (in round 193.0) is 1
+The number TOTAL of Hits (until this round 193.0) is 2456
+The number TOTAL of Misses (until this round 193.0) is 84
+
+Round 194.0 finished
+In this round 5 Messages were sent
+Overall 1378 Messages were sent
+
+The number of Hits (in round 194.0) is 39
+The number of Misses (in round 194.0) is 1
+The number TOTAL of Hits (until this round 194.0) is 2495
+The number TOTAL of Misses (until this round 194.0) is 85
+
+Round 195.0 finished
+In this round 9 Messages were sent
+Overall 1387 Messages were sent
+
+The number of Hits (in round 195.0) is 40
+The number TOTAL of Hits (until this round 195.0) is 2535
+The number TOTAL of Misses (until this round 195.0) is 85
+
+Round 196.0 finished
+In this round 4 Messages were sent
+Overall 1391 Messages were sent
+
+The number of Hits (in round 196.0) is 39
+The number of Misses (in round 196.0) is 1
+The number TOTAL of Hits (until this round 196.0) is 2574
+The number TOTAL of Misses (until this round 196.0) is 86
+
+Round 197.0 finished
+In this round 10 Messages were sent
+Overall 1401 Messages were sent
+
+The number of Hits (in round 197.0) is 39
+The number TOTAL of Hits (until this round 197.0) is 2613
+The number TOTAL of Misses (until this round 197.0) is 86
+
+Round 198.0 finished
+In this round 4 Messages were sent
+Overall 1405 Messages were sent
+
+The number of Hits (in round 198.0) is 39
+The number of Misses (in round 198.0) is 2
+The number TOTAL of Hits (until this round 198.0) is 2652
+The number TOTAL of Misses (until this round 198.0) is 88
+
+Round 199.0 finished
+In this round 10 Messages were sent
+Overall 1415 Messages were sent
+
+The number of Hits (in round 199.0) is 41
+The number TOTAL of Hits (until this round 199.0) is 2693
+The number TOTAL of Misses (until this round 199.0) is 88
+
+Round 200.0 finished
+In this round 2 Messages were sent
+Overall 1417 Messages were sent
+
+The number of Hits (in round 200.0) is 41
+The number TOTAL of Hits (until this round 200.0) is 2734
+The number TOTAL of Misses (until this round 200.0) is 88
+
+# # The Global RMSE is 2.765289670516313
+
+Round 201.0 finished
+In this round 10 Messages were sent
+Overall 1427 Messages were sent
+
+The number of Hits (in round 201.0) is 39
+The number of Misses (in round 201.0) is 2
+The number TOTAL of Hits (until this round 201.0) is 2773
+The number TOTAL of Misses (until this round 201.0) is 90
+
+Round 202.0 finished
+In this round 4 Messages were sent
+Overall 1431 Messages were sent
+
+The number of Hits (in round 202.0) is 39
+The number TOTAL of Hits (until this round 202.0) is 2812
+The number TOTAL of Misses (until this round 202.0) is 90
+
+Round 203.0 finished
+In this round 10 Messages were sent
+Overall 1441 Messages were sent
+
+The number of Hits (in round 203.0) is 37
+The number of Misses (in round 203.0) is 2
+The number TOTAL of Hits (until this round 203.0) is 2849
+The number TOTAL of Misses (until this round 203.0) is 92
+
+Round 204.0 finished
+In this round 6 Messages were sent
+Overall 1447 Messages were sent
+
+The number of Hits (in round 204.0) is 36
+The number of Misses (in round 204.0) is 2
+The number TOTAL of Hits (until this round 204.0) is 2885
+The number TOTAL of Misses (until this round 204.0) is 94
+
+Round 205.0 finished
+In this round 11 Messages were sent
+Overall 1458 Messages were sent
+
+The number of Hits (in round 205.0) is 38
+The number TOTAL of Hits (until this round 205.0) is 2923
+The number TOTAL of Misses (until this round 205.0) is 94
+
+Round 206.0 finished
+In this round 4 Messages were sent
+Overall 1462 Messages were sent
+
+The number of Hits (in round 206.0) is 36
+The number of Misses (in round 206.0) is 3
+The number TOTAL of Hits (until this round 206.0) is 2959
+The number TOTAL of Misses (until this round 206.0) is 97
+
+Round 207.0 finished
+In this round 13 Messages were sent
+Overall 1475 Messages were sent
+
+The number of Hits (in round 207.0) is 34
+The number of Misses (in round 207.0) is 2
+The number TOTAL of Hits (until this round 207.0) is 2993
+The number TOTAL of Misses (until this round 207.0) is 99
+
+Round 208.0 finished
+In this round 6 Messages were sent
+Overall 1481 Messages were sent
+
+The number of Hits (in round 208.0) is 31
+The number of Misses (in round 208.0) is 4
+The number TOTAL of Hits (until this round 208.0) is 3024
+The number TOTAL of Misses (until this round 208.0) is 103
+
+Round 209.0 finished
+In this round 16 Messages were sent
+Overall 1497 Messages were sent
+
+The number of Hits (in round 209.0) is 30
+The number of Misses (in round 209.0) is 1
+The number TOTAL of Hits (until this round 209.0) is 3054
+The number TOTAL of Misses (until this round 209.0) is 104
+
+Round 210.0 finished
+In this round 7 Messages were sent
+Overall 1504 Messages were sent
+
+The number of Hits (in round 210.0) is 32
+The number of Misses (in round 210.0) is 1
+The number TOTAL of Hits (until this round 210.0) is 3086
+The number TOTAL of Misses (until this round 210.0) is 105
+
+# # The Global RMSE is 2.6006856562234844
+
+Round 211.0 finished
+In this round 14 Messages were sent
+Overall 1518 Messages were sent
+
+The number of Hits (in round 211.0) is 34
+The number of Misses (in round 211.0) is 1
+The number TOTAL of Hits (until this round 211.0) is 3120
+The number TOTAL of Misses (until this round 211.0) is 106
+
+Round 212.0 finished
+In this round 5 Messages were sent
+Overall 1523 Messages were sent
+
+The number of Hits (in round 212.0) is 30
+The number of Misses (in round 212.0) is 4
+The number TOTAL of Hits (until this round 212.0) is 3150
+The number TOTAL of Misses (until this round 212.0) is 110
+
+Round 213.0 finished
+In this round 18 Messages were sent
+Overall 1541 Messages were sent
+
+The number of Hits (in round 213.0) is 30
+The number TOTAL of Hits (until this round 213.0) is 3180
+The number TOTAL of Misses (until this round 213.0) is 110
+
+Round 214.0 finished
+In this round 5 Messages were sent
+Overall 1546 Messages were sent
+
+The number of Hits (in round 214.0) is 31
+The number TOTAL of Hits (until this round 214.0) is 3211
+The number TOTAL of Misses (until this round 214.0) is 110
+
+Round 215.0 finished
+In this round 17 Messages were sent
+Overall 1563 Messages were sent
+
+The number of Hits (in round 215.0) is 29
+The number of Misses (in round 215.0) is 2
+The number TOTAL of Hits (until this round 215.0) is 3240
+The number TOTAL of Misses (until this round 215.0) is 112
+
+Round 216.0 finished
+In this round 7 Messages were sent
+Overall 1570 Messages were sent
+
+The number of Hits (in round 216.0) is 29
+The number TOTAL of Hits (until this round 216.0) is 3269
+The number TOTAL of Misses (until this round 216.0) is 112
+
+Round 217.0 finished
+In this round 17 Messages were sent
+Overall 1587 Messages were sent
+
+The number of Hits (in round 217.0) is 29
+The number TOTAL of Hits (until this round 217.0) is 3298
+The number TOTAL of Misses (until this round 217.0) is 112
+
+Round 218.0 finished
+In this round 7 Messages were sent
+Overall 1594 Messages were sent
+
+The number of Hits (in round 218.0) is 30
+The number TOTAL of Hits (until this round 218.0) is 3328
+The number TOTAL of Misses (until this round 218.0) is 112
+
+Round 219.0 finished
+In this round 16 Messages were sent
+Overall 1610 Messages were sent
+
+The number of Hits (in round 219.0) is 29
+The number of Misses (in round 219.0) is 1
+The number TOTAL of Hits (until this round 219.0) is 3357
+The number TOTAL of Misses (until this round 219.0) is 113
+
+Round 220.0 finished
+In this round 8 Messages were sent
+Overall 1618 Messages were sent
+
+The number of Hits (in round 220.0) is 32
+The number TOTAL of Hits (until this round 220.0) is 3389
+The number TOTAL of Misses (until this round 220.0) is 113
+
+# # The Global RMSE is 2.485627207481405
+
+Round 221.0 finished
+In this round 13 Messages were sent
+Overall 1631 Messages were sent
+
+The number of Hits (in round 221.0) is 33
+The number TOTAL of Hits (until this round 221.0) is 3422
+The number TOTAL of Misses (until this round 221.0) is 113
+
+Round 222.0 finished
+In this round 7 Messages were sent
+Overall 1638 Messages were sent
+
+The number of Hits (in round 222.0) is 36
+The number TOTAL of Hits (until this round 222.0) is 3458
+The number TOTAL of Misses (until this round 222.0) is 113
+
+Round 223.0 finished
+In this round 10 Messages were sent
+Overall 1648 Messages were sent
+
+The number of Hits (in round 223.0) is 39
+The number of Misses (in round 223.0) is 1
+The number TOTAL of Hits (until this round 223.0) is 3497
+The number TOTAL of Misses (until this round 223.0) is 114
+
+Round 224.0 finished
+In this round 4 Messages were sent
+Overall 1652 Messages were sent
+
+The number of Hits (in round 224.0) is 41
+The number of Misses (in round 224.0) is 1
+The number TOTAL of Hits (until this round 224.0) is 3538
+The number TOTAL of Misses (until this round 224.0) is 115
+
+Round 225.0 finished
+In this round 8 Messages were sent
+Overall 1660 Messages were sent
+
+The number of Hits (in round 225.0) is 37
+The number of Misses (in round 225.0) is 4
+The number TOTAL of Hits (until this round 225.0) is 3575
+The number TOTAL of Misses (until this round 225.0) is 119
+
+Round 226.0 finished
+In this round 8 Messages were sent
+Overall 1668 Messages were sent
+
+The number of Hits (in round 226.0) is 38
+The number TOTAL of Hits (until this round 226.0) is 3613
+The number TOTAL of Misses (until this round 226.0) is 119
+
+Round 227.0 finished
+In this round 7 Messages were sent
+Overall 1675 Messages were sent
+
+The number of Hits (in round 227.0) is 37
+The number of Misses (in round 227.0) is 1
+The number TOTAL of Hits (until this round 227.0) is 3650
+The number TOTAL of Misses (until this round 227.0) is 120
+
+Round 228.0 finished
+In this round 9 Messages were sent
+Overall 1684 Messages were sent
+
+The number of Hits (in round 228.0) is 36
+The number of Misses (in round 228.0) is 1
+The number TOTAL of Hits (until this round 228.0) is 3686
+The number TOTAL of Misses (until this round 228.0) is 121
+
+Round 229.0 finished
+In this round 8 Messages were sent
+Overall 1692 Messages were sent
+
+The number of Hits (in round 229.0) is 38
+The number TOTAL of Hits (until this round 229.0) is 3724
+The number TOTAL of Misses (until this round 229.0) is 121
+
+Round 230.0 finished
+In this round 7 Messages were sent
+Overall 1699 Messages were sent
+
+The number of Hits (in round 230.0) is 38
+The number TOTAL of Hits (until this round 230.0) is 3762
+The number TOTAL of Misses (until this round 230.0) is 121
+
+# # The Global RMSE is 15.852442357527483
+
+Round 231.0 finished
+In this round 8 Messages were sent
+Overall 1707 Messages were sent
+
+The number of Hits (in round 231.0) is 38
+The number TOTAL of Hits (until this round 231.0) is 3800
+The number TOTAL of Misses (until this round 231.0) is 121
+
+Round 232.0 finished
+In this round 7 Messages were sent
+Overall 1714 Messages were sent
+
+The number of Hits (in round 232.0) is 41
+The number TOTAL of Hits (until this round 232.0) is 3841
+The number TOTAL of Misses (until this round 232.0) is 121
+
+Round 233.0 finished
+In this round 5 Messages were sent
+Overall 1719 Messages were sent
+
+The number of Hits (in round 233.0) is 41
+The number TOTAL of Hits (until this round 233.0) is 3882
+The number TOTAL of Misses (until this round 233.0) is 121
+
+Round 234.0 finished
+In this round 7 Messages were sent
+Overall 1726 Messages were sent
+
+The number of Hits (in round 234.0) is 37
+The number of Misses (in round 234.0) is 4
+The number TOTAL of Hits (until this round 234.0) is 3919
+The number TOTAL of Misses (until this round 234.0) is 125
+
+Round 235.0 finished
+In this round 9 Messages were sent
+Overall 1735 Messages were sent
+
+The number of Hits (in round 235.0) is 37
+The number of Misses (in round 235.0) is 1
+The number TOTAL of Hits (until this round 235.0) is 3956
+The number TOTAL of Misses (until this round 235.0) is 126
+
+Round 236.0 finished
+In this round 7 Messages were sent
+Overall 1742 Messages were sent
+
+The number of Hits (in round 236.0) is 35
+The number of Misses (in round 236.0) is 2
+The number TOTAL of Hits (until this round 236.0) is 3991
+The number TOTAL of Misses (until this round 236.0) is 128
+
+Round 237.0 finished
+In this round 11 Messages were sent
+Overall 1753 Messages were sent
+
+The number of Hits (in round 237.0) is 36
+The number of Misses (in round 237.0) is 1
+The number TOTAL of Hits (until this round 237.0) is 4027
+The number TOTAL of Misses (until this round 237.0) is 129
+
+Round 238.0 finished
+In this round 6 Messages were sent
+Overall 1759 Messages were sent
+
+The number of Hits (in round 238.0) is 36
+The number of Misses (in round 238.0) is 1
+The number TOTAL of Hits (until this round 238.0) is 4063
+The number TOTAL of Misses (until this round 238.0) is 130
+
+Round 239.0 finished
+In this round 11 Messages were sent
+Overall 1770 Messages were sent
+
+The number of Hits (in round 239.0) is 36
+The number of Misses (in round 239.0) is 1
+The number TOTAL of Hits (until this round 239.0) is 4099
+The number TOTAL of Misses (until this round 239.0) is 131
+
+Round 240.0 finished
+In this round 6 Messages were sent
+Overall 1776 Messages were sent
+
+The number of Hits (in round 240.0) is 36
+The number of Misses (in round 240.0) is 2
+The number TOTAL of Hits (until this round 240.0) is 4135
+The number TOTAL of Misses (until this round 240.0) is 133
+
+# # The Global RMSE is 15.120575256718652
+
+Round 241.0 finished
+In this round 11 Messages were sent
+Overall 1787 Messages were sent
+
+The number of Hits (in round 241.0) is 36
+The number of Misses (in round 241.0) is 1
+The number TOTAL of Hits (until this round 241.0) is 4171
+The number TOTAL of Misses (until this round 241.0) is 134
+
+Round 242.0 finished
+In this round 6 Messages were sent
+Overall 1793 Messages were sent
+
+The number of Hits (in round 242.0) is 36
+The number TOTAL of Hits (until this round 242.0) is 4207
+The number TOTAL of Misses (until this round 242.0) is 134
+
+Round 243.0 finished
+In this round 11 Messages were sent
+Overall 1804 Messages were sent
+
+The number of Hits (in round 243.0) is 37
+The number TOTAL of Hits (until this round 243.0) is 4244
+The number TOTAL of Misses (until this round 243.0) is 134
+
+Round 244.0 finished
+In this round 5 Messages were sent
+Overall 1809 Messages were sent
+
+The number of Hits (in round 244.0) is 36
+The number of Misses (in round 244.0) is 2
+The number TOTAL of Hits (until this round 244.0) is 4280
+The number TOTAL of Misses (until this round 244.0) is 136
+
+Round 245.0 finished
+In this round 12 Messages were sent
+Overall 1821 Messages were sent
+
+The number of Hits (in round 245.0) is 35
+The number of Misses (in round 245.0) is 2
+The number TOTAL of Hits (until this round 245.0) is 4315
+The number TOTAL of Misses (until this round 245.0) is 138
+
+Round 246.0 finished
+In this round 6 Messages were sent
+Overall 1827 Messages were sent
+
+The number of Hits (in round 246.0) is 33
+The number of Misses (in round 246.0) is 2
+The number TOTAL of Hits (until this round 246.0) is 4348
+The number TOTAL of Misses (until this round 246.0) is 140
+
+Round 247.0 finished
+In this round 14 Messages were sent
+Overall 1841 Messages were sent
+
+The number of Hits (in round 247.0) is 32
+The number of Misses (in round 247.0) is 1
+The number TOTAL of Hits (until this round 247.0) is 4380
+The number TOTAL of Misses (until this round 247.0) is 141
+
+Round 248.0 finished
+In this round 7 Messages were sent
+Overall 1848 Messages were sent
+
+The number of Hits (in round 248.0) is 31
+The number of Misses (in round 248.0) is 2
+The number TOTAL of Hits (until this round 248.0) is 4411
+The number TOTAL of Misses (until this round 248.0) is 143
+
+Round 249.0 finished
+In this round 15 Messages were sent
+Overall 1863 Messages were sent
+
+The number of Hits (in round 249.0) is 32
+The number TOTAL of Hits (until this round 249.0) is 4443
+The number TOTAL of Misses (until this round 249.0) is 143
+
+Round 250.0 finished
+In this round 6 Messages were sent
+Overall 1869 Messages were sent
+
+The number of Hits (in round 250.0) is 35
+The number TOTAL of Hits (until this round 250.0) is 4478
+The number TOTAL of Misses (until this round 250.0) is 143
+
+# # The Global RMSE is 14.531593176910365
+
+Round 251.0 finished
+In this round 12 Messages were sent
+Overall 1881 Messages were sent
+
+The number of Hits (in round 251.0) is 35
+The number of Misses (in round 251.0) is 1
+The number TOTAL of Hits (until this round 251.0) is 4513
+The number TOTAL of Misses (until this round 251.0) is 144
+
+Round 252.0 finished
+In this round 6 Messages were sent
+Overall 1887 Messages were sent
+
+The number of Hits (in round 252.0) is 33
+The number of Misses (in round 252.0) is 3
+The number TOTAL of Hits (until this round 252.0) is 4546
+The number TOTAL of Misses (until this round 252.0) is 147
+
+Round 253.0 finished
+In this round 14 Messages were sent
+Overall 1901 Messages were sent
+
+The number of Hits (in round 253.0) is 32
+The number of Misses (in round 253.0) is 1
+The number TOTAL of Hits (until this round 253.0) is 4578
+The number TOTAL of Misses (until this round 253.0) is 148
+
+Round 254.0 finished
+In this round 7 Messages were sent
+Overall 1908 Messages were sent
+
+The number of Hits (in round 254.0) is 33
+The number TOTAL of Hits (until this round 254.0) is 4611
+The number TOTAL of Misses (until this round 254.0) is 148
+
+Round 255.0 finished
+In this round 13 Messages were sent
+Overall 1921 Messages were sent
+
+The number of Hits (in round 255.0) is 32
+The number of Misses (in round 255.0) is 3
+The number TOTAL of Hits (until this round 255.0) is 4643
+The number TOTAL of Misses (until this round 255.0) is 151
+
+# # The Global RMSE is 14.26699704227641
+
+Round 256.0 finished
+In this round 8 Messages were sent
+Overall 1929 Messages were sent
+
+The number of Hits (in round 256.0) is 31
+The number of Misses (in round 256.0) is 1
+The number TOTAL of Hits (until this round 256.0) is 4674
+The number TOTAL of Misses (until this round 256.0) is 152
+
+Round 257.0 finished
+In this round 14 Messages were sent
+Overall 1943 Messages were sent
+
+The number of Hits (in round 257.0) is 30
+The number of Misses (in round 257.0) is 1
+The number TOTAL of Hits (until this round 257.0) is 4704
+The number TOTAL of Misses (until this round 257.0) is 153
+
+Round 258.0 finished
+In this round 9 Messages were sent
+Overall 1952 Messages were sent
+
+The number of Hits (in round 258.0) is 30
+The number of Misses (in round 258.0) is 1
+The number TOTAL of Hits (until this round 258.0) is 4734
+The number TOTAL of Misses (until this round 258.0) is 154
+
+Round 259.0 finished
+In this round 14 Messages were sent
+Overall 1966 Messages were sent
+
+The number of Hits (in round 259.0) is 30
+The number of Misses (in round 259.0) is 1
+The number TOTAL of Hits (until this round 259.0) is 4764
+The number TOTAL of Misses (until this round 259.0) is 155
+
+Round 260.0 finished
+In this round 9 Messages were sent
+Overall 1975 Messages were sent
+
+The number of Hits (in round 260.0) is 33
+The number TOTAL of Hits (until this round 260.0) is 4797
+The number TOTAL of Misses (until this round 260.0) is 155
+
+# # The Global RMSE is 14.03755787933133
+
+Round 261.0 finished
+In this round 11 Messages were sent
+Overall 1986 Messages were sent
+
+The number of Hits (in round 261.0) is 30
+The number of Misses (in round 261.0) is 3
+The number TOTAL of Hits (until this round 261.0) is 4827
+The number TOTAL of Misses (until this round 261.0) is 158
+
+Round 262.0 finished
+In this round 12 Messages were sent
+Overall 1998 Messages were sent
+
+The number of Hits (in round 262.0) is 29
+The number of Misses (in round 262.0) is 2
+The number TOTAL of Hits (until this round 262.0) is 4856
+The number TOTAL of Misses (until this round 262.0) is 160
+
+Round 263.0 finished
+In this round 12 Messages were sent
+Overall 2010 Messages were sent
+
+The number of Hits (in round 263.0) is 28
+The number of Misses (in round 263.0) is 1
+The number TOTAL of Hits (until this round 263.0) is 4884
+The number TOTAL of Misses (until this round 263.0) is 161
+
+Round 264.0 finished
+In this round 13 Messages were sent
+Overall 2023 Messages were sent
+
+The number of Hits (in round 264.0) is 29
+The number TOTAL of Hits (until this round 264.0) is 4913
+The number TOTAL of Misses (until this round 264.0) is 161
+
+Round 265.0 finished
+In this round 11 Messages were sent
+Overall 2034 Messages were sent
+
+The number of Hits (in round 265.0) is 30
+The number of Misses (in round 265.0) is 2
+The number TOTAL of Hits (until this round 265.0) is 4943
+The number TOTAL of Misses (until this round 265.0) is 163
+
+# # The Global RMSE is 13.82425883229114
+
+Round 266.0 finished
+In this round 12 Messages were sent
+Overall 2046 Messages were sent
+
+The number of Hits (in round 266.0) is 29
+The number of Misses (in round 266.0) is 1
+The number TOTAL of Hits (until this round 266.0) is 4972
+The number TOTAL of Misses (until this round 266.0) is 164
+
+Round 267.0 finished
+In this round 12 Messages were sent
+Overall 2058 Messages were sent
+
+The number of Hits (in round 267.0) is 30
+The number TOTAL of Hits (until this round 267.0) is 5002
+The number TOTAL of Misses (until this round 267.0) is 164
+
+Round 268.0 finished
+In this round 11 Messages were sent
+Overall 2069 Messages were sent
+
+The number of Hits (in round 268.0) is 30
+The number of Misses (in round 268.0) is 3
+The number TOTAL of Hits (until this round 268.0) is 5032
+The number TOTAL of Misses (until this round 268.0) is 167
+
+Round 269.0 finished
+In this round 12 Messages were sent
+Overall 2081 Messages were sent
+
+The number of Hits (in round 269.0) is 31
+The number TOTAL of Hits (until this round 269.0) is 5063
+The number TOTAL of Misses (until this round 269.0) is 167
+
+Round 270.0 finished
+In this round 10 Messages were sent
+Overall 2091 Messages were sent
+
+The number of Hits (in round 270.0) is 31
+The number TOTAL of Hits (until this round 270.0) is 5094
+The number TOTAL of Misses (until this round 270.0) is 167
+
+# # The Global RMSE is 13.619101340286731
+
+Round 271.0 finished
+In this round 12 Messages were sent
+Overall 2103 Messages were sent
+
+The number of Hits (in round 271.0) is 32
+The number TOTAL of Hits (until this round 271.0) is 5126
+The number TOTAL of Misses (until this round 271.0) is 167
+
+Round 272.0 finished
+In this round 9 Messages were sent
+Overall 2112 Messages were sent
+
+The number of Hits (in round 272.0) is 34
+The number of Misses (in round 272.0) is 1
+The number TOTAL of Hits (until this round 272.0) is 5160
+The number TOTAL of Misses (until this round 272.0) is 168
+
+Round 273.0 finished
+In this round 10 Messages were sent
+Overall 2122 Messages were sent
+
+The number of Hits (in round 273.0) is 36
+The number TOTAL of Hits (until this round 273.0) is 5196
+The number TOTAL of Misses (until this round 273.0) is 168
+
+Round 274.0 finished
+In this round 7 Messages were sent
+Overall 2129 Messages were sent
+
+The number of Hits (in round 274.0) is 37
+The number of Misses (in round 274.0) is 1
+The number TOTAL of Hits (until this round 274.0) is 5233
+The number TOTAL of Misses (until this round 274.0) is 169
+
+Round 275.0 finished
+In this round 9 Messages were sent
+Overall 2138 Messages were sent
+
+The number of Hits (in round 275.0) is 36
+The number of Misses (in round 275.0) is 1
+The number TOTAL of Hits (until this round 275.0) is 5269
+The number TOTAL of Misses (until this round 275.0) is 170
+
+Round 276.0 finished
+In this round 8 Messages were sent
+Overall 2146 Messages were sent
+
+The number of Hits (in round 276.0) is 35
+The number of Misses (in round 276.0) is 1
+The number TOTAL of Hits (until this round 276.0) is 5304
+The number TOTAL of Misses (until this round 276.0) is 171
+
+Round 277.0 finished
+In this round 10 Messages were sent
+Overall 2156 Messages were sent
+
+The number of Hits (in round 277.0) is 33
+The number of Misses (in round 277.0) is 4
+The number TOTAL of Hits (until this round 277.0) is 5337
+The number TOTAL of Misses (until this round 277.0) is 175
+
+Round 278.0 finished
+In this round 10 Messages were sent
+Overall 2166 Messages were sent
+
+The number of Hits (in round 278.0) is 31
+The number of Misses (in round 278.0) is 3
+The number TOTAL of Hits (until this round 278.0) is 5368
+The number TOTAL of Misses (until this round 278.0) is 178
+
+Round 279.0 finished
+In this round 12 Messages were sent
+Overall 2178 Messages were sent
+
+The number of Hits (in round 279.0) is 31
+The number of Misses (in round 279.0) is 2
+The number TOTAL of Hits (until this round 279.0) is 5399
+The number TOTAL of Misses (until this round 279.0) is 180
+
+Round 280.0 finished
+In this round 10 Messages were sent
+Overall 2188 Messages were sent
+
+The number of Hits (in round 280.0) is 31
+The number TOTAL of Hits (until this round 280.0) is 5430
+The number TOTAL of Misses (until this round 280.0) is 180
+
+# # The Global RMSE is 13.188700771976873
+
+Round 281.0 finished
+In this round 12 Messages were sent
+Overall 2200 Messages were sent
+
+The number of Hits (in round 281.0) is 33
+The number TOTAL of Hits (until this round 281.0) is 5463
+The number TOTAL of Misses (until this round 281.0) is 180
+
+Round 282.0 finished
+In this round 8 Messages were sent
+Overall 2208 Messages were sent
+
+The number of Hits (in round 282.0) is 33
+The number of Misses (in round 282.0) is 1
+The number TOTAL of Hits (until this round 282.0) is 5496
+The number TOTAL of Misses (until this round 282.0) is 181
+
+Round 283.0 finished
+In this round 12 Messages were sent
+Overall 2220 Messages were sent
+
+The number of Hits (in round 283.0) is 32
+The number of Misses (in round 283.0) is 2
+The number TOTAL of Hits (until this round 283.0) is 5528
+The number TOTAL of Misses (until this round 283.0) is 183
+
+Round 284.0 finished
+In this round 9 Messages were sent
+Overall 2229 Messages were sent
+
+The number of Hits (in round 284.0) is 33
+The number of Misses (in round 284.0) is 1
+The number TOTAL of Hits (until this round 284.0) is 5561
+The number TOTAL of Misses (until this round 284.0) is 184
+
+Round 285.0 finished
+In this round 11 Messages were sent
+Overall 2240 Messages were sent
+
+The number of Hits (in round 285.0) is 32
+The number of Misses (in round 285.0) is 2
+The number TOTAL of Hits (until this round 285.0) is 5593
+The number TOTAL of Misses (until this round 285.0) is 186
+
+Round 286.0 finished
+In this round 10 Messages were sent
+Overall 2250 Messages were sent
+
+The number of Hits (in round 286.0) is 31
+The number of Misses (in round 286.0) is 1
+The number TOTAL of Hits (until this round 286.0) is 5624
+The number TOTAL of Misses (until this round 286.0) is 187
+
+Round 287.0 finished
+In this round 12 Messages were sent
+Overall 2262 Messages were sent
+
+The number of Hits (in round 287.0) is 31
+The number of Misses (in round 287.0) is 1
+The number TOTAL of Hits (until this round 287.0) is 5655
+The number TOTAL of Misses (until this round 287.0) is 188
+
+Round 288.0 finished
+In this round 10 Messages were sent
+Overall 2272 Messages were sent
+
+The number of Hits (in round 288.0) is 31
+The number of Misses (in round 288.0) is 1
+The number TOTAL of Hits (until this round 288.0) is 5686
+The number TOTAL of Misses (until this round 288.0) is 189
+
+Round 289.0 finished
+In this round 12 Messages were sent
+Overall 2284 Messages were sent
+
+The number of Hits (in round 289.0) is 30
+The number of Misses (in round 289.0) is 1
+The number TOTAL of Hits (until this round 289.0) is 5716
+The number TOTAL of Misses (until this round 289.0) is 190
+
+Round 290.0 finished
+In this round 11 Messages were sent
+Overall 2295 Messages were sent
+
+The number of Hits (in round 290.0) is 30
+The number of Misses (in round 290.0) is 2
+The number TOTAL of Hits (until this round 290.0) is 5746
+The number TOTAL of Misses (until this round 290.0) is 192
+
+# # The Global RMSE is 12.819290839000978
+
+Round 291.0 finished
+In this round 12 Messages were sent
+Overall 2307 Messages were sent
+
+The number of Hits (in round 291.0) is 31
+The number TOTAL of Hits (until this round 291.0) is 5777
+The number TOTAL of Misses (until this round 291.0) is 192
+
+Round 292.0 finished
+In this round 10 Messages were sent
+Overall 2317 Messages were sent
+
+The number of Hits (in round 292.0) is 33
+The number of Misses (in round 292.0) is 2
+The number TOTAL of Hits (until this round 292.0) is 5810
+The number TOTAL of Misses (until this round 292.0) is 194
+
+Round 293.0 finished
+In this round 10 Messages were sent
+Overall 2327 Messages were sent
+
+The number of Hits (in round 293.0) is 34
+The number TOTAL of Hits (until this round 293.0) is 5844
+The number TOTAL of Misses (until this round 293.0) is 194
+
+Round 294.0 finished
+In this round 9 Messages were sent
+Overall 2336 Messages were sent
+
+The number of Hits (in round 294.0) is 34
+The number of Misses (in round 294.0) is 2
+The number TOTAL of Hits (until this round 294.0) is 5878
+The number TOTAL of Misses (until this round 294.0) is 196
+
+Round 295.0 finished
+In this round 10 Messages were sent
+Overall 2346 Messages were sent
+
+The number of Hits (in round 295.0) is 35
+The number of Misses (in round 295.0) is 1
+The number TOTAL of Hits (until this round 295.0) is 5913
+The number TOTAL of Misses (until this round 295.0) is 197
+
+Round 296.0 finished
+In this round 8 Messages were sent
+Overall 2354 Messages were sent
+
+The number of Hits (in round 296.0) is 35
+The number of Misses (in round 296.0) is 1
+The number TOTAL of Hits (until this round 296.0) is 5948
+The number TOTAL of Misses (until this round 296.0) is 198
+
+Round 297.0 finished
+In this round 10 Messages were sent
+Overall 2364 Messages were sent
+
+The number of Hits (in round 297.0) is 38
+The number TOTAL of Hits (until this round 297.0) is 5986
+The number TOTAL of Misses (until this round 297.0) is 198
+
+Round 298.0 finished
+In this round 5 Messages were sent
+Overall 2369 Messages were sent
+
+The number of Hits (in round 298.0) is 37
+The number of Misses (in round 298.0) is 1
+The number TOTAL of Hits (until this round 298.0) is 6023
+The number TOTAL of Misses (until this round 298.0) is 199
+
+Round 299.0 finished
+In this round 11 Messages were sent
+Overall 2380 Messages were sent
+
+The number of Hits (in round 299.0) is 36
+The number of Misses (in round 299.0) is 2
+The number TOTAL of Hits (until this round 299.0) is 6059
+The number TOTAL of Misses (until this round 299.0) is 201
+
+Round 300.0 finished
+In this round 6 Messages were sent
+Overall 2386 Messages were sent
+
+The number of Hits (in round 300.0) is 32
+The number of Misses (in round 300.0) is 4
+The number TOTAL of Hits (until this round 300.0) is 6091
+The number TOTAL of Misses (until this round 300.0) is 205
+
+# # The Global RMSE is 12.44951560198083
+
+Round 301.0 finished
+In this round 15 Messages were sent
+Overall 2401 Messages were sent
+
+The number of Hits (in round 301.0) is 32
+The number TOTAL of Hits (until this round 301.0) is 6123
+The number TOTAL of Misses (until this round 301.0) is 205
+
+Round 302.0 finished
+In this round 6 Messages were sent
+Overall 2407 Messages were sent
+
+The number of Hits (in round 302.0) is 33
+The number of Misses (in round 302.0) is 1
+The number TOTAL of Hits (until this round 302.0) is 6156
+The number TOTAL of Misses (until this round 302.0) is 206
+
+Round 303.0 finished
+In this round 14 Messages were sent
+Overall 2421 Messages were sent
+
+The number of Hits (in round 303.0) is 31
+The number of Misses (in round 303.0) is 2
+The number TOTAL of Hits (until this round 303.0) is 6187
+The number TOTAL of Misses (until this round 303.0) is 208
+
+Round 304.0 finished
+In this round 8 Messages were sent
+Overall 2429 Messages were sent
+
+The number of Hits (in round 304.0) is 28
+The number of Misses (in round 304.0) is 3
+The number TOTAL of Hits (until this round 304.0) is 6215
+The number TOTAL of Misses (until this round 304.0) is 211
+
+Round 305.0 finished
+In this round 17 Messages were sent
+Overall 2446 Messages were sent
+
+The number of Hits (in round 305.0) is 25
+The number of Misses (in round 305.0) is 4
+The number TOTAL of Hits (until this round 305.0) is 6240
+The number TOTAL of Misses (until this round 305.0) is 215
+
+Round 306.0 finished
+In this round 11 Messages were sent
+Overall 2457 Messages were sent
+
+The number of Hits (in round 306.0) is 28
+The number TOTAL of Hits (until this round 306.0) is 6268
+The number TOTAL of Misses (until this round 306.0) is 215
+
+Round 307.0 finished
+In this round 14 Messages were sent
+Overall 2471 Messages were sent
+
+The number of Hits (in round 307.0) is 29
+The number of Misses (in round 307.0) is 1
+The number TOTAL of Hits (until this round 307.0) is 6297
+The number TOTAL of Misses (until this round 307.0) is 216
+
+Round 308.0 finished
+In this round 10 Messages were sent
+Overall 2481 Messages were sent
+
+The number of Hits (in round 308.0) is 30
+The number of Misses (in round 308.0) is 2
+The number TOTAL of Hits (until this round 308.0) is 6327
+The number TOTAL of Misses (until this round 308.0) is 218
+
+Round 309.0 finished
+In this round 13 Messages were sent
+Overall 2494 Messages were sent
+
+The number of Hits (in round 309.0) is 31
+The number TOTAL of Hits (until this round 309.0) is 6358
+The number TOTAL of Misses (until this round 309.0) is 218
+
+Round 310.0 finished
+In this round 9 Messages were sent
+Overall 2503 Messages were sent
+
+The number of Hits (in round 310.0) is 31
+The number TOTAL of Hits (until this round 310.0) is 6389
+The number TOTAL of Misses (until this round 310.0) is 218
+
+# # The Global RMSE is 12.205442297156107
+
+Round 311.0 finished
+In this round 13 Messages were sent
+Overall 2516 Messages were sent
+
+The number of Hits (in round 311.0) is 30
+The number of Misses (in round 311.0) is 2
+The number TOTAL of Hits (until this round 311.0) is 6419
+The number TOTAL of Misses (until this round 311.0) is 220
+
+Round 312.0 finished
+In this round 10 Messages were sent
+Overall 2526 Messages were sent
+
+The number of Hits (in round 312.0) is 30
+The number of Misses (in round 312.0) is 2
+The number TOTAL of Hits (until this round 312.0) is 6449
+The number TOTAL of Misses (until this round 312.0) is 222
+
+Round 313.0 finished
+In this round 13 Messages were sent
+Overall 2539 Messages were sent
+
+The number of Hits (in round 313.0) is 31
+The number TOTAL of Hits (until this round 313.0) is 6480
+The number TOTAL of Misses (until this round 313.0) is 222
+
+Round 314.0 finished
+In this round 9 Messages were sent
+Overall 2548 Messages were sent
+
+The number of Hits (in round 314.0) is 31
+The number of Misses (in round 314.0) is 3
+The number TOTAL of Hits (until this round 314.0) is 6511
+The number TOTAL of Misses (until this round 314.0) is 225
+
+Round 315.0 finished
+In this round 13 Messages were sent
+Overall 2561 Messages were sent
+
+The number of Hits (in round 315.0) is 32
+The number TOTAL of Hits (until this round 315.0) is 6543
+The number TOTAL of Misses (until this round 315.0) is 225
+
+Round 316.0 finished
+In this round 8 Messages were sent
+Overall 2569 Messages were sent
+
+The number of Hits (in round 316.0) is 34
+The number of Misses (in round 316.0) is 1
+The number TOTAL of Hits (until this round 316.0) is 6577
+The number TOTAL of Misses (until this round 316.0) is 226
+
+Round 317.0 finished
+In this round 11 Messages were sent
+Overall 2580 Messages were sent
+
+The number of Hits (in round 317.0) is 33
+The number of Misses (in round 317.0) is 2
+The number TOTAL of Hits (until this round 317.0) is 6610
+The number TOTAL of Misses (until this round 317.0) is 228
+
+Round 318.0 finished
+In this round 9 Messages were sent
+Overall 2589 Messages were sent
+
+The number of Hits (in round 318.0) is 31
+The number of Misses (in round 318.0) is 2
+The number TOTAL of Hits (until this round 318.0) is 6641
+The number TOTAL of Misses (until this round 318.0) is 230
+
+Round 319.0 finished
+In this round 13 Messages were sent
+Overall 2602 Messages were sent
+
+The number of Hits (in round 319.0) is 31
+The number of Misses (in round 319.0) is 1
+The number TOTAL of Hits (until this round 319.0) is 6672
+The number TOTAL of Misses (until this round 319.0) is 231
+
+Round 320.0 finished
+In this round 9 Messages were sent
+Overall 2611 Messages were sent
+
+The number of Hits (in round 320.0) is 32
+The number of Misses (in round 320.0) is 1
+The number TOTAL of Hits (until this round 320.0) is 6704
+The number TOTAL of Misses (until this round 320.0) is 232
+
+# # The Global RMSE is 11.912523988382349
+
+Round 321.0 finished
+In this round 12 Messages were sent
+Overall 2623 Messages were sent
+
+The number of Hits (in round 321.0) is 32
+The number TOTAL of Hits (until this round 321.0) is 6736
+The number TOTAL of Misses (until this round 321.0) is 232
+
+Round 322.0 finished
+In this round 9 Messages were sent
+Overall 2632 Messages were sent
+
+The number of Hits (in round 322.0) is 30
+The number of Misses (in round 322.0) is 2
+The number TOTAL of Hits (until this round 322.0) is 6766
+The number TOTAL of Misses (until this round 322.0) is 234
+
+Round 323.0 finished
+In this round 14 Messages were sent
+Overall 2646 Messages were sent
+
+The number of Hits (in round 323.0) is 28
+The number of Misses (in round 323.0) is 2
+The number TOTAL of Hits (until this round 323.0) is 6794
+The number TOTAL of Misses (until this round 323.0) is 236
+
+Round 324.0 finished
+In this round 11 Messages were sent
+Overall 2657 Messages were sent
+
+The number of Hits (in round 324.0) is 28
+The number of Misses (in round 324.0) is 1
+The number TOTAL of Hits (until this round 324.0) is 6822
+The number TOTAL of Misses (until this round 324.0) is 237
+
+Round 325.0 finished
+In this round 14 Messages were sent
+Overall 2671 Messages were sent
+
+The number of Hits (in round 325.0) is 29
+The number TOTAL of Hits (until this round 325.0) is 6851
+The number TOTAL of Misses (until this round 325.0) is 237
+
+Round 326.0 finished
+In this round 10 Messages were sent
+Overall 2681 Messages were sent
+
+The number of Hits (in round 326.0) is 31
+The number of Misses (in round 326.0) is 2
+The number TOTAL of Hits (until this round 326.0) is 6882
+The number TOTAL of Misses (until this round 326.0) is 239
+
+Round 327.0 finished
+In this round 12 Messages were sent
+Overall 2693 Messages were sent
+
+The number of Hits (in round 327.0) is 34
+The number TOTAL of Hits (until this round 327.0) is 6916
+The number TOTAL of Misses (until this round 327.0) is 239
+
+Round 328.0 finished
+In this round 7 Messages were sent
+Overall 2700 Messages were sent
+
+The number of Hits (in round 328.0) is 35
+The number of Misses (in round 328.0) is 1
+The number TOTAL of Hits (until this round 328.0) is 6951
+The number TOTAL of Misses (until this round 328.0) is 240
+
+Round 329.0 finished
+In this round 11 Messages were sent
+Overall 2711 Messages were sent
+
+The number of Hits (in round 329.0) is 36
+The number of Misses (in round 329.0) is 1
+The number TOTAL of Hits (until this round 329.0) is 6987
+The number TOTAL of Misses (until this round 329.0) is 241
+
+Round 330.0 finished
+In this round 6 Messages were sent
+Overall 2717 Messages were sent
+
+The number of Hits (in round 330.0) is 37
+The number TOTAL of Hits (until this round 330.0) is 7024
+The number TOTAL of Misses (until this round 330.0) is 241
+
+# # The Global RMSE is 11.63968333768131
+
+Round 331.0 finished
+In this round 10 Messages were sent
+Overall 2727 Messages were sent
+
+The number of Hits (in round 331.0) is 38
+The number TOTAL of Hits (until this round 331.0) is 7062
+The number TOTAL of Misses (until this round 331.0) is 241
+
+Round 332.0 finished
+In this round 5 Messages were sent
+Overall 2732 Messages were sent
+
+The number of Hits (in round 332.0) is 38
+The number of Misses (in round 332.0) is 3
+The number TOTAL of Hits (until this round 332.0) is 7100
+The number TOTAL of Misses (until this round 332.0) is 244
+
+Round 333.0 finished
+In this round 10 Messages were sent
+Overall 2742 Messages were sent
+
+The number of Hits (in round 333.0) is 38
+The number TOTAL of Hits (until this round 333.0) is 7138
+The number TOTAL of Misses (until this round 333.0) is 244
+
+Round 334.0 finished
+In this round 5 Messages were sent
+Overall 2747 Messages were sent
+
+The number of Hits (in round 334.0) is 38
+The number of Misses (in round 334.0) is 2
+The number TOTAL of Hits (until this round 334.0) is 7176
+The number TOTAL of Misses (until this round 334.0) is 246
+
+Round 335.0 finished
+In this round 10 Messages were sent
+Overall 2757 Messages were sent
+
+The number of Hits (in round 335.0) is 40
+The number TOTAL of Hits (until this round 335.0) is 7216
+The number TOTAL of Misses (until this round 335.0) is 246
+
+Round 336.0 finished
+In this round 3 Messages were sent
+Overall 2760 Messages were sent
+
+The number of Hits (in round 336.0) is 40
+The number TOTAL of Hits (until this round 336.0) is 7256
+The number TOTAL of Misses (until this round 336.0) is 246
+
+Round 337.0 finished
+In this round 10 Messages were sent
+Overall 2770 Messages were sent
+
+The number of Hits (in round 337.0) is 37
+The number of Misses (in round 337.0) is 3
+The number TOTAL of Hits (until this round 337.0) is 7293
+The number TOTAL of Misses (until this round 337.0) is 249
+
+Round 338.0 finished
+In this round 6 Messages were sent
+Overall 2776 Messages were sent
+
+The number of Hits (in round 338.0) is 38
+The number TOTAL of Hits (until this round 338.0) is 7331
+The number TOTAL of Misses (until this round 338.0) is 249
+
+Round 339.0 finished
+In this round 9 Messages were sent
+Overall 2785 Messages were sent
+
+The number of Hits (in round 339.0) is 36
+The number of Misses (in round 339.0) is 2
+The number TOTAL of Hits (until this round 339.0) is 7367
+The number TOTAL of Misses (until this round 339.0) is 251
+
+Round 340.0 finished
+In this round 8 Messages were sent
+Overall 2793 Messages were sent
+
+The number of Hits (in round 340.0) is 39
+The number TOTAL of Hits (until this round 340.0) is 7406
+The number TOTAL of Misses (until this round 340.0) is 251
+
+# # The Global RMSE is 11.33801602426092
+
+Round 341.0 finished
+In this round 6 Messages were sent
+Overall 2799 Messages were sent
+
+The number of Hits (in round 341.0) is 40
+The number TOTAL of Hits (until this round 341.0) is 7446
+The number TOTAL of Misses (until this round 341.0) is 251
+
+Round 342.0 finished
+In this round 7 Messages were sent
+Overall 2806 Messages were sent
+
+The number of Hits (in round 342.0) is 37
+The number of Misses (in round 342.0) is 3
+The number TOTAL of Hits (until this round 342.0) is 7483
+The number TOTAL of Misses (until this round 342.0) is 254
+
+Round 343.0 finished
+In this round 9 Messages were sent
+Overall 2815 Messages were sent
+
+The number of Hits (in round 343.0) is 38
+The number of Misses (in round 343.0) is 1
+The number TOTAL of Hits (until this round 343.0) is 7521
+The number TOTAL of Misses (until this round 343.0) is 255
+
+Round 344.0 finished
+In this round 6 Messages were sent
+Overall 2821 Messages were sent
+
+The number of Hits (in round 344.0) is 37
+The number of Misses (in round 344.0) is 1
+The number TOTAL of Hits (until this round 344.0) is 7558
+The number TOTAL of Misses (until this round 344.0) is 256
+
+Round 345.0 finished
+In this round 10 Messages were sent
+Overall 2831 Messages were sent
+
+The number of Hits (in round 345.0) is 38
+The number TOTAL of Hits (until this round 345.0) is 7596
+The number TOTAL of Misses (until this round 345.0) is 256
+
+Round 346.0 finished
+In this round 5 Messages were sent
+Overall 2836 Messages were sent
+
+The number of Hits (in round 346.0) is 38
+The number of Misses (in round 346.0) is 1
+The number TOTAL of Hits (until this round 346.0) is 7634
+The number TOTAL of Misses (until this round 346.0) is 257
+
+Round 347.0 finished
+In this round 10 Messages were sent
+Overall 2846 Messages were sent
+
+The number of Hits (in round 347.0) is 35
+The number of Misses (in round 347.0) is 3
+The number TOTAL of Hits (until this round 347.0) is 7669
+The number TOTAL of Misses (until this round 347.0) is 260
+
+Round 348.0 finished
+In this round 8 Messages were sent
+Overall 2854 Messages were sent
+
+The number of Hits (in round 348.0) is 36
+The number TOTAL of Hits (until this round 348.0) is 7705
+The number TOTAL of Misses (until this round 348.0) is 260
+
+Round 349.0 finished
+In this round 9 Messages were sent
+Overall 2863 Messages were sent
+
+The number of Hits (in round 349.0) is 35
+The number of Misses (in round 349.0) is 2
+The number TOTAL of Hits (until this round 349.0) is 7740
+The number TOTAL of Misses (until this round 349.0) is 262
+
+Round 350.0 finished
+In this round 9 Messages were sent
+Overall 2872 Messages were sent
+
+The number of Hits (in round 350.0) is 33
+The number of Misses (in round 350.0) is 2
+The number TOTAL of Hits (until this round 350.0) is 7773
+The number TOTAL of Misses (until this round 350.0) is 264
+
+# # The Global RMSE is 11.066754364763476
+
+Round 351.0 finished
+In this round 11 Messages were sent
+Overall 2883 Messages were sent
+
+The number of Hits (in round 351.0) is 31
+The number of Misses (in round 351.0) is 3
+The number TOTAL of Hits (until this round 351.0) is 7804
+The number TOTAL of Misses (until this round 351.0) is 267
+
+Round 352.0 finished
+In this round 11 Messages were sent
+Overall 2894 Messages were sent
+
+The number of Hits (in round 352.0) is 30
+The number of Misses (in round 352.0) is 1
+The number TOTAL of Hits (until this round 352.0) is 7834
+The number TOTAL of Misses (until this round 352.0) is 268
+
+Round 353.0 finished
+In this round 12 Messages were sent
+Overall 2906 Messages were sent
+
+The number of Hits (in round 353.0) is 30
+The number of Misses (in round 353.0) is 2
+The number TOTAL of Hits (until this round 353.0) is 7864
+The number TOTAL of Misses (until this round 353.0) is 270
+
+Round 354.0 finished
+In this round 11 Messages were sent
+Overall 2917 Messages were sent
+
+The number of Hits (in round 354.0) is 32
+The number TOTAL of Hits (until this round 354.0) is 7896
+The number TOTAL of Misses (until this round 354.0) is 270
+
+Round 355.0 finished
+In this round 10 Messages were sent
+Overall 2927 Messages were sent
+
+The number of Hits (in round 355.0) is 33
+The number TOTAL of Hits (until this round 355.0) is 7929
+The number TOTAL of Misses (until this round 355.0) is 270
+
+Round 356.0 finished
+In this round 10 Messages were sent
+Overall 2937 Messages were sent
+
+The number of Hits (in round 356.0) is 31
+The number of Misses (in round 356.0) is 2
+The number TOTAL of Hits (until this round 356.0) is 7960
+The number TOTAL of Misses (until this round 356.0) is 272
+
+Round 357.0 finished
+In this round 12 Messages were sent
+Overall 2949 Messages were sent
+
+The number of Hits (in round 357.0) is 30
+The number of Misses (in round 357.0) is 1
+The number TOTAL of Hits (until this round 357.0) is 7990
+The number TOTAL of Misses (until this round 357.0) is 273
+
+Round 358.0 finished
+In this round 11 Messages were sent
+Overall 2960 Messages were sent
+
+The number of Hits (in round 358.0) is 31
+The number of Misses (in round 358.0) is 1
+The number TOTAL of Hits (until this round 358.0) is 8021
+The number TOTAL of Misses (until this round 358.0) is 274
+
+Round 359.0 finished
+In this round 11 Messages were sent
+Overall 2971 Messages were sent
+
+The number of Hits (in round 359.0) is 32
+The number TOTAL of Hits (until this round 359.0) is 8053
+The number TOTAL of Misses (until this round 359.0) is 274
+
+Round 360.0 finished
+In this round 10 Messages were sent
+Overall 2981 Messages were sent
+
+The number of Hits (in round 360.0) is 32
+The number of Misses (in round 360.0) is 1
+The number TOTAL of Hits (until this round 360.0) is 8085
+The number TOTAL of Misses (until this round 360.0) is 275
+
+# # The Global RMSE is 10.850877822443943
+
+Round 361.0 finished
+In this round 11 Messages were sent
+Overall 2992 Messages were sent
+
+The number of Hits (in round 361.0) is 31
+The number of Misses (in round 361.0) is 2
+The number TOTAL of Hits (until this round 361.0) is 8116
+The number TOTAL of Misses (until this round 361.0) is 277
+
+Round 362.0 finished
+In this round 11 Messages were sent
+Overall 3003 Messages were sent
+
+The number of Hits (in round 362.0) is 31
+The number of Misses (in round 362.0) is 1
+The number TOTAL of Hits (until this round 362.0) is 8147
+The number TOTAL of Misses (until this round 362.0) is 278
+
+Round 363.0 finished
+In this round 11 Messages were sent
+Overall 3014 Messages were sent
+
+The number of Hits (in round 363.0) is 33
+The number TOTAL of Hits (until this round 363.0) is 8180
+The number TOTAL of Misses (until this round 363.0) is 278
+
+Round 364.0 finished
+In this round 9 Messages were sent
+Overall 3023 Messages were sent
+
+The number of Hits (in round 364.0) is 36
+The number TOTAL of Hits (until this round 364.0) is 8216
+The number TOTAL of Misses (until this round 364.0) is 278
+
+Round 365.0 finished
+In this round 8 Messages were sent
+Overall 3031 Messages were sent
+
+The number of Hits (in round 365.0) is 36
+The number TOTAL of Hits (until this round 365.0) is 8252
+The number TOTAL of Misses (until this round 365.0) is 278
+
+Round 366.0 finished
+In this round 9 Messages were sent
+Overall 3040 Messages were sent
+
+The number of Hits (in round 366.0) is 35
+The number of Misses (in round 366.0) is 2
+The number TOTAL of Hits (until this round 366.0) is 8287
+The number TOTAL of Misses (until this round 366.0) is 280
+
+Round 367.0 finished
+In this round 9 Messages were sent
+Overall 3049 Messages were sent
+
+The number of Hits (in round 367.0) is 36
+The number TOTAL of Hits (until this round 367.0) is 8323
+The number TOTAL of Misses (until this round 367.0) is 280
+
+Round 368.0 finished
+In this round 8 Messages were sent
+Overall 3057 Messages were sent
+
+The number of Hits (in round 368.0) is 34
+The number of Misses (in round 368.0) is 3
+The number TOTAL of Hits (until this round 368.0) is 8357
+The number TOTAL of Misses (until this round 368.0) is 283
+
+Round 369.0 finished
+In this round 11 Messages were sent
+Overall 3068 Messages were sent
+
+The number of Hits (in round 369.0) is 34
+The number of Misses (in round 369.0) is 2
+The number TOTAL of Hits (until this round 369.0) is 8391
+The number TOTAL of Misses (until this round 369.0) is 285
+
+Round 370.0 finished
+In this round 8 Messages were sent
+Overall 3076 Messages were sent
+
+The number of Hits (in round 370.0) is 34
+The number of Misses (in round 370.0) is 1
+The number TOTAL of Hits (until this round 370.0) is 8425
+The number TOTAL of Misses (until this round 370.0) is 286
+
+# # The Global RMSE is 10.63003970097047
+
+Round 371.0 finished
+In this round 11 Messages were sent
+Overall 3087 Messages were sent
+
+The number of Hits (in round 371.0) is 31
+The number of Misses (in round 371.0) is 3
+The number TOTAL of Hits (until this round 371.0) is 8456
+The number TOTAL of Misses (until this round 371.0) is 289
+
+Round 372.0 finished
+In this round 11 Messages were sent
+Overall 3098 Messages were sent
+
+The number of Hits (in round 372.0) is 32
+The number TOTAL of Hits (until this round 372.0) is 8488
+The number TOTAL of Misses (until this round 372.0) is 289
+
+Round 373.0 finished
+In this round 10 Messages were sent
+Overall 3108 Messages were sent
+
+The number of Hits (in round 373.0) is 35
+The number of Misses (in round 373.0) is 1
+The number TOTAL of Hits (until this round 373.0) is 8523
+The number TOTAL of Misses (until this round 373.0) is 290
+
+Round 374.0 finished
+In this round 8 Messages were sent
+Overall 3116 Messages were sent
+
+The number of Hits (in round 374.0) is 36
+The number of Misses (in round 374.0) is 2
+The number TOTAL of Hits (until this round 374.0) is 8559
+The number TOTAL of Misses (until this round 374.0) is 292
+
+Round 375.0 finished
+In this round 9 Messages were sent
+Overall 3125 Messages were sent
+
+The number of Hits (in round 375.0) is 35
+The number of Misses (in round 375.0) is 3
+The number TOTAL of Hits (until this round 375.0) is 8594
+The number TOTAL of Misses (until this round 375.0) is 295
+
+Round 376.0 finished
+In this round 9 Messages were sent
+Overall 3134 Messages were sent
+
+The number of Hits (in round 376.0) is 33
+The number of Misses (in round 376.0) is 2
+The number TOTAL of Hits (until this round 376.0) is 8627
+The number TOTAL of Misses (until this round 376.0) is 297
+
+Round 377.0 finished
+In this round 11 Messages were sent
+Overall 3145 Messages were sent
+
+The number of Hits (in round 377.0) is 32
+The number of Misses (in round 377.0) is 1
+The number TOTAL of Hits (until this round 377.0) is 8659
+The number TOTAL of Misses (until this round 377.0) is 298
+
+Round 378.0 finished
+In this round 10 Messages were sent
+Overall 3155 Messages were sent
+
+The number of Hits (in round 378.0) is 33
+The number of Misses (in round 378.0) is 1
+The number TOTAL of Hits (until this round 378.0) is 8692
+The number TOTAL of Misses (until this round 378.0) is 299
+
+Round 379.0 finished
+In this round 10 Messages were sent
+Overall 3165 Messages were sent
+
+The number of Hits (in round 379.0) is 34
+The number TOTAL of Hits (until this round 379.0) is 8726
+The number TOTAL of Misses (until this round 379.0) is 299
+
+Round 380.0 finished
+In this round 9 Messages were sent
+Overall 3174 Messages were sent
+
+The number of Hits (in round 380.0) is 35
+The number of Misses (in round 380.0) is 1
+The number TOTAL of Hits (until this round 380.0) is 8761
+The number TOTAL of Misses (until this round 380.0) is 300
+
+# # The Global RMSE is 10.422736730774558
+
+Round 381.0 finished
+In this round 9 Messages were sent
+Overall 3183 Messages were sent
+
+The number of Hits (in round 381.0) is 33
+The number of Misses (in round 381.0) is 2
+The number TOTAL of Hits (until this round 381.0) is 8794
+The number TOTAL of Misses (until this round 381.0) is 302
+
+Round 382.0 finished
+In this round 11 Messages were sent
+Overall 3194 Messages were sent
+
+The number of Hits (in round 382.0) is 34
+The number TOTAL of Hits (until this round 382.0) is 8828
+The number TOTAL of Misses (until this round 382.0) is 302
+
+Round 383.0 finished
+In this round 8 Messages were sent
+Overall 3202 Messages were sent
+
+The number of Hits (in round 383.0) is 35
+The number of Misses (in round 383.0) is 1
+The number TOTAL of Hits (until this round 383.0) is 8863
+The number TOTAL of Misses (until this round 383.0) is 303
+
+Round 384.0 finished
+In this round 10 Messages were sent
+Overall 3212 Messages were sent
+
+The number of Hits (in round 384.0) is 32
+The number of Misses (in round 384.0) is 4
+The number TOTAL of Hits (until this round 384.0) is 8895
+The number TOTAL of Misses (until this round 384.0) is 307
+
+Round 385.0 finished
+In this round 11 Messages were sent
+Overall 3223 Messages were sent
+
+The number of Hits (in round 385.0) is 32
+The number of Misses (in round 385.0) is 3
+The number TOTAL of Hits (until this round 385.0) is 8927
+The number TOTAL of Misses (until this round 385.0) is 310
+
+Round 386.0 finished
+In this round 10 Messages were sent
+Overall 3233 Messages were sent
+
+The number of Hits (in round 386.0) is 34
+The number TOTAL of Hits (until this round 386.0) is 8961
+The number TOTAL of Misses (until this round 386.0) is 310
+
+Round 387.0 finished
+In this round 9 Messages were sent
+Overall 3242 Messages were sent
+
+The number of Hits (in round 387.0) is 33
+The number of Misses (in round 387.0) is 3
+The number TOTAL of Hits (until this round 387.0) is 8994
+The number TOTAL of Misses (until this round 387.0) is 313
+
+Round 388.0 finished
+In this round 11 Messages were sent
+Overall 3253 Messages were sent
+
+The number of Hits (in round 388.0) is 31
+The number of Misses (in round 388.0) is 2
+The number TOTAL of Hits (until this round 388.0) is 9025
+The number TOTAL of Misses (until this round 388.0) is 315
+
+Round 389.0 finished
+In this round 11 Messages were sent
+Overall 3264 Messages were sent
+
+The number of Hits (in round 389.0) is 32
+The number of Misses (in round 389.0) is 1
+The number TOTAL of Hits (until this round 389.0) is 9057
+The number TOTAL of Misses (until this round 389.0) is 316
+
+Round 390.0 finished
+In this round 10 Messages were sent
+Overall 3274 Messages were sent
+
+The number of Hits (in round 390.0) is 31
+The number of Misses (in round 390.0) is 1
+The number TOTAL of Hits (until this round 390.0) is 9088
+The number TOTAL of Misses (until this round 390.0) is 317
+
+# # The Global RMSE is 10.28688488994361
+
+Round 391.0 finished
+In this round 12 Messages were sent
+Overall 3286 Messages were sent
+
+The number of Hits (in round 391.0) is 30
+The number of Misses (in round 391.0) is 1
+The number TOTAL of Hits (until this round 391.0) is 9118
+The number TOTAL of Misses (until this round 391.0) is 318
+
+Round 392.0 finished
+In this round 11 Messages were sent
+Overall 3297 Messages were sent
+
+The number of Hits (in round 392.0) is 29
+The number of Misses (in round 392.0) is 1
+The number TOTAL of Hits (until this round 392.0) is 9147
+The number TOTAL of Misses (until this round 392.0) is 319
+
+Round 393.0 finished
+In this round 13 Messages were sent
+Overall 3310 Messages were sent
+
+The number of Hits (in round 393.0) is 27
+The number of Misses (in round 393.0) is 3
+The number TOTAL of Hits (until this round 393.0) is 9174
+The number TOTAL of Misses (until this round 393.0) is 322
+
+Round 394.0 finished
+In this round 13 Messages were sent
+Overall 3323 Messages were sent
+
+The number of Hits (in round 394.0) is 24
+The number of Misses (in round 394.0) is 3
+The number TOTAL of Hits (until this round 394.0) is 9198
+The number TOTAL of Misses (until this round 394.0) is 325
+
+Round 395.0 finished
+In this round 16 Messages were sent
+Overall 3339 Messages were sent
+
+The number of Hits (in round 395.0) is 26
+The number TOTAL of Hits (until this round 395.0) is 9224
+The number TOTAL of Misses (until this round 395.0) is 325
+
+Round 396.0 finished
+In this round 11 Messages were sent
+Overall 3350 Messages were sent
+
+The number of Hits (in round 396.0) is 28
+The number TOTAL of Hits (until this round 396.0) is 9252
+The number TOTAL of Misses (until this round 396.0) is 325
+
+Round 397.0 finished
+In this round 14 Messages were sent
+Overall 3364 Messages were sent
+
+The number of Hits (in round 397.0) is 29
+The number TOTAL of Hits (until this round 397.0) is 9281
+The number TOTAL of Misses (until this round 397.0) is 325
+
+Round 398.0 finished
+In this round 10 Messages were sent
+Overall 3374 Messages were sent
+
+The number of Hits (in round 398.0) is 29
+The number of Misses (in round 398.0) is 1
+The number TOTAL of Hits (until this round 398.0) is 9310
+The number TOTAL of Misses (until this round 398.0) is 326
+
+Round 399.0 finished
+In this round 14 Messages were sent
+Overall 3388 Messages were sent
+
+The number of Hits (in round 399.0) is 29
+The number TOTAL of Hits (until this round 399.0) is 9339
+The number TOTAL of Misses (until this round 399.0) is 326
+
+Round 400.0 finished
+In this round 10 Messages were sent
+Overall 3398 Messages were sent
+
+The number of Hits (in round 400.0) is 32
+The number TOTAL of Hits (until this round 400.0) is 9371
+The number TOTAL of Misses (until this round 400.0) is 326
+
+# # The Global RMSE is 10.130835407274251
+
+Round 401.0 finished
+In this round 11 Messages were sent
+Overall 3409 Messages were sent
+
+The number of Hits (in round 401.0) is 31
+The number of Misses (in round 401.0) is 3
+The number TOTAL of Hits (until this round 401.0) is 9402
+The number TOTAL of Misses (until this round 401.0) is 329
+
+Round 402.0 finished
+In this round 11 Messages were sent
+Overall 3420 Messages were sent
+
+The number of Hits (in round 402.0) is 28
+The number of Misses (in round 402.0) is 4
+The number TOTAL of Hits (until this round 402.0) is 9430
+The number TOTAL of Misses (until this round 402.0) is 333
+
+Round 403.0 finished
+In this round 14 Messages were sent
+Overall 3434 Messages were sent
+
+The number of Hits (in round 403.0) is 25
+The number of Misses (in round 403.0) is 3
+The number TOTAL of Hits (until this round 403.0) is 9455
+The number TOTAL of Misses (until this round 403.0) is 336
+
+Round 404.0 finished
+In this round 14 Messages were sent
+Overall 3448 Messages were sent
+
+The number of Hits (in round 404.0) is 27
+The number TOTAL of Hits (until this round 404.0) is 9482
+The number TOTAL of Misses (until this round 404.0) is 336
+
+Round 405.0 finished
+In this round 12 Messages were sent
+Overall 3460 Messages were sent
+
+The number of Hits (in round 405.0) is 28
+The number TOTAL of Hits (until this round 405.0) is 9510
+The number TOTAL of Misses (until this round 405.0) is 336
+
+Round 406.0 finished
+In this round 13 Messages were sent
+Overall 3473 Messages were sent
+
+The number of Hits (in round 406.0) is 32
+The number TOTAL of Hits (until this round 406.0) is 9542
+The number TOTAL of Misses (until this round 406.0) is 336
+
+Round 407.0 finished
+In this round 8 Messages were sent
+Overall 3481 Messages were sent
+
+The number of Hits (in round 407.0) is 34
+The number TOTAL of Hits (until this round 407.0) is 9576
+The number TOTAL of Misses (until this round 407.0) is 336
+
+Round 408.0 finished
+In this round 11 Messages were sent
+Overall 3492 Messages were sent
+
+The number of Hits (in round 408.0) is 36
+The number TOTAL of Hits (until this round 408.0) is 9612
+The number TOTAL of Misses (until this round 408.0) is 336
+
+Round 409.0 finished
+In this round 6 Messages were sent
+Overall 3498 Messages were sent
+
+The number of Hits (in round 409.0) is 37
+The number TOTAL of Hits (until this round 409.0) is 9649
+The number TOTAL of Misses (until this round 409.0) is 336
+
+Round 410.0 finished
+In this round 10 Messages were sent
+Overall 3508 Messages were sent
+
+The number of Hits (in round 410.0) is 37
+The number of Misses (in round 410.0) is 1
+The number TOTAL of Hits (until this round 410.0) is 9686
+The number TOTAL of Misses (until this round 410.0) is 337
+
+Round 411.0 finished
+In this round 6 Messages were sent
+Overall 3514 Messages were sent
+
+The number of Hits (in round 411.0) is 33
+The number of Misses (in round 411.0) is 4
+The number TOTAL of Hits (until this round 411.0) is 9719
+The number TOTAL of Misses (until this round 411.0) is 341
+
+Round 412.0 finished
+In this round 14 Messages were sent
+Overall 3528 Messages were sent
+
+The number of Hits (in round 412.0) is 32
+The number of Misses (in round 412.0) is 1
+The number TOTAL of Hits (until this round 412.0) is 9751
+The number TOTAL of Misses (until this round 412.0) is 342
+
+Round 413.0 finished
+In this round 7 Messages were sent
+Overall 3535 Messages were sent
+
+The number of Hits (in round 413.0) is 32
+The number of Misses (in round 413.0) is 1
+The number TOTAL of Hits (until this round 413.0) is 9783
+The number TOTAL of Misses (until this round 413.0) is 343
+
+Round 414.0 finished
+In this round 14 Messages were sent
+Overall 3549 Messages were sent
+
+The number of Hits (in round 414.0) is 35
+The number TOTAL of Hits (until this round 414.0) is 9818
+The number TOTAL of Misses (until this round 414.0) is 343
+
+Round 415.0 finished
+In this round 4 Messages were sent
+Overall 3553 Messages were sent
+
+The number of Hits (in round 415.0) is 38
+The number TOTAL of Hits (until this round 415.0) is 9856
+The number TOTAL of Misses (until this round 415.0) is 343
+
+Round 416.0 finished
+In this round 11 Messages were sent
+Overall 3564 Messages were sent
+
+The number of Hits (in round 416.0) is 38
+The number of Misses (in round 416.0) is 1
+The number TOTAL of Hits (until this round 416.0) is 9894
+The number TOTAL of Misses (until this round 416.0) is 344
+
+Round 417.0 finished
+In this round 4 Messages were sent
+Overall 3568 Messages were sent
+
+The number of Hits (in round 417.0) is 41
+The number of Misses (in round 417.0) is 1
+The number TOTAL of Hits (until this round 417.0) is 9935
+The number TOTAL of Misses (until this round 417.0) is 345
+
+Round 418.0 finished
+In this round 8 Messages were sent
+Overall 3576 Messages were sent
+
+The number of Hits (in round 418.0) is 39
+The number of Misses (in round 418.0) is 2
+The number TOTAL of Hits (until this round 418.0) is 9974
+The number TOTAL of Misses (until this round 418.0) is 347
+
+Round 419.0 finished
+In this round 6 Messages were sent
+Overall 3582 Messages were sent
+
+The number of Hits (in round 419.0) is 41
+The number TOTAL of Hits (until this round 419.0) is 10015
+The number TOTAL of Misses (until this round 419.0) is 347
+
+Round 420.0 finished
+In this round 6 Messages were sent
+Overall 3588 Messages were sent
+
+The number of Hits (in round 420.0) is 41
+The number TOTAL of Hits (until this round 420.0) is 10056
+The number TOTAL of Misses (until this round 420.0) is 347
+
+Round 421.0 finished
+In this round 6 Messages were sent
+Overall 3594 Messages were sent
+
+The number of Hits (in round 421.0) is 41
+The number of Misses (in round 421.0) is 1
+The number TOTAL of Hits (until this round 421.0) is 10097
+The number TOTAL of Misses (until this round 421.0) is 348
+
+Round 422.0 finished
+In this round 6 Messages were sent
+Overall 3600 Messages were sent
+
+The number of Hits (in round 422.0) is 40
+The number of Misses (in round 422.0) is 4
+The number TOTAL of Hits (until this round 422.0) is 10137
+The number TOTAL of Misses (until this round 422.0) is 352
+
+Round 423.0 finished
+In this round 7 Messages were sent
+Overall 3607 Messages were sent
+
+The number of Hits (in round 423.0) is 38
+The number of Misses (in round 423.0) is 3
+The number TOTAL of Hits (until this round 423.0) is 10175
+The number TOTAL of Misses (until this round 423.0) is 355
+
+Round 424.0 finished
+In this round 8 Messages were sent
+Overall 3615 Messages were sent
+
+The number of Hits (in round 424.0) is 35
+The number of Misses (in round 424.0) is 3
+The number TOTAL of Hits (until this round 424.0) is 10210
+The number TOTAL of Misses (until this round 424.0) is 358
+
+Round 425.0 finished
+In this round 10 Messages were sent
+Overall 3625 Messages were sent
+
+The number of Hits (in round 425.0) is 33
+The number of Misses (in round 425.0) is 2
+The number TOTAL of Hits (until this round 425.0) is 10243
+The number TOTAL of Misses (until this round 425.0) is 360
+
+Round 426.0 finished
+In this round 10 Messages were sent
+Overall 3635 Messages were sent
+
+The number of Hits (in round 426.0) is 33
+The number TOTAL of Hits (until this round 426.0) is 10276
+The number TOTAL of Misses (until this round 426.0) is 360
+
+Round 427.0 finished
+In this round 10 Messages were sent
+Overall 3645 Messages were sent
+
+The number of Hits (in round 427.0) is 35
+The number TOTAL of Hits (until this round 427.0) is 10311
+The number TOTAL of Misses (until this round 427.0) is 360
+
+Round 428.0 finished
+In this round 8 Messages were sent
+Overall 3653 Messages were sent
+
+The number of Hits (in round 428.0) is 34
+The number of Misses (in round 428.0) is 1
+The number TOTAL of Hits (until this round 428.0) is 10345
+The number TOTAL of Misses (until this round 428.0) is 361
+
+Round 429.0 finished
+In this round 11 Messages were sent
+Overall 3664 Messages were sent
+
+The number of Hits (in round 429.0) is 33
+The number of Misses (in round 429.0) is 2
+The number TOTAL of Hits (until this round 429.0) is 10378
+The number TOTAL of Misses (until this round 429.0) is 363
+
+Round 430.0 finished
+In this round 9 Messages were sent
+Overall 3673 Messages were sent
+
+The number of Hits (in round 430.0) is 33
+The number of Misses (in round 430.0) is 2
+The number TOTAL of Hits (until this round 430.0) is 10411
+The number TOTAL of Misses (until this round 430.0) is 365
+
+Round 431.0 finished
+In this round 11 Messages were sent
+Overall 3684 Messages were sent
+
+The number of Hits (in round 431.0) is 32
+The number of Misses (in round 431.0) is 1
+The number TOTAL of Hits (until this round 431.0) is 10443
+The number TOTAL of Misses (until this round 431.0) is 366
+
+Round 432.0 finished
+In this round 10 Messages were sent
+Overall 3694 Messages were sent
+
+The number of Hits (in round 432.0) is 32
+The number TOTAL of Hits (until this round 432.0) is 10475
+The number TOTAL of Misses (until this round 432.0) is 366
+
+Round 433.0 finished
+In this round 11 Messages were sent
+Overall 3705 Messages were sent
+
+The number of Hits (in round 433.0) is 31
+The number of Misses (in round 433.0) is 2
+The number TOTAL of Hits (until this round 433.0) is 10506
+The number TOTAL of Misses (until this round 433.0) is 368
+
+Round 434.0 finished
+In this round 11 Messages were sent
+Overall 3716 Messages were sent
+
+The number of Hits (in round 434.0) is 31
+The number of Misses (in round 434.0) is 1
+The number TOTAL of Hits (until this round 434.0) is 10537
+The number TOTAL of Misses (until this round 434.0) is 369
+
+Round 435.0 finished
+In this round 11 Messages were sent
+Overall 3727 Messages were sent
+
+The number of Hits (in round 435.0) is 30
+The number of Misses (in round 435.0) is 1
+The number TOTAL of Hits (until this round 435.0) is 10567
+The number TOTAL of Misses (until this round 435.0) is 370
+
+Round 436.0 finished
+In this round 12 Messages were sent
+Overall 3739 Messages were sent
+
+The number of Hits (in round 436.0) is 31
+The number TOTAL of Hits (until this round 436.0) is 10598
+The number TOTAL of Misses (until this round 436.0) is 370
+
+Round 437.0 finished
+In this round 10 Messages were sent
+Overall 3749 Messages were sent
+
+The number of Hits (in round 437.0) is 30
+The number of Misses (in round 437.0) is 1
+The number TOTAL of Hits (until this round 437.0) is 10628
+The number TOTAL of Misses (until this round 437.0) is 371
+
+Round 438.0 finished
+In this round 13 Messages were sent
+Overall 3762 Messages were sent
+
+The number of Hits (in round 438.0) is 28
+The number of Misses (in round 438.0) is 2
+The number TOTAL of Hits (until this round 438.0) is 10656
+The number TOTAL of Misses (until this round 438.0) is 373
+
+Round 439.0 finished
+In this round 12 Messages were sent
+Overall 3774 Messages were sent
+
+The number of Hits (in round 439.0) is 31
+The number TOTAL of Hits (until this round 439.0) is 10687
+The number TOTAL of Misses (until this round 439.0) is 373
+
+Round 440.0 finished
+In this round 10 Messages were sent
+Overall 3784 Messages were sent
+
+The number of Hits (in round 440.0) is 32
+The number of Misses (in round 440.0) is 1
+The number TOTAL of Hits (until this round 440.0) is 10719
+The number TOTAL of Misses (until this round 440.0) is 374
+
+Round 441.0 finished
+In this round 11 Messages were sent
+Overall 3795 Messages were sent
+
+The number of Hits (in round 441.0) is 31
+The number of Misses (in round 441.0) is 2
+The number TOTAL of Hits (until this round 441.0) is 10750
+The number TOTAL of Misses (until this round 441.0) is 376
+
+Round 442.0 finished
+In this round 11 Messages were sent
+Overall 3806 Messages were sent
+
+The number of Hits (in round 442.0) is 30
+The number of Misses (in round 442.0) is 4
+The number TOTAL of Hits (until this round 442.0) is 10780
+The number TOTAL of Misses (until this round 442.0) is 380
+
+Round 443.0 finished
+In this round 12 Messages were sent
+Overall 3818 Messages were sent
+
+The number of Hits (in round 443.0) is 28
+The number of Misses (in round 443.0) is 3
+The number TOTAL of Hits (until this round 443.0) is 10808
+The number TOTAL of Misses (until this round 443.0) is 383
+
+Round 444.0 finished
+In this round 13 Messages were sent
+Overall 3831 Messages were sent
+
+The number of Hits (in round 444.0) is 28
+The number of Misses (in round 444.0) is 1
+The number TOTAL of Hits (until this round 444.0) is 10836
+The number TOTAL of Misses (until this round 444.0) is 384
+
+Round 445.0 finished
+In this round 12 Messages were sent
+Overall 3843 Messages were sent
+
+The number of Hits (in round 445.0) is 31
+The number TOTAL of Hits (until this round 445.0) is 10867
+The number TOTAL of Misses (until this round 445.0) is 384
+
+Round 446.0 finished
+In this round 10 Messages were sent
+Overall 3853 Messages were sent
+
+The number of Hits (in round 446.0) is 31
+The number of Misses (in round 446.0) is 1
+The number TOTAL of Hits (until this round 446.0) is 10898
+The number TOTAL of Misses (until this round 446.0) is 385
+
+Round 447.0 finished
+In this round 12 Messages were sent
+Overall 3865 Messages were sent
+
+The number of Hits (in round 447.0) is 31
+The number TOTAL of Hits (until this round 447.0) is 10929
+The number TOTAL of Misses (until this round 447.0) is 385
+
+Round 448.0 finished
+In this round 10 Messages were sent
+Overall 3875 Messages were sent
+
+The number of Hits (in round 448.0) is 31
+The number of Misses (in round 448.0) is 1
+The number TOTAL of Hits (until this round 448.0) is 10960
+The number TOTAL of Misses (until this round 448.0) is 386
+
+Round 449.0 finished
+In this round 12 Messages were sent
+Overall 3887 Messages were sent
+
+The number of Hits (in round 449.0) is 31
+The number of Misses (in round 449.0) is 2
+The number TOTAL of Hits (until this round 449.0) is 10991
+The number TOTAL of Misses (until this round 449.0) is 388
+
+Round 450.0 finished
+In this round 10 Messages were sent
+Overall 3897 Messages were sent
+
+The number of Hits (in round 450.0) is 32
+The number of Misses (in round 450.0) is 1
+The number TOTAL of Hits (until this round 450.0) is 11023
+The number TOTAL of Misses (until this round 450.0) is 389
+
+# # The Global RMSE is 9.907480104205234
+
+Round 451.0 finished
+In this round 11 Messages were sent
+Overall 3908 Messages were sent
+
+The number of Hits (in round 451.0) is 34
+The number of Misses (in round 451.0) is 1
+The number TOTAL of Hits (until this round 451.0) is 11057
+The number TOTAL of Misses (until this round 451.0) is 390
+
+Round 452.0 finished
+In this round 8 Messages were sent
+Overall 3916 Messages were sent
+
+The number of Hits (in round 452.0) is 33
+The number of Misses (in round 452.0) is 2
+The number TOTAL of Hits (until this round 452.0) is 11090
+The number TOTAL of Misses (until this round 452.0) is 392
+
+Round 453.0 finished
+In this round 12 Messages were sent
+Overall 3928 Messages were sent
+
+The number of Hits (in round 453.0) is 33
+The number of Misses (in round 453.0) is 2
+The number TOTAL of Hits (until this round 453.0) is 11123
+The number TOTAL of Misses (until this round 453.0) is 394
+
+Round 454.0 finished
+In this round 8 Messages were sent
+Overall 3936 Messages were sent
+
+The number of Hits (in round 454.0) is 32
+The number of Misses (in round 454.0) is 2
+The number TOTAL of Hits (until this round 454.0) is 11155
+The number TOTAL of Misses (until this round 454.0) is 396
+
+Round 455.0 finished
+In this round 13 Messages were sent
+Overall 3949 Messages were sent
+
+The number of Hits (in round 455.0) is 31
+The number of Misses (in round 455.0) is 1
+The number TOTAL of Hits (until this round 455.0) is 11186
+The number TOTAL of Misses (until this round 455.0) is 397
+
+Round 456.0 finished
+In this round 9 Messages were sent
+Overall 3958 Messages were sent
+
+The number of Hits (in round 456.0) is 31
+The number of Misses (in round 456.0) is 1
+The number TOTAL of Hits (until this round 456.0) is 11217
+The number TOTAL of Misses (until this round 456.0) is 398
+
+Round 457.0 finished
+In this round 13 Messages were sent
+Overall 3971 Messages were sent
+
+The number of Hits (in round 457.0) is 31
+The number of Misses (in round 457.0) is 1
+The number TOTAL of Hits (until this round 457.0) is 11248
+The number TOTAL of Misses (until this round 457.0) is 399
+
+Round 458.0 finished
+In this round 9 Messages were sent
+Overall 3980 Messages were sent
+
+The number of Hits (in round 458.0) is 34
+The number TOTAL of Hits (until this round 458.0) is 11282
+The number TOTAL of Misses (until this round 458.0) is 399
+
+Round 459.0 finished
+In this round 10 Messages were sent
+Overall 3990 Messages were sent
+
+The number of Hits (in round 459.0) is 32
+The number of Misses (in round 459.0) is 3
+The number TOTAL of Hits (until this round 459.0) is 11314
+The number TOTAL of Misses (until this round 459.0) is 402
+
+Round 460.0 finished
+In this round 11 Messages were sent
+Overall 4001 Messages were sent
+
+The number of Hits (in round 460.0) is 31
+The number of Misses (in round 460.0) is 3
+The number TOTAL of Hits (until this round 460.0) is 11345
+The number TOTAL of Misses (until this round 460.0) is 405
+
+Round 461.0 finished
+In this round 11 Messages were sent
+Overall 4012 Messages were sent
+
+The number of Hits (in round 461.0) is 30
+The number of Misses (in round 461.0) is 2
+The number TOTAL of Hits (until this round 461.0) is 11375
+The number TOTAL of Misses (until this round 461.0) is 407
+
+Round 462.0 finished
+In this round 12 Messages were sent
+Overall 4024 Messages were sent
+
+The number of Hits (in round 462.0) is 30
+The number of Misses (in round 462.0) is 2
+The number TOTAL of Hits (until this round 462.0) is 11405
+The number TOTAL of Misses (until this round 462.0) is 409
+
+Round 463.0 finished
+In this round 11 Messages were sent
+Overall 4035 Messages were sent
+
+The number of Hits (in round 463.0) is 31
+The number TOTAL of Hits (until this round 463.0) is 11436
+The number TOTAL of Misses (until this round 463.0) is 409
+
+Round 464.0 finished
+In this round 11 Messages were sent
+Overall 4046 Messages were sent
+
+The number of Hits (in round 464.0) is 29
+The number of Misses (in round 464.0) is 2
+The number TOTAL of Hits (until this round 464.0) is 11465
+The number TOTAL of Misses (until this round 464.0) is 411
+
+Round 465.0 finished
+In this round 13 Messages were sent
+Overall 4059 Messages were sent
+
+The number of Hits (in round 465.0) is 31
+The number TOTAL of Hits (until this round 465.0) is 11496
+The number TOTAL of Misses (until this round 465.0) is 411
+
+Round 466.0 finished
+In this round 9 Messages were sent
+Overall 4068 Messages were sent
+
+The number of Hits (in round 466.0) is 31
+The number of Misses (in round 466.0) is 2
+The number TOTAL of Hits (until this round 466.0) is 11527
+The number TOTAL of Misses (until this round 466.0) is 413
+
+Round 467.0 finished
+In this round 13 Messages were sent
+Overall 4081 Messages were sent
+
+The number of Hits (in round 467.0) is 29
+The number of Misses (in round 467.0) is 2
+The number TOTAL of Hits (until this round 467.0) is 11556
+The number TOTAL of Misses (until this round 467.0) is 415
+
+Round 468.0 finished
+In this round 11 Messages were sent
+Overall 4092 Messages were sent
+
+The number of Hits (in round 468.0) is 30
+The number TOTAL of Hits (until this round 468.0) is 11586
+The number TOTAL of Misses (until this round 468.0) is 415
+
+Round 469.0 finished
+In this round 12 Messages were sent
+Overall 4104 Messages were sent
+
+The number of Hits (in round 469.0) is 28
+The number of Misses (in round 469.0) is 2
+The number TOTAL of Hits (until this round 469.0) is 11614
+The number TOTAL of Misses (until this round 469.0) is 417
+
+Round 470.0 finished
+In this round 13 Messages were sent
+Overall 4117 Messages were sent
+
+The number of Hits (in round 470.0) is 26
+The number of Misses (in round 470.0) is 2
+The number TOTAL of Hits (until this round 470.0) is 11640
+The number TOTAL of Misses (until this round 470.0) is 419
+
+Round 471.0 finished
+In this round 14 Messages were sent
+Overall 4131 Messages were sent
+
+The number of Hits (in round 471.0) is 24
+The number of Misses (in round 471.0) is 2
+The number TOTAL of Hits (until this round 471.0) is 11664
+The number TOTAL of Misses (until this round 471.0) is 421
+
+Round 472.0 finished
+In this round 15 Messages were sent
+Overall 4146 Messages were sent
+
+The number of Hits (in round 472.0) is 21
+The number of Misses (in round 472.0) is 4
+The number TOTAL of Hits (until this round 472.0) is 11685
+The number TOTAL of Misses (until this round 472.0) is 425
+
+Round 473.0 finished
+In this round 17 Messages were sent
+Overall 4163 Messages were sent
+
+The number of Hits (in round 473.0) is 22
+The number of Misses (in round 473.0) is 1
+The number TOTAL of Hits (until this round 473.0) is 11707
+The number TOTAL of Misses (until this round 473.0) is 426
+
+Round 474.0 finished
+In this round 14 Messages were sent
+Overall 4177 Messages were sent
+
+The number of Hits (in round 474.0) is 24
+The number TOTAL of Hits (until this round 474.0) is 11731
+The number TOTAL of Misses (until this round 474.0) is 426
+
+Round 475.0 finished
+In this round 15 Messages were sent
+Overall 4192 Messages were sent
+
+The number of Hits (in round 475.0) is 27
+The number TOTAL of Hits (until this round 475.0) is 11758
+The number TOTAL of Misses (until this round 475.0) is 426
+
+Round 476.0 finished
+In this round 11 Messages were sent
+Overall 4203 Messages were sent
+
+The number of Hits (in round 476.0) is 32
+The number TOTAL of Hits (until this round 476.0) is 11790
+The number TOTAL of Misses (until this round 476.0) is 426
+
+Round 477.0 finished
+In this round 10 Messages were sent
+Overall 4213 Messages were sent
+
+The number of Hits (in round 477.0) is 34
+The number of Misses (in round 477.0) is 1
+The number TOTAL of Hits (until this round 477.0) is 11824
+The number TOTAL of Misses (until this round 477.0) is 427
+
+Round 478.0 finished
+In this round 9 Messages were sent
+Overall 4222 Messages were sent
+
+The number of Hits (in round 478.0) is 35
+The number of Misses (in round 478.0) is 1
+The number TOTAL of Hits (until this round 478.0) is 11859
+The number TOTAL of Misses (until this round 478.0) is 428
+
+Round 479.0 finished
+In this round 9 Messages were sent
+Overall 4231 Messages were sent
+
+The number of Hits (in round 479.0) is 32
+The number of Misses (in round 479.0) is 3
+The number TOTAL of Hits (until this round 479.0) is 11891
+The number TOTAL of Misses (until this round 479.0) is 431
+
+Round 480.0 finished
+In this round 12 Messages were sent
+Overall 4243 Messages were sent
+
+The number of Hits (in round 480.0) is 32
+The number of Misses (in round 480.0) is 2
+The number TOTAL of Hits (until this round 480.0) is 11923
+The number TOTAL of Misses (until this round 480.0) is 433
+
+Round 481.0 finished
+In this round 9 Messages were sent
+Overall 4252 Messages were sent
+
+The number of Hits (in round 481.0) is 32
+The number TOTAL of Hits (until this round 481.0) is 11955
+The number TOTAL of Misses (until this round 481.0) is 433
+
+Round 482.0 finished
+In this round 12 Messages were sent
+Overall 4264 Messages were sent
+
+The number of Hits (in round 482.0) is 31
+The number of Misses (in round 482.0) is 2
+The number TOTAL of Hits (until this round 482.0) is 11986
+The number TOTAL of Misses (until this round 482.0) is 435
+
+Round 483.0 finished
+In this round 10 Messages were sent
+Overall 4274 Messages were sent
+
+The number of Hits (in round 483.0) is 33
+The number of Misses (in round 483.0) is 2
+The number TOTAL of Hits (until this round 483.0) is 12019
+The number TOTAL of Misses (until this round 483.0) is 437
+
+Round 484.0 finished
+In this round 10 Messages were sent
+Overall 4284 Messages were sent
+
+The number of Hits (in round 484.0) is 34
+The number TOTAL of Hits (until this round 484.0) is 12053
+The number TOTAL of Misses (until this round 484.0) is 437
+
+Round 485.0 finished
+In this round 9 Messages were sent
+Overall 4293 Messages were sent
+
+The number of Hits (in round 485.0) is 33
+The number of Misses (in round 485.0) is 1
+The number TOTAL of Hits (until this round 485.0) is 12086
+The number TOTAL of Misses (until this round 485.0) is 438
+
+Round 486.0 finished
+In this round 11 Messages were sent
+Overall 4304 Messages were sent
+
+The number of Hits (in round 486.0) is 35
+The number TOTAL of Hits (until this round 486.0) is 12121
+The number TOTAL of Misses (until this round 486.0) is 438
+
+Round 487.0 finished
+In this round 7 Messages were sent
+Overall 4311 Messages were sent
+
+The number of Hits (in round 487.0) is 36
+The number of Misses (in round 487.0) is 1
+The number TOTAL of Hits (until this round 487.0) is 12157
+The number TOTAL of Misses (until this round 487.0) is 439
+
+Round 488.0 finished
+In this round 10 Messages were sent
+Overall 4321 Messages were sent
+
+The number of Hits (in round 488.0) is 37
+The number TOTAL of Hits (until this round 488.0) is 12194
+The number TOTAL of Misses (until this round 488.0) is 439
+
+Round 489.0 finished
+In this round 6 Messages were sent
+Overall 4327 Messages were sent
+
+The number of Hits (in round 489.0) is 33
+The number of Misses (in round 489.0) is 4
+The number TOTAL of Hits (until this round 489.0) is 12227
+The number TOTAL of Misses (until this round 489.0) is 443
+
+Round 490.0 finished
+In this round 14 Messages were sent
+Overall 4341 Messages were sent
+
+The number of Hits (in round 490.0) is 33
+The number of Misses (in round 490.0) is 1
+The number TOTAL of Hits (until this round 490.0) is 12260
+The number TOTAL of Misses (until this round 490.0) is 444
+
+Round 491.0 finished
+In this round 6 Messages were sent
+Overall 4347 Messages were sent
+
+The number of Hits (in round 491.0) is 31
+The number of Misses (in round 491.0) is 3
+The number TOTAL of Hits (until this round 491.0) is 12291
+The number TOTAL of Misses (until this round 491.0) is 447
+
+Round 492.0 finished
+In this round 16 Messages were sent
+Overall 4363 Messages were sent
+
+The number of Hits (in round 492.0) is 32
+The number of Misses (in round 492.0) is 1
+The number TOTAL of Hits (until this round 492.0) is 12323
+The number TOTAL of Misses (until this round 492.0) is 448
+
+Round 493.0 finished
+In this round 5 Messages were sent
+Overall 4368 Messages were sent
+
+The number of Hits (in round 493.0) is 32
+The number of Misses (in round 493.0) is 2
+The number TOTAL of Hits (until this round 493.0) is 12355
+The number TOTAL of Misses (until this round 493.0) is 450
+
+Round 494.0 finished
+In this round 16 Messages were sent
+Overall 4384 Messages were sent
+
+The number of Hits (in round 494.0) is 30
+The number of Misses (in round 494.0) is 2
+The number TOTAL of Hits (until this round 494.0) is 12385
+The number TOTAL of Misses (until this round 494.0) is 452
+
+Round 495.0 finished
+In this round 7 Messages were sent
+Overall 4391 Messages were sent
+
+The number of Hits (in round 495.0) is 30
+The number of Misses (in round 495.0) is 2
+The number TOTAL of Hits (until this round 495.0) is 12415
+The number TOTAL of Misses (until this round 495.0) is 454
+
+Round 496.0 finished
+In this round 16 Messages were sent
+Overall 4407 Messages were sent
+
+The number of Hits (in round 496.0) is 30
+The number of Misses (in round 496.0) is 1
+The number TOTAL of Hits (until this round 496.0) is 12445
+The number TOTAL of Misses (until this round 496.0) is 455
+
+Round 497.0 finished
+In this round 7 Messages were sent
+Overall 4414 Messages were sent
+
+The number of Hits (in round 497.0) is 29
+The number of Misses (in round 497.0) is 3
+The number TOTAL of Hits (until this round 497.0) is 12474
+The number TOTAL of Misses (until this round 497.0) is 458
+
+Round 498.0 finished
+In this round 17 Messages were sent
+Overall 4431 Messages were sent
+
+The number of Hits (in round 498.0) is 30
+The number TOTAL of Hits (until this round 498.0) is 12504
+The number TOTAL of Misses (until this round 498.0) is 458
+
+Round 499.0 finished
+In this round 6 Messages were sent
+Overall 4437 Messages were sent
+
+The number of Hits (in round 499.0) is 32
+The number TOTAL of Hits (until this round 499.0) is 12536
+The number TOTAL of Misses (until this round 499.0) is 458
+
+Round 500.0 finished
+In this round 15 Messages were sent
+Overall 4452 Messages were sent
+
+The number of Hits (in round 500.0) is 30
+The number of Misses (in round 500.0) is 2
+The number TOTAL of Hits (until this round 500.0) is 12566
+The number TOTAL of Misses (until this round 500.0) is 460
+
+# # The Global RMSE is 9.273477763418214
+
+Round 501.0 finished
+In this round 8 Messages were sent
+Overall 4460 Messages were sent
+
+The number of Hits (in round 501.0) is 32
+The number of Misses (in round 501.0) is 1
+The number TOTAL of Hits (until this round 501.0) is 12598
+The number TOTAL of Misses (until this round 501.0) is 461
+
+Round 502.0 finished
+In this round 13 Messages were sent
+Overall 4473 Messages were sent
+
+The number of Hits (in round 502.0) is 34
+The number TOTAL of Hits (until this round 502.0) is 12632
+The number TOTAL of Misses (until this round 502.0) is 461
+
+Round 503.0 finished
+In this round 6 Messages were sent
+Overall 4479 Messages were sent
+
+The number of Hits (in round 503.0) is 34
+The number TOTAL of Hits (until this round 503.0) is 12666
+The number TOTAL of Misses (until this round 503.0) is 461
+
+Round 504.0 finished
+In this round 13 Messages were sent
+Overall 4492 Messages were sent
+
+The number of Hits (in round 504.0) is 32
+The number of Misses (in round 504.0) is 2
+The number TOTAL of Hits (until this round 504.0) is 12698
+The number TOTAL of Misses (until this round 504.0) is 463
+
+Round 505.0 finished
+In this round 8 Messages were sent
+Overall 4500 Messages were sent
+
+The number of Hits (in round 505.0) is 30
+The number of Misses (in round 505.0) is 3
+The number TOTAL of Hits (until this round 505.0) is 12728
+The number TOTAL of Misses (until this round 505.0) is 466
+
+Round 506.0 finished
+In this round 15 Messages were sent
+Overall 4515 Messages were sent
+
+The number of Hits (in round 506.0) is 28
+The number of Misses (in round 506.0) is 2
+The number TOTAL of Hits (until this round 506.0) is 12756
+The number TOTAL of Misses (until this round 506.0) is 468
+
+Round 507.0 finished
+In this round 10 Messages were sent
+Overall 4525 Messages were sent
+
+The number of Hits (in round 507.0) is 29
+The number of Misses (in round 507.0) is 2
+The number TOTAL of Hits (until this round 507.0) is 12785
+The number TOTAL of Misses (until this round 507.0) is 470
+
+Round 508.0 finished
+In this round 14 Messages were sent
+Overall 4539 Messages were sent
+
+The number of Hits (in round 508.0) is 29
+The number TOTAL of Hits (until this round 508.0) is 12814
+The number TOTAL of Misses (until this round 508.0) is 470
+
+Round 509.0 finished
+In this round 10 Messages were sent
+Overall 4549 Messages were sent
+
+The number of Hits (in round 509.0) is 26
+The number of Misses (in round 509.0) is 4
+The number TOTAL of Hits (until this round 509.0) is 12840
+The number TOTAL of Misses (until this round 509.0) is 474
+
+Round 510.0 finished
+In this round 17 Messages were sent
+Overall 4566 Messages were sent
+
+The number of Hits (in round 510.0) is 26
+The number of Misses (in round 510.0) is 1
+The number TOTAL of Hits (until this round 510.0) is 12866
+The number TOTAL of Misses (until this round 510.0) is 475
+
+Round 511.0 finished
+In this round 10 Messages were sent
+Overall 4576 Messages were sent
+
+The number of Hits (in round 511.0) is 26
+The number TOTAL of Hits (until this round 511.0) is 12892
+The number TOTAL of Misses (until this round 511.0) is 475
+
+Round 512.0 finished
+In this round 17 Messages were sent
+Overall 4593 Messages were sent
+
+The number of Hits (in round 512.0) is 26
+The number of Misses (in round 512.0) is 2
+The number TOTAL of Hits (until this round 512.0) is 12918
+The number TOTAL of Misses (until this round 512.0) is 477
+
+Round 513.0 finished
+In this round 10 Messages were sent
+Overall 4603 Messages were sent
+
+The number of Hits (in round 513.0) is 27
+The number of Misses (in round 513.0) is 1
+The number TOTAL of Hits (until this round 513.0) is 12945
+The number TOTAL of Misses (until this round 513.0) is 478
+
+Round 514.0 finished
+In this round 16 Messages were sent
+Overall 4619 Messages were sent
+
+The number of Hits (in round 514.0) is 28
+The number of Misses (in round 514.0) is 1
+The number TOTAL of Hits (until this round 514.0) is 12973
+The number TOTAL of Misses (until this round 514.0) is 479
+
+Round 515.0 finished
+In this round 9 Messages were sent
+Overall 4628 Messages were sent
+
+The number of Hits (in round 515.0) is 28
+The number of Misses (in round 515.0) is 2
+The number TOTAL of Hits (until this round 515.0) is 13001
+The number TOTAL of Misses (until this round 515.0) is 481
+
+Round 516.0 finished
+In this round 16 Messages were sent
+Overall 4644 Messages were sent
+
+The number of Hits (in round 516.0) is 30
+The number of Misses (in round 516.0) is 1
+The number TOTAL of Hits (until this round 516.0) is 13031
+The number TOTAL of Misses (until this round 516.0) is 482
+
+Round 517.0 finished
+In this round 7 Messages were sent
+Overall 4651 Messages were sent
+
+The number of Hits (in round 517.0) is 30
+The number of Misses (in round 517.0) is 3
+The number TOTAL of Hits (until this round 517.0) is 13061
+The number TOTAL of Misses (until this round 517.0) is 485
+
+Round 518.0 finished
+In this round 16 Messages were sent
+Overall 4667 Messages were sent
+
+The number of Hits (in round 518.0) is 29
+The number of Misses (in round 518.0) is 2
+The number TOTAL of Hits (until this round 518.0) is 13090
+The number TOTAL of Misses (until this round 518.0) is 487
+
+Round 519.0 finished
+In this round 8 Messages were sent
+Overall 4675 Messages were sent
+
+The number of Hits (in round 519.0) is 27
+The number of Misses (in round 519.0) is 4
+The number TOTAL of Hits (until this round 519.0) is 13117
+The number TOTAL of Misses (until this round 519.0) is 491
+
+Round 520.0 finished
+In this round 18 Messages were sent
+Overall 4693 Messages were sent
+
+The number of Hits (in round 520.0) is 27
+The number of Misses (in round 520.0) is 1
+The number TOTAL of Hits (until this round 520.0) is 13144
+The number TOTAL of Misses (until this round 520.0) is 492
+
+Round 521.0 finished
+In this round 8 Messages were sent
+Overall 4701 Messages were sent
+
+The number of Hits (in round 521.0) is 27
+The number of Misses (in round 521.0) is 2
+The number TOTAL of Hits (until this round 521.0) is 13171
+The number TOTAL of Misses (until this round 521.0) is 494
+
+Round 522.0 finished
+In this round 18 Messages were sent
+Overall 4719 Messages were sent
+
+The number of Hits (in round 522.0) is 25
+The number of Misses (in round 522.0) is 2
+The number TOTAL of Hits (until this round 522.0) is 13196
+The number TOTAL of Misses (until this round 522.0) is 496
+
+Round 523.0 finished
+In this round 10 Messages were sent
+Overall 4729 Messages were sent
+
+The number of Hits (in round 523.0) is 26
+The number TOTAL of Hits (until this round 523.0) is 13222
+The number TOTAL of Misses (until this round 523.0) is 496
+
+Round 524.0 finished
+In this round 17 Messages were sent
+Overall 4746 Messages were sent
+
+The number of Hits (in round 524.0) is 28
+The number TOTAL of Hits (until this round 524.0) is 13250
+The number TOTAL of Misses (until this round 524.0) is 496
+
+Round 525.0 finished
+In this round 8 Messages were sent
+Overall 4754 Messages were sent
+
+The number of Hits (in round 525.0) is 29
+The number of Misses (in round 525.0) is 3
+The number TOTAL of Hits (until this round 525.0) is 13279
+The number TOTAL of Misses (until this round 525.0) is 499
+
+Round 526.0 finished
+In this round 16 Messages were sent
+Overall 4770 Messages were sent
+
+The number of Hits (in round 526.0) is 30
+The number TOTAL of Hits (until this round 526.0) is 13309
+The number TOTAL of Misses (until this round 526.0) is 499
+
+Round 527.0 finished
+In this round 7 Messages were sent
+Overall 4777 Messages were sent
+
+The number of Hits (in round 527.0) is 28
+The number of Misses (in round 527.0) is 2
+The number TOTAL of Hits (until this round 527.0) is 13337
+The number TOTAL of Misses (until this round 527.0) is 501
+
+Round 528.0 finished
+In this round 18 Messages were sent
+Overall 4795 Messages were sent
+
+The number of Hits (in round 528.0) is 26
+The number of Misses (in round 528.0) is 3
+The number TOTAL of Hits (until this round 528.0) is 13363
+The number TOTAL of Misses (until this round 528.0) is 504
+
+Round 529.0 finished
+In this round 9 Messages were sent
+Overall 4804 Messages were sent
+
+The number of Hits (in round 529.0) is 30
+The number of Misses (in round 529.0) is 1
+The number TOTAL of Hits (until this round 529.0) is 13393
+The number TOTAL of Misses (until this round 529.0) is 505
+
+Round 530.0 finished
+In this round 14 Messages were sent
+Overall 4818 Messages were sent
+
+The number of Hits (in round 530.0) is 29
+The number of Misses (in round 530.0) is 2
+The number TOTAL of Hits (until this round 530.0) is 13422
+The number TOTAL of Misses (until this round 530.0) is 507
+
+Round 531.0 finished
+In this round 10 Messages were sent
+Overall 4828 Messages were sent
+
+The number of Hits (in round 531.0) is 29
+The number of Misses (in round 531.0) is 1
+The number TOTAL of Hits (until this round 531.0) is 13451
+The number TOTAL of Misses (until this round 531.0) is 508
+
+Round 532.0 finished
+In this round 14 Messages were sent
+Overall 4842 Messages were sent
+
+The number of Hits (in round 532.0) is 29
+The number of Misses (in round 532.0) is 1
+The number TOTAL of Hits (until this round 532.0) is 13480
+The number TOTAL of Misses (until this round 532.0) is 509
+
+Round 533.0 finished
+In this round 10 Messages were sent
+Overall 4852 Messages were sent
+
+The number of Hits (in round 533.0) is 31
+The number of Misses (in round 533.0) is 1
+The number TOTAL of Hits (until this round 533.0) is 13511
+The number TOTAL of Misses (until this round 533.0) is 510
+
+Round 534.0 finished
+In this round 12 Messages were sent
+Overall 4864 Messages were sent
+
+The number of Hits (in round 534.0) is 29
+The number of Misses (in round 534.0) is 2
+The number TOTAL of Hits (until this round 534.0) is 13540
+The number TOTAL of Misses (until this round 534.0) is 512
+
+Round 535.0 finished
+In this round 12 Messages were sent
+Overall 4876 Messages were sent
+
+The number of Hits (in round 535.0) is 29
+The number of Misses (in round 535.0) is 2
+The number TOTAL of Hits (until this round 535.0) is 13569
+The number TOTAL of Misses (until this round 535.0) is 514
+
+Round 536.0 finished
+In this round 12 Messages were sent
+Overall 4888 Messages were sent
+
+The number of Hits (in round 536.0) is 28
+The number of Misses (in round 536.0) is 1
+The number TOTAL of Hits (until this round 536.0) is 13597
+The number TOTAL of Misses (until this round 536.0) is 515
+
+Round 537.0 finished
+In this round 13 Messages were sent
+Overall 4901 Messages were sent
+
+The number of Hits (in round 537.0) is 28
+The number of Misses (in round 537.0) is 3
+The number TOTAL of Hits (until this round 537.0) is 13625
+The number TOTAL of Misses (until this round 537.0) is 518
+
+Round 538.0 finished
+In this round 12 Messages were sent
+Overall 4913 Messages were sent
+
+The number of Hits (in round 538.0) is 28
+The number TOTAL of Hits (until this round 538.0) is 13653
+The number TOTAL of Misses (until this round 538.0) is 518
+
+Round 539.0 finished
+In this round 13 Messages were sent
+Overall 4926 Messages were sent
+
+The number of Hits (in round 539.0) is 26
+The number of Misses (in round 539.0) is 2
+The number TOTAL of Hits (until this round 539.0) is 13679
+The number TOTAL of Misses (until this round 539.0) is 520
+
+Round 540.0 finished
+In this round 14 Messages were sent
+Overall 4940 Messages were sent
+
+The number of Hits (in round 540.0) is 25
+The number TOTAL of Hits (until this round 540.0) is 13704
+The number TOTAL of Misses (until this round 540.0) is 520
+
+Round 541.0 finished
+In this round 13 Messages were sent
+Overall 4953 Messages were sent
+
+The number of Hits (in round 541.0) is 25
+The number of Misses (in round 541.0) is 1
+The number TOTAL of Hits (until this round 541.0) is 13729
+The number TOTAL of Misses (until this round 541.0) is 521
+
+Round 542.0 finished
+In this round 14 Messages were sent
+Overall 4967 Messages were sent
+
+The number of Hits (in round 542.0) is 24
+The number of Misses (in round 542.0) is 3
+The number TOTAL of Hits (until this round 542.0) is 13753
+The number TOTAL of Misses (until this round 542.0) is 524
+
+Round 543.0 finished
+In this round 14 Messages were sent
+Overall 4981 Messages were sent
+
+The number of Hits (in round 543.0) is 28
+The number TOTAL of Hits (until this round 543.0) is 13781
+The number TOTAL of Misses (until this round 543.0) is 524
+
+Round 544.0 finished
+In this round 10 Messages were sent
+Overall 4991 Messages were sent
+
+The number of Hits (in round 544.0) is 27
+The number of Misses (in round 544.0) is 2
+The number TOTAL of Hits (until this round 544.0) is 13808
+The number TOTAL of Misses (until this round 544.0) is 526
+
+Round 545.0 finished
+In this round 14 Messages were sent
+Overall 5005 Messages were sent
+
+The number of Hits (in round 545.0) is 26
+The number of Misses (in round 545.0) is 3
+The number TOTAL of Hits (until this round 545.0) is 13834
+The number TOTAL of Misses (until this round 545.0) is 529
+
+Round 546.0 finished
+In this round 11 Messages were sent
+Overall 5016 Messages were sent
+
+The number of Hits (in round 546.0) is 26
+The number of Misses (in round 546.0) is 3
+The number TOTAL of Hits (until this round 546.0) is 13860
+The number TOTAL of Misses (until this round 546.0) is 532
+
+Round 547.0 finished
+In this round 14 Messages were sent
+Overall 5030 Messages were sent
+
+The number of Hits (in round 547.0) is 25
+The number of Misses (in round 547.0) is 2
+The number TOTAL of Hits (until this round 547.0) is 13885
+The number TOTAL of Misses (until this round 547.0) is 534
+
+Round 548.0 finished
+In this round 12 Messages were sent
+Overall 5042 Messages were sent
+
+The number of Hits (in round 548.0) is 24
+The number of Misses (in round 548.0) is 2
+The number TOTAL of Hits (until this round 548.0) is 13909
+The number TOTAL of Misses (until this round 548.0) is 536
+
+Round 549.0 finished
+In this round 15 Messages were sent
+Overall 5057 Messages were sent
+
+The number of Hits (in round 549.0) is 25
+The number TOTAL of Hits (until this round 549.0) is 13934
+The number TOTAL of Misses (until this round 549.0) is 536
+
+Round 550.0 finished
+In this round 11 Messages were sent
+Overall 5068 Messages were sent
+
+The number of Hits (in round 550.0) is 25
+The number of Misses (in round 550.0) is 2
+The number TOTAL of Hits (until this round 550.0) is 13959
+The number TOTAL of Misses (until this round 550.0) is 538
+
+# # The Global RMSE is 8.790489187334922
+
+Round 551.0 finished
+In this round 15 Messages were sent
+Overall 5083 Messages were sent
+
+The number of Hits (in round 551.0) is 28
+The number TOTAL of Hits (until this round 551.0) is 13987
+The number TOTAL of Misses (until this round 551.0) is 538
+
+Round 552.0 finished
+In this round 8 Messages were sent
+Overall 5091 Messages were sent
+
+The number of Hits (in round 552.0) is 29
+The number of Misses (in round 552.0) is 1
+The number TOTAL of Hits (until this round 552.0) is 14016
+The number TOTAL of Misses (until this round 552.0) is 539
+
+Round 553.0 finished
+In this round 14 Messages were sent
+Overall 5105 Messages were sent
+
+The number of Hits (in round 553.0) is 28
+The number of Misses (in round 553.0) is 1
+The number TOTAL of Hits (until this round 553.0) is 14044
+The number TOTAL of Misses (until this round 553.0) is 540
+
+Round 554.0 finished
+In this round 8 Messages were sent
+Overall 5113 Messages were sent
+
+The number of Hits (in round 554.0) is 28
+The number of Misses (in round 554.0) is 1
+The number TOTAL of Hits (until this round 554.0) is 14072
+The number TOTAL of Misses (until this round 554.0) is 541
+
+Round 555.0 finished
+In this round 14 Messages were sent
+Overall 5127 Messages were sent
+
+The number of Hits (in round 555.0) is 29
+The number of Misses (in round 555.0) is 1
+The number TOTAL of Hits (until this round 555.0) is 14101
+The number TOTAL of Misses (until this round 555.0) is 542
+
+Round 556.0 finished
+In this round 7 Messages were sent
+Overall 5134 Messages were sent
+
+The number of Hits (in round 556.0) is 28
+The number of Misses (in round 556.0) is 2
+The number TOTAL of Hits (until this round 556.0) is 14129
+The number TOTAL of Misses (until this round 556.0) is 544
+
+Round 557.0 finished
+In this round 15 Messages were sent
+Overall 5149 Messages were sent
+
+The number of Hits (in round 557.0) is 25
+The number of Misses (in round 557.0) is 4
+The number TOTAL of Hits (until this round 557.0) is 14154
+The number TOTAL of Misses (until this round 557.0) is 548
+
+Round 558.0 finished
+In this round 10 Messages were sent
+Overall 5159 Messages were sent
+
+The number of Hits (in round 558.0) is 24
+The number of Misses (in round 558.0) is 3
+The number TOTAL of Hits (until this round 558.0) is 14178
+The number TOTAL of Misses (until this round 558.0) is 551
+
+Round 559.0 finished
+In this round 16 Messages were sent
+Overall 5175 Messages were sent
+
+The number of Hits (in round 559.0) is 22
+The number of Misses (in round 559.0) is 2
+The number TOTAL of Hits (until this round 559.0) is 14200
+The number TOTAL of Misses (until this round 559.0) is 553
+
+Round 560.0 finished
+In this round 12 Messages were sent
+Overall 5187 Messages were sent
+
+The number of Hits (in round 560.0) is 21
+The number of Misses (in round 560.0) is 2
+The number TOTAL of Hits (until this round 560.0) is 14221
+The number TOTAL of Misses (until this round 560.0) is 555
+
+Round 561.0 finished
+In this round 17 Messages were sent
+Overall 5204 Messages were sent
+
+The number of Hits (in round 561.0) is 18
+The number of Misses (in round 561.0) is 4
+The number TOTAL of Hits (until this round 561.0) is 14239
+The number TOTAL of Misses (until this round 561.0) is 559
+
+Round 562.0 finished
+In this round 15 Messages were sent
+Overall 5219 Messages were sent
+
+The number of Hits (in round 562.0) is 20
+The number TOTAL of Hits (until this round 562.0) is 14259
+The number TOTAL of Misses (until this round 562.0) is 559
+
+Round 563.0 finished
+In this round 15 Messages were sent
+Overall 5234 Messages were sent
+
+The number of Hits (in round 563.0) is 22
+The number of Misses (in round 563.0) is 2
+The number TOTAL of Hits (until this round 563.0) is 14281
+The number TOTAL of Misses (until this round 563.0) is 561
+
+Round 564.0 finished
+In this round 13 Messages were sent
+Overall 5247 Messages were sent
+
+The number of Hits (in round 564.0) is 22
+The number of Misses (in round 564.0) is 1
+The number TOTAL of Hits (until this round 564.0) is 14303
+The number TOTAL of Misses (until this round 564.0) is 562
+
+Round 565.0 finished
+In this round 15 Messages were sent
+Overall 5262 Messages were sent
+
+The number of Hits (in round 565.0) is 24
+The number of Misses (in round 565.0) is 1
+The number TOTAL of Hits (until this round 565.0) is 14327
+The number TOTAL of Misses (until this round 565.0) is 563
+
+Round 566.0 finished
+In this round 11 Messages were sent
+Overall 5273 Messages were sent
+
+The number of Hits (in round 566.0) is 27
+The number TOTAL of Hits (until this round 566.0) is 14354
+The number TOTAL of Misses (until this round 566.0) is 563
+
+Round 567.0 finished
+In this round 12 Messages were sent
+Overall 5285 Messages were sent
+
+The number of Hits (in round 567.0) is 26
+The number of Misses (in round 567.0) is 1
+The number TOTAL of Hits (until this round 567.0) is 14380
+The number TOTAL of Misses (until this round 567.0) is 564
+
+Round 568.0 finished
+In this round 12 Messages were sent
+Overall 5297 Messages were sent
+
+The number of Hits (in round 568.0) is 23
+The number of Misses (in round 568.0) is 3
+The number TOTAL of Hits (until this round 568.0) is 14403
+The number TOTAL of Misses (until this round 568.0) is 567
+
+Round 569.0 finished
+In this round 15 Messages were sent
+Overall 5312 Messages were sent
+
+The number of Hits (in round 569.0) is 23
+The number of Misses (in round 569.0) is 1
+The number TOTAL of Hits (until this round 569.0) is 14426
+The number TOTAL of Misses (until this round 569.0) is 568
+
+Round 570.0 finished
+In this round 12 Messages were sent
+Overall 5324 Messages were sent
+
+The number of Hits (in round 570.0) is 25
+The number of Misses (in round 570.0) is 1
+The number TOTAL of Hits (until this round 570.0) is 14451
+The number TOTAL of Misses (until this round 570.0) is 569
+
+Round 571.0 finished
+In this round 12 Messages were sent
+Overall 5336 Messages were sent
+
+The number of Hits (in round 571.0) is 23
+The number of Misses (in round 571.0) is 4
+The number TOTAL of Hits (until this round 571.0) is 14474
+The number TOTAL of Misses (until this round 571.0) is 573
+
+Round 572.0 finished
+In this round 14 Messages were sent
+Overall 5350 Messages were sent
+
+The number of Hits (in round 572.0) is 24
+The number of Misses (in round 572.0) is 1
+The number TOTAL of Hits (until this round 572.0) is 14498
+The number TOTAL of Misses (until this round 572.0) is 574
+
+Round 573.0 finished
+In this round 11 Messages were sent
+Overall 5361 Messages were sent
+
+The number of Hits (in round 573.0) is 25
+The number of Misses (in round 573.0) is 1
+The number TOTAL of Hits (until this round 573.0) is 14523
+The number TOTAL of Misses (until this round 573.0) is 575
+
+Round 574.0 finished
+In this round 13 Messages were sent
+Overall 5374 Messages were sent
+
+The number of Hits (in round 574.0) is 22
+The number of Misses (in round 574.0) is 4
+The number TOTAL of Hits (until this round 574.0) is 14545
+The number TOTAL of Misses (until this round 574.0) is 579
+
+Round 575.0 finished
+In this round 14 Messages were sent
+Overall 5388 Messages were sent
+
+The number of Hits (in round 575.0) is 21
+The number of Misses (in round 575.0) is 3
+The number TOTAL of Hits (until this round 575.0) is 14566
+The number TOTAL of Misses (until this round 575.0) is 582
+
+Round 576.0 finished
+In this round 14 Messages were sent
+Overall 5402 Messages were sent
+
+The number of Hits (in round 576.0) is 22
+The number TOTAL of Hits (until this round 576.0) is 14588
+The number TOTAL of Misses (until this round 576.0) is 582
+
+Round 577.0 finished
+In this round 13 Messages were sent
+Overall 5415 Messages were sent
+
+The number of Hits (in round 577.0) is 23
+The number TOTAL of Hits (until this round 577.0) is 14611
+The number TOTAL of Misses (until this round 577.0) is 582
+
+Round 578.0 finished
+In this round 12 Messages were sent
+Overall 5427 Messages were sent
+
+The number of Hits (in round 578.0) is 23
+The number of Misses (in round 578.0) is 1
+The number TOTAL of Hits (until this round 578.0) is 14634
+The number TOTAL of Misses (until this round 578.0) is 583
+
+Round 579.0 finished
+In this round 13 Messages were sent
+Overall 5440 Messages were sent
+
+The number of Hits (in round 579.0) is 21
+The number of Misses (in round 579.0) is 3
+The number TOTAL of Hits (until this round 579.0) is 14655
+The number TOTAL of Misses (until this round 579.0) is 586
+
+Round 580.0 finished
+In this round 14 Messages were sent
+Overall 5454 Messages were sent
+
+The number of Hits (in round 580.0) is 19
+The number of Misses (in round 580.0) is 1
+The number TOTAL of Hits (until this round 580.0) is 14674
+The number TOTAL of Misses (until this round 580.0) is 587
+
+Round 581.0 finished
+In this round 13 Messages were sent
+Overall 5467 Messages were sent
+
+The number of Hits (in round 581.0) is 20
+The number TOTAL of Hits (until this round 581.0) is 14694
+The number TOTAL of Misses (until this round 581.0) is 587
+
+Round 582.0 finished
+In this round 13 Messages were sent
+Overall 5480 Messages were sent
+
+The number of Hits (in round 582.0) is 21
+The number of Misses (in round 582.0) is 1
+The number TOTAL of Hits (until this round 582.0) is 14715
+The number TOTAL of Misses (until this round 582.0) is 588
+
+Round 583.0 finished
+In this round 12 Messages were sent
+Overall 5492 Messages were sent
+
+The number of Hits (in round 583.0) is 21
+The number TOTAL of Hits (until this round 583.0) is 14736
+The number TOTAL of Misses (until this round 583.0) is 588
+
+Round 584.0 finished
+In this round 12 Messages were sent
+Overall 5504 Messages were sent
+
+The number of Hits (in round 584.0) is 25
+The number TOTAL of Hits (until this round 584.0) is 14761
+The number TOTAL of Misses (until this round 584.0) is 588
+
+Round 585.0 finished
+In this round 8 Messages were sent
+Overall 5512 Messages were sent
+
+The number of Hits (in round 585.0) is 25
+The number of Misses (in round 585.0) is 2
+The number TOTAL of Hits (until this round 585.0) is 14786
+The number TOTAL of Misses (until this round 585.0) is 590
+
+Round 586.0 finished
+In this round 12 Messages were sent
+Overall 5524 Messages were sent
+
+The number of Hits (in round 586.0) is 22
+The number of Misses (in round 586.0) is 3
+The number TOTAL of Hits (until this round 586.0) is 14808
+The number TOTAL of Misses (until this round 586.0) is 593
+
+Round 587.0 finished
+In this round 11 Messages were sent
+Overall 5535 Messages were sent
+
+The number of Hits (in round 587.0) is 24
+The number of Misses (in round 587.0) is 2
+The number TOTAL of Hits (until this round 587.0) is 14832
+The number TOTAL of Misses (until this round 587.0) is 595
+
+Round 588.0 finished
+In this round 10 Messages were sent
+Overall 5545 Messages were sent
+
+The number of Hits (in round 588.0) is 24
+The number of Misses (in round 588.0) is 1
+The number TOTAL of Hits (until this round 588.0) is 14856
+The number TOTAL of Misses (until this round 588.0) is 596
+
+Round 589.0 finished
+In this round 11 Messages were sent
+Overall 5556 Messages were sent
+
+The number of Hits (in round 589.0) is 22
+The number of Misses (in round 589.0) is 3
+The number TOTAL of Hits (until this round 589.0) is 14878
+The number TOTAL of Misses (until this round 589.0) is 599
+
+Round 590.0 finished
+In this round 12 Messages were sent
+Overall 5568 Messages were sent
+
+The number of Hits (in round 590.0) is 22
+The number of Misses (in round 590.0) is 1
+The number TOTAL of Hits (until this round 590.0) is 14900
+The number TOTAL of Misses (until this round 590.0) is 600
+
+Round 591.0 finished
+In this round 11 Messages were sent
+Overall 5579 Messages were sent
+
+The number of Hits (in round 591.0) is 23
+The number TOTAL of Hits (until this round 591.0) is 14923
+The number TOTAL of Misses (until this round 591.0) is 600
+
+Round 592.0 finished
+In this round 11 Messages were sent
+Overall 5590 Messages were sent
+
+The number of Hits (in round 592.0) is 22
+The number TOTAL of Hits (until this round 592.0) is 14945
+The number TOTAL of Misses (until this round 592.0) is 600
+
+Round 593.0 finished
+In this round 11 Messages were sent
+Overall 5601 Messages were sent
+
+The number of Hits (in round 593.0) is 21
+The number of Misses (in round 593.0) is 3
+The number TOTAL of Hits (until this round 593.0) is 14966
+The number TOTAL of Misses (until this round 593.0) is 603
+
+Round 594.0 finished
+In this round 12 Messages were sent
+Overall 5613 Messages were sent
+
+The number of Hits (in round 594.0) is 20
+The number of Misses (in round 594.0) is 2
+The number TOTAL of Hits (until this round 594.0) is 14986
+The number TOTAL of Misses (until this round 594.0) is 605
+
+Round 595.0 finished
+In this round 12 Messages were sent
+Overall 5625 Messages were sent
+
+The number of Hits (in round 595.0) is 18
+The number of Misses (in round 595.0) is 3
+The number TOTAL of Hits (until this round 595.0) is 15004
+The number TOTAL of Misses (until this round 595.0) is 608
+
+Round 596.0 finished
+In this round 14 Messages were sent
+Overall 5639 Messages were sent
+
+The number of Hits (in round 596.0) is 16
+The number of Misses (in round 596.0) is 3
+The number TOTAL of Hits (until this round 596.0) is 15020
+The number TOTAL of Misses (until this round 596.0) is 611
+
+Round 597.0 finished
+In this round 14 Messages were sent
+Overall 5653 Messages were sent
+
+The number of Hits (in round 597.0) is 16
+The number TOTAL of Hits (until this round 597.0) is 15036
+The number TOTAL of Misses (until this round 597.0) is 611
+
+Round 598.0 finished
+In this round 14 Messages were sent
+Overall 5667 Messages were sent
+
+The number of Hits (in round 598.0) is 18
+The number of Misses (in round 598.0) is 2
+The number TOTAL of Hits (until this round 598.0) is 15054
+The number TOTAL of Misses (until this round 598.0) is 613
+
+Round 599.0 finished
+In this round 12 Messages were sent
+Overall 5679 Messages were sent
+
+The number of Hits (in round 599.0) is 19
+The number TOTAL of Hits (until this round 599.0) is 15073
+The number TOTAL of Misses (until this round 599.0) is 613
+
+Round 600.0 finished
+In this round 13 Messages were sent
+Overall 5692 Messages were sent
+
+The number of Hits (in round 600.0) is 18
+The number of Misses (in round 600.0) is 2
+The number TOTAL of Hits (until this round 600.0) is 15091
+The number TOTAL of Misses (until this round 600.0) is 615
+
+# # The Global RMSE is 18.260381608042113
+
