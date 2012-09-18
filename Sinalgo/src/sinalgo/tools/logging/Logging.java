@@ -414,7 +414,8 @@ public class Logging {
 	}
 	
 	public static String getTimeDirectoryName() {
-		return Global.projectName + "_" + timePrefix;
+		return Global.projectName;
+//		return Global.projectName + "_" + timePrefix;
 	}
 
 	/**
@@ -539,6 +540,7 @@ public class Logging {
 	 */
 	private Logging(String aFileName, boolean append) {
 		try {
+			aFileName += "_" + timePrefix + ".txt";
 			String dir = Configuration.logFileDirectory;
 			if(dir != "") {
 				createDir(dir);
