@@ -26,9 +26,14 @@ public class SinkNode extends SimpleNode
 	private String dataSensedType = "h";
 	
 	/**
-	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
+	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 */
 	private double thresholdError = 0.01;
+	
+	/**
+	 * Percentual do limiar de erro espacial aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
+	 */
+	private double spacialThresholdError = 0.01;
 	
 	public SinkNode()
 	{
