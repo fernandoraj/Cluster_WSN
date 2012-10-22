@@ -4,37 +4,38 @@ import java.util.Stack;
 import java.util.Vector;
 
 import sinalgo.nodes.Node;
+import sinalgo.nodes.Position;
 import sinalgo.nodes.messages.Message;
 
 public class WsnMsgResponse extends Message {
 	
 	/**
-	 *  Identificador da mensagem
+	 *  Identificador da mensagem - Message ID
 	 */
 	public Integer sequenceID;
 	
 	/**
-	 * Tempo de vida do Pacote
+	 * Tempo de vida do Pacote - Time to live from package
 	 */
 	public Integer ttl;
 	
 	/**
-	 * No de destino
+	 * Nó de destino - Destination node
 	 */
 	public Node destino;
 	
 	/**
-	 * No de origem
+	 * Nó de origem - Source node
 	 */
 	public Node origem;
 	
 	/**
-	 * No que vai reencaminhar a mensagem
+	 * Nó que vai reencaminhar a mensagem
 	 */
 	public Node forwardingHop;
 	
 	/**
-	 * Numero de saltos até o destino
+	 * Número de saltos até o destino
 	 */
 	public Integer saltosAteDestino;
 	
@@ -57,7 +58,17 @@ public class WsnMsgResponse extends Message {
 	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro)
 	 */
 	public double thresholdError = 0.0;
+
+	/**
+	 * Percentual do limiar de erro espacial aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
+	 */
+	public double spacialThresholdError = 0.0;
 	
+	/**
+	 * Spatial position from the source node from message
+	 */
+	public Position spatialPos;
+
 	/**
 	 * Caminho de nós do nó que envia a mensagem de resposta até o sink node, em forma de pilha
 	 */
@@ -229,7 +240,31 @@ public class WsnMsgResponse extends Message {
 		this.dataSensedType = dataSensedType;
 		this.thresholdError = thresholdEr;
 	}
-	
+
+	/**
+	 * Construtor estendido da Classe
+	 * @param seqID Identificador da mensagem
+	 * @param origem No de origem
+	 * @param destino No de destino
+	 * @param forwardingHop No que vai reencaminhar a mensagem
+	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
+	 * @param sizeTS Numero de dados sensoreados por time slot (Tamanho do time slot)
+	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
+	 * @param thresholdEr Limiar de erro aceitável
+	 * @param spatialThresholdEr Limiar de erro espacial aceitável
+	 */
+	public WsnMsgResponse(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType, double thresholdEr, double spatialThresholdEr) {
+		this.sequenceID = seqID;
+		this.origem = origem;
+		this.destino = destino;
+		this.forwardingHop = forwardingHop;
+		this.tipoMsg = tipo;
+		this.sizeTimeSlot = sizeTS;
+		this.dataSensedType = dataSensedType;
+		this.thresholdError = thresholdEr;
+		this.spacialThresholdError = spatialThresholdEr;
+	}
+
 	@Override
 	public Message clone() {
 		WsnMsgResponse msg = new WsnMsgResponse(this.sequenceID, this.origem, this.destino, this.forwardingHop, this.tipoMsg);
@@ -240,6 +275,8 @@ public class WsnMsgResponse extends Message {
 		msg.thresholdError = this.thresholdError;
 		msg.dataRecordItens = this.dataRecordItens;
 		msg.pathToSenderNode = this.pathToSenderNode;
+		msg.spacialThresholdError = this.spacialThresholdError;
+		msg.spatialPos = this.spatialPos;
 		return msg;
 	}
 
