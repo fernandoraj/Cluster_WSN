@@ -70,6 +70,11 @@ public class WsnMsgResponse extends Message {
 	public Position spatialPos;
 
 	/**
+	 * Battery level from the sensor at moment
+	 */
+	public double batLevel;
+	
+	/**
 	 * Caminho de nós do nó que envia a mensagem de resposta até o sink node, em forma de pilha
 	 */
 	private Stack<Integer> pathToSenderNode;
@@ -107,16 +112,22 @@ public class WsnMsgResponse extends Message {
 	
 	private char[] types;
 	
+	private double[] batLevels;
+	
+	private int[] rounds;
+	
 	public class DataRecord
 	{
 		char type;
 		double value;
 		double time;
+		double batLevel;
+		int round;
 	}
 	
 	public Vector<DataRecord> dataRecordItens;
 	
-	public void addDataRecordItens(char typ, double val, double tim)
+	public void addDataRecordItens(char typ, double val, double tim, double bat, int rnd)
 	{
 		if (this.dataRecordItens == null)
 		{
@@ -127,6 +138,8 @@ public class WsnMsgResponse extends Message {
 		dr.type = typ;
 		dr.value = val;
 		dr.time = tim;
+		dr.batLevel = bat;
+		dr.round = rnd;
 		
 		dataRecordItens.add(dr);
 		naoLido = true;
@@ -144,6 +157,8 @@ public class WsnMsgResponse extends Message {
 			values = new double[tam];
 			times = new double[tam];
 			types = new char[tam];
+			batLevels = new double[tam];
+			rounds = new int[tam];
 			
 			for (int i=0; i<tam; i++)
 			{
@@ -152,12 +167,16 @@ public class WsnMsgResponse extends Message {
 					values[i] = ((DataRecord)dataRecordItens.get(i)).value;
 					times[i] = ((DataRecord)dataRecordItens.get(i)).time;
 					types[i] = ((DataRecord)dataRecordItens.get(i)).type;
+					batLevels[i] = ((DataRecord)dataRecordItens.get(i)).batLevel;
+					rounds[i] = ((DataRecord)dataRecordItens.get(i)).round;
 				}
 				else
 				{
 					values[i] = 0.0;
 					times[i] = 0.0;
 					types[i] = ' ';
+					batLevels[i] = 0.0;
+					rounds[i] = 0;
 				}
 			}
 			
@@ -181,6 +200,18 @@ public class WsnMsgResponse extends Message {
 	{
 		lerDados();
 		return types;
+	}
+	
+	public double[] getDataRecordBatLevels()
+	{
+		lerDados();
+		return batLevels;
+	}
+	
+	public int[] getDataRecordRounds()
+	{
+		lerDados();
+		return rounds;
 	}
 	
 	/**
@@ -253,7 +284,7 @@ public class WsnMsgResponse extends Message {
 	 * @param thresholdEr Limiar de erro aceitável
 	 * @param spatialThresholdEr Limiar de erro espacial aceitável
 	 */
-	public WsnMsgResponse(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType, double thresholdEr, double spatialThresholdEr) {
+	public WsnMsgResponse(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType, double thresholdEr, double spatialThresholdEr, double batLevel) {
 		this.sequenceID = seqID;
 		this.origem = origem;
 		this.destino = destino;
@@ -263,6 +294,7 @@ public class WsnMsgResponse extends Message {
 		this.dataSensedType = dataSensedType;
 		this.thresholdError = thresholdEr;
 		this.spacialThresholdError = spatialThresholdEr;
+		this.batLevel = batLevel;
 	}
 
 	@Override
@@ -277,6 +309,7 @@ public class WsnMsgResponse extends Message {
 		msg.pathToSenderNode = this.pathToSenderNode;
 		msg.spacialThresholdError = this.spacialThresholdError;
 		msg.spatialPos = this.spatialPos;
+		msg.batLevel = this.batLevel;
 		return msg;
 	}
 
