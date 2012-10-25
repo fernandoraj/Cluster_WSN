@@ -2,11 +2,14 @@ package projects.wsnee.nodes.nodeImplementations;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.HashMap;
+import java.util.Iterator;
 
-import projects.wsn.nodes.messages.WsnMsg;
-import projects.wsn.nodes.messages.WsnMsgResponse;
-import projects.wsn.nodes.timers.WsnMessageTimer;
-import projects.wsn.utils.Utils;
+import projects.wsnee.nodes.messages.WsnMsg;
+import projects.wsnee.nodes.messages.WsnMsgResponse;
+import projects.wsnee.nodes.timers.WsnMessageTimer;
+import projects.wsnee.utils.Utils;
+import projects.wsnee.utils.ArrayList2d;
 import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
@@ -34,6 +37,16 @@ public class SinkNode extends SimpleNode
 	 * Percentual do limiar de erro espacial aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 */
 	private double spacialThresholdError = 0.01;
+	
+	/**
+	 * Maximum distance acceptable to the formation of clusters. If it is equal to zero (0.0), ignoring
+	 */
+	private double maxDistance = 0.0;
+	
+	/**
+	 * Array 2D (clusters) from sensors (Messages from sensors = WsnMsgResponse).
+	 */
+	private ArrayList2d<WsnMsgResponse> messageGroups;
 	
 	public SinkNode()
 	{
@@ -81,6 +94,222 @@ public class SinkNode extends SimpleNode
 			} //if (message instanceof WsnMsg)
 		} //while (inbox.hasNext())
 	} //public void handleMessages
+	
+	/**
+	 * Each line in "messageGroups" (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.origem), 
+	 * classified by Dissimilarity Measure from yours data sensed, stored on WsnMsgResponse.dataRecordItens
+	 *  
+	 * @param wsnMsgResp
+	 */
+	private void classifyNodeInClusterByMessage(WsnMsgResponse newWsnMsgResp)
+	{
+		if (messageGroups == null) // If there isn't a message group yet, then it does create one and adds the message to it
+		{
+			messageGroups = new ArrayList2d<WsnMsgResponse>();
+			messageGroups.ensureCapacity(54); // Ensure the capacity as the total number of sensors (nodes) in the data set
+			messageGroups.add(newWsnMsgResp, 0); // Add the initial message to the group (ArrayList2d of WsnMsgResponse)
+		}
+		else
+		{
+			boolean found = false;
+			int line = 0;
+			while ((!found) && (line < messageGroups.getNumRows()))
+			{
+				int col = 0;
+				boolean continueThisLine = true;
+				while ((continueThisLine) && (col < messageGroups.getNumCols(line)))
+				{
+					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
+					if (testDistanceBetweenSensorPositions(currentWsnMsgResp, newWsnMsgResp))
+					{
+						if (testDissimilarityMeasureWithPairRounds(currentWsnMsgResp, newWsnMsgResp)) // If this (new)message (with sensor readings) already is dissimilar to current message
+						{
+							continueThisLine = false; // Then this (new)message don't belongs to this cluster / line / group
+						}
+					}
+					col++;
+				}
+				if ((continueThisLine) && (col == messageGroups.getNumCols(line)))
+				{
+					found = true;
+					messageGroups.add(newWsnMsgResp, line);
+				}
+				else
+				{
+					line++;
+				}
+			}
+			if (!found)
+			{
+				messageGroups.add(newWsnMsgResp, messageGroups.getNumRows()); // It adds the new message "wsnMsgResp" in a new line (cluster) of messageGroup 
+			}
+/*				
+			for (int line = 0; line < messageGroups.getNumRows(); line++)
+			{
+				for (int col = 0; col < messageGroups.getNumCols(line); col++)
+				{
+					
+				}
+			}
+*/			
+		}
+	}
+	
+	private boolean testDistanceBetweenSensorPositions(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
+	{
+		boolean distanceOK = false;
+		if (maxDistance > 0.0)
+		{
+			if (currentWsnMsg.spatialPos.distanceTo(newWsnMsg.spatialPos) <= maxDistance)
+			{
+				distanceOK = true;
+			}
+/*
+			else
+			{
+				distanceOK = false;
+			}
+*/
+			// distanceOK = (currentWsnMsg.spatialPos.distanceTo(newWsnMsg.spatialPos) <= maxDistance); //Another form for the "if" (above) 
+		}
+		else if (maxDistance == 0.0) // Case the distance between sensors should be ignored
+		{
+			distanceOK = true;
+		}
+		return distanceOK;
+	}
+	
+/*
+	private boolean testDissimilarityMeasureWithoutPairRounds(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
+	{
+		return true;
+	}
+*/
+	
+	private boolean testDissimilarityMeasureWithPairRounds(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
+	{
+		boolean sameSize = true;
+		boolean mDissimilarityMagnitudeFound = false;
+		boolean tDissimilarityTrendFound = false;
+		
+		int currentSize = currentWsnMsg.dataRecordItens.size();
+		double[] currentValues = new double[currentSize];
+		double[] currentTimes = new double[currentSize];
+		char[] currentTypes = new char[currentSize];
+		double[] currentBatLevel = new double[currentSize];
+		int[] currentRound = new int[currentSize];
+		
+		//Data read from current sensor (from ArrayList2d)
+		currentValues = currentWsnMsg.getDataRecordValues();
+		currentTimes = currentWsnMsg.getDataRecordTimes();
+		currentTypes = currentWsnMsg.getDataRecordTypes();
+		currentBatLevel = currentWsnMsg.getDataRecordBatLevels();
+		currentRound = currentWsnMsg.getDataRecordRounds();
+
+		
+		int newSize = newWsnMsg.dataRecordItens.size();
+		double[] newValues = new double[newSize];
+		double[] newTimes = new double[newSize];
+		char[] newTypes = new char[newSize];
+		double[] newBatLevel = new double[newSize];
+		int[] newRound = new int[newSize];
+		
+		//Data read from new sensor (from message received)
+		newValues = newWsnMsg.getDataRecordValues();
+		newTimes = newWsnMsg.getDataRecordTimes();
+		newTypes = newWsnMsg.getDataRecordTypes();
+		newBatLevel = newWsnMsg.getDataRecordBatLevels();
+		newRound = newWsnMsg.getDataRecordRounds();
+
+		HashMap<Integer, Double> hashCurrentMsg, hashNewMsg;
+		
+		hashCurrentMsg = new HashMap<Integer, Double>();
+		hashNewMsg = new HashMap<Integer, Double>();
+		
+		// Populates 2 HashMaps with the values from currentWsnMsg and newWsnMsg
+		for (int i=0,j=0; (i < currentSize || j < newSize); i++, j++)
+		{
+			if (i < currentSize)
+			{	
+				hashCurrentMsg.put(currentRound[i], currentValues[i]);
+			}
+			if (j < newSize)
+			{
+				hashNewMsg.put(newRound[j], newValues[j]);
+			}
+		}
+
+
+/*
+		Iterator<Double> it = hashCurrentMsg.values().iterator();
+		
+		while (it.hasNext())
+		{
+		    System.out.println(it.next());
+		}
+*/	
+		
+		for (int i : hashCurrentMsg.keySet())
+		{
+			if (hashNewMsg.containsKey(i) && (Math.abs(hashCurrentMsg.get(i) - hashNewMsg.get(i)) > spacialThresholdError))
+			{
+				mDissimilarityMagnitudeFound = true;
+				return mDissimilarityMagnitudeFound;
+/*
+				if (Math.abs(hashCurrentMsg.get(i) - hashNewMsg.get(i)) > spacialThresholdError)
+				{
+					mDissimilarityMagnitudeFound = true;
+				}
+*/				
+			}
+		}
+		
+		int contQ1 = 0;
+		int contQ = currentSize; // = newSize;
+		for (int i=1,j=1; (i < currentSize && j < newSize); i++, j++)
+		{
+			double difX, difY;			
+			difX = (currentValues[i] - currentValues[i-1]);
+			difY = (newValues[j] - newValues[j-1]);
+			if ((difX * difY) >= 0)
+			{
+				contQ1++;
+			}
+		}
+		if (contQ1/contQ < thresholdError)
+		{
+			tDissimilarityTrendFound = true;
+			return tDissimilarityTrendFound;
+		}
+		
+/*
+		if (currentSize != newSize)
+		{
+			sameSize = false; // Size from (2) data sets are different
+		}
+		
+		if (sameSize && compareDataSetValuesPairToPair(currentValues, newValues, currentSize))
+		{
+			
+		}
+*/	
+		return (mDissimilarityMagnitudeFound || tDissimilarityTrendFound);
+	}
+
+	private boolean compareDataSetValuesPairToPair(double[] valuesC, double[] valuesN, int size)
+	{
+		boolean ok = true;
+		int cont = 0;
+		while (ok && (cont<size))
+		{
+			if (Math.abs(valuesC[cont] - valuesN[cont]) > spacialThresholdError)
+			{
+				ok = false;
+			}
+			cont++;
+		}
+		return ok;
+	}
 	
 	private void receiveMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 	{
