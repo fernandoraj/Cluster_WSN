@@ -42,7 +42,7 @@ public class ArrayList2d<Type>
 	/**
 	 * Adds an item at the end of the specified row. This will guarantee that at least row rows exist.
 	 */
-	public void Add(Type data, int row)
+	public void add(Type data, int row)
 	{
 		ensureCapacity(row);
 		while(row >= getNumRows())
