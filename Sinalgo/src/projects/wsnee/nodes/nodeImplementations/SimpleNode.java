@@ -8,13 +8,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
-import projects.wsn.nodes.messages.WsnMsg;
-import projects.wsn.nodes.messages.WsnMsgResponse;
-import projects.wsn.nodes.timers.PredictionTimer;
-import projects.wsn.nodes.timers.WsnMessageResponseTimer;
-import projects.wsn.nodes.timers.WsnMessageTimer;
-import projects.wsn.utils.FileHandler;
-import projects.wsn.utils.Utils;
+import projects.wsnee.nodes.messages.WsnMsg;
+import projects.wsnee.nodes.messages.WsnMsgResponse;
+import projects.wsnee.nodes.timers.PredictionTimer;
+import projects.wsnee.nodes.timers.WsnMessageResponseTimer;
+import projects.wsnee.nodes.timers.WsnMessageTimer;
+import projects.wsnee.utils.FileHandler;
+import projects.wsnee.utils.Utils;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.configuration.WrongConfigurationException;
@@ -64,6 +64,11 @@ public class SimpleNode extends Node
 	 * Tempo (data/hora em milisegundos) da última leitura do sensor 
 	 */
 	protected double lastTimeRead;
+	
+	/**
+	 * Last voltage level of the battery from sensor  
+	 */
+	protected double lastBatLevel;
 	
 	/**
 	 * Stores sensor readings of this node loaded from the sensor readings file.
@@ -241,12 +246,20 @@ public class SimpleNode extends Node
 	{
 		
 		int medida = 0;
+		int numSequenceVoltageData = 7; //Position of voltage data according the data structure in "data*.txt" file
+		int numSequenceRound = 2;
+/*
+ * Exemple:
+ * 				2004-03-21 19:02:26.792489 65528 4 87.383 45.4402 5.52 2.31097
+ * Position         [0]         [1]         [2] [3]  [4]    [5]    [6]   [7]
+ * Data type       Data         Hora       Round ID  Temp   Hum    Lum   Volt
+ */
 		if (dataSensedType != null)
 		{
 			medida = identificarTipo(dataSensedType);
 		}
 		String dataLine = performSensorReading();
-		int cont = 0, i=0;
+		int i=0; //cont = 0 
 		while (i<sizeTimeSlot && dataLine != null)
 		{
 			i++;
@@ -255,12 +268,16 @@ public class SimpleNode extends Node
 				String linhas[] = dataLine.split(" ");
 				double value;
 				double quantTime;
+				double batLevel;
+				int round;
 //				Utils.printForDebug("(ultimoRoundLido + sizeTimeSlot) = "+(ultimoRoundLido + sizeTimeSlot));
 //				Utils.printForDebug("cont = "+cont);
 				if (linhas.length > 4)
 				{
-					cont++;
-					ultimoRoundLido = Integer.parseInt(linhas[2]); //Número do round 
+//					cont++;
+					
+					round = Integer.parseInt(linhas[numSequenceRound]); //Número do round
+					
 					if (linhas[medida] == null || linhas[medida].equals(""))
 					{
 						value = 0.0;
@@ -276,13 +293,33 @@ public class SimpleNode extends Node
 							value = 0.0;
 						}//catch
 					}//else
+					
+					if (linhas[numSequenceVoltageData] == null || linhas[numSequenceVoltageData].equals(""))
+					{
+						batLevel = 0.0;
+					}
+					else
+					{
+						try
+						{
+							batLevel = Double.parseDouble(linhas[numSequenceVoltageData]);
+						}//try
+						catch (NumberFormatException e)
+						{
+							batLevel = 0.0;
+						}//catch
+					}//else
+					
 					quantTime = parseCalendarHoras(linhas[0], linhas[1]);
 					
 					lastValueRead = value;
 					lastTimeRead = quantTime;
-					addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
+					lastBatLevel = batLevel;
+					ultimoRoundLido = round;
 
-					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
+					addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
+
+					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
 					
 				}//if (linhas.length > 4)
 			}//if (dataLine != null && dataSensedType != null && medida != 0)
@@ -442,7 +479,7 @@ public class SimpleNode extends Node
 	/**
 	 * Identifica o tipo de dados a ser lido (posição na linha) de acordo com a string passada, conforme o exemplo abaixo:
 	 * 				2004-03-21 19:02:26.792489 65528 4 87.383 45.4402 5.52 2.31097
-	 * Posição          [1]         [2]         [3] [4]  [5]    [6]    [7]   [8]
+	 * Posição          [0]         [1]         [2] [3]  [4]    [5]    [6]   [7]
 	 * Tipo de dado    Data         Hora       Round ID  Temp   Hum    Lum   Volt
 	 * 
 	 * Onde: Data e Hora são a data e o horário em que ocorreu a leitura dos valores sensoreados
@@ -547,6 +584,15 @@ public class SimpleNode extends Node
 	protected void triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError)
 	{
 		int medida = 0;
+		int numSequenceVoltageData = 7; //According the data structure in "data*.txt" file
+		int numSequenceRound = 2;
+/*
+ * Exemple:
+ * 				2004-03-21 19:02:26.792489 65528 4 87.383 45.4402 5.52 2.31097
+ * Position         [0]         [1]         [2] [3]  [4]    [5]    [6]   [7]
+ * Data type       Data         Hora       Round ID  Temp   Hum    Lum   Volt
+ */
+
 		if (dataSensedType != null)
 		{
 			medida = identificarTipo(dataSensedType);
@@ -557,6 +603,7 @@ public class SimpleNode extends Node
 			String linhas[] = sensorReading.split(" ");
 			double value;
 			double quantTime;
+			double batLevel;
 			if (linhas.length > 4)
 			{
 				if (linhas[medida] == null || linhas[medida].equals(""))
@@ -574,10 +621,29 @@ public class SimpleNode extends Node
 						value = 0.0;
 					}//catch
 				}//else
+				
+				if (linhas[numSequenceVoltageData] == null || linhas[numSequenceVoltageData].equals(""))
+				{
+					batLevel = 0.0;
+				}
+				else
+				{
+					try
+					{
+						batLevel = Double.parseDouble(linhas[numSequenceVoltageData]);
+					}//try
+					catch (NumberFormatException e)
+					{
+						batLevel = 0.0;
+					}//catch
+				}//else
+
+				int round = Integer.parseInt(linhas[numSequenceRound]); //Número do round
+				
 				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
 				double predictionValue = makePrediction(coefA, coefB, quantTime);
 				
-				addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
+				addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
 				
 				if (isValuePredictInValueReading(value, predictionValue, maxError))
 				{
@@ -607,7 +673,7 @@ public class SimpleNode extends Node
 					//Adds the last values ​​previously read to the message that goes to the sink
 					for(int cont=0; cont<dataRecordItens.size(); cont++) //for(int cont=0; cont<slidingWindowSize; cont++)
 					{
-						wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).type, dataRecordItens.get(cont).value, dataRecordItens.get(cont).time); 
+						wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).type, dataRecordItens.get(cont).value, dataRecordItens.get(cont).time, dataRecordItens.get(cont).batLevel, dataRecordItens.get(cont).round); 
 					}
 					
 					addThisNodeToPath(wsnMsgResp);
@@ -666,11 +732,13 @@ public class SimpleNode extends Node
 		char type;
 		double value;
 		double time;
+		double batLevel;
+		int round;
 	}
 	
 	public Vector<DataRecord> dataRecordItens;
 	
-	public void addDataRecordItens(char typ, double val, double tim)
+	public void addDataRecordItens(char typ, double val, double tim, double bat, int rnd)
 	{
 		if (this.dataRecordItens == null)
 		{
@@ -681,6 +749,8 @@ public class SimpleNode extends Node
 		dr.type = typ;
 		dr.value = val;
 		dr.time = tim;
+		dr.batLevel = bat;
+		dr.round = rnd;
 		
 		dataRecordItens.add(dr);
 		//Implements a FIFO structure with the vector 'dataRecordItens' with at most 'slidingWindowSize' elements
