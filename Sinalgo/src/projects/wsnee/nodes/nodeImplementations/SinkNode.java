@@ -3,7 +3,7 @@ package projects.wsnee.nodes.nodeImplementations;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.HashMap;
-import java.util.Iterator;
+//import java.util.Iterator;
 
 import projects.wsnee.nodes.messages.WsnMsg;
 import projects.wsnee.nodes.messages.WsnMsgResponse;
@@ -48,6 +48,11 @@ public class SinkNode extends SimpleNode
 	 */
 	private ArrayList2d<WsnMsgResponse> messageGroups;
 	
+	/**
+	 * Number of messages received by sink node from all other sensors nodes
+	 */
+	private int numMessagesReceived = 0;
+	
 	public SinkNode()
 	{
 		super();
@@ -90,16 +95,62 @@ public class SinkNode extends SimpleNode
 			{
 				this.setColor(Color.YELLOW);
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
-				receiveMessage(wsnMsgResp, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedType);
+				classifyNodeInClusterByMessage(wsnMsgResp);
+				numMessagesReceived++;
+				if (numMessagesReceived >= 54)
+				{
+					classifyRepresentativeNodesByResidualEnergy();
+				}
+//				receiveMessage(wsnMsgResp, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedType);
 			} //if (message instanceof WsnMsg)
 		} //while (inbox.hasNext())
 	} //public void handleMessages
 	
 	/**
+	 * It selects the Representative Node for each line (group) from sensors by the max residual energy and puts him in the first position (in line)
+	 */
+	private void classifyRepresentativeNodesByResidualEnergy()
+	{
+		if (messageGroups != null) // If there is a message group created
+		{
+			for (int line=0; line < messageGroups.getNumRows(); line++)
+			{
+				double maxBatLevel = 0.0;
+				int maxIndex = 0;
+				for (int col=0; col < messageGroups.getNumCols(line); col++)
+				{
+					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
+					double currentBatLevel = currentWsnMsgResp.batLevel;
+					int currentIndex = col;
+					if (currentBatLevel > maxBatLevel)
+					{
+						maxIndex = currentIndex;
+					}
+					 
+				}
+				if (maxIndex != 0)
+				{
+					changeMessageMaxBatLevelPosition(line, maxIndex);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Change the message with maximum battery level for the first position [0] in that line from array
+	 * @param line
+	 * @param maxIndex
+	 */
+	private void changeMessageMaxBatLevelPosition(int line, int maxIndex)
+	{
+		messageGroups.move(line, maxIndex, 0);
+	}
+	
+	/**
 	 * Each line in "messageGroups" (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.origem), 
 	 * classified by Dissimilarity Measure from yours data sensed, stored on WsnMsgResponse.dataRecordItens
 	 *  
-	 * @param wsnMsgResp
+	 * @param wsnMsgResp Message to be used for classify the sensor node
 	 */
 	private void classifyNodeInClusterByMessage(WsnMsgResponse newWsnMsgResp)
 	{
@@ -124,7 +175,7 @@ public class SinkNode extends SimpleNode
 					{
 						if (testDissimilarityMeasureWithPairRounds(currentWsnMsgResp, newWsnMsgResp)) // If this (new)message (with sensor readings) already is dissimilar to current message
 						{
-							continueThisLine = false; // Then this (new)message don't belongs to this cluster / line / group
+							continueThisLine = false; // Then this (new)message doesn't belong to this cluster / line / group
 						}
 					}
 					col++;
@@ -186,39 +237,54 @@ public class SinkNode extends SimpleNode
 	}
 */
 	
+	/**
+	 * It tests if there is dissimilarity (lack of similarity) between the 2 set of measure from 2 sensor brought by the 2 messages
+	 * @param currentWsnMsg Represents the current message from the group of messages (messageGroups) in a "ArrayList2d<WsnMsgResponse>" structure
+	 * @param newWsnMsg Represents the recently arrived message in the sink node, sent from the source sensor node
+	 * @return True case the two messages are DISsimilar, i.e., from different clusters (or "groups"); False, otherwise
+	 */
+	
 	private boolean testDissimilarityMeasureWithPairRounds(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 	{
-		boolean sameSize = true;
+//		boolean sameSize = true;
 		boolean mDissimilarityMagnitudeFound = false;
 		boolean tDissimilarityTrendFound = false;
 		
 		int currentSize = currentWsnMsg.dataRecordItens.size();
 		double[] currentValues = new double[currentSize];
+/*
 		double[] currentTimes = new double[currentSize];
 		char[] currentTypes = new char[currentSize];
 		double[] currentBatLevel = new double[currentSize];
+*/
 		int[] currentRound = new int[currentSize];
 		
 		//Data read from current sensor (from ArrayList2d)
 		currentValues = currentWsnMsg.getDataRecordValues();
+/*
 		currentTimes = currentWsnMsg.getDataRecordTimes();
 		currentTypes = currentWsnMsg.getDataRecordTypes();
 		currentBatLevel = currentWsnMsg.getDataRecordBatLevels();
+*/
 		currentRound = currentWsnMsg.getDataRecordRounds();
 
 		
 		int newSize = newWsnMsg.dataRecordItens.size();
 		double[] newValues = new double[newSize];
+/*
 		double[] newTimes = new double[newSize];
 		char[] newTypes = new char[newSize];
 		double[] newBatLevel = new double[newSize];
+*/
 		int[] newRound = new int[newSize];
 		
 		//Data read from new sensor (from message received)
 		newValues = newWsnMsg.getDataRecordValues();
+/*
 		newTimes = newWsnMsg.getDataRecordTimes();
 		newTypes = newWsnMsg.getDataRecordTypes();
 		newBatLevel = newWsnMsg.getDataRecordBatLevels();
+*/
 		newRound = newWsnMsg.getDataRecordRounds();
 
 		HashMap<Integer, Double> hashCurrentMsg, hashNewMsg;
@@ -265,7 +331,7 @@ public class SinkNode extends SimpleNode
 		}
 		
 		int contQ1 = 0;
-		int contQ = currentSize; // = newSize;
+		int contQ = currentSize; // = newSize; // Total size of sensed values from node
 		for (int i=1,j=1; (i < currentSize && j < newSize); i++, j++)
 		{
 			double difX, difY;			
@@ -318,11 +384,11 @@ public class SinkNode extends SimpleNode
 			int size = wsnMsgResp.dataRecordItens.size();
 			double[] valores = new double[size];
 			double[] tempos = new double[size];
-			char[] tipos = new char[size];
+//			char[] tipos = new char[size];
 			//Dados lidos do sensor correspondente
 			valores = wsnMsgResp.getDataRecordValues();
 			tempos = wsnMsgResp.getDataRecordTimes();
-			tipos = wsnMsgResp.getDataRecordTypes();
+//			tipos = wsnMsgResp.getDataRecordTypes();
 			//Coeficientes de regressão linear com os vetores acima
 			double coeficienteA, coeficienteB;
 			double mediaTempos, mediaValores;
