@@ -328,6 +328,7 @@ public class SimpleNode extends Node
 				dataLine = performSensorReading();
 			}//if (i<sizeTimeSlot)
 		}//while (i<sizeTimeSlot && dataLine != null)
+		wsnMsgResp.batLevel = lastBatLevel; // Level of battery from last reading of sensor node
 	}
 	
 	/**
