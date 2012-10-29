@@ -52,6 +52,12 @@ public class ArrayList2d<Type>
 		array.get(row).add(data);
 	}
  
+	/**
+	 * Returns the element at the specified position (row,col) in this list2d, without removing it from list2d
+	 * @param row Line number in which the element is 
+	 * @param col Column number in which the element is
+	 * @return The element required
+	 */
 	public Type get(int row, int col)
 	{
 		return array.get(row).get(col);
@@ -62,11 +68,21 @@ public class ArrayList2d<Type>
 		array.get(row).set(col,data);
 	}
  
+	public void add(int row, int col, Type data)
+	{
+		array.get(row).add(col,data);
+	}
+
 	public void remove(int row, int col)
 	{
 		array.get(row).remove(col);
 	}
  
+	public void move(int row, int colSource, int colDest)
+	{
+		array.get(row).add(colDest, array.get(row).remove(colSource)); // To be tested!?
+	}
+
 	public boolean contains(Type data)
 	{
 		for (int i = 0; i < array.size(); i++)
