@@ -99,7 +99,11 @@ public class SinkNode extends SimpleNode
 				numMessagesReceived++;
 				if (numMessagesReceived >= 54)
 				{
+					Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
+					printMessageGroupsArray2d();
 					classifyRepresentativeNodesByResidualEnergy();
+					Utils.printForDebug("@ @ @ MessageGroups AFTER classification:\n");
+					printMessageGroupsArray2d();
 				}
 //				receiveMessage(wsnMsgResp, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedType);
 			} //if (message instanceof WsnMsg)
@@ -126,12 +130,27 @@ public class SinkNode extends SimpleNode
 					{
 						maxIndex = currentIndex;
 					}
-					 
 				}
 				if (maxIndex != 0)
 				{
 					changeMessageMaxBatLevelPosition(line, maxIndex);
 				}
+			}
+		}
+	}
+	
+	private void printMessageGroupsArray2d()
+	{
+		if (messageGroups != null) // If there is a message group created
+		{
+			for (int line=0; line < messageGroups.getNumRows(); line++)
+			{
+				for (int col=0; col < messageGroups.getNumCols(line); col++)
+				{
+					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
+					Utils.printForDebug("Line = "+line+", Col = "+col+": NodeID = "+currentWsnMsgResp.origem.ID+" BatLevel = "+currentWsnMsgResp.batLevel);
+				}
+				Utils.printForDebug("\n");
 			}
 		}
 	}
