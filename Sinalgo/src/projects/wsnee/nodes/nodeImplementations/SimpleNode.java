@@ -234,6 +234,7 @@ public class SimpleNode extends Node
 	private void addThisNodeToPath(WsnMsgResponse wsnMsgResp)
 	{
 		wsnMsgResp.pushToPath(this.ID);
+		wsnMsgResp.saltosAteDestino++;
 	}
 	
 	/**
