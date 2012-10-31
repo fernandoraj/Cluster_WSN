@@ -1,6 +1,6 @@
 package projects.wsnee.nodes.timers;
 
-import projects.wsn.nodes.nodeImplementations.SimpleNode;
+import projects.wsnee.nodes.nodeImplementations.SimpleNode;
 import sinalgo.nodes.timers.Timer;
 
 public class PredictionTimer extends Timer {
