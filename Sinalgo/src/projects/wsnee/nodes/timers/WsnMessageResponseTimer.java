@@ -1,7 +1,7 @@
 package projects.wsnee.nodes.timers;
 
-import projects.wsn.nodes.messages.WsnMsgResponse;
-import projects.wsn.nodes.nodeImplementations.SimpleNode;
+import projects.wsnee.nodes.messages.WsnMsgResponse;
+import projects.wsnee.nodes.nodeImplementations.SimpleNode;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.timers.Timer;
 
