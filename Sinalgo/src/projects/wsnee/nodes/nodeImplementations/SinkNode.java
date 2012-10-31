@@ -3,7 +3,7 @@ package projects.wsnee.nodes.nodeImplementations;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.HashMap;
-//import java.util.Iterator;
+import java.util.Set;
 
 import projects.wsnee.nodes.messages.WsnMsg;
 import projects.wsnee.nodes.messages.WsnMsgResponse;
@@ -31,12 +31,17 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 */
-	private double thresholdError = 0.01;
+	private double thresholdError = 0.1;
 	
 	/**
-	 * Percentual do limiar de erro espacial aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
+	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 */
-	private double spacialThresholdError = 0.01;
+	private double spacialThresholdError = 1.0;
+	
+	/**
+	 * Percentual mínimo das medições de 2 sensores a ficar dentro dos limiares aceitáveis para que os mesmos sejam classificados no mesmo cluster
+	 */
+	private double metaThreshold = 0.5;
 	
 	/**
 	 * Maximum distance acceptable to the formation of clusters. If it is equal to zero (0.0), ignoring
@@ -102,8 +107,11 @@ public class SinkNode extends SimpleNode
 					Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
 					printMessageGroupsArray2d();
 					classifyRepresentativeNodesByResidualEnergy();
-					Utils.printForDebug("@ @ @ MessageGroups AFTER classification:\n");
+					Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
 					printMessageGroupsArray2d();
+					classifyRepresentativeNodesByHopsToSink();
+					Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
+					printMessageGroupsArray2d();					
 				}
 //				receiveMessage(wsnMsgResp, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedType);
 			} //if (message instanceof WsnMsg)
@@ -120,7 +128,7 @@ public class SinkNode extends SimpleNode
 			for (int line=0; line < messageGroups.getNumRows(); line++)
 			{
 				double maxBatLevel = 0.0;
-				int maxIndex = 0;
+				int maxBatLevelIndexInThisLine = 0;
 				for (int col=0; col < messageGroups.getNumCols(line); col++)
 				{
 					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
@@ -128,12 +136,39 @@ public class SinkNode extends SimpleNode
 					int currentIndex = col;
 					if (currentBatLevel > maxBatLevel)
 					{
-						maxIndex = currentIndex;
+						maxBatLevelIndexInThisLine = currentIndex;
 					}
 				}
-				if (maxIndex != 0)
+				if (maxBatLevelIndexInThisLine != 0)
 				{
-					changeMessageMaxBatLevelPosition(line, maxIndex);
+					changeMessagePositionInLine(line, maxBatLevelIndexInThisLine);
+				}
+			}
+		}
+	}
+	
+	private void classifyRepresentativeNodesByHopsToSink()
+	{
+		if (messageGroups != null) // If there is a message group created
+		{
+			for (int line=0; line < messageGroups.getNumRows(); line++)
+			{
+				if (messageGroups.get(line, 0) != null)
+				{
+					int minIndexNumHopsToSink = 0;
+					boolean sameBatLevel = false;
+					WsnMsgResponse firstWsnMsgRespInLine = messageGroups.get(line, 0);
+					int col=1;
+					while ((col < messageGroups.getNumCols(line)) && (messageGroups.get(line, col).batLevel == firstWsnMsgRespInLine.batLevel) && (messageGroups.get(line, col).saltosAteDestino < firstWsnMsgRespInLine.saltosAteDestino) )
+					{
+						minIndexNumHopsToSink = col;
+						sameBatLevel = true;
+						col++;
+					}
+					if (sameBatLevel)
+					{
+						changeMessagePositionInLine(line, minIndexNumHopsToSink);
+					}
 				}
 			}
 		}
@@ -156,13 +191,13 @@ public class SinkNode extends SimpleNode
 	}
 	
 	/**
-	 * Change the message with maximum battery level for the first position [0] in that line from array
+	 * Change the message from "index" position for the first position [0] in that line from array
 	 * @param line
-	 * @param maxIndex
+	 * @param index
 	 */
-	private void changeMessageMaxBatLevelPosition(int line, int maxIndex)
+	private void changeMessagePositionInLine(int line, int index)
 	{
-		messageGroups.move(line, maxIndex, 0);
+		messageGroups.move(line, index, 0);
 	}
 	
 	/**
@@ -325,28 +360,27 @@ public class SinkNode extends SimpleNode
 		}
 
 
-/*
-		Iterator<Double> it = hashCurrentMsg.values().iterator();
+		int maxSizeOf2Msg = Math.max(currentSize, newSize);		
 		
-		while (it.hasNext())
-		{
-		    System.out.println(it.next());
-		}
-*/	
+		int numDissimilarity = 0;
 		
-		for (int i : hashCurrentMsg.keySet())
+		Set<Integer> keys = hashCurrentMsg.keySet();
+		for (Integer key : keys)
 		{
-			if (hashNewMsg.containsKey(i) && (Math.abs(hashCurrentMsg.get(i) - hashNewMsg.get(i)) > spacialThresholdError))
+			if (hashNewMsg.containsKey(key))
 			{
-				mDissimilarityMagnitudeFound = true;
-				return mDissimilarityMagnitudeFound;
-/*
-				if (Math.abs(hashCurrentMsg.get(i) - hashNewMsg.get(i)) > spacialThresholdError)
+				double curValue = hashCurrentMsg.get(key);
+				double newValue = hashNewMsg.get(key);
+				if (Math.abs(curValue - newValue) > spacialThresholdError)
 				{
-					mDissimilarityMagnitudeFound = true;
+					numDissimilarity++;
 				}
-*/				
 			}
+		}
+		if (numDissimilarity > metaThreshold * maxSizeOf2Msg)
+		{
+			mDissimilarityMagnitudeFound = true;
+			return mDissimilarityMagnitudeFound;
 		}
 		
 		int contQ1 = 0;
