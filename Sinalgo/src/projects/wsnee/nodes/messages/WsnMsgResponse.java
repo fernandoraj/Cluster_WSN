@@ -248,6 +248,7 @@ public class WsnMsgResponse extends Message {
 		this.tipoMsg = tipo;
 		this.sizeTimeSlot = sizeTS;
 		this.dataSensedType = dataSensedType;
+		this.saltosAteDestino = 0;
 	}
 
 	/**
