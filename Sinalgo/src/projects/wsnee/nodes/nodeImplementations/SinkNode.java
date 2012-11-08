@@ -19,31 +19,43 @@ public class SinkNode extends SimpleNode
 {
 
 	/**
-	 * Numero de dados sensoreados por time slot (Tamanho do time slot) 
+	 * Numero de dados sensoriados por time slot (Tamanho do time slot)
+	 * Number of sensed data per time slot (time slot size)
 	 */
 	private Integer sizeTimeSlot = 100;
 	
 	/**
-	 * Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
+	 * Tipo de dado a ser sensoriado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
+	 * Type of data to be sensed (read in the sensor nodes), which can be: "t" = temperature, "h" = humidity, "l" = brightness or "v" = voltage
 	 */
 	private String dataSensedType = "h";
 	
 	/**
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
+	 * Percentage of temporal acceptable error threshold for the readings of sensor nodes, which may be between 0.0 (accepts no errors) and 1.0 (accepts any error)
 	 */
 	private double thresholdError = 0.1;
 	
 	/**
 	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
+	 * Limit of acceptable magnitude difference (spatial error) for the readings of sensor nodes / - which can be between 0.0 (no errors accepted) and 1.0 (accepts any error)
 	 */
-	private double spacialThresholdError = 1.0;
+	private double spacialThresholdError = 1.5;
 	
 	/**
-	 * Percentual mínimo das medições de 2 sensores a ficar dentro dos limiares aceitáveis para que os mesmos sejam classificados no mesmo cluster
+	 * Percentual mínimo do número de rounds iguais das medições de 2 sensores para que os mesmos sejam classificados no mesmo cluster
+	 * Minimum percentage of the number of equal measurement rounds of 2 sensors so that they are classified in the same cluster
+	 */
+	private double equalRoundsThreshold = 0.5;
+	
+	/**
+	 * Percentual mínimo das medições de 2 sensores (no mesmo round) a ficar dentro dos limiares aceitáveis para que os mesmos sejam classificados no mesmo cluster
+	 * Minimum percentage of measurements of two sensors (in the same round) to stay within the acceptable thresholds for them to be classified in the same cluster
 	 */
 	private double metaThreshold = 0.5;
 	
 	/**
+	 * Distância máxima aceitável para a formação de clusters. Se for igual a zero (0,0), não considerar tal limite (distância)
 	 * Maximum distance acceptable to the formation of clusters. If it is equal to zero (0.0), ignoring
 	 */
 	private double maxDistance = 0.0;
@@ -106,12 +118,25 @@ public class SinkNode extends SimpleNode
 				{
 					Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
 					printMessageGroupsArray2d();
+					
 					classifyRepresentativeNodesByResidualEnergy();
+					
 					Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
 					printMessageGroupsArray2d();
+					
 					classifyRepresentativeNodesByHopsToSink();
+					
 					Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
-					printMessageGroupsArray2d();					
+					printMessageGroupsArray2d();
+					
+					if (messageGroups != null) // If there is a message group created
+					{
+						for (int line=0; line < messageGroups.getNumRows(); line++)
+						{
+							WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(line, 0);
+							receiveMessage(wsnMsgResponseRepresentative);
+						}
+					}
 				}
 //				receiveMessage(wsnMsgResp, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedType);
 			} //if (message instanceof WsnMsg)
@@ -129,19 +154,27 @@ public class SinkNode extends SimpleNode
 			{
 				double maxBatLevel = 0.0;
 				int maxBatLevelIndexInThisLine = 0;
-				for (int col=0; col < messageGroups.getNumCols(line); col++)
+				int bubbleLevel = 0;
+				while (bubbleLevel < (messageGroups.getNumCols(line) - 1))
 				{
-					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
-					double currentBatLevel = currentWsnMsgResp.batLevel;
-					int currentIndex = col;
-					if (currentBatLevel > maxBatLevel)
+					for (int col=bubbleLevel; col < messageGroups.getNumCols(line); col++)
 					{
-						maxBatLevelIndexInThisLine = currentIndex;
+						WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
+						double currentBatLevel = currentWsnMsgResp.batLevel;
+						int currentIndex = col;
+						if (currentBatLevel > maxBatLevel)
+						{
+							maxBatLevel = currentBatLevel;
+							maxBatLevelIndexInThisLine = currentIndex;
+						}
 					}
-				}
-				if (maxBatLevelIndexInThisLine != 0)
-				{
-					changeMessagePositionInLine(line, maxBatLevelIndexInThisLine);
+					if (maxBatLevelIndexInThisLine != 0)
+					{
+						messageGroups.move(line, maxBatLevelIndexInThisLine, bubbleLevel);//changeMessagePositionInLine(line, maxBatLevelIndexInThisLine);
+					}
+					bubbleLevel++;
+					maxBatLevel = 0.0;
+					maxBatLevelIndexInThisLine = 0;
 				}
 			}
 		}
@@ -187,6 +220,7 @@ public class SinkNode extends SimpleNode
 				}
 				Utils.printForDebug("\n");
 			}
+			Utils.printForDebug("Number of Lines / Clusters = "+messageGroups.getNumRows());
 		}
 	}
 	
@@ -227,9 +261,13 @@ public class SinkNode extends SimpleNode
 					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
 					if (testDistanceBetweenSensorPositions(currentWsnMsgResp, newWsnMsgResp))
 					{
-						if (testDissimilarityMeasureWithPairRounds(currentWsnMsgResp, newWsnMsgResp)) // If this (new)message (with sensor readings) already is dissimilar to current message
+						if (testSimilarityMeasureWithPairRounds(currentWsnMsgResp, newWsnMsgResp)) // If this (new)message (with sensor readings) already is dissimilar to current message
 						{
-							continueThisLine = false; // Then this (new)message doesn't belong to this cluster / line / group
+							continueThisLine = true; // Then this (new)message doesn't belong to this cluster / line / group
+						}
+						else
+						{
+							continueThisLine = false;
 						}
 					}
 					col++;
@@ -298,11 +336,11 @@ public class SinkNode extends SimpleNode
 	 * @return True case the two messages are DISsimilar, i.e., from different clusters (or "groups"); False, otherwise
 	 */
 	
-	private boolean testDissimilarityMeasureWithPairRounds(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
+	private boolean testSimilarityMeasureWithPairRounds(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 	{
 //		boolean sameSize = true;
-		boolean mDissimilarityMagnitudeFound = false;
-		boolean tDissimilarityTrendFound = false;
+		boolean mSimilarityMagnitude = false;
+		boolean tSimilarityTrend = false;
 		
 		int currentSize = currentWsnMsg.dataRecordItens.size();
 		double[] currentValues = new double[currentSize];
@@ -360,31 +398,40 @@ public class SinkNode extends SimpleNode
 		}
 
 
-		int maxSizeOf2Msg = Math.max(currentSize, newSize);		
+//		int maxSizeOf2Msg = Math.max(currentSize, newSize);		
 		
-		int numDissimilarity = 0;
+//		int numDissimilarity = 0;
+		
+		int numEqualKeys = 0;
+		
+		double sumDifs = 0.0;
 		
 		Set<Integer> keys = hashCurrentMsg.keySet();
 		for (Integer key : keys)
 		{
 			if (hashNewMsg.containsKey(key))
 			{
+				numEqualKeys++;
 				double curValue = hashCurrentMsg.get(key);
 				double newValue = hashNewMsg.get(key);
-				if (Math.abs(curValue - newValue) > spacialThresholdError)
-				{
-					numDissimilarity++;
-				}
+				sumDifs += Math.abs(curValue - newValue);
 			}
 		}
-		if (numDissimilarity > metaThreshold * maxSizeOf2Msg)
+
+		if ((numEqualKeys > 0) && (sumDifs/numEqualKeys <= spacialThresholdError))
 		{
-			mDissimilarityMagnitudeFound = true;
-			return mDissimilarityMagnitudeFound;
+			mSimilarityMagnitude = true;
+//			return mSimilarityMagnitude;
 		}
-		
-		int contQ1 = 0;
-		int contQ = currentSize; // = newSize; // Total size of sensed values from node
+/*
+		if ((numEqualKeys >= equalRoundsThreshold * maxSizeOf2Msg) && (numDissimilarity >= metaThreshold * numEqualKeys))
+		{
+			mSimilarityMagnitude = true;
+			return mSimilarityMagnitude;
+		}
+*/		
+		double contN1 = 0.0;
+		double contN = currentSize; // = newSize; // Total size of sensed values from node
 		for (int i=1,j=1; (i < currentSize && j < newSize); i++, j++)
 		{
 			double difX, difY;			
@@ -392,13 +439,13 @@ public class SinkNode extends SimpleNode
 			difY = (newValues[j] - newValues[j-1]);
 			if ((difX * difY) >= 0)
 			{
-				contQ1++;
+				contN1++;
 			}
 		}
-		if (contQ1/contQ < thresholdError)
+		if ((contN > 0.0) && (contN1/contN >= thresholdError))
 		{
-			tDissimilarityTrendFound = true;
-			return tDissimilarityTrendFound;
+			tSimilarityTrend = true;
+//			return tDissimilarityTrendFound;
 		}
 		
 /*
@@ -412,7 +459,7 @@ public class SinkNode extends SimpleNode
 			
 		}
 */	
-		return (mDissimilarityMagnitudeFound || tDissimilarityTrendFound);
+		return (mSimilarityMagnitude && tSimilarityTrend);
 	}
 
 	private boolean compareDataSetValuesPairToPair(double[] valuesC, double[] valuesN, int size)
@@ -430,7 +477,7 @@ public class SinkNode extends SimpleNode
 		return ok;
 	}
 	
-	private void receiveMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
+	private void receiveMessage(WsnMsgResponse wsnMsgResp)
 	{
 		if (wsnMsgResp != null && wsnMsgResp.dataRecordItens != null)
 		{
