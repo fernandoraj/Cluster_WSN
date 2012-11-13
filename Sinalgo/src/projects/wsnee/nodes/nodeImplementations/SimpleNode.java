@@ -646,6 +646,10 @@ public class SimpleNode extends Node
 				double predictionValue = makePrediction(coefA, coefB, quantTime);
 				
 				addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
+
+/*
+ *  HERE IS THE POINT OF TEST FROM PREDICT VALUE FOR CHOICE WHAT TO DO !!!				
+ */
 				
 				if (isValuePredictInValueReading(value, predictionValue, maxError))
 				{
