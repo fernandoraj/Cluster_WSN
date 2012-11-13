@@ -61,6 +61,12 @@ public class SinkNode extends SimpleNode
 	private double maxDistance = 0.0;
 	
 	/**
+	 * Número total de nós sensores presentes na rede
+	 * Total number of sensor nodes in the network
+	 */
+	private static int numTotalOfSensors = 54;
+	
+	/**
 	 * Array 2D (clusters) from sensors (Messages from sensors = WsnMsgResponse).
 	 */
 	private ArrayList2d<WsnMsgResponse> messageGroups;
@@ -114,7 +120,7 @@ public class SinkNode extends SimpleNode
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
 				classifyNodeInClusterByMessage(wsnMsgResp);
 				numMessagesReceived++;
-				if (numMessagesReceived >= 54)
+				if (numMessagesReceived >= numTotalOfSensors)
 				{
 					Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
 					printMessageGroupsArray2d();
@@ -131,9 +137,13 @@ public class SinkNode extends SimpleNode
 					
 					if (messageGroups != null) // If there is a message group created
 					{
-						for (int line=0; line < messageGroups.getNumRows(); line++)
+						for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
 						{
-							WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(line, 0);
+							WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(line, 0); // Get the Representative Node (or Cluster Head)
+							Utils.printForDebug("Line = "+line);
+							Utils.printForDebug("wsnMsgResponseRepresentative.sizeTimeSlot = "+wsnMsgResponseRepresentative.sizeTimeSlot);
+							wsnMsgResponseRepresentative.sizeTimeSlot = (int)(sizeTimeSlot / messageGroups.getNumCols(line));
+							Utils.printForDebug("New wsnMsgResponseRepresentative.sizeTimeSlot = "+wsnMsgResponseRepresentative.sizeTimeSlot);
 							receiveMessage(wsnMsgResponseRepresentative);
 						}
 					}
@@ -245,7 +255,7 @@ public class SinkNode extends SimpleNode
 		if (messageGroups == null) // If there isn't a message group yet, then it does create one and adds the message to it
 		{
 			messageGroups = new ArrayList2d<WsnMsgResponse>();
-			messageGroups.ensureCapacity(54); // Ensure the capacity as the total number of sensors (nodes) in the data set
+			messageGroups.ensureCapacity(numTotalOfSensors); // Ensure the capacity as the total number of sensors (nodes) in the data set
 			messageGroups.add(newWsnMsgResp, 0); // Add the initial message to the group (ArrayList2d of WsnMsgResponse)
 		}
 		else
@@ -559,7 +569,8 @@ public class SinkNode extends SimpleNode
 	
 	private void sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB)
 	{
-		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.origem , this, 1, 1, dataSensedType, thresholdError);
+		
+		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.origem , this, 1, wsnMsgResp.sizeTimeSlot, dataSensedType, thresholdError);
 		wsnMessage.setCoefs(coeficienteA, coeficienteB);
 		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath());
 		sendToNextNodeInPath(wsnMessage);
