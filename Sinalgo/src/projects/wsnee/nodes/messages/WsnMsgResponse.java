@@ -3,6 +3,8 @@ package projects.wsnee.nodes.messages;
 import java.util.Stack;
 import java.util.Vector;
 
+import projects.wsnee.utils.Utils;
+
 import sinalgo.nodes.Node;
 import sinalgo.nodes.Position;
 import sinalgo.nodes.messages.Message;
@@ -213,6 +215,19 @@ public class WsnMsgResponse extends Message {
 		lerDados();
 		return rounds;
 	}
+	
+	/**
+	 * The sizeTimeSlot of Representative Node will be inversely proportional to the number of sensors in the same cluster -> number 'L' in documentation
+	 * @param globalTimeSlot Initial Size of Time Slot from the sink node
+	 * @param numSensorsInThisCLuster Number of nodes (sensors) in that cluster (group)
+	 */
+	public void calculatesTheSizeTimeSlotFromRepresentativeNode(int globalTimeSlot, int numSensorsInThisCLuster)
+	{
+		Utils.printForDebug("wsnMsgResponseRepresentative.sizeTimeSlot = "+this.sizeTimeSlot);
+		this.sizeTimeSlot = (int)(globalTimeSlot / numSensorsInThisCLuster);
+		Utils.printForDebug("New wsnMsgResponseRepresentative.sizeTimeSlot = "+this.sizeTimeSlot);
+	}
+
 	
 	/**
 	 * Construtor básico da Classe
