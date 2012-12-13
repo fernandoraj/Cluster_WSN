@@ -140,18 +140,16 @@ public class SinkNode extends SimpleNode
 						for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
 						{
 							WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(line, 0); // Get the Representative Node (or Cluster Head)
-							Utils.printForDebug("Line = "+line);
-							Utils.printForDebug("wsnMsgResponseRepresentative.sizeTimeSlot = "+wsnMsgResponseRepresentative.sizeTimeSlot);
-							wsnMsgResponseRepresentative.sizeTimeSlot = (int)(sizeTimeSlot / messageGroups.getNumCols(line));
-							Utils.printForDebug("New wsnMsgResponseRepresentative.sizeTimeSlot = "+wsnMsgResponseRepresentative.sizeTimeSlot);
+							int numSensors = messageGroups.getNumCols(line);
+							wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
 							receiveMessage(wsnMsgResponseRepresentative);
 						}
 					}
 				}
-//				receiveMessage(wsnMsgResp, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedType);
 			} //if (message instanceof WsnMsg)
 		} //while (inbox.hasNext())
 	} //public void handleMessages
+	
 	
 	/**
 	 * It selects the Representative Node for each line (group) from sensors by the max residual energy and puts him in the first position (in line)
