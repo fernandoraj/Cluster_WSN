@@ -41,7 +41,14 @@ public class SimpleNode extends Node
 	protected static int slidingWindowSize = 4;
 	
 	/**
-	 * Armazenar o nó que será usado para alcançar a Estação-Base
+	 * Slot de tempo próprio de cada nó (representativo)
+	 * Own slot time from each (representative) sensor - cluster head
+	 */
+	protected Integer ownTimeSlot;
+	
+	/**
+	 * Armazena o nó que será usado para alcançar a Estação-Base
+	 * Save/storage the node that will be used for range the Station Base
 	 */
 	protected Node proximoNoAteEstacaoBase;
 	
@@ -69,6 +76,21 @@ public class SimpleNode extends Node
 	 * Last voltage level of the battery from sensor  
 	 */
 	protected double lastBatLevel;
+	
+	/**
+	 * Number of predictions made by the sensor node in this timeslot
+	 */
+	protected int numTotalPredictions;
+	
+	/**
+	 * Number of prediction errors of the sensor node in this timeslot
+	 */
+	protected int numPredictionErrors;
+	
+	/**
+	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
+	 */
+	private static final double limitPredictionError = 2;
 	
 	/**
 	 * Stores sensor readings of this node loaded from the sensor readings file.
@@ -534,7 +556,8 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Faz o cálculo da predição do valor sensoreado de acordo com os coeficientes (A e B) informados e o parâmetro de tempo
+	 * Faz o cálculo da predição do valor sensoreado de acordo com os coeficientes (A e B) informados e o parâmetro de tempo; incrementa o contador de predições (numTotalPredictions)
+	 * It calculates the prediction sensed value according to coefficients (A and B) informed and time parameter; it increments the prediction count (numTotalPredictions)
 	 * @param A Coeficiente A (interceptor) da equação de regressão, dada por S(t) = A + B.t 
 	 * @param B Coeficiente B (slope, inclinação) da equação de regressão, dada por S(t) = A + B.t
 	 * @param tempo Parâmetro de tempo a ter o valor da grandeza predito 
@@ -544,6 +567,7 @@ public class SimpleNode extends Node
 	{
 		double time;
 		time = A + B*tempo;
+		this.numTotalPredictions++;
 		return time;
 	}
 	
@@ -573,6 +597,10 @@ public class SimpleNode extends Node
 		double coefA = wsnMessage.getCoefA();
 		double coefB = wsnMessage.getCoefB();
 		double maxError = wsnMessage.getThresholdError();
+
+		this.numTotalPredictions = 0;
+		this.numPredictionErrors = 0;
+		this.ownTimeSlot = wsnMessage.sizeTimeSlot;
 		triggerPredictions(wsnMessage.dataSensedType, coefA, coefB, maxError);
 	}
 	
@@ -648,17 +676,29 @@ public class SimpleNode extends Node
 				addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
 
 /*
- *  HERE IS THE POINT OF TEST FROM PREDICT VALUE FOR CHOICE WHAT TO DO !!!				
+ *  HERE IS THE POINT OF TEST FROM PREDICT VALUE FOR CHOICE WHAT TO DO !!!
  */
 				
-				if (isValuePredictInValueReading(value, predictionValue, maxError))
+				if (!isValuePredictInValueReading(value, predictionValue, maxError))
+				{
+					numPredictionErrors++;
+				}
+
+				Utils.printForDebug("* * O num. total de predicoes eh "+numTotalPredictions+"! NoID = "+this.ID);
+				
+				if(numPredictionErrors > 0)
+				{
+					Utils.printForDebug("* * * * O num. de erros de predicoes eh "+numPredictionErrors+"! NoID = "+this.ID+"\n");
+				}
+				
+				if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.ownTimeSlot))
 				{
 					ultimoRoundLido = Integer.parseInt(linhas[2]);
 //					lastValueRead = value;
 //					lastTimeRead = quantTime;
 					
 					PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError);
-					newPredictionTimer.startRelative(1, this);
+					newPredictionTimer.startRelative(1, this); 
 /*					
 					Utils.printForDebug(" @ @ O valor predito ESTA dentro da margem de erro do valor lido! NoID = "+this.ID);
 					Utils.printForDebug("Round = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
@@ -666,6 +706,8 @@ public class SimpleNode extends Node
 				}
 				else
 				{
+					Utils.printForDebug("* numPredictionErrors = "+numPredictionErrors+"! NoID = "+this.ID+"\n");
+					
 					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 1, 2, dataSensedType);
 /*					
 					//Adiciona os últimos valores lidos anteriormente a mensagem que vai para o sink
