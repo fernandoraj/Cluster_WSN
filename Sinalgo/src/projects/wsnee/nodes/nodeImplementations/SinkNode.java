@@ -118,31 +118,46 @@ public class SinkNode extends SimpleNode
 			{
 				this.setColor(Color.YELLOW);
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
-				classifyNodeInClusterByMessage(wsnMsgResp);
-				numMessagesReceived++;
-				if (numMessagesReceived >= numTotalOfSensors)
+				
+				if (wsnMsgResp.tipoMsg == 2) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de erros de predição
 				{
-					Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
-					printMessageGroupsArray2d();
+					receiveMessage(wsnMsgResp);
+				}
+				else if (wsnMsgResp.tipoMsg == 3) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
+				{
+					// PAREI AQUI!!!
+				}
+				else
+				{
+					classifyNodeInClusterByMessage(wsnMsgResp);
 					
-					classifyRepresentativeNodesByResidualEnergy();
+					numMessagesReceived++;
 					
-					Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
-					printMessageGroupsArray2d();
-					
-					classifyRepresentativeNodesByHopsToSink();
-					
-					Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
-					printMessageGroupsArray2d();
-					
-					if (messageGroups != null) // If there is a message group created
+					if (numMessagesReceived >= numTotalOfSensors)
 					{
-						for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
+						Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
+						printMessageGroupsArray2d();
+						
+						classifyRepresentativeNodesByResidualEnergy();
+						
+						Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
+						printMessageGroupsArray2d();
+						
+						classifyRepresentativeNodesByHopsToSink();
+						
+						Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
+						printMessageGroupsArray2d();
+						
+						if (messageGroups != null) // If there is a message group created
 						{
-							WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(line, 0); // Get the Representative Node (or Cluster Head)
-							int numSensors = messageGroups.getNumCols(line);
-							wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-							receiveMessage(wsnMsgResponseRepresentative);
+							for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
+							{
+								WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(line, 0); // Get the Representative Node (or Cluster Head)
+								int numSensors = messageGroups.getNumCols(line);
+								Utils.printForDebug("Cluster / Line number = "+line+"\n");
+								wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+								receiveMessage(wsnMsgResponseRepresentative);
+							}
 						}
 					}
 				}
@@ -243,7 +258,8 @@ public class SinkNode extends SimpleNode
 	}
 	
 	/**
-	 * Each line in "messageGroups" (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.origem), 
+	 * Adds the WsnMsgResponse object, passed by parameter, in the correct line ("Cluster") from the messageGroups (ArrayList2d) according with the Dissimilarity Measure 
+	 * PS.: Each line in "messageGroups" (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.origem), 
 	 * classified by Dissimilarity Measure from yours data sensed, stored on WsnMsgResponse.dataRecordItens
 	 *  
 	 * @param wsnMsgResp Message to be used for classify the sensor node
@@ -485,6 +501,11 @@ public class SinkNode extends SimpleNode
 		return ok;
 	}
 	
+	/**
+	 * Recebe a mensagem passada, lê os parâmetros (itens) no dataRecordItens, calcula os coeficientes A e B de acordo com estes parâmetros e envia tais coeficientes para o nó sensor de origem
+	 * [Eng] Receives the message, it reads the parameters (items) in dataRecordItens, calculates the coefficients A and B according to these parameters and sends these coefficients for the sensor node of origin
+	 * @param wsnMsgResp Mensagem recebida com os parâmetros a serem lidos
+	 */
 	private void receiveMessage(WsnMsgResponse wsnMsgResp)
 	{
 		if (wsnMsgResp != null && wsnMsgResp.dataRecordItens != null)
