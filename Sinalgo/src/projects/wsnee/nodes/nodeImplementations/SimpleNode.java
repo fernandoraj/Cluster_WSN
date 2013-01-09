@@ -668,10 +668,10 @@ public class SimpleNode extends Node
 					}//catch
 				}//else
 
-				int round = Integer.parseInt(linhas[numSequenceRound]); //Número do round
+				int round = Integer.parseInt(linhas[numSequenceRound]); // Número do round
 				
 				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
-				double predictionValue = makePrediction(coefA, coefB, quantTime);
+				double predictionValue = makePrediction(coefA, coefB, quantTime); // Incrementa o contador numTotalPredictions (numTotalPredictions++)
 				
 				addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
 
@@ -684,9 +684,9 @@ public class SimpleNode extends Node
 					numPredictionErrors++;
 				}
 
-				Utils.printForDebug("* * O num. total de predicoes eh "+numTotalPredictions+"! NoID = "+this.ID);
+				Utils.printForDebug("* * O num. total de predicoes eh "+numTotalPredictions+"! NoID = "+this.ID+" Maximo de Predicoes = "+this.ownTimeSlot);
 				
-				if(numPredictionErrors > 0)
+				if (numPredictionErrors > 0)
 				{
 					Utils.printForDebug("* * * * O num. de erros de predicoes eh "+numPredictionErrors+"! NoID = "+this.ID+"\n");
 				}
@@ -706,9 +706,24 @@ public class SimpleNode extends Node
 				}
 				else
 				{
-					Utils.printForDebug("* numPredictionErrors = "+numPredictionErrors+"! NoID = "+this.ID+"\n");
+					WsnMsgResponse wsnMsgResp;
 					
-					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 1, 2, dataSensedType);
+					if (!(numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.ownTimeSlot)) // Caso tenha saído do laço de predição por ter excedido o número máximo de erros de predição e não pelo limite do seu time slot (número máximo de predições a serem feitas por este Nó Representativo - ou Cluster Head)
+					{
+						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 2, (this.ownTimeSlot - numTotalPredictions), dataSensedType);
+						
+						Utils.printForDebug("* O num. de erros de predicoes eh "+numPredictionErrors+"! NoID = "+this.ID+"\n");
+						Utils.printForDebug("\n\n * * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
+						Utils.printForDebug("\nRound = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
+					}
+					else // if (numTotalPredictions >= this.ownTimeSlot) // Caso tenha saído do laço de predições por ter excedido o limite do seu time slot próprio(número máximo de predições a serem feitas por este Nó Representativo)
+					{
+						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 3, 2, dataSensedType);
+						
+						Utils.printForDebug("* * O num. total de predicoes eh "+numTotalPredictions+" e o Maximo de Predicoes = "+this.ownTimeSlot+"! NoID = "+this.ID+"\n");						
+					}
+					
+					
 /*					
 					//Adiciona os últimos valores lidos anteriormente a mensagem que vai para o sink
 					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), lastValueRead, lastTimeRead);
@@ -718,20 +733,20 @@ public class SimpleNode extends Node
 					lastTimeRead = quantTime;
 					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), lastValueRead, lastTimeRead);
 */					
+					//Adiciona os últimos valores lidos anteriormente a mensagem que vai para o sink
 					//Adds the last values ​​previously read to the message that goes to the sink
 					for(int cont=0; cont<dataRecordItens.size(); cont++) //for(int cont=0; cont<slidingWindowSize; cont++)
 					{
 						wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).type, dataRecordItens.get(cont).value, dataRecordItens.get(cont).time, dataRecordItens.get(cont).batLevel, dataRecordItens.get(cont).round); 
 					}
 					
+					//Adiciona o nó atual para o caminho de retorno da mensagem de volta do sink para este nó
+					//Adds the current node to the return path of the message back from the sink node to this node
 					addThisNodeToPath(wsnMsgResp);
 					
 					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
 					
 					timer.startRelative(1, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
-					
-					Utils.printForDebug("\n\n * * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
-					Utils.printForDebug("\nRound = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
 				}
 				
 			}//if (linhas.length > 4)
