@@ -42,7 +42,7 @@ public class WsnMsgResponse extends Message {
 	public Integer saltosAteDestino;
 	
 	/**
-	 * Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
+	 * Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
 	 */
 	public Integer tipoMsg = 0;
 	
@@ -235,7 +235,7 @@ public class WsnMsgResponse extends Message {
 	 * @param origem No de origem
 	 * @param destino No de destino
 	 * @param forwardingHop No que vai reencaminhar a mensagem
-	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
+	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
 	 */
 	public WsnMsgResponse(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo) {
 		this.sequenceID = seqID;
@@ -251,7 +251,7 @@ public class WsnMsgResponse extends Message {
 	 * @param origem No de origem
 	 * @param destino No de destino
 	 * @param forwardingHop No que vai reencaminhar a mensagem
-	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
+	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
 	 * @param sizeTS Numero de dados sensoreados por time slot (Tamanho do time slot)
 	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 */
@@ -272,7 +272,7 @@ public class WsnMsgResponse extends Message {
 	 * @param origem No de origem
 	 * @param destino No de destino
 	 * @param forwardingHop No que vai reencaminhar a mensagem
-	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
+	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
 	 * @param sizeTS Numero de dados sensoreados por time slot (Tamanho do time slot)
 	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 * @param thresholdEr Limiar de erro aceitavel
@@ -294,7 +294,7 @@ public class WsnMsgResponse extends Message {
 	 * @param origem No de origem
 	 * @param destino No de destino
 	 * @param forwardingHop No que vai reencaminhar a mensagem
-	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
+	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
 	 * @param sizeTS Numero de dados sensoreados por time slot (Tamanho do time slot)
 	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 * @param thresholdEr Limiar de erro aceitável
