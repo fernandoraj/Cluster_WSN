@@ -718,7 +718,7 @@ public class SimpleNode extends Node
 					}
 					else // if (numTotalPredictions >= this.ownTimeSlot) // Caso tenha saído do laço de predições por ter excedido o limite do seu time slot próprio(número máximo de predições a serem feitas por este Nó Representativo)
 					{
-						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 3, 2, dataSensedType);
+						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 3, 0, dataSensedType);
 						
 						Utils.printForDebug("* * O num. total de predicoes eh "+numTotalPredictions+" e o Maximo de Predicoes = "+this.ownTimeSlot+"! NoID = "+this.ID+"\n");						
 					}
