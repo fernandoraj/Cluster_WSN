@@ -76,6 +76,16 @@ public class SinkNode extends SimpleNode
 	 */
 	private int numMessagesReceived = 0;
 	
+	/**
+	 * Number of messages of error prediction received by sink node from all other sensors nodes
+	 */
+	private int numMessagesOfErrorPredictionReceived = 0;
+	
+	/**
+	 * Number of messages of time slot finished received by sink node from all other sensors nodes
+	 */
+	private int numMessagesOfTimeSlotFinishedReceived = 0;
+	
 	public SinkNode()
 	{
 		super();
@@ -121,15 +131,39 @@ public class SinkNode extends SimpleNode
 				
 				if (wsnMsgResp.tipoMsg == 2) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de erros de predição
 				{
-					receiveMessage(wsnMsgResp);
+					numMessagesOfErrorPredictionReceived++;
+					receiveMessage(wsnMsgResp); // Recebe a mensagem, para recálculo dos coeficientes e reenvio dos mesmos àquele nó sensor (Nó Representativo), mantendo o número de predições a serem executadas como complemento do total calculado inicialmente, ou seja, NÃO reinicia o ciclo de time slot daquele cluster
 				}
 				else if (wsnMsgResp.tipoMsg == 3) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
 				{
-					// PAREI AQUI!!!
+					numMessagesOfTimeSlotFinishedReceived++;
+					int lineFromClusterNode = searchAndReplaceNodeInClusterByMessage(wsnMsgResp);
+					if (lineFromClusterNode >= 0)
+					{
+						Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
+						printMessageGroupsArray2d();
+						
+						classifyRepresentativeNodesByResidualEnergy();
+						
+						Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
+						printMessageGroupsArray2d();
+						
+						classifyRepresentativeNodesByHopsToSink();
+						
+						Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
+						printMessageGroupsArray2d();
+						
+						WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(lineFromClusterNode, 0); // Get the Representative Node (or Cluster Head)
+						int numSensors = messageGroups.getNumCols(lineFromClusterNode);
+						Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
+						wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+						receiveMessage(wsnMsgResponseRepresentative);
+					}
+					// PAREI AQUI!!! - Fazer testes para verificar se os cluster estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
 				}
 				else
 				{
-					classifyNodeInClusterByMessage(wsnMsgResp);
+					addNodeInClusterClassifiedByMessage(wsnMsgResp);
 					
 					numMessagesReceived++;
 					
@@ -264,7 +298,7 @@ public class SinkNode extends SimpleNode
 	 *  
 	 * @param wsnMsgResp Message to be used for classify the sensor node
 	 */
-	private void classifyNodeInClusterByMessage(WsnMsgResponse newWsnMsgResp)
+	private void addNodeInClusterClassifiedByMessage(WsnMsgResponse newWsnMsgResp)
 	{
 		if (messageGroups == null) // If there isn't a message group yet, then it does create one and adds the message to it
 		{
@@ -321,7 +355,61 @@ public class SinkNode extends SimpleNode
 */			
 		}
 	}
+
+	/**
+	 * Search the WsnMsgResponse object with the same source node, in the correct position in "Cluster" from the messageGroups (ArrayList2d) and replace him with the one passed by parameter  
+	 * PS.: Each line in "messageGroups" (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.origem), 
+	 * classified by Dissimilarity Measure from yours data sensed, stored on WsnMsgResponse.dataRecordItens
+	 *  
+	 * @param wsnMsgResp Message to be used for classify the sensor node
+	 */
+	private int searchAndReplaceNodeInClusterByMessage(WsnMsgResponse newWsnMsgResp)
+	{
+		int lineCLuster = -1;
+		if (messageGroups == null) // If there isn't a message group yet, then it does create one and adds the message to it
+		{
+			Utils.printForDebug("ERROR in searchAndReplaceNodeInClusterByMessage method: There isn't messageGroups object instanciated yet!");
+		}
+		else
+		{
+			boolean found = false;
+			int line = 0, col = 0;
+			while ((!found) && (line < messageGroups.getNumRows()))
+			{
+				col = 0;
+				while ((!found) && (col < messageGroups.getNumCols(line)))
+				{
+					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
+					if (isEqualNodeSourceFromMessages(currentWsnMsgResp, newWsnMsgResp))
+					{
+						found = true;
+					}
+					else
+					{
+						col++;
+					}
+				}
+				if (!found)
+				{
+					line++;
+				}
+			}
+			if (found)
+			{
+				lineCLuster = line;
+				messageGroups.set(line, col, newWsnMsgResp); // It sets the new message "wsnMsgResp" in the line and col (cluster) of messageGroup 
+			}
+		}
+		return lineCLuster;
+	}
+
 	
+	/**
+	 * Testa se a distância entre os nós sensores que enviaram tais mensagens (currentWsnMsg e newWsnMsg) é menor ou igual a máxima distância possível (maxDistance) para os dois nós estarem no mesmo cluster
+	 * @param currentWsnMsg Mensagem atual já classificada no cluster
+	 * @param newWsnMsg Nova mensagem a ser classificada no cluster
+	 * @return Retorna "verdadeiro" caso a distância entre os nós sensores que enviaram as mensagens não ultrapassa o limite máximo, "falso" caso contrário
+	 */
 	private boolean testDistanceBetweenSensorPositions(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 	{
 		boolean distanceOK = false;
@@ -344,6 +432,11 @@ public class SinkNode extends SimpleNode
 			distanceOK = true;
 		}
 		return distanceOK;
+	}
+	
+	private boolean isEqualNodeSourceFromMessages(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
+	{
+		return (currentWsnMsg.origem.ID == newWsnMsg.origem.ID);
 	}
 	
 /*
@@ -586,6 +679,12 @@ public class SinkNode extends SimpleNode
 		return (mediaValores - B*mediaTempos);
 	}
 	
+	/**
+	 * Cria uma nova mensagem (WsnMsg) para envio dos coeficientes recebidos através dos parâmetros, e a envia para o próximo nó no caminho até o nó de origem da mensagem (wsnMsgResp.origem)
+	 * @param wsnMsgResp Mensagem de resposta enviada do nó de origem para o nó sink, que agora enviará os (novos) coeficientes calculados para o nó de origem 
+	 * @param coeficienteA Valor do coeficiente A da equação de regressão
+	 * @param coeficienteB Valor do coeficiente B da equação de regressão
+	 */
 	private void sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB)
 	{
 		
