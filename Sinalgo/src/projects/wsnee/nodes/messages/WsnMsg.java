@@ -148,7 +148,11 @@ public class WsnMsg extends Message {
 		{
 			return null;
 		}
-		return pathToSenderNode.pop();
+		if (this.saltosAteDestino != null && this.saltosAteDestino > 0)
+		{
+			this.saltosAteDestino--; // Decrementa o contador de saltos (passos) de caminho (de rota) de nós
+		}
+		return pathToSenderNode.pop(); // Remove/Desempilha o próximo nó (noID) do caminho (path) para o nó de origem e o retorna
 	}
 	
 	public void setPathToSenderNode(Stack<Integer> pathToSenderNode)
