@@ -253,10 +253,14 @@ public class SimpleNode extends Node
 		} //while (inbox.hasNext())
 	} //public void handleMessages
 	
+	/**
+	 * Adiciona o nó atual no caminho do sink até o nó de origem (source) da mensagem
+	 * @param wsnMsgResp Mensagem de resposta a ter o nó atual adicionado (empilhado) em seu caminho do sink para o nó de origem 
+	 */
 	private void addThisNodeToPath(WsnMsgResponse wsnMsgResp)
 	{
 		wsnMsgResp.pushToPath(this.ID);
-		wsnMsgResp.saltosAteDestino++;
+//		wsnMsgResp.saltosAteDestino++; // Transferido para o método pushToPath() da classe WsnMsgResponse
 	}
 	
 	/**
@@ -675,6 +679,10 @@ public class SimpleNode extends Node
 				
 				addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
 
+				ultimoRoundLido = round;
+//				lastValueRead = value;
+//				lastTimeRead = quantTime;
+
 /*
  *  HERE IS THE POINT OF TEST FROM PREDICT VALUE FOR CHOICE WHAT TO DO !!!
  */
@@ -693,10 +701,6 @@ public class SimpleNode extends Node
 				
 				if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.ownTimeSlot))
 				{
-					ultimoRoundLido = Integer.parseInt(linhas[2]);
-//					lastValueRead = value;
-//					lastTimeRead = quantTime;
-					
 					PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError);
 					newPredictionTimer.startRelative(1, this); 
 /*					
@@ -712,7 +716,7 @@ public class SimpleNode extends Node
 					{
 						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 2, (this.ownTimeSlot - numTotalPredictions), dataSensedType);
 						
-						Utils.printForDebug("* O num. de erros de predicoes eh "+numPredictionErrors+"! NoID = "+this.ID+"\n");
+						Utils.printForDebug("* O num. de erros de predicoes ("+numPredictionErrors+") ALCANCOU o limite maximo de erros de predicao ("+limitPredictionError+")! NoID = "+this.ID+"\n");
 						Utils.printForDebug("\n\n * * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
 						Utils.printForDebug("\nRound = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
 					}
@@ -720,9 +724,8 @@ public class SimpleNode extends Node
 					{
 						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 3, 0, dataSensedType);
 						
-						Utils.printForDebug("* * O num. total de predicoes eh "+numTotalPredictions+" e o Maximo de Predicoes = "+this.ownTimeSlot+"! NoID = "+this.ID+"\n");						
-					}
-					
+						Utils.printForDebug("* * O total de lacos de predicoes ("+numTotalPredictions+") CHEGOU ao maximo de lacos de predicoes (TimeSlot proprio = "+this.ownTimeSlot+") deste noh representativo / cluster! NoID = "+this.ID+"\n");						
+					}					
 					
 /*					
 					//Adiciona os últimos valores lidos anteriormente a mensagem que vai para o sink
@@ -743,6 +746,8 @@ public class SimpleNode extends Node
 					//Adiciona o nó atual para o caminho de retorno da mensagem de volta do sink para este nó
 					//Adds the current node to the return path of the message back from the sink node to this node
 					addThisNodeToPath(wsnMsgResp);
+					
+					wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
 					
 					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
 					
