@@ -4,7 +4,6 @@ import java.util.Stack;
 import java.util.Vector;
 
 import projects.wsnee.utils.Utils;
-
 import sinalgo.nodes.Node;
 import sinalgo.nodes.Position;
 import sinalgo.nodes.messages.Message;
@@ -91,7 +90,8 @@ public class WsnMsgResponse extends Message {
 		{
 			pathToSenderNode = new Stack<Integer>();
 		}
-		pathToSenderNode.push(no);
+		saltosAteDestino++; // Incrementa o contador de saltos (passos) de caminho (de rota) de nós
+		pathToSenderNode.push(no); // Adiciona/empilha o nó passado (noID) ao caminho (path) para o nó de origem
 	}
 	
 	/**
@@ -225,7 +225,7 @@ public class WsnMsgResponse extends Message {
 	{
 		Utils.printForDebug("wsnMsgResponseRepresentative.sizeTimeSlot = "+this.sizeTimeSlot);
 		this.sizeTimeSlot = (int)(globalTimeSlot / numSensorsInThisCLuster);
-		Utils.printForDebug("New wsnMsgResponseRepresentative.sizeTimeSlot = "+this.sizeTimeSlot);
+		Utils.printForDebug("New wsnMsgResponseRepresentative.sizeTimeSlot = "+this.sizeTimeSlot+"\n");
 	}
 
 	
