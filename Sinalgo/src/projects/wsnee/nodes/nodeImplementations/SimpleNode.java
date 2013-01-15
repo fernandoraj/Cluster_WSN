@@ -716,9 +716,9 @@ public class SimpleNode extends Node
 					{
 						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 2, (this.ownTimeSlot - numTotalPredictions), dataSensedType);
 						
-						Utils.printForDebug("* O num. de erros de predicoes ("+numPredictionErrors+") ALCANCOU o limite maximo de erros de predicao ("+limitPredictionError+")! NoID = "+this.ID+"\n");
-						Utils.printForDebug("\n\n * * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
-						Utils.printForDebug("\nRound = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
+						Utils.printForDebug("* O num. de erros de predicao ("+numPredictionErrors+") ALCANCOU o limite maximo de erros de predicao ("+limitPredictionError+")! NoID = "+this.ID+"\n");
+						Utils.printForDebug("* * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
+						Utils.printForDebug("Round = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError+"\n");
 					}
 					else // if (numTotalPredictions >= this.ownTimeSlot) // Caso tenha saído do laço de predições por ter excedido o limite do seu time slot próprio(número máximo de predições a serem feitas por este Nó Representativo)
 					{
