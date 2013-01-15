@@ -8,8 +8,8 @@ import java.util.Set;
 import projects.wsnee.nodes.messages.WsnMsg;
 import projects.wsnee.nodes.messages.WsnMsgResponse;
 import projects.wsnee.nodes.timers.WsnMessageTimer;
-import projects.wsnee.utils.Utils;
 import projects.wsnee.utils.ArrayList2d;
+import projects.wsnee.utils.Utils;
 import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
@@ -129,6 +129,8 @@ public class SinkNode extends SimpleNode
 				this.setColor(Color.YELLOW);
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
 				
+				Utils.printForDebug("@ @ @ Message Received by SINK from the NodeID = "+wsnMsgResp.origem.ID +" with MsgType = "+wsnMsgResp.tipoMsg+"\n");
+				
 				if (wsnMsgResp.tipoMsg == 2) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de erros de predição
 				{
 					numMessagesOfErrorPredictionReceived++;
@@ -188,7 +190,7 @@ public class SinkNode extends SimpleNode
 							{
 								WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(line, 0); // Get the Representative Node (or Cluster Head)
 								int numSensors = messageGroups.getNumCols(line);
-								Utils.printForDebug("Cluster / Line number = "+line+"\n");
+								Utils.printForDebug("Cluster / Line number = "+line);
 								wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
 								receiveMessage(wsnMsgResponseRepresentative);
 							}
@@ -273,11 +275,11 @@ public class SinkNode extends SimpleNode
 				for (int col=0; col < messageGroups.getNumCols(line); col++)
 				{
 					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
-					Utils.printForDebug("Line = "+line+", Col = "+col+": NodeID = "+currentWsnMsgResp.origem.ID+" BatLevel = "+currentWsnMsgResp.batLevel);
+					Utils.printForDebug("Line = "+line+", Col = "+col+": NodeID = "+currentWsnMsgResp.origem.ID+" BatLevel = "+currentWsnMsgResp.batLevel+" Round = "+((SimpleNode)currentWsnMsgResp.origem).ultimoRoundLido);
 				}
 				Utils.printForDebug("\n");
 			}
-			Utils.printForDebug("Number of Lines / Clusters = "+messageGroups.getNumRows());
+			Utils.printForDebug("Number of Lines / Clusters = "+messageGroups.getNumRows()+"\n");
 		}
 	}
 	
