@@ -39,7 +39,8 @@ package sinalgo.runtime;
 
 import java.util.Date;
 
-import projects.wsn.utils.Utils;
+import projects.wsnee.utils.Utils;
+//import projects.wsn.utils.Utils;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.nodes.Node;
@@ -185,11 +186,11 @@ public class SynchronousRuntimeThread extends Thread {
 			if (Global.numberOfHitsOverAll > 0)
 			{
 				System.out.println("\n");
-				Utils.printForDebug(" * * The number TOTAL of Hits (in round "+Global.currentTime+") is "+Global.numberOfHitsOverAll);
+				Utils.printForDebug(" * * The TOTAL number of Hits (until the round "+Global.currentTime+") is "+Global.numberOfHitsOverAll);
 			}
 			if (Global.numberOfMissesOverAll > 0)
 			{
-				Utils.printForDebug(" * * The number TOTAL of Misses (in round "+Global.currentTime+") is "+Global.numberOfMissesOverAll);
+				Utils.printForDebug(" * * The TOTAL number of Misses (until the round "+Global.currentTime+") is "+Global.numberOfMissesOverAll);
 			}
 			
 		
@@ -207,11 +208,11 @@ public class SynchronousRuntimeThread extends Thread {
 				}
 				if (Global.numberOfHitsOverAll > 0)
 				{
-					Global.log.logln("The number TOTAL of Hits (until this round "+Global.currentTime+") is "+Global.numberOfHitsOverAll);
+					Global.log.logln("The TOTAL number of Hits (until this round "+Global.currentTime+") is "+Global.numberOfHitsOverAll);
 				}
 				if (Global.numberOfMissesOverAll > 0)
 				{
-					Global.log.logln("The number TOTAL of Misses (until this round "+Global.currentTime+") is "+Global.numberOfMissesOverAll+"\n");
+					Global.log.logln("The TOTAL number of Misses (until this round "+Global.currentTime+") is "+Global.numberOfMissesOverAll+"\n");
 				}
 			}
 

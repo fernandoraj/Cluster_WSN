@@ -81,7 +81,7 @@ public class Global {
 	 * or create a separete log file.
 	 * <p>
 	 * Note: A log FILE is only created if outputToConsole is set to false in the 
-	 * config file of the proejct. Otherwise, the text written to this logger is printed
+	 * config file of the project. Otherwise, the text written to this logger is printed
 	 * to the console.
 	 */
 	public static Logging log = null; // only install after logging has been activated. 
