@@ -34,7 +34,7 @@ public class SinkNode extends SimpleNode
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 * Percentage of temporal acceptable error threshold for the readings of sensor nodes, which may be between 0.0 (accepts no errors) and 1.0 (accepts any error)
 	 */
-	private double thresholdError = 0.1;
+	private double thresholdError = 0.01;
 	
 	/**
 	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
@@ -134,6 +134,9 @@ public class SinkNode extends SimpleNode
 				if (wsnMsgResp.tipoMsg == 2) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de erros de predição
 				{
 					numMessagesOfErrorPredictionReceived++;
+					
+// CASO O CLUSTER PRECISE SOFRER UM SPLIT, UMA MENS. SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK DEVE SER ENVIADA PARA CADA UM DOS NÓS DO CLUSTER 
+					
 					receiveMessage(wsnMsgResp); // Recebe a mensagem, para recálculo dos coeficientes e reenvio dos mesmos àquele nó sensor (Nó Representativo), mantendo o número de predições a serem executadas como complemento do total calculado inicialmente, ou seja, NÃO reinicia o ciclo de time slot daquele cluster
 				}
 				else if (wsnMsgResp.tipoMsg == 3) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
@@ -161,7 +164,7 @@ public class SinkNode extends SimpleNode
 						wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
 						receiveMessage(wsnMsgResponseRepresentative);
 					}
-					// PAREI AQUI!!! - Fazer testes para verificar se os cluster estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
+					// PAREI AQUI!!! - Fazer testes para verificar se os clusters estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
 				}
 				else
 				{

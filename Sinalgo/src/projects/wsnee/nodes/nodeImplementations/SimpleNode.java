@@ -222,6 +222,8 @@ public class SimpleNode extends Node
 					
 					if (wsnMessage != null)
 					{
+//	CASO O CLUSTER PRECISE SOFRER UM SPLIT, CADA UM DOS NÓS DO CLUSTER DEVE RECEBER UMA MENS. SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK
+						
 						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType); 
 						prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
 					}
@@ -560,7 +562,7 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Faz o cálculo da predição do valor sensoreado de acordo com os coeficientes (A e B) informados e o parâmetro de tempo; incrementa o contador de predições (numTotalPredictions)
+	 * Faz o cálculo da predição do valor sensoreado de acordo com os coeficientes (A e B) informados e o parâmetro de tempo; incrementa o contador de predições (numTotalPredictions) <p>
 	 * It calculates the prediction sensed value according to coefficients (A and B) informed and time parameter; it increments the prediction count (numTotalPredictions)
 	 * @param A Coeficiente A (interceptor) da equação de regressão, dada por S(t) = A + B.t 
 	 * @param B Coeficiente B (slope, inclinação) da equação de regressão, dada por S(t) = A + B.t
@@ -576,6 +578,7 @@ public class SimpleNode extends Node
 	}
 	
 	/**
+	 * Inicia um temporizador (timer) para enviar a mensagem passada para o próximo nó no caminho até o nó de destino <p>
 	 * It starts a timer to send the message passed to the next node in path to destination node 
 	 * @param wsnMessage Message to be sended to destination node
 	 */
@@ -686,22 +689,22 @@ public class SimpleNode extends Node
 /*
  *  HERE IS THE POINT OF TEST FROM PREDICT VALUE FOR CHOICE WHAT TO DO !!!
  */
-				
+
 				if (!isValuePredictInValueReading(value, predictionValue, maxError))
 				{
-					numPredictionErrors++;
+					numPredictionErrors++; // Contador do número de erros de predição
 				}
 
 				Utils.printForDebug("* * O num. total de predicoes eh "+numTotalPredictions+"! NoID = "+this.ID+" Maximo de Predicoes = "+this.ownTimeSlot);
 				
-				if (numPredictionErrors > 0)
+				if (numPredictionErrors > 0) // Se há erros de predição, então exibe uma mensagem
 				{
 					Utils.printForDebug("* * * * O num. de erros de predicoes eh "+numPredictionErrors+"! NoID = "+this.ID+"\n");
 				}
 				
-				if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.ownTimeSlot))
+				if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.ownTimeSlot)) // Se o número de erros de predição é menor do que o limite aceitável de erros (limitPredictionError) e o número de predições executadas é menor do que o máximo de predições para este nó sensor
 				{
-					PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError);
+					PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
 					newPredictionTimer.startRelative(1, this); 
 /*					
 					Utils.printForDebug(" @ @ O valor predito ESTA dentro da margem de erro do valor lido! NoID = "+this.ID);
@@ -738,7 +741,7 @@ public class SimpleNode extends Node
 */					
 					//Adiciona os últimos valores lidos anteriormente a mensagem que vai para o sink
 					//Adds the last values ​​previously read to the message that goes to the sink
-					for(int cont=0; cont<dataRecordItens.size(); cont++) //for(int cont=0; cont<slidingWindowSize; cont++)
+					for (int cont=0; cont<dataRecordItens.size(); cont++) //for(int cont=0; cont<slidingWindowSize; cont++)
 					{
 						wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).type, dataRecordItens.get(cont).value, dataRecordItens.get(cont).time, dataRecordItens.get(cont).batLevel, dataRecordItens.get(cont).round); 
 					}
@@ -759,7 +762,7 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Calls the method triggerPredictions
+	 * It calls the method triggerPredictions
 	 * @param dataSensedType Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 * @param coefA Coefficient A from the Regression Equation for this sensor
 	 * @param coefB Coefficient B from the Regression Equation for this sensor
@@ -771,7 +774,7 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Compares the read value('value') to the predict value('predictionValue') using 'maxError' as threshold error
+	 * It compares the read value('value') to the predict value('predictionValue') using 'maxError' as threshold error
 	 * @param value Value read from the sensor
 	 * @param predictionValue Value predict to be compared
 	 * @param maxError Threshold error to the calculation of prediction for this sensor
@@ -795,6 +798,12 @@ public class SimpleNode extends Node
 		return hit;
 	}
 	
+	/**
+	 * Inner class (structure) to store important data from sersors readings, like: type 
+	 * (Type of sensor data, like t=Temp., h=Hum., l=Lum. or v=Volt.), value (Absolute value),
+	 * time (Date/time from value reading), batLevel (Battery power level sensor) and round (Round number)
+	 * @author Fernando Rodrigues
+	 */
 	public class DataRecord
 	{
 		char type;
@@ -806,6 +815,14 @@ public class SimpleNode extends Node
 	
 	public Vector<DataRecord> dataRecordItens;
 	
+	/**
+	 * Adds the respective values to dataRecordItens attribute from this sensor (SimpleNode)
+	 * @param typ Type of sensor data, like t=Temp., h=Hum., l=Lum. or v=Volt.
+	 * @param val Absolute value
+	 * @param tim Date/time from value reading in double format
+	 * @param bat Battery power level sensor
+	 * @param rnd Round number
+	 */
 	public void addDataRecordItens(char typ, double val, double tim, double bat, int rnd)
 	{
 		if (this.dataRecordItens == null)
