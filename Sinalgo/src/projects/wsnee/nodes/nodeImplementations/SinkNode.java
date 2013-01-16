@@ -19,7 +19,7 @@ public class SinkNode extends SimpleNode
 {
 
 	/**
-	 * Numero de dados sensoriados por time slot (Tamanho do time slot)
+	 * Número de dados sensoriados por time slot (Tamanho do time slot)
 	 * Number of sensed data per time slot (time slot size)
 	 */
 	private Integer sizeTimeSlot = 100;
@@ -34,7 +34,7 @@ public class SinkNode extends SimpleNode
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 * Percentage of temporal acceptable error threshold for the readings of sensor nodes, which may be between 0.0 (accepts no errors) and 1.0 (accepts any error)
 	 */
-	private double thresholdError = 0.01;
+	private double thresholdError = 0.05;
 	
 	/**
 	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
