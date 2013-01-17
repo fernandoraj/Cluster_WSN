@@ -10,7 +10,7 @@ public class Utils {
 	/**
 	 * the mode of debug is used to print debug messages that are spread throughout the project.
 	 */
-	private static boolean inDebugMode = false;
+	private static boolean inDebugMode = true;
 	
 	/**
 	 * Print debug messages only if the <code>inDebugMode</code> static variable is <code>true</code>.
