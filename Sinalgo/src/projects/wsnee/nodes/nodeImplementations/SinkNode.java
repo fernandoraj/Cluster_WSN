@@ -28,13 +28,13 @@ public class SinkNode extends SimpleNode
 	 * Tipo de dado a ser sensoriado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 * Type of data to be sensed (read in the sensor nodes), which can be: "t" = temperature, "h" = humidity, "l" = brightness or "v" = voltage
 	 */
-	private String dataSensedType = "h";
+	private String dataSensedType = "t";
 	
 	/**
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 * Percentage of temporal acceptable error threshold for the readings of sensor nodes, which may be between 0.0 (accepts no errors) and 1.0 (accepts any error)
 	 */
-	private double thresholdError = 0.05;
+	private double thresholdError = 0.1;
 	
 	/**
 	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
@@ -58,7 +58,7 @@ public class SinkNode extends SimpleNode
 	 * Distância máxima aceitável para a formação de clusters. Se for igual a zero (0,0), não considerar tal limite (distância)
 	 * Maximum distance acceptable to the formation of clusters. If it is equal to zero (0.0), ignoring
 	 */
-	private double maxDistance = 0.0;
+	private double maxDistance = 8.0;
 	
 	/**
 	 * Número total de nós sensores presentes na rede
@@ -324,6 +324,7 @@ public class SinkNode extends SimpleNode
 					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
 					if (testDistanceBetweenSensorPositions(currentWsnMsgResp, newWsnMsgResp))
 					{
+// DANDO ERRO NO TESTE DE DIST.
 						if (testSimilarityMeasureWithPairRounds(currentWsnMsgResp, newWsnMsgResp)) // If this (new)message (with sensor readings) already is dissimilar to current message
 						{
 							continueThisLine = true; // Then this (new)message doesn't belong to this cluster / line / group
@@ -420,7 +421,7 @@ public class SinkNode extends SimpleNode
 		boolean distanceOK = false;
 		if (maxDistance > 0.0)
 		{
-			if (currentWsnMsg.spatialPos.distanceTo(newWsnMsg.spatialPos) <= maxDistance)
+			if (currentWsnMsg.spatialPos != null && newWsnMsg.spatialPos != null && currentWsnMsg.spatialPos.distanceTo(newWsnMsg.spatialPos) <= maxDistance)
 			{
 				distanceOK = true;
 			}
