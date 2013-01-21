@@ -358,6 +358,7 @@ public class SimpleNode extends Node
 			}//if (i<sizeTimeSlot)
 		}//while (i<sizeTimeSlot && dataLine != null)
 		wsnMsgResp.batLevel = lastBatLevel; // Level of battery from last reading of sensor node
+		wsnMsgResp.spatialPos = wsnMsgResp.origem.getPosition(); // Spacial position from the source node from message response
 	}
 	
 	/**
