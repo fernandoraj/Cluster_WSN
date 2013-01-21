@@ -34,7 +34,7 @@ public class SinkNode extends SimpleNode
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 * Percentage of temporal acceptable error threshold for the readings of sensor nodes, which may be between 0.0 (accepts no errors) and 1.0 (accepts any error)
 	 */
-	private double thresholdError = 0.1;
+	private double thresholdError = 0.05;
 	
 	/**
 	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
@@ -58,7 +58,7 @@ public class SinkNode extends SimpleNode
 	 * Distância máxima aceitável para a formação de clusters. Se for igual a zero (0,0), não considerar tal limite (distância)
 	 * Maximum distance acceptable to the formation of clusters. If it is equal to zero (0.0), ignoring
 	 */
-	private double maxDistance = 8.0;
+	private double maxDistance = 8.0; //8.0;
 	
 	/**
 	 * Número total de nós sensores presentes na rede
@@ -242,6 +242,9 @@ public class SinkNode extends SimpleNode
 		}
 	}
 	
+	/**
+	 * It classifies the Nodes for each line (group) from sensors by the min distance to sink among them who have the same max residual energy and puts him in the first position (in line)
+	 */
 	private void classifyRepresentativeNodesByHopsToSink()
 	{
 		if (messageGroups != null) // If there is a message group created
@@ -269,18 +272,30 @@ public class SinkNode extends SimpleNode
 		}
 	}
 	
+	/**
+	 * It prints and colore nodes by the clusters (message groups) formed
+	 */
 	private void printMessageGroupsArray2d()
 	{
 		if (messageGroups != null) // If there is a message group created
 		{
+			int codColor = 0;
+			Color[] arrayColor = {Color.CYAN, Color.DARK_GRAY, Color.GRAY, Color.MAGENTA, Color.ORANGE, Color.GREEN, Color.BLUE, Color.PINK, Color.LIGHT_GRAY, Color.BLACK};
+			Color currentRandomColor = arrayColor[codColor]; 
+//			Color currentRandomColor = new Color(codColor); 
 			for (int line=0; line < messageGroups.getNumRows(); line++)
 			{
 				for (int col=0; col < messageGroups.getNumCols(line); col++)
 				{
 					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
+					currentWsnMsgResp.origem.setColor(currentRandomColor);
 					Utils.printForDebug("Line = "+line+", Col = "+col+": NodeID = "+currentWsnMsgResp.origem.ID+" BatLevel = "+currentWsnMsgResp.batLevel+" Round = "+((SimpleNode)currentWsnMsgResp.origem).ultimoRoundLido);
 				}
 				Utils.printForDebug("\n");
+				codColor += 1;
+				codColor = (codColor < 10 ? codColor : 0);
+				currentRandomColor = arrayColor[codColor];
+//				currentRandomColor = new Color(codColor);
 			}
 			Utils.printForDebug("Number of Lines / Clusters = "+messageGroups.getNumRows()+"\n");
 		}
@@ -333,6 +348,10 @@ public class SinkNode extends SimpleNode
 						{
 							continueThisLine = false;
 						}
+					}
+					else
+					{
+						continueThisLine = false;
 					}
 					col++;
 				}
