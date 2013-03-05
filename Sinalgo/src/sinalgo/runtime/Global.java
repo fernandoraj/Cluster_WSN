@@ -133,6 +133,11 @@ public class Global {
 	public static int predictionsCount = 0;
 	
 	/**
+	 * Global counter of the number of sensor readings
+	 */
+	public static int sensorReadingsCount = 0;
+	
+	/**
 	 * The current time of the simulation.
 	 * <p>
 	 * In synchronous simulation, this time is incremented by 1 at the end of every round, in
@@ -312,10 +317,10 @@ public class Global {
 		Tools.runGC(Tools.getTextOutputPrintStream());
 	}
 	
+	
 	@GlobalMethod(menuText = "Clear Recycled Objects", subMenu="Sinalgo Memory", order=3)
 	public static void disposeRecycledObjects() {
 		Tools.disposeRecycledObjects(Tools.getTextOutputPrintStream()); 	
 	}
-
 
 }
