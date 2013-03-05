@@ -86,6 +86,11 @@ public class SinkNode extends SimpleNode
 	 */
 	private int numMessagesOfTimeSlotFinishedReceived = 0;
 	
+	/**
+	 * Indicates that sink node signalize to all other nodes must continuously sensing (naive)
+	 */
+	private boolean allSensorsMustContinuoslySense = false;
+	
 	public SinkNode()
 	{
 		super();
@@ -110,10 +115,16 @@ public class SinkNode extends SimpleNode
 	}
 	
 	@NodePopupMethod(menuText="Definir Sink como Raiz de Roteamento")
-	public void construirRoteamento(){
+	public void construirRoteamento()
+	{
 		this.proximoNoAteEstacaoBase = this;
 		//WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0); //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo
-		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedType); 
+		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedType);
+		
+		// The numberOfMessagesOverAll and sensorReadingsCount attribs are used to define a param from energy consumption of the overall network
+		Utils.printForDebug("Global.numberOfMessagesOverAll = "+Global.numberOfMessagesOverAll);
+		Utils.printForDebug("Global.sensorReadingsCount = "+Global.sensorReadingsCount);
+		
 		WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
 		timer.startRelative(1, this);
 	}
@@ -124,6 +135,10 @@ public class SinkNode extends SimpleNode
 		while (inbox.hasNext())
 		{
 			Message message = inbox.next();
+			
+			Utils.printForDebug("Global.numberOfMessagesOverAll = "+Global.numberOfMessagesOverAll);
+			Utils.printForDebug("Global.sensorReadingsCount = "+Global.sensorReadingsCount);
+			
 			if (message instanceof WsnMsgResponse)
 			{
 				this.setColor(Color.YELLOW);
@@ -189,13 +204,32 @@ public class SinkNode extends SimpleNode
 						
 						if (messageGroups != null) // If there is a message group created
 						{
-							for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
+							if (!allSensorsMustContinuoslySense) // If only the representative nodes must sensing
 							{
-								WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(line, 0); // Get the Representative Node (or Cluster Head)
-								int numSensors = messageGroups.getNumCols(line);
-								Utils.printForDebug("Cluster / Line number = "+line);
-								wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-								receiveMessage(wsnMsgResponseRepresentative);
+								for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
+								{
+									WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(line, 0); // Get the Representative Node (or Cluster Head)
+									int numSensors = messageGroups.getNumCols(line);
+									Utils.printForDebug("Cluster / Line number = "+line);
+									wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+									receiveMessage(wsnMsgResponseRepresentative);
+								}
+							}
+							else // If all nodes in cluters must sensing, and not only the representative nodes
+							{
+								// TESTAR AQUI!
+								for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
+								{
+									int numSensors = messageGroups.getNumCols(line);
+									Utils.printForDebug("Cluster / Line number = "+line);
+									for (int col=0; col < numSensors; col++) // For each colunm from that line in messageGroups
+									{
+										WsnMsgResponse wsnMsgResponseCurrent = messageGroups.get(line, col); // Get the Node
+										wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+										receiveMessage(wsnMsgResponseCurrent);
+									}
+								}
+								// ATÉ AQUI!!!
 							}
 						}
 					}
