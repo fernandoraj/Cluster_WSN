@@ -77,6 +77,11 @@ public class ArrayList2d<Type>
 	{
 		array.get(row).remove(col);
 	}
+	
+	public void remove(int row)
+	{
+		array.remove(row);
+	}
  
 	public void move(int row, int colSource, int colDest)
 	{
