@@ -25,6 +25,12 @@ public class SinkNode extends SimpleNode
 	private Integer sizeTimeSlot = 100;
 	
 	/**
+	 * Número de dados sensoriados por time slot (Tamanho do time slot)
+	 * Number of sensed data per time slot (time slot size)
+	 */
+	private Integer sizeTimeUpdate = 5;
+	
+	/**
 	 * Tipo de dado a ser sensoriado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 * Type of data to be sensed (read in the sensor nodes), which can be: "t" = temperature, "h" = humidity, "l" = brightness or "v" = voltage
 	 */
@@ -71,6 +77,8 @@ public class SinkNode extends SimpleNode
 	 */
 	private ArrayList2d<WsnMsgResponse> messageGroups;
 	
+	private ArrayList2d<WsnMsgResponse> newCluster;
+	
 	/**
 	 * Number of messages received by sink node from all other sensors nodes
 	 */
@@ -91,6 +99,13 @@ public class SinkNode extends SimpleNode
 	 */
 	private boolean allSensorsMustContinuoslySense = false;
 	
+	/**
+	 * Flag to indicate that the sink still not clustered all nodes for the first time
+	 */
+	private boolean stillNonclustered = true;
+	
+	private int expectedNumberOfSensors, numMessagesExpectedReceived = 0;
+	
 	public SinkNode()
 	{
 		super();
@@ -99,6 +114,8 @@ public class SinkNode extends SimpleNode
 		Utils.printForDebug("The type of data sensed is "+dataSensedType);
 		Utils.printForDebug("The threshold of error (max error) is "+thresholdError);
 		Utils.printForDebug("The size of sliding window is "+SimpleNode.slidingWindowSize);
+		Utils.printForDebug("The maximum distance between sensors in the same cluster is "+maxDistance);
+		Utils.printForDebug("The status for continuos sense is "+allSensorsMustContinuoslySense);
 		
 //		if(LogL.ROUND_DETAIL){
 			Global.log.logln("\nThe size of time slot is "+sizeTimeSlot);
@@ -117,7 +134,7 @@ public class SinkNode extends SimpleNode
 	@NodePopupMethod(menuText="Definir Sink como Raiz de Roteamento")
 	public void construirRoteamento()
 	{
-		this.proximoNoAteEstacaoBase = this;
+		this.nextNodeToBaseStation = this;
 		//WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0); //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo
 		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedType);
 		
@@ -144,17 +161,25 @@ public class SinkNode extends SimpleNode
 				this.setColor(Color.YELLOW);
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
 				
-				Utils.printForDebug("@ @ @ Message Received by SINK from the NodeID = "+wsnMsgResp.origem.ID +" with MsgType = "+wsnMsgResp.tipoMsg+"\n");
+				Utils.printForDebug("@ @ @ Message Received by SINK from the NodeID = "+wsnMsgResp.source.ID +" with MsgType = "+wsnMsgResp.typeMsg+"\n");
 				
-				if (wsnMsgResp.tipoMsg == 2) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de erros de predição
+				if (wsnMsgResp.typeMsg == 2) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de erros de predição
 				{
 					numMessagesOfErrorPredictionReceived++;
 					
 // CASO O CLUSTER PRECISE SOFRER UM SPLIT, UMA MENS. SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK DEVE SER ENVIADA PARA CADA UM DOS NÓS DO CLUSTER 
+/*					
+					int lineFromCluster = identifyCluster(wsnMsgResp);
+					if (lineFromCluster >= 0)
+					{
 					
+						expectedNumberOfSensors = sendSenseRequestMessageToAllSensorsInCluster(lineFromCluster);
+						triggerSplitFromCluster(lineFromCluster);
+					}
+*/					
 					receiveMessage(wsnMsgResp); // Recebe a mensagem, para recálculo dos coeficientes e reenvio dos mesmos àquele nó sensor (Nó Representativo), mantendo o número de predições a serem executadas como complemento do total calculado inicialmente, ou seja, NÃO reinicia o ciclo de time slot daquele cluster
 				}
-				else if (wsnMsgResp.tipoMsg == 3) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
+				else if (wsnMsgResp.typeMsg == 3) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
 				{
 					numMessagesOfTimeSlotFinishedReceived++;
 					int lineFromClusterNode = searchAndReplaceNodeInClusterByMessage(wsnMsgResp);
@@ -180,64 +205,180 @@ public class SinkNode extends SimpleNode
 						receiveMessage(wsnMsgResponseRepresentative);
 					}
 					// PAREI AQUI!!! - Fazer testes para verificar se os clusters estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
-				}
+				} // else if (wsnMsgResp.typeMsg == 3)
 				else
 				{
-					addNodeInClusterClassifiedByMessage(wsnMsgResp);
 					
+// ALTERAR NESTE PONTO PARA VERIFICAR QUANDO UMA MENSAGEM DE RESPOSTA A UMA REQUISIÇÃO FOR RECEBIDA PARA REALIZAR POSSÍVEL SPLIT DE CLUSTER 
 					numMessagesReceived++;
 					
-					if (numMessagesReceived >= numTotalOfSensors)
+					if (stillNonclustered) // If the sink still not clustered all nodes for the first time
 					{
-						Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
-						printMessageGroupsArray2d();
-						
-						classifyRepresentativeNodesByResidualEnergy();
-						
-						Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
-						printMessageGroupsArray2d();
-						
-						classifyRepresentativeNodesByHopsToSink();
-						
-						Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
-						printMessageGroupsArray2d();
-						
-						if (messageGroups != null) // If there is a message group created
+						if (messageGroups == null) // If there isn't a message group yet, then it does create one and adds the message to it
 						{
-							if (!allSensorsMustContinuoslySense) // If only the representative nodes must sensing
+							messageGroups = new ArrayList2d<WsnMsgResponse>();
+							messageGroups.ensureCapacity(numTotalOfSensors); // Ensure the capacity as the total number of sensors (nodes) in the data set
+							messageGroups.add(wsnMsgResp, 0); // Add the initial message to the group (ArrayList2d of WsnMsgResponse)
+						}
+						else
+						{
+							addNodeInClusterClassifiedByMessage(messageGroups, wsnMsgResp);
+						}
+						
+						if (numMessagesReceived >= numTotalOfSensors)
+						{
+							Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
+							printMessageGroupsArray2d();
+							
+							classifyRepresentativeNodesByResidualEnergy();
+							
+							Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
+							printMessageGroupsArray2d();
+							
+							classifyRepresentativeNodesByHopsToSink();
+							
+							Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
+							printMessageGroupsArray2d();
+							
+							stillNonclustered = false;
+						 	
+							if (messageGroups != null) // If there is a message group created
 							{
-								for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
+								if (!allSensorsMustContinuoslySense) // If only the representative nodes must sensing
 								{
-									WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(line, 0); // Get the Representative Node (or Cluster Head)
-									int numSensors = messageGroups.getNumCols(line);
-									Utils.printForDebug("Cluster / Line number = "+line);
-									wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-									receiveMessage(wsnMsgResponseRepresentative);
-								}
-							}
-							else // If all nodes in cluters must sensing, and not only the representative nodes
-							{
-								// TESTAR AQUI!
-								for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
-								{
-									int numSensors = messageGroups.getNumCols(line);
-									Utils.printForDebug("Cluster / Line number = "+line);
-									for (int col=0; col < numSensors; col++) // For each colunm from that line in messageGroups
+									for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
 									{
-										WsnMsgResponse wsnMsgResponseCurrent = messageGroups.get(line, col); // Get the Node
-										wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-										receiveMessage(wsnMsgResponseCurrent);
+										WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(line, 0); // Get the Representative Node (or Cluster Head)
+										int numSensors = messageGroups.getNumCols(line);
+										Utils.printForDebug("Cluster / Line number = "+line);
+										wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+										receiveMessage(wsnMsgResponseRepresentative);
+									} // for (int line=0; line < messageGroups.getNumRows(); line++)
+								} // if (!allSensorsMustContinuoslySense)
+								else // If all nodes in cluters must sensing, and not only the representative nodes
+								{
+									// TESTAR AQUI!
+									for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
+									{
+										int numSensors = messageGroups.getNumCols(line);
+										Utils.printForDebug("Cluster / Line number = "+line);
+										for (int col=0; col < numSensors; col++) // For each colunm from that line in messageGroups
+										{
+											WsnMsgResponse wsnMsgResponseCurrent = messageGroups.get(line, col); // Get the Node
+											wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+											receiveMessage(wsnMsgResponseCurrent);
+										}
 									}
-								}
-								// ATÉ AQUI!!!
+									// ATÉ AQUI!!!
+								} // else
+							} // if (messageGroups != null)
+						} // if (numMessagesReceived >= numTotalOfSensors)
+					} // if (stillNonclustered)
+					
+					else // otherwise
+					{
+						numMessagesExpectedReceived++;
+						if (newCluster == null)
+						{
+							newCluster = new ArrayList2d<WsnMsgResponse>();
+							newCluster.ensureCapacity(expectedNumberOfSensors);
+							newCluster.add(wsnMsgResp, 0);
+						}
+						else
+						{
+							addNodeInClusterClassifiedByMessage(newCluster, wsnMsgResp);
+							if (numMessagesExpectedReceived >= expectedNumberOfSensors) // If all messagesResponse (from all nodes in Cluster to be splited) already done received
+							{
+								// classifyRepresentativeNodesByResidualEnergy(newCluster);
+								// classifyRepresentativeNodesByHopsToSink(newCluster);
+								// unifyClusters(messageGroups, newCluster);
 							}
 						}
 					}
-				}
+					
+				} // else
 			} //if (message instanceof WsnMsg)
 		} //while (inbox.hasNext())
 	} //public void handleMessages
 	
+	private void triggerSplitFromCluster(int lineFromCluster)
+	{
+		// IDEIA: O nó representativo acabou de enviar seus últimos dados de leitura (sensoriamento), então ele não precisa enviar novamente
+		// Remover cluster (nós do cluster) de messageGroups
+		messageGroups.remove(lineFromCluster);
+		// Armazenar quantos nós existiam neste cluster, para saber quando todos terminaram de responder
+		// Identificá-los pelo clusterHeadID
+	}
+	
+	private int sendSenseRequestMessageToAllSensorsInCluster(int lineFromCluster)
+	{
+		int numSensorsInThisCluster = 0;
+		if (messageGroups == null) // If there isn't a message group yet
+		{
+			Utils.printForDebug("ERROR in sendSenseRequestMessageToAllCluster method: There isn't messageGroups object instanciated yet!");
+		}
+		else
+		{
+			int col = 0;
+			numSensorsInThisCluster = messageGroups.getNumCols(lineFromCluster);
+			while (col < numSensorsInThisCluster)
+			{
+				WsnMsgResponse currentWsnMsgResp = messageGroups.get(lineFromCluster, col);
+				
+				WsnMsg wsnMessage = new WsnMsg(1, this, currentWsnMsgResp.source, this, 1, sizeTimeUpdate, dataSensedType);
+								
+				wsnMessage.removeCoefs(); // Identifies this message as requesting sensing and not sending coefficients
+				wsnMessage.setPathToSenderNode(currentWsnMsgResp.clonePath()); // Sets the path (route) to destination node (source) - same "currentWsnMsgResp.origem"
+				
+				sendToNextNodeInPath(wsnMessage);
+/*				
+				WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
+				timer.startRelative(1, this);
+*/
+				col++;
+			}
+		}
+		return numSensorsInThisCluster;
+	}
+	
+	private int identifyCluster(WsnMsgResponse newWsnMsgResp)
+	{
+		int lineCLuster = -1;
+		if (messageGroups == null) // If there isn't a message group yet
+		{
+			Utils.printForDebug("ERROR in identifyCluster method: There isn't messageGroups object instanciated yet!");
+		}
+		else
+		{
+			boolean found = false;
+			int line = 0, col = 0;
+			while ((!found) && (line < messageGroups.getNumRows()))
+			{
+				col = 0;
+				while ((!found) && (col < messageGroups.getNumCols(line)))
+				{
+					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
+					if (isEqualNodeSourceFromMessages(currentWsnMsgResp, newWsnMsgResp))
+					{
+						found = true;
+					}
+					else
+					{
+						col++;
+					}
+				}
+				if (!found)
+				{
+					line++;
+				}
+			}
+			if (found)
+			{
+				lineCLuster = line;
+			}
+		}
+		return lineCLuster;
+	}
 	
 	/**
 	 * It selects the Representative Node for each line (group) from sensors by the max residual energy and puts him in the first position (in line)
@@ -291,7 +432,7 @@ public class SinkNode extends SimpleNode
 					boolean sameBatLevel = false;
 					WsnMsgResponse firstWsnMsgRespInLine = messageGroups.get(line, 0);
 					int col=1;
-					while ((col < messageGroups.getNumCols(line)) && (messageGroups.get(line, col).batLevel == firstWsnMsgRespInLine.batLevel) && (messageGroups.get(line, col).saltosAteDestino < firstWsnMsgRespInLine.saltosAteDestino) )
+					while ((col < messageGroups.getNumCols(line)) && (messageGroups.get(line, col).batLevel == firstWsnMsgRespInLine.batLevel) && (messageGroups.get(line, col).hopsToTarget < firstWsnMsgRespInLine.hopsToTarget) )
 					{
 						minIndexNumHopsToSink = col;
 						sameBatLevel = true;
@@ -314,7 +455,36 @@ public class SinkNode extends SimpleNode
 		if (messageGroups != null) // If there is a message group created
 		{
 			int codColor = 0;
-			Color[] arrayColor = {Color.CYAN, Color.DARK_GRAY, Color.GRAY, Color.MAGENTA, Color.ORANGE, Color.GREEN, Color.BLUE, Color.PINK, Color.LIGHT_GRAY, Color.BLACK};
+			Color[] arrayColor = {
+					Color.CYAN, 
+					Color.DARK_GRAY, 
+					Color.GRAY, 
+					Color.MAGENTA, 
+					Color.ORANGE, 
+					Color.GREEN, 
+					Color.BLUE, 
+					Color.PINK, 
+					Color.LIGHT_GRAY, 
+					new Color(25,25,112), 
+					new Color(16,78,139), 
+					new Color(0,199,140), 
+					new Color(189,183,107), 
+					new Color(205,133,0), 
+					new Color(176,23,31), 
+					new Color(139,71,137), 
+					new Color(138,43,226), 
+					new Color(132,112,255), 
+					new Color(100,149,237), 
+					new Color(95,158,160), 
+					new Color(0,206,209), 
+					new Color(61,145,64), 
+					new Color(255,0,0), 
+					new Color(198,113,113),
+					new Color(128,0,0),
+					new Color(113,113,198),
+					new Color(234,234,234),
+					new Color(238,99,99),
+					Color.BLACK};
 			Color currentRandomColor = arrayColor[codColor]; 
 //			Color currentRandomColor = new Color(codColor); 
 			for (int line=0; line < messageGroups.getNumRows(); line++)
@@ -322,12 +492,12 @@ public class SinkNode extends SimpleNode
 				for (int col=0; col < messageGroups.getNumCols(line); col++)
 				{
 					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
-					currentWsnMsgResp.origem.setColor(currentRandomColor);
-					Utils.printForDebug("Line = "+line+", Col = "+col+": NodeID = "+currentWsnMsgResp.origem.ID+" BatLevel = "+currentWsnMsgResp.batLevel+" Round = "+((SimpleNode)currentWsnMsgResp.origem).ultimoRoundLido);
+					currentWsnMsgResp.source.setColor(currentRandomColor);
+					Utils.printForDebug("Line = "+line+", Col = "+col+": NodeID = "+currentWsnMsgResp.source.ID+" BatLevel = "+currentWsnMsgResp.batLevel+" Round = "+((SimpleNode)currentWsnMsgResp.source).lastRoundRead);
 				}
 				Utils.printForDebug("\n");
 				codColor += 1;
-				codColor = (codColor < 10 ? codColor : 0);
+				codColor = (codColor < 28 ? codColor : 0);
 				currentRandomColor = arrayColor[codColor];
 //				currentRandomColor = new Color(codColor);
 			}
@@ -352,67 +522,58 @@ public class SinkNode extends SimpleNode
 	 *  
 	 * @param wsnMsgResp Message to be used for classify the sensor node
 	 */
-	private void addNodeInClusterClassifiedByMessage(WsnMsgResponse newWsnMsgResp)
+	private void addNodeInClusterClassifiedByMessage(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
 	{
-		if (messageGroups == null) // If there isn't a message group yet, then it does create one and adds the message to it
+		boolean found = false;
+		int line = 0;
+		while ((!found) && (line < tempCluster.getNumRows()))
 		{
-			messageGroups = new ArrayList2d<WsnMsgResponse>();
-			messageGroups.ensureCapacity(numTotalOfSensors); // Ensure the capacity as the total number of sensors (nodes) in the data set
-			messageGroups.add(newWsnMsgResp, 0); // Add the initial message to the group (ArrayList2d of WsnMsgResponse)
-		}
-		else
-		{
-			boolean found = false;
-			int line = 0;
-			while ((!found) && (line < messageGroups.getNumRows()))
+			int col = 0;
+			boolean continueThisLine = true;
+			while ((continueThisLine) && (col < tempCluster.getNumCols(line)))
 			{
-				int col = 0;
-				boolean continueThisLine = true;
-				while ((continueThisLine) && (col < messageGroups.getNumCols(line)))
+				WsnMsgResponse currentWsnMsgResp = tempCluster.get(line, col);
+				if (testDistanceBetweenSensorPositions(currentWsnMsgResp, newWsnMsgResp))
 				{
-					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
-					if (testDistanceBetweenSensorPositions(currentWsnMsgResp, newWsnMsgResp))
-					{
 // DANDO ERRO NO TESTE DE DIST.
-						if (testSimilarityMeasureWithPairRounds(currentWsnMsgResp, newWsnMsgResp)) // If this (new)message (with sensor readings) already is dissimilar to current message
-						{
-							continueThisLine = true; // Then this (new)message doesn't belong to this cluster / line / group
-						}
-						else
-						{
-							continueThisLine = false;
-						}
+					if (testSimilarityMeasureWithPairRounds(currentWsnMsgResp, newWsnMsgResp)) // If this (new)message (with sensor readings) already is dissimilar to current message
+					{
+						continueThisLine = true; // Then this (new)message doesn't belong to this cluster / line / group
 					}
 					else
 					{
 						continueThisLine = false;
 					}
-					col++;
-				}
-				if ((continueThisLine) && (col == messageGroups.getNumCols(line)))
-				{
-					found = true;
-					messageGroups.add(newWsnMsgResp, line);
 				}
 				else
 				{
-					line++;
+					continueThisLine = false;
 				}
+				col++;
 			}
-			if (!found)
+			if ((continueThisLine) && (col == tempCluster.getNumCols(line)))
 			{
-				messageGroups.add(newWsnMsgResp, messageGroups.getNumRows()); // It adds the new message "wsnMsgResp" in a new line (cluster) of messageGroup 
+				found = true;
+				tempCluster.add(newWsnMsgResp, line);
 			}
+			else
+			{
+				line++;
+			}
+		}
+		if (!found)
+		{
+			tempCluster.add(newWsnMsgResp, tempCluster.getNumRows()); // It adds the new message "wsnMsgResp" in a new line (cluster) of messageGroup 
+		}
 /*				
-			for (int line = 0; line < messageGroups.getNumRows(); line++)
+			for (int line = 0; line < tempCluster.getNumRows(); line++)
 			{
-				for (int col = 0; col < messageGroups.getNumCols(line); col++)
+				for (int col = 0; col < tempCluster.getNumCols(line); col++)
 				{
 					
 				}
 			}
 */			
-		}
 	}
 
 	/**
@@ -425,7 +586,7 @@ public class SinkNode extends SimpleNode
 	private int searchAndReplaceNodeInClusterByMessage(WsnMsgResponse newWsnMsgResp)
 	{
 		int lineCLuster = -1;
-		if (messageGroups == null) // If there isn't a message group yet, then it does create one and adds the message to it
+		if (messageGroups == null) // If there isn't a message group yet
 		{
 			Utils.printForDebug("ERROR in searchAndReplaceNodeInClusterByMessage method: There isn't messageGroups object instanciated yet!");
 		}
@@ -495,7 +656,7 @@ public class SinkNode extends SimpleNode
 	
 	private boolean isEqualNodeSourceFromMessages(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 	{
-		return (currentWsnMsg.origem.ID == newWsnMsg.origem.ID);
+		return (currentWsnMsg.source.ID == newWsnMsg.source.ID);
 	}
 	
 /*
@@ -747,7 +908,7 @@ public class SinkNode extends SimpleNode
 	private void sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB)
 	{
 		
-		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.origem , this, 1, wsnMsgResp.sizeTimeSlot, dataSensedType, thresholdError);
+		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.source , this, 1, wsnMsgResp.sizeTimeSlot, dataSensedType, thresholdError);
 		wsnMessage.setCoefs(coeficienteA, coeficienteB);
 		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath());
 		sendToNextNodeInPath(wsnMessage);
