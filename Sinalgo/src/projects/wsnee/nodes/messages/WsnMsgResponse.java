@@ -21,14 +21,14 @@ public class WsnMsgResponse extends Message {
 	public Integer ttl;
 	
 	/**
-	 * Nó de destino - Destination node
+	 * Nó de destino - Target node
 	 */
-	public Node destino;
+	public Node target;
 	
 	/**
 	 * Nó de origem - Source node
 	 */
-	public Node origem;
+	public Node source;
 	
 	/**
 	 * Nó que vai reencaminhar a mensagem
@@ -38,12 +38,12 @@ public class WsnMsgResponse extends Message {
 	/**
 	 * Número de saltos até o destino
 	 */
-	public Integer saltosAteDestino;
+	public Integer hopsToTarget;
 	
 	/**
 	 * Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
 	 */
-	public Integer tipoMsg = 0;
+	public Integer typeMsg = 0;
 	
 	/**
 	 * Numero de dados sensoreados por time slot (Tamanho do time slot) 
@@ -90,7 +90,7 @@ public class WsnMsgResponse extends Message {
 		{
 			pathToSenderNode = new Stack<Integer>();
 		}
-		saltosAteDestino++; // Incrementa o contador de saltos (passos) de caminho (de rota) de nós
+		hopsToTarget++; // Incrementa o contador de saltos (passos) de caminho (de rota) de nós
 		pathToSenderNode.push(no); // Adiciona/empilha o nó passado (noID) ao caminho (path) para o nó de origem
 	}
 	
@@ -239,10 +239,10 @@ public class WsnMsgResponse extends Message {
 	 */
 	public WsnMsgResponse(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo) {
 		this.sequenceID = seqID;
-		this.origem = origem;
-		this.destino = destino;
+		this.source = origem;
+		this.target = destino;
 		this.forwardingHop = forwardingHop;
-		this.tipoMsg = tipo;
+		this.typeMsg = tipo;
 	}
 
 	/**
@@ -257,13 +257,13 @@ public class WsnMsgResponse extends Message {
 	 */
 	public WsnMsgResponse(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType) {
 		this.sequenceID = seqID;
-		this.origem = origem;
-		this.destino = destino;
+		this.source = origem;
+		this.target = destino;
 		this.forwardingHop = forwardingHop;
-		this.tipoMsg = tipo;
+		this.typeMsg = tipo;
 		this.sizeTimeSlot = sizeTS;
 		this.dataSensedType = dataSensedType;
-		this.saltosAteDestino = 0;
+		this.hopsToTarget = 0;
 	}
 
 	/**
@@ -279,10 +279,10 @@ public class WsnMsgResponse extends Message {
 	 */
 	public WsnMsgResponse(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType, double thresholdEr) {
 		this.sequenceID = seqID;
-		this.origem = origem;
-		this.destino = destino;
+		this.source = origem;
+		this.target = destino;
 		this.forwardingHop = forwardingHop;
-		this.tipoMsg = tipo;
+		this.typeMsg = tipo;
 		this.sizeTimeSlot = sizeTS;
 		this.dataSensedType = dataSensedType;
 		this.thresholdError = thresholdEr;
@@ -302,10 +302,10 @@ public class WsnMsgResponse extends Message {
 	 */
 	public WsnMsgResponse(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType, double thresholdEr, double spatialThresholdEr, double batLevel) {
 		this.sequenceID = seqID;
-		this.origem = origem;
-		this.destino = destino;
+		this.source = origem;
+		this.target = destino;
 		this.forwardingHop = forwardingHop;
-		this.tipoMsg = tipo;
+		this.typeMsg = tipo;
 		this.sizeTimeSlot = sizeTS;
 		this.dataSensedType = dataSensedType;
 		this.thresholdError = thresholdEr;
@@ -315,9 +315,9 @@ public class WsnMsgResponse extends Message {
 
 	@Override
 	public Message clone() {
-		WsnMsgResponse msg = new WsnMsgResponse(this.sequenceID, this.origem, this.destino, this.forwardingHop, this.tipoMsg);
+		WsnMsgResponse msg = new WsnMsgResponse(this.sequenceID, this.source, this.target, this.forwardingHop, this.typeMsg);
 		msg.ttl = this.ttl;
-		msg.saltosAteDestino = this.saltosAteDestino;
+		msg.hopsToTarget = this.hopsToTarget;
 		msg.sizeTimeSlot = this.sizeTimeSlot;
 		msg.dataSensedType = this.dataSensedType;
 		msg.thresholdError = this.thresholdError;
