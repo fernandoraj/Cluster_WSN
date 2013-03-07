@@ -48,9 +48,9 @@ public class SimpleNode extends Node
 	
 	/**
 	 * Armazena o nó que será usado para alcançar a Estação-Base
-	 * Save/storage the node that will be used for range the Station Base
+	 * Save/storage the node that will be used for range the Base Station 
 	 */
-	protected Node proximoNoAteEstacaoBase;
+	protected Node nextNodeToBaseStation;
 	
 	/**
 	 * Armazena o número de sequencia da última mensagem recebida
@@ -60,7 +60,7 @@ public class SimpleNode extends Node
 	/**
 	 * Valor do último round em que houve leitura do sensor (que teve valor lido do arquivo) 
 	 */
-	protected int ultimoRoundLido;
+	protected int lastRoundRead;
 	
 	/**
 	 * Valor (grandeza/magnitude) da última leitura do sensor 
@@ -91,6 +91,16 @@ public class SimpleNode extends Node
 	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
 	private static final double limitPredictionError = 2;
+	
+	/**
+	 * Number / Identifier of cluster to which this node belongs
+	 */
+	private Integer clusterId = -1;
+	
+	/**
+	 * Number / Identifier of sensor node that manages / represents the cluster to which this node belongs
+	 */
+	private Integer clusterHeadId = -1;
 	
 	/**
 	 * Stores sensor readings of this node loaded from the sensor readings file.
@@ -153,15 +163,15 @@ public class SimpleNode extends Node
 					
 //					Utils.printForDebug("** Entrou em if (wsnMessage.forwardingHop.equals(this)) ** NoID = "+this.ID);
 				}
-				else if (wsnMessage.tipoMsg == 0)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
+				else if (wsnMessage.typeMsg == 0)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
 				{ 
 					this.setColor(Color.BLUE);
 
 //					Utils.printForDebug("*** Entrou em else if (wsnMessage.tipoMsg == 0) *** NoID = "+this.ID);
 					
-					if (proximoNoAteEstacaoBase == null)
+					if (nextNodeToBaseStation == null)
 					{
-						proximoNoAteEstacaoBase = inbox.getSender();
+						nextNodeToBaseStation = inbox.getSender();
 						sequenceNumber = wsnMessage.sequenceID;
 						
 //						Utils.printForDebug("**** Entrou em if (proximoNoAteEstacaoBase == null) **** NoID = "+this.ID);
@@ -182,7 +192,7 @@ public class SimpleNode extends Node
 //						Utils.printForDebug("****** Entrou em encaminhar = Boolean.FALSE; ****** NoID = "+this.ID);
 					}
 				} //if (wsnMessage.tipoMsg == 0)
-				else if (wsnMessage.tipoMsg == 1)// Mensagem que vai do sink para os nós sensores e é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
+				else if (wsnMessage.typeMsg == 1)// Mensagem que vai do sink para os nós sensores e é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
 				{ 
 //					this.setColor(Color.YELLOW);
 //					Integer nextNodeId = wsnMessage.popFromPath();
@@ -192,26 +202,47 @@ public class SimpleNode extends Node
 					encaminhar = Boolean.FALSE;
 					
 					//Definir roteamento de mensagem
-					if (wsnMessage.destino != this)
+					if (wsnMessage.target != this)
 					{
 //						Utils.printForDebug("@@ Entrou em if (nextNodeId != null && wsnMessage.destino != this) @@ NoID = "+this.ID);
 						
 						sendToNextNodeInPath(wsnMessage);
 					}
-					else if (wsnMessage.destino == this) //Se este for o nó de destino da mensagem...
+					else if (wsnMessage.target == this) //Se este for o nó de destino da mensagem...
 					{ 
 //						sequenceNumber = wsnMessage.sequenceID;
 						this.setColor(Color.RED);
 						
 //						Utils.printForDebug("@@@ Entrou em else if (wsnMessage.destino == this && nextNodeId == null) @@@ NoID = "+this.ID);
 						
-						//...então o nó deve receber os coeficientes enviados pelo sink e...
-						receiveCoefficients(wsnMessage);
-						//...não deve mais encaminhar esta mensagem
+						if (wsnMessage.hasCoefs()) // If this message contains / has coefficients (A and B), then 
+						{
+							//...então o nó deve receber os coeficientes enviados pelo sink e...
+							receiveCoefficients(wsnMessage);
+							//...não deve mais encaminhar esta mensagem
+						}
+						else // Else this message request (new) node sense (reading)
+//		CASO O CLUSTER PRECISE SOFRER UM SPLIT, CADA UM DOS NÓS DO CLUSTER DEVE RECEBER UMA MENS. SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK
+						{
+							
+							WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, "");
+							
+							if (wsnMessage != null)
+							{
+								wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType); 
+								prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
+							}
+							addThisNodeToPath(wsnMsgResp);
+							
+							WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
+							
+							timer.startRelative(wsnMessage.sizeTimeSlot, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+							
+						}
 					}
 				} //if (wsnMessage.tipoMsg == 0)
 				
-				if (encaminhar && wsnMessage.tipoMsg == 1)
+				if (encaminhar && wsnMessage.typeMsg == 1)
 				{
 					wsnMessage.forwardingHop = this; 
 					broadcast(wsnMessage);
@@ -229,7 +260,7 @@ public class SimpleNode extends Node
 					}
 					addThisNodeToPath(wsnMsgResp);
 					
-					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
+					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
 					
 					timer.startRelative(wsnMessage.sizeTimeSlot, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
 					
@@ -248,7 +279,7 @@ public class SimpleNode extends Node
 				
 				addThisNodeToPath(wsnMsgResp);
 				
-				WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
+				WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
 				
 				timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
 			} // else if (message instanceof WsnMsgResponse)
@@ -344,7 +375,7 @@ public class SimpleNode extends Node
 					lastValueRead = value;
 					lastTimeRead = quantTime;
 					lastBatLevel = batLevel;
-					ultimoRoundLido = round;
+					lastRoundRead = round;
 
 					addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
 
@@ -358,7 +389,7 @@ public class SimpleNode extends Node
 			}//if (i<sizeTimeSlot)
 		}//while (i<sizeTimeSlot && dataLine != null)
 		wsnMsgResp.batLevel = lastBatLevel; // Level of battery from last reading of sensor node
-		wsnMsgResp.spatialPos = wsnMsgResp.origem.getPosition(); // Spacial position from the source node from message response
+		wsnMsgResp.spatialPos = wsnMsgResp.source.getPosition(); // Spacial position from the source node from message response
 	}
 	
 	/**
@@ -603,14 +634,17 @@ public class SimpleNode extends Node
 	 */
 	protected void receiveCoefficients(WsnMsg wsnMessage)
 	{
-		double coefA = wsnMessage.getCoefA();
-		double coefB = wsnMessage.getCoefB();
-		double maxError = wsnMessage.getThresholdError();
-
-		this.numTotalPredictions = 0;
-		this.numPredictionErrors = 0;
-		this.ownTimeSlot = wsnMessage.sizeTimeSlot;
-		triggerPredictions(wsnMessage.dataSensedType, coefA, coefB, maxError);
+		if (wsnMessage.hasCoefs())
+		{
+			double coefA = wsnMessage.getCoefA();
+			double coefB = wsnMessage.getCoefB();
+			double maxError = wsnMessage.getThresholdError();
+	
+			this.numTotalPredictions = 0;
+			this.numPredictionErrors = 0;
+			this.ownTimeSlot = wsnMessage.sizeTimeSlot;
+			triggerPredictions(wsnMessage.dataSensedType, coefA, coefB, maxError);
+		}
 	}
 	
 	/**
@@ -684,7 +718,7 @@ public class SimpleNode extends Node
 				
 				addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
 
-				ultimoRoundLido = round;
+				lastRoundRead = round;
 //				lastValueRead = value;
 //				lastTimeRead = quantTime;
 
@@ -723,7 +757,7 @@ public class SimpleNode extends Node
 						
 						Utils.printForDebug("* O num. de erros de predicao ("+numPredictionErrors+") ALCANCOU o limite maximo de erros de predicao ("+limitPredictionError+")! NoID = "+this.ID+"\n");
 						Utils.printForDebug("* * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
-						Utils.printForDebug("Round = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError+"\n");
+						Utils.printForDebug("Round = "+lastRoundRead+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError+"\n");
 					}
 					else // if (numTotalPredictions >= this.ownTimeSlot) // Caso tenha saído do laço de predições por ter excedido o limite do seu time slot próprio(número máximo de predições a serem feitas por este Nó Representativo)
 					{
@@ -754,7 +788,7 @@ public class SimpleNode extends Node
 					
 					wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
 					
-					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
+					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
 					
 					timer.startRelative(1, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
 				}
