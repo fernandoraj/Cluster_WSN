@@ -18,29 +18,29 @@ public class WsnMsg extends Message {
 	public Integer ttl;
 	
 	/**
-	 * No de destino
+	 * Nó de destino
 	 */
-	public Node destino;
+	public Node target;
 	
 	/**
-	 * No de origem
+	 * Nó de origem
 	 */
-	public Node origem;
+	public Node source;
 	
 	/**
-	 * No que vai reencaminhar a mensagem
+	 * Nó que vai reencaminhar a mensagem
 	 */
 	public Node forwardingHop;
 	
 	/**
-	 * Numero de saltos até o destino
+	 * Número de saltos até o destino
 	 */
-	public Integer saltosAteDestino;
+	public Integer hopsToTarget;
 	
 	/**
 	 * Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
 	 */
-	public Integer tipoMsg = 0;
+	public Integer typeMsg = 0;
 	
 	/**
 	 * Numero de dados sensoreados por time slot (Tamanho do time slot) 
@@ -63,6 +63,26 @@ public class WsnMsg extends Message {
 	}
 	
 	/**
+	 * Number/Identifier of cluster from node (target)
+	 */
+	private Integer clusterId = -1;
+	
+	public Integer getClusterId()
+	{
+		return this.clusterId;
+	}
+	
+	/**
+	 * Number/Identifier of sensor node that manages/represents the cluster of node (target)
+	 */
+	private Integer clusterHeadId = -1;
+	
+	public Integer getClusterHeadId()
+	{
+		return this.clusterHeadId;
+	}
+	
+	/**
 	 * Representa os coeficientes (A e B) da equação (de regressão) a serem enviados para o nó correspondente
 	 * @author Fernando
 	 */
@@ -81,7 +101,7 @@ public class WsnMsg extends Message {
 	 * Método "get" para o parâmetro hasCoefs
 	 * @return Valor de hasCoefs, indicando se a mensagem já teve seus coeficientes configurados
 	 */
-	public boolean isCoefs()
+	public boolean hasCoefs()
 	{
 		return hasCoefs;
 	}
@@ -134,6 +154,18 @@ public class WsnMsg extends Message {
 	}
 
 	/**
+	 * Remove os valores dos coeficientes (A e B) da equação
+	 */
+	public void removeCoefs()
+	{
+		if (coefs != null)
+		{
+			coefs = null;
+		}
+		hasCoefs = false;
+	}
+	
+	/**
 	 * Caminho de nós do nó que envia a mensagem de resposta até o sink node, em forma de pilha
 	 */
 	private Stack<Integer> pathToSenderNode;
@@ -148,9 +180,9 @@ public class WsnMsg extends Message {
 		{
 			return null;
 		}
-		if (this.saltosAteDestino != null && this.saltosAteDestino > 0)
+		if (this.hopsToTarget != null && this.hopsToTarget > 0)
 		{
-			this.saltosAteDestino--; // Decrementa o contador de saltos (passos) de caminho (de rota) de nós
+			this.hopsToTarget--; // Decrementa o contador de saltos (passos) de caminho (de rota) de nós
 		}
 		return pathToSenderNode.pop(); // Remove/Desempilha o próximo nó (noID) do caminho (path) para o nó de origem e o retorna
 	}
@@ -170,10 +202,10 @@ public class WsnMsg extends Message {
 	 */
 	public WsnMsg(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo) {
 		this.sequenceID = seqID;
-		this.origem = origem;
-		this.destino = destino;
+		this.source = origem;
+		this.target = destino;
 		this.forwardingHop = forwardingHop;
-		this.tipoMsg = tipo;
+		this.typeMsg = tipo;
 	}
 
 	/**
@@ -188,10 +220,10 @@ public class WsnMsg extends Message {
 	 */
 	public WsnMsg(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType) {
 		this.sequenceID = seqID;
-		this.origem = origem;
-		this.destino = destino;
+		this.source = origem;
+		this.target = destino;
 		this.forwardingHop = forwardingHop;
-		this.tipoMsg = tipo;
+		this.typeMsg = tipo;
 		this.sizeTimeSlot = sizeTS;
 		this.dataSensedType = dataSensedType;
 	}
@@ -209,10 +241,10 @@ public class WsnMsg extends Message {
 	 */
 	public WsnMsg(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType, double thresholdEr) {
 		this.sequenceID = seqID;
-		this.origem = origem;
-		this.destino = destino;
+		this.source = origem;
+		this.target = destino;
 		this.forwardingHop = forwardingHop;
-		this.tipoMsg = tipo;
+		this.typeMsg = tipo;
 		this.sizeTimeSlot = sizeTS;
 		this.dataSensedType = dataSensedType;
 		this.thresholdError = thresholdEr;
@@ -220,9 +252,9 @@ public class WsnMsg extends Message {
 	
 	@Override
 	public Message clone() {
-		WsnMsg msg = new WsnMsg(this.sequenceID, this.origem, this.destino, this.forwardingHop, this.tipoMsg);
+		WsnMsg msg = new WsnMsg(this.sequenceID, this.source, this.target, this.forwardingHop, this.typeMsg);
 		msg.ttl = this.ttl;
-		msg.saltosAteDestino = this.saltosAteDestino;
+		msg.hopsToTarget = this.hopsToTarget;
 		msg.sizeTimeSlot = this.sizeTimeSlot;
 		msg.dataSensedType = this.dataSensedType;
 		msg.thresholdError = this.thresholdError;
