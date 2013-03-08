@@ -168,15 +168,15 @@ public class SinkNode extends SimpleNode
 					numMessagesOfErrorPredictionReceived++;
 					
 // CASO O CLUSTER PRECISE SOFRER UM SPLIT, UMA MENS. SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK DEVE SER ENVIADA PARA CADA UM DOS NÓS DO CLUSTER 
-/*					
+					
 					int lineFromCluster = identifyCluster(wsnMsgResp);
 					if (lineFromCluster >= 0)
 					{
 					
-						expectedNumberOfSensors = sendSenseRequestMessageToAllSensorsInCluster(lineFromCluster);
+						expectedNumberOfSensors = sendSenseRequestMessageToAllSensorsInCluster(messageGroups, lineFromCluster);
 						triggerSplitFromCluster(lineFromCluster);
 					}
-*/					
+				
 					receiveMessage(wsnMsgResp); // Recebe a mensagem, para recálculo dos coeficientes e reenvio dos mesmos àquele nó sensor (Nó Representativo), mantendo o número de predições a serem executadas como complemento do total calculado inicialmente, ou seja, NÃO reinicia o ciclo de time slot daquele cluster
 				}
 				else if (wsnMsgResp.typeMsg == 3) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
@@ -188,12 +188,12 @@ public class SinkNode extends SimpleNode
 						Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
 						printMessageGroupsArray2d();
 						
-						classifyRepresentativeNodesByResidualEnergy();
+						classifyRepresentativeNodesByResidualEnergy(messageGroups);
 						
 						Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
 						printMessageGroupsArray2d();
 						
-						classifyRepresentativeNodesByHopsToSink();
+						classifyRepresentativeNodesByHopsToSink(messageGroups);
 						
 						Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
 						printMessageGroupsArray2d();
@@ -206,7 +206,7 @@ public class SinkNode extends SimpleNode
 					}
 					// PAREI AQUI!!! - Fazer testes para verificar se os clusters estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
 				} // else if (wsnMsgResp.typeMsg == 3)
-				else
+				else // If it is a message from a (Representative) node containing reading (sense) data
 				{
 					
 // ALTERAR NESTE PONTO PARA VERIFICAR QUANDO UMA MENSAGEM DE RESPOSTA A UMA REQUISIÇÃO FOR RECEBIDA PARA REALIZAR POSSÍVEL SPLIT DE CLUSTER 
@@ -230,12 +230,12 @@ public class SinkNode extends SimpleNode
 							Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
 							printMessageGroupsArray2d();
 							
-							classifyRepresentativeNodesByResidualEnergy();
+							classifyRepresentativeNodesByResidualEnergy(messageGroups);
 							
 							Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
 							printMessageGroupsArray2d();
 							
-							classifyRepresentativeNodesByHopsToSink();
+							classifyRepresentativeNodesByHopsToSink(messageGroups);
 							
 							Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
 							printMessageGroupsArray2d();
@@ -278,22 +278,29 @@ public class SinkNode extends SimpleNode
 					else // otherwise
 					{
 						numMessagesExpectedReceived++;
-						if (newCluster == null)
+						if (newCluster == null) // If a new cluster (temp) has not yet been created (instanciated)
 						{
-							newCluster = new ArrayList2d<WsnMsgResponse>();
+							newCluster = new ArrayList2d<WsnMsgResponse>(); // Instanciate him
 							newCluster.ensureCapacity(expectedNumberOfSensors);
-							newCluster.add(wsnMsgResp, 0);
-						}
+							newCluster.add(wsnMsgResp, 0); // Adds the new response message sensor to new cluster 
+						} // end if (newCluster == null)
 						else
 						{
 							addNodeInClusterClassifiedByMessage(newCluster, wsnMsgResp);
 							if (numMessagesExpectedReceived >= expectedNumberOfSensors) // If all messagesResponse (from all nodes in Cluster to be splited) already done received
 							{
-								// classifyRepresentativeNodesByResidualEnergy(newCluster);
-								// classifyRepresentativeNodesByHopsToSink(newCluster);
-								// unifyClusters(messageGroups, newCluster);
-							}
-						}
+								classifyRepresentativeNodesByResidualEnergy(newCluster);
+								classifyRepresentativeNodesByHopsToSink(newCluster);
+								
+								unifyClusters(messageGroups, newCluster); // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
+								
+								numMessagesExpectedReceived = 0;
+								newCluster = null;
+								
+//NESTE PONTO, É PRECISO MANDAR MENSAGEM PARA OS NOVOS NÓS REPRESENTATIVOS PARA QUE OS MESMOS CONTINUEM UMA NOVA FASE (CICLO) DE SENSORIAMENTO 
+								
+							} // end if (numMessagesExpectedReceived >= expectedNumberOfSensors)
+						} // end else
 					}
 					
 				} // else
@@ -301,6 +308,32 @@ public class SinkNode extends SimpleNode
 		} //while (inbox.hasNext())
 	} //public void handleMessages
 	
+	/**
+	 * Adds all sensors from all clusters from the tempClusterGiver in the tempClusterReceiver
+	 * @param tempClusterReceiver Cluster structure that will receive the sensors/clusters from the tempClusterGiver structure
+	 * @param tempClusterGiver Cluster structure that will give the sensors/clusters to the tempClusterReceiver structure
+	 */
+	private void unifyClusters(ArrayList2d<WsnMsgResponse> tempClusterReceiver, ArrayList2d<WsnMsgResponse> tempClusterGiver)
+	{
+		int rowReceiver, rowGiver = 0, col;
+		rowReceiver = tempClusterReceiver.getNumRows();
+		while (rowGiver < tempClusterGiver.getNumRows())
+		{
+			col = 0;
+			while (col < tempClusterGiver.getNumCols(rowGiver))
+			{
+				tempClusterReceiver.add(tempClusterGiver.get(rowGiver, col), rowReceiver);
+				col++;
+			} // end while (col < tempClusterGiver.getNumCols(rowGiver))
+			rowGiver++;
+			rowReceiver++;
+		} // end while (rowGiver < tempClusterGiver.getNumRows())
+	} // end unifyClusters(ArrayList2d<WsnMsgResponse> tempClusterReceiver, ArrayList2d<WsnMsgResponse> tempClusterGiver)
+	
+	/**
+	 * It triggers the process to split a cluster, through the exclusion (remove) from the line from old cluster - to be splited
+	 * @param lineFromCluster Line number from cluster to be divided
+	 */
 	private void triggerSplitFromCluster(int lineFromCluster)
 	{
 		// IDEIA: O nó representativo acabou de enviar seus últimos dados de leitura (sensoriamento), então ele não precisa enviar novamente
@@ -310,20 +343,25 @@ public class SinkNode extends SimpleNode
 		// Identificá-los pelo clusterHeadID
 	}
 	
-	private int sendSenseRequestMessageToAllSensorsInCluster(int lineFromCluster)
+	/**
+	 * When a sensor node sends a message to sink indicating a novelty, the sink must shoot messages to all sensors in that cluster requiring new readings from sensors to verify the similarity of the cluster 
+	 * @param lineFromCluster Line number from current cluster
+	 * @return Number of sensors in the cluster from lineFromCluster
+	 */
+	private int sendSenseRequestMessageToAllSensorsInCluster(ArrayList2d<WsnMsgResponse> tempCluster, int lineFromCluster)
 	{
 		int numSensorsInThisCluster = 0;
-		if (messageGroups == null) // If there isn't a message group yet
+		if (tempCluster == null) // If there isn't a message group yet
 		{
-			Utils.printForDebug("ERROR in sendSenseRequestMessageToAllCluster method: There isn't messageGroups object instanciated yet!");
+			Utils.printForDebug("ERROR in sendSenseRequestMessageToAllCluster method: There isn't tempCluster object instanciated yet!");
 		}
 		else
 		{
 			int col = 0;
-			numSensorsInThisCluster = messageGroups.getNumCols(lineFromCluster);
+			numSensorsInThisCluster = tempCluster.getNumCols(lineFromCluster);
 			while (col < numSensorsInThisCluster)
 			{
-				WsnMsgResponse currentWsnMsgResp = messageGroups.get(lineFromCluster, col);
+				WsnMsgResponse currentWsnMsgResp = tempCluster.get(lineFromCluster, col);
 				
 				WsnMsg wsnMessage = new WsnMsg(1, this, currentWsnMsgResp.source, this, 1, sizeTimeUpdate, dataSensedType);
 								
@@ -383,69 +421,69 @@ public class SinkNode extends SimpleNode
 	/**
 	 * It selects the Representative Node for each line (group) from sensors by the max residual energy and puts him in the first position (in line)
 	 */
-	private void classifyRepresentativeNodesByResidualEnergy()
+	private void classifyRepresentativeNodesByResidualEnergy(ArrayList2d<WsnMsgResponse> tempCluster)
 	{
-		if (messageGroups != null) // If there is a message group created
+		if (tempCluster != null) // If there is a message group created
 		{
-			for (int line=0; line < messageGroups.getNumRows(); line++)
+			for (int line=0; line < tempCluster.getNumRows(); line++)
 			{
 				double maxBatLevel = 0.0;
 				int maxBatLevelIndexInThisLine = 0;
 				int bubbleLevel = 0;
-				while (bubbleLevel < (messageGroups.getNumCols(line) - 1))
+				while (bubbleLevel < (tempCluster.getNumCols(line) - 1))
 				{
-					for (int col=bubbleLevel; col < messageGroups.getNumCols(line); col++)
+					for (int col=bubbleLevel; col < tempCluster.getNumCols(line); col++)
 					{
-						WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
+						WsnMsgResponse currentWsnMsgResp = tempCluster.get(line, col);
 						double currentBatLevel = currentWsnMsgResp.batLevel;
 						int currentIndex = col;
 						if (currentBatLevel > maxBatLevel)
 						{
 							maxBatLevel = currentBatLevel;
 							maxBatLevelIndexInThisLine = currentIndex;
-						}
-					}
+						} // end if (currentBatLevel > maxBatLevel)
+					} // end for (int col=bubbleLevel; col < tempCluster.getNumCols(line); col++)
 					if (maxBatLevelIndexInThisLine != 0)
 					{
-						messageGroups.move(line, maxBatLevelIndexInThisLine, bubbleLevel);//changeMessagePositionInLine(line, maxBatLevelIndexInThisLine);
-					}
+						tempCluster.move(line, maxBatLevelIndexInThisLine, bubbleLevel);//changeMessagePositionInLine(line, maxBatLevelIndexInThisLine);
+					} // end if (maxBatLevelIndexInThisLine != 0)
 					bubbleLevel++;
 					maxBatLevel = 0.0;
 					maxBatLevelIndexInThisLine = 0;
-				}
-			}
-		}
-	}
+				} // end while (bubbleLevel < (tempCluster.getNumCols(line) - 1))
+			} // end for (int line=0; line < tempCluster.getNumRows(); line++)
+		} // end if (tempCluster != null)
+	} // classifyRepresentativeNodesByResidualEnergy(ArrayList2d<WsnMsgResponse> tempCluster)
 	
 	/**
 	 * It classifies the Nodes for each line (group) from sensors by the min distance to sink among them who have the same max residual energy and puts him in the first position (in line)
 	 */
-	private void classifyRepresentativeNodesByHopsToSink()
+	private void classifyRepresentativeNodesByHopsToSink(ArrayList2d<WsnMsgResponse> tempCluster)
 	{
-		if (messageGroups != null) // If there is a message group created
+		if (tempCluster != null) // If there is a message group created
 		{
-			for (int line=0; line < messageGroups.getNumRows(); line++)
+			for (int line=0; line < tempCluster.getNumRows(); line++)
 			{
-				if (messageGroups.get(line, 0) != null)
+				if (tempCluster.get(line, 0) != null)
 				{
 					int minIndexNumHopsToSink = 0;
 					boolean sameBatLevel = false;
-					WsnMsgResponse firstWsnMsgRespInLine = messageGroups.get(line, 0);
+					WsnMsgResponse firstWsnMsgRespInLine = tempCluster.get(line, 0);
 					int col=1;
-					while ((col < messageGroups.getNumCols(line)) && (messageGroups.get(line, col).batLevel == firstWsnMsgRespInLine.batLevel) && (messageGroups.get(line, col).hopsToTarget < firstWsnMsgRespInLine.hopsToTarget) )
+					while ((col < tempCluster.getNumCols(line)) && (tempCluster.get(line, col).batLevel == firstWsnMsgRespInLine.batLevel) && (tempCluster.get(line, col).hopsToTarget < firstWsnMsgRespInLine.hopsToTarget) )
 					{
 						minIndexNumHopsToSink = col;
 						sameBatLevel = true;
 						col++;
-					}
+					} // end while ((col < tempCluster.getNumCols(line)) && (tempCluster.get(line, col).batLevel == firstWsnMsgRespInLine.batLevel) && (tempCluster.get(line, col).hopsToTarget < firstWsnMsgRespInLine.hopsToTarget) )
 					if (sameBatLevel)
 					{
 						changeMessagePositionInLine(line, minIndexNumHopsToSink);
-					}
-				}
-			}
-		}
-	}
+					} // end if (sameBatLevel)
+				} // end if (tempCluster.get(line, 0) != null)
+			} // end for (int line=0; line < tempCluster.getNumRows(); line++)
+		} // end if (tempCluster != null)
+	} // end classifyRepresentativeNodesByHopsToSink(ArrayList2d<WsnMsgResponse> tempCluster)
 	
 	/**
 	 * It prints and colore nodes by the clusters (message groups) formed
