@@ -291,13 +291,49 @@ public class SinkNode extends SimpleNode
 							{
 								classifyRepresentativeNodesByResidualEnergy(newCluster);
 								classifyRepresentativeNodesByHopsToSink(newCluster);
-								
+
+								//NESTE PONTO, É PRECISO MANDAR MENSAGEM PARA OS NOVOS NÓS REPRESENTATIVOS PARA QUE OS MESMOS CONTINUEM UMA NOVA FASE 
+								// (CICLO) DE SENSORIAMENTO
+								if (newCluster != null) // If there is a message group created
+								{
+									if (!allSensorsMustContinuoslySense) // If only the representative nodes must sensing
+									{
+										for (int line=0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from newCluster
+										{
+											WsnMsgResponse wsnMsgResponseRepresentative = newCluster.get(line, 0); // Get the Representative Node (or Cluster Head)
+											int numSensors = newCluster.getNumCols(line);
+											Utils.printForDebug("Cluster / Line number = "+line);
+											wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+											receiveMessage(wsnMsgResponseRepresentative);
+										} // for (int line=0; line < newCluster.getNumRows(); line++)
+									} // if (!allSensorsMustContinuoslySense)
+									else // If all nodes in cluters must sensing, and not only the representative nodes
+									{
+										// TESTAR AQUI!
+										for (int line=0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from messageGroups
+										{
+											int numSensors = newCluster.getNumCols(line);
+											Utils.printForDebug("Cluster / Line number = "+line);
+											for (int col=0; col < numSensors; col++) // For each colunm from that line in newCluster
+											{
+												WsnMsgResponse wsnMsgResponseCurrent = newCluster.get(line, col); // Get the Node
+												wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+												receiveMessage(wsnMsgResponseCurrent);
+											}
+										}
+										// ATÉ AQUI!!!
+									} // else
+								} // if (newCluster != null)
+									
+									
+									
+									
 								unifyClusters(messageGroups, newCluster); // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
 								
 								numMessagesExpectedReceived = 0;
 								newCluster = null;
 								
-//NESTE PONTO, É PRECISO MANDAR MENSAGEM PARA OS NOVOS NÓS REPRESENTATIVOS PARA QUE OS MESMOS CONTINUEM UMA NOVA FASE (CICLO) DE SENSORIAMENTO 
+ 
 								
 							} // end if (numMessagesExpectedReceived >= expectedNumberOfSensors)
 						} // end else
@@ -309,7 +345,7 @@ public class SinkNode extends SimpleNode
 	} //public void handleMessages
 	
 	/**
-	 * Adds all sensors from all clusters from the tempClusterGiver in the tempClusterReceiver
+	 * Adds the clusters (lines) from tempClusterGiver in the tempClusterReceiver
 	 * @param tempClusterReceiver Cluster structure that will receive the sensors/clusters from the tempClusterGiver structure
 	 * @param tempClusterGiver Cluster structure that will give the sensors/clusters to the tempClusterReceiver structure
 	 */
@@ -379,6 +415,11 @@ public class SinkNode extends SimpleNode
 		return numSensorsInThisCluster;
 	}
 	
+	/**
+	 * It identifies which cluster (line number) where the "newWsnMsgResp" is 
+	 * @param newWsnMsgResp MessageResponse representing the sensor node to be localized in messageGroups
+	 * @return Line number (cluster) from message passed by
+	 */
 	private int identifyCluster(WsnMsgResponse newWsnMsgResp)
 	{
 		int lineCLuster = -1;
@@ -419,7 +460,8 @@ public class SinkNode extends SimpleNode
 	}
 	
 	/**
-	 * It selects the Representative Node for each line (group) from sensors by the max residual energy and puts him in the first position (in line)
+	 * It selects the Representative Node for each line (cluster) from sensors by the max residual energy and puts him in the first position (in line)
+	 * @param tempCluster Cluster (ArrayList) which will have the sensors ordered (line by line) by the max residual energy
 	 */
 	private void classifyRepresentativeNodesByResidualEnergy(ArrayList2d<WsnMsgResponse> tempCluster)
 	{
@@ -456,7 +498,8 @@ public class SinkNode extends SimpleNode
 	} // classifyRepresentativeNodesByResidualEnergy(ArrayList2d<WsnMsgResponse> tempCluster)
 	
 	/**
-	 * It classifies the Nodes for each line (group) from sensors by the min distance to sink among them who have the same max residual energy and puts him in the first position (in line)
+	 * It classifies the Nodes for each line (cluster) from sensors by the min distance (in number of hops) to sink among them who have the same max residual energy and puts him in the first position (in line)
+	 * @param tempCluster Cluster (ArrayList) which will have the sensors ordered (line by line - as a second criterion) by the min number of hops to sink 
 	 */
 	private void classifyRepresentativeNodesByHopsToSink(ArrayList2d<WsnMsgResponse> tempCluster)
 	{
