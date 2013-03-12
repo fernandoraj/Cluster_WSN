@@ -275,9 +275,10 @@ public class SinkNode extends SimpleNode
 						} // if (numMessagesReceived >= numTotalOfSensors)
 					} // if (stillNonclustered)
 					
-					else // otherwise
+					else // otherwise, if the sink have already been clustered all nodes for the first time
 					{
 						numMessagesExpectedReceived++;
+						
 						if (newCluster == null) // If a new cluster (temp) has not yet been created (instanciated)
 						{
 							newCluster = new ArrayList2d<WsnMsgResponse>(); // Instanciate him
@@ -290,9 +291,11 @@ public class SinkNode extends SimpleNode
 							if (numMessagesExpectedReceived >= expectedNumberOfSensors) // If all messagesResponse (from all nodes in Cluster to be splited) already done received
 							{
 								classifyRepresentativeNodesByResidualEnergy(newCluster);
+								
 								classifyRepresentativeNodesByHopsToSink(newCluster);
 
-								//NESTE PONTO, É PRECISO MANDAR MENSAGEM PARA OS NOVOS NÓS REPRESENTATIVOS PARA QUE OS MESMOS CONTINUEM UMA NOVA FASE 
+								//NESTE PONTO, É PRECISO MANDAR MENSAGEM PARA OS NOVOS NÓS REPRESENTATIVOS PARA QUE OS MESMOS INICIEM UMA NOVA FASE (Novo ciclo de sensoriamento)
+								
 								// (CICLO) DE SENSORIAMENTO
 								if (newCluster != null) // If there is a message group created
 								{
@@ -305,8 +308,9 @@ public class SinkNode extends SimpleNode
 											Utils.printForDebug("Cluster / Line number = "+line);
 											wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
 											receiveMessage(wsnMsgResponseRepresentative);
-										} // for (int line=0; line < newCluster.getNumRows(); line++)
-									} // if (!allSensorsMustContinuoslySense)
+										} // end for (int line=0; line < newCluster.getNumRows(); line++)
+									} // end if (!allSensorsMustContinuoslySense)
+									
 									else // If all nodes in cluters must sensing, and not only the representative nodes
 									{
 										// TESTAR AQUI!
@@ -319,23 +323,18 @@ public class SinkNode extends SimpleNode
 												WsnMsgResponse wsnMsgResponseCurrent = newCluster.get(line, col); // Get the Node
 												wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
 												receiveMessage(wsnMsgResponseCurrent);
-											}
-										}
+											} // end for (int col=0; col < numSensors; col++)
+										} // end for (int line=0; line < newCluster.getNumRows(); line++)
 										// ATÉ AQUI!!!
 									} // else
-								} // if (newCluster != null)
-									
-									
-									
-									
+								} // end if (newCluster != null)
+																	
 								unifyClusters(messageGroups, newCluster); // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
 								
 								numMessagesExpectedReceived = 0;
 								newCluster = null;
 								
- 
-								
-							} // end if (numMessagesExpectedReceived >= expectedNumberOfSensors)
+ 							} // end if (numMessagesExpectedReceived >= expectedNumberOfSensors)
 						} // end else
 					}
 					
@@ -597,11 +596,12 @@ public class SinkNode extends SimpleNode
 	}
 	
 	/**
-	 * Adds the WsnMsgResponse object, passed by parameter, in the correct line ("Cluster") from the messageGroups (ArrayList2d) according with the Dissimilarity Measure 
-	 * PS.: Each line in "messageGroups" (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.origem), 
+	 * Adds the WsnMsgResponse object (newWsnMsgResp), passed by parameter, in the correct line ("Cluster") from the tempCluster (ArrayList2d) according with the Dissimilarity Measure 
+	 * PS.: Each line in tempCluster (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.origem), 
 	 * classified by Dissimilarity Measure from yours data sensed, stored on WsnMsgResponse.dataRecordItens
 	 *  
-	 * @param wsnMsgResp Message to be used for classify the sensor node
+	 * @param tempCluster ArrayList2d from sensors, organized as clusters (line by line) 
+	 * @param newWsnMsgResp Message to be used for classify the sensor node
 	 */
 	private void addNodeInClusterClassifiedByMessage(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
 	{
