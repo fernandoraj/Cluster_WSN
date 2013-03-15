@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import projects.defaultProject.nodes.timers.DirectMessageTimer;
 import projects.wsnee.nodes.messages.WsnMsg;
 import projects.wsnee.nodes.messages.WsnMsgResponse;
 import projects.wsnee.nodes.timers.PredictionTimer;
@@ -93,14 +94,15 @@ public class SimpleNode extends Node
 	private static final double limitPredictionError = 2;
 	
 	/**
-	 * Number / Identifier of cluster to which this node belongs
-	 */
-	private Integer clusterId = -1;
-	
-	/**
-	 * Number / Identifier of sensor node that manages / represents the cluster to which this node belongs
+	 * Number / Identifier of cluster head sensor node that manages / represents
+	 * the cluster to which this node belongs
 	 */
 	private Integer clusterHeadId = -1;
+	
+	/**
+	 * Sensor node that manages/represents the cluster to which this node belongs
+	 */
+	private Node clusterHead;
 	
 	/**
 	 * Stores sensor readings of this node loaded from the sensor readings file.
@@ -271,19 +273,38 @@ public class SimpleNode extends Node
 					
 				} //if (encaminhar)
 			} //if (message instanceof WsnMsg)
-			else if (message instanceof WsnMsgResponse) //Mensagem de resposta dos nós sensores para o sink que deve ser repassada para o "proximoNoAteEstacaoBase"
+			
+			else if (message instanceof WsnMsgResponse) // Mensagem de resposta dos nós sensores, ou para o sink, que deve ser repassada para o "proximoNoAteEstacaoBase", ou para o cluster head, que deve ser recebida retida pelo mesmo
 			{
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
 				
-//				this.setColor(Color.YELLOW);
-				
-				addThisNodeToPath(wsnMsgResp);
-				
-				WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
-				
-				timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
+				if (wsnMsgResp.target != null && wsnMsgResp.target.ID == this.ID) // ou (wsnMsgResp.target == this) // This is the cluster head sensor which is receiving a message from another sensor of this same clsuter
+				{ // TRATAR AQUI DO CASO EM QUE OS CLUSTER HEADS DEVEM ASSUMIR O CONTROLE DA SITUAÇÃO!!!
+
+/*
+ * Neste caso, algum nó sensor pertencente ao mesmo cluster em que este nó (this) é o Cluster Head, está enviando uma mensagem para ele (CH)
+ * informando que houve algum tipo de erro: de predição ou de número máximo de predições.
+ * Analisar o que o CH pode fazer para diminuir o gasto energético na rede!
+ */
+					
+					
+					
+					
+				}
+				else
+				{
+//					this.setColor(Color.YELLOW);
+					
+					addThisNodeToPath(wsnMsgResp);
+					
+					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
+					
+					timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
+				}
 			} // else if (message instanceof WsnMsgResponse)
+			
 		} //while (inbox.hasNext())
+		
 	} //public void handleMessages
 	
 	/**
@@ -497,6 +518,7 @@ public class SimpleNode extends Node
 			e.printStackTrace();
 		}
 	}
+	
 	/**
 	 * Fills the <code>sensorReadingsQueue</code> list with sensor readings from the {@link FileHandler}.
 	 */
@@ -629,11 +651,15 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Get the coefficients from the Regression Equation and the threshold error from the message passed by and trigger the predictions for this node 
-	 * @param wsnMessage Message to have the coefficients read
+	 * Get the coefficients from the Regression Equation and the threshold error
+	 * from the message passed by and trigger the predictions for this node
+	 * 
+	 * @param wsnMessage
+	 *            Message which have the coefficients read
 	 */
 	protected void receiveCoefficients(WsnMsg wsnMessage)
 	{
+		this.clusterHead = wsnMessage.getClusterHead();
 		if (wsnMessage.hasCoefs())
 		{
 			double coefA = wsnMessage.getCoefA();
@@ -753,7 +779,7 @@ public class SimpleNode extends Node
 					
 					if (!(numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.ownTimeSlot)) // Caso tenha saído do laço de predição por ter excedido o número máximo de erros de predição e não pelo limite do seu time slot (número máximo de predições a serem feitas por este Nó Representativo - ou Cluster Head)
 					{
-						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 2, (this.ownTimeSlot - numTotalPredictions), dataSensedType);
+						wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, (this.ownTimeSlot - numTotalPredictions), dataSensedType);
 						
 						Utils.printForDebug("* O num. de erros de predicao ("+numPredictionErrors+") ALCANCOU o limite maximo de erros de predicao ("+limitPredictionError+")! NoID = "+this.ID+"\n");
 						Utils.printForDebug("* * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
@@ -761,7 +787,7 @@ public class SimpleNode extends Node
 					}
 					else // if (numTotalPredictions >= this.ownTimeSlot) // Caso tenha saído do laço de predições por ter excedido o limite do seu time slot próprio(número máximo de predições a serem feitas por este Nó Representativo)
 					{
-						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 3, 0, dataSensedType);
+						wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 3, 0, dataSensedType);
 						
 						Utils.printForDebug("* * O total de lacos de predicoes ("+numTotalPredictions+") CHEGOU ao maximo de lacos de predicoes (TimeSlot proprio = "+this.ownTimeSlot+") deste noh representativo / cluster! NoID = "+this.ID+"\n");						
 					}					
@@ -788,9 +814,16 @@ public class SimpleNode extends Node
 					
 					wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
 					
-					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
-					
-					timer.startRelative(1, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+					if (this.clusterHead == null) // It means that there isn't a cluster head, so the response message must be send to sink node (base station)
+					{
+						WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
+						timer.startRelative(1, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+					} // end if (this.clusterHead == null)
+					else
+					{
+						DirectMessageTimer timer = new DirectMessageTimer(wsnMsgResp, clusterHead);
+						timer.startRelative(1, this);
+					}
 				}
 				
 			}//if (linhas.length > 4)
