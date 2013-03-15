@@ -14,6 +14,7 @@ import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 import sinalgo.runtime.Global;
+import sinalgo.nodes.Node;
 
 public class SinkNode extends SimpleNode 
 {
@@ -95,7 +96,7 @@ public class SinkNode extends SimpleNode
 	private int numMessagesOfTimeSlotFinishedReceived = 0;
 	
 	/**
-	 * Indicates that sink node signalize to all other nodes must continuously sensing (naive)
+	 * Indicates that sink node signalize to all other nodes must continuously sensing (naive using Cluster Heads)
 	 */
 	private boolean allSensorsMustContinuoslySense = false;
 	
@@ -177,7 +178,7 @@ public class SinkNode extends SimpleNode
 						triggerSplitFromCluster(lineFromCluster);
 					}
 				
-					receiveMessage(wsnMsgResp); // Recebe a mensagem, para recálculo dos coeficientes e reenvio dos mesmos àquele nó sensor (Nó Representativo), mantendo o número de predições a serem executadas como complemento do total calculado inicialmente, ou seja, NÃO reinicia o ciclo de time slot daquele cluster
+					receiveMessage(wsnMsgResp, null); // Recebe a mensagem, para recálculo dos coeficientes e reenvio dos mesmos àquele nó sensor (Nó Representativo), mantendo o número de predições a serem executadas como complemento do total calculado inicialmente, ou seja, NÃO reinicia o ciclo de time slot daquele cluster
 				}
 				else if (wsnMsgResp.typeMsg == 3) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
 				{
@@ -202,7 +203,7 @@ public class SinkNode extends SimpleNode
 						int numSensors = messageGroups.getNumCols(lineFromClusterNode);
 						Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
 						wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-						receiveMessage(wsnMsgResponseRepresentative);
+						receiveMessage(wsnMsgResponseRepresentative, null);
 					}
 					// PAREI AQUI!!! - Fazer testes para verificar se os clusters estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
 				} // else if (wsnMsgResp.typeMsg == 3)
@@ -225,7 +226,7 @@ public class SinkNode extends SimpleNode
 							addNodeInClusterClassifiedByMessage(messageGroups, wsnMsgResp);
 						}
 						
-						if (numMessagesReceived >= numTotalOfSensors)
+						if (numMessagesReceived >= numTotalOfSensors) // In this point, clusters should be "closed", and the sensors inside them being classified
 						{
 							Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
 							printMessageGroupsArray2d();
@@ -252,7 +253,7 @@ public class SinkNode extends SimpleNode
 										int numSensors = messageGroups.getNumCols(line);
 										Utils.printForDebug("Cluster / Line number = "+line);
 										wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-										receiveMessage(wsnMsgResponseRepresentative);
+										receiveMessage(wsnMsgResponseRepresentative, null);
 									} // for (int line=0; line < messageGroups.getNumRows(); line++)
 								} // if (!allSensorsMustContinuoslySense)
 								else // If all nodes in cluters must sensing, and not only the representative nodes
@@ -261,19 +262,20 @@ public class SinkNode extends SimpleNode
 									for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
 									{
 										int numSensors = messageGroups.getNumCols(line);
+										Node chNode = (messageGroups.get(line, 0)).source; // Cluster Head from the current cluster/line
 										Utils.printForDebug("Cluster / Line number = "+line);
 										for (int col=0; col < numSensors; col++) // For each colunm from that line in messageGroups
 										{
 											WsnMsgResponse wsnMsgResponseCurrent = messageGroups.get(line, col); // Get the Node
 											wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-											receiveMessage(wsnMsgResponseCurrent);
+											receiveMessage(wsnMsgResponseCurrent, chNode);
 										}
 									}
 									// ATÉ AQUI!!!
-								} // else
-							} // if (messageGroups != null)
-						} // if (numMessagesReceived >= numTotalOfSensors)
-					} // if (stillNonclustered)
+								} // end else
+							} // end if (messageGroups != null)
+						} // end if (numMessagesReceived >= numTotalOfSensors)
+					} // end if (stillNonclustered)
 					
 					else // otherwise, if the sink have already been clustered all nodes for the first time
 					{
@@ -307,7 +309,7 @@ public class SinkNode extends SimpleNode
 											int numSensors = newCluster.getNumCols(line);
 											Utils.printForDebug("Cluster / Line number = "+line);
 											wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-											receiveMessage(wsnMsgResponseRepresentative);
+											receiveMessage(wsnMsgResponseRepresentative, null);
 										} // end for (int line=0; line < newCluster.getNumRows(); line++)
 									} // end if (!allSensorsMustContinuoslySense)
 									
@@ -317,12 +319,13 @@ public class SinkNode extends SimpleNode
 										for (int line=0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from messageGroups
 										{
 											int numSensors = newCluster.getNumCols(line);
+											Node chNode = (newCluster.get(line, 0)).source; // Cluster Head from the current cluster/line
 											Utils.printForDebug("Cluster / Line number = "+line);
 											for (int col=0; col < numSensors; col++) // For each colunm from that line in newCluster
 											{
 												WsnMsgResponse wsnMsgResponseCurrent = newCluster.get(line, col); // Get the Node
 												wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-												receiveMessage(wsnMsgResponseCurrent);
+												receiveMessage(wsnMsgResponseCurrent, chNode);
 											} // end for (int col=0; col < numSensors; col++)
 										} // end for (int line=0; line < newCluster.getNumRows(); line++)
 										// ATÉ AQUI!!!
@@ -338,10 +341,10 @@ public class SinkNode extends SimpleNode
 						} // end else
 					}
 					
-				} // else
-			} //if (message instanceof WsnMsg)
-		} //while (inbox.hasNext())
-	} //public void handleMessages
+				} // end else
+			} // end if (message instanceof WsnMsg)
+		} //end while (inbox.hasNext())
+	} //end public void handleMessages()
 	
 	/**
 	 * Adds the clusters (lines) from tempClusterGiver in the tempClusterReceiver
@@ -577,7 +580,7 @@ public class SinkNode extends SimpleNode
 				}
 				Utils.printForDebug("\n");
 				codColor += 1;
-				codColor = (codColor < 28 ? codColor : 0);
+				codColor = (codColor < 29 ? codColor : 0);
 				currentRandomColor = arrayColor[codColor];
 //				currentRandomColor = new Color(codColor);
 			}
@@ -896,11 +899,18 @@ public class SinkNode extends SimpleNode
 	}
 	
 	/**
-	 * Recebe a mensagem passada, lê os parâmetros (itens) no dataRecordItens, calcula os coeficientes A e B de acordo com estes parâmetros e envia tais coeficientes para o nó sensor de origem
-	 * [Eng] Receives the message, it reads the parameters (items) in dataRecordItens, calculates the coefficients A and B according to these parameters and sends these coefficients for the sensor node of origin
-	 * @param wsnMsgResp Mensagem recebida com os parâmetros a serem lidos
+	 * Recebe a mensagem passada, lê os parâmetros (itens) no dataRecordItens,
+	 * calcula os coeficientes A e B de acordo com estes parâmetros e envia tais
+	 * coeficientes para o nó sensor de origem
+	 * <p>
+	 * [Eng] Receives the message, reads the parameters (items) in
+	 * dataRecordItens, calculates the coefficients A and B according to these
+	 * parameters and sends these coefficients for the sensor node of origin
+	 * 
+	 * @param wsnMsgResp
+	 *            Mensagem recebida com os parâmetros a serem lidos
 	 */
-	private void receiveMessage(WsnMsgResponse wsnMsgResp)
+	private void receiveMessage(WsnMsgResponse wsnMsgResp, Node clusterHeadNode)
 	{
 		if (wsnMsgResp != null && wsnMsgResp.dataRecordItens != null)
 		{
@@ -921,7 +931,7 @@ public class SinkNode extends SimpleNode
 			//Cálculos dos coeficientes de regressão linear com os vetores acima
 			coeficienteB = calculaB(valores, tempos, mediaValores, mediaTempos);
 			coeficienteA = calculaA(mediaValores, mediaTempos, coeficienteB);
-			sendCoefficients(wsnMsgResp, coeficienteA, coeficienteB);
+			sendCoefficients(wsnMsgResp, coeficienteA, coeficienteB, clusterHeadNode);
 		}
 	}
 	
@@ -981,15 +991,23 @@ public class SinkNode extends SimpleNode
 	}
 	
 	/**
-	 * Cria uma nova mensagem (WsnMsg) para envio dos coeficientes recebidos através dos parâmetros, e a envia para o próximo nó no caminho até o nó de origem da mensagem (wsnMsgResp.origem)
-	 * @param wsnMsgResp Mensagem de resposta enviada do nó de origem para o nó sink, que agora enviará os (novos) coeficientes calculados para o nó de origem 
-	 * @param coeficienteA Valor do coeficiente A da equação de regressão
-	 * @param coeficienteB Valor do coeficiente B da equação de regressão
+	 * Cria uma nova mensagem (WsnMsg) para envio dos coeficientes recebidos
+	 * através dos parâmetros, e a envia para o próximo nó no caminho até o nó
+	 * de origem da mensagem (wsnMsgResp.origem)
+	 * 
+	 * @param wsnMsgResp
+	 *            Mensagem de resposta enviada do nó de origem para o nó sink,
+	 *            que agora enviará os (novos) coeficientes calculados para o nó
+	 *            de origem
+	 * @param coeficienteA
+	 *            Valor do coeficiente A da equação de regressão
+	 * @param coeficienteB
+	 *            Valor do coeficiente B da equação de regressão
 	 */
-	private void sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB)
+	private void sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB, Node clusterHeadNode)
 	{
-		
-		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.source , this, 1, wsnMsgResp.sizeTimeSlot, dataSensedType, thresholdError);
+		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.source , this, 1, wsnMsgResp.sizeTimeSlot, dataSensedType, thresholdError, clusterHeadNode);
+		// WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.source , this, 1, wsnMsgResp.sizeTimeSlot, dataSensedType, thresholdError);
 		wsnMessage.setCoefs(coeficienteA, coeficienteB);
 		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath());
 		sendToNextNodeInPath(wsnMessage);
