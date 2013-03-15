@@ -5,6 +5,13 @@ import java.util.Stack;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Message;
 
+/**
+ * Class that represents a message sent to one (or more) sensor(s) with a
+ * request
+ * 
+ * @author Fernando Rodrigues
+ * 
+ */
 public class WsnMsg extends Message {
 	
 	/**
@@ -63,23 +70,23 @@ public class WsnMsg extends Message {
 	}
 	
 	/**
-	 * Number/Identifier of cluster from node (target)
-	 */
-	private Integer clusterId = -1;
-	
-	public Integer getClusterId()
-	{
-		return this.clusterId;
-	}
-	
-	/**
-	 * Number/Identifier of sensor node that manages/represents the cluster of node (target)
+	 * Number/Id of cluster head from node (target)
 	 */
 	private Integer clusterHeadId = -1;
 	
 	public Integer getClusterHeadId()
 	{
 		return this.clusterHeadId;
+	}
+	
+	/**
+	 * Sensor node that manages/represents the cluster of node (target)
+	 */
+	private Node clusterHead;
+	
+	public Node getClusterHead()
+	{
+		return this.clusterHead;
 	}
 	
 	/**
@@ -248,6 +255,30 @@ public class WsnMsg extends Message {
 		this.sizeTimeSlot = sizeTS;
 		this.dataSensedType = dataSensedType;
 		this.thresholdError = thresholdEr;
+	}
+	
+	/**
+	 * Construtor estendido da Classe
+	 * @param seqID Identificador da mensagem
+	 * @param origem No de origem
+	 * @param destino No de destino
+	 * @param forwardingHop No que vai reencaminhar a mensagem
+	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados
+	 * @param sizeTS Numero de dados sensoreados por time slot (Tamanho do time slot)
+	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
+	 * @param thresholdEr Limiar de erro aceitavel
+	 * @param clusterHeadNode Cluster Head do cluster do nó que receberá a mensagem
+	 */
+	public WsnMsg(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType, double thresholdEr, Node clusterHeadNode) {
+		this.sequenceID = seqID;
+		this.source = origem;
+		this.target = destino;
+		this.forwardingHop = forwardingHop;
+		this.typeMsg = tipo;
+		this.sizeTimeSlot = sizeTS;
+		this.dataSensedType = dataSensedType;
+		this.thresholdError = thresholdEr;
+		this.clusterHead = clusterHeadNode;
 	}
 	
 	@Override
