@@ -8,6 +8,13 @@ import sinalgo.nodes.Node;
 import sinalgo.nodes.Position;
 import sinalgo.nodes.messages.Message;
 
+/**
+ * Class that represents a response message sent, usually to the sink (or
+ * another sensor) in response to a request
+ * 
+ * @author Fernando Rodrigues
+ * 
+ */
 public class WsnMsgResponse extends Message {
 	
 	/**
@@ -41,7 +48,9 @@ public class WsnMsgResponse extends Message {
 	public Integer hopsToTarget;
 	
 	/**
-	 * Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
+	 * Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados,
+	 * 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de
+	 * predição excedido
 	 */
 	public Integer typeMsg = 0;
 	
