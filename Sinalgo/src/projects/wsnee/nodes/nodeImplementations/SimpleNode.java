@@ -284,7 +284,7 @@ public class SimpleNode extends Node
 /*
  * Neste caso, algum nó sensor pertencente ao mesmo cluster em que este nó (this) é o Cluster Head, está enviando uma mensagem para ele (CH)
  * informando que houve algum tipo de erro: de predição ou de número máximo de predições.
- * Analisar o que o CH pode fazer para diminuir o gasto energético na rede!
+ * O CH irá verificar, a cada 2 ou mais mensagens de erro de predição e verificará se os sensores que enviaram tais mensagens estão dentro dos limiares de siilaridade.
  */
 					
 					
