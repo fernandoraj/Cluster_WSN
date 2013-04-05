@@ -168,38 +168,40 @@ public class SinkNode extends SimpleNode
 				{
 					numMessagesOfErrorPredictionReceived++;
 					
-// CASO O CLUSTER PRECISE SOFRER UM SPLIT, UMA MENS. SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK DEVE SER ENVIADA PARA CADA UM DOS NÓS DO CLUSTER 
+// CASO O CLUSTER PRECISE SOFRER UM SPLIT, UMA MENSAGEM SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK DEVE SER ENVIADA PARA CADA UM DOS NÓS DO CLUSTER 
 					
 					int lineFromCluster = identifyCluster(wsnMsgResp);
 					if (lineFromCluster >= 0)
 					{
-					
 						expectedNumberOfSensors = sendSenseRequestMessageToAllSensorsInCluster(messageGroups, lineFromCluster);
 						triggerSplitFromCluster(lineFromCluster);
 					}
 				
 					receiveMessage(wsnMsgResp, null); // Recebe a mensagem, para recálculo dos coeficientes e reenvio dos mesmos àquele nó sensor (Nó Representativo), mantendo o número de predições a serem executadas como complemento do total calculado inicialmente, ou seja, NÃO reinicia o ciclo de time slot daquele cluster
 				}
+				
 				else if (wsnMsgResp.typeMsg == 3) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
 				{
 					numMessagesOfTimeSlotFinishedReceived++;
-					int lineFromClusterNode = searchAndReplaceNodeInClusterByMessage(wsnMsgResp);
-					if (lineFromClusterNode >= 0)
+					
+					int lineFromClusterNode = searchAndReplaceNodeInClusterByMessage(wsnMsgResp); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
+					
+					if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
 					{
 						Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
 						printMessageGroupsArray2d();
 						
-						classifyRepresentativeNodesByResidualEnergy(messageGroups);
+						classifyRepresentativeNodesByResidualEnergy(messageGroups); // (Re)classifica os nós dos clusters por energia residual
 						
 						Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
 						printMessageGroupsArray2d();
 						
-						classifyRepresentativeNodesByHopsToSink(messageGroups);
+						classifyRepresentativeNodesByHopsToSink(messageGroups); // (Re)classifica os nós dos clusters por saltos até o sink node 
 						
 						Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
 						printMessageGroupsArray2d();
 						
-						WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(lineFromClusterNode, 0); // Get the Representative Node (or Cluster Head)
+						WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(lineFromClusterNode, 0); // Get the (new) Representative Node (or Cluster Head)
 						int numSensors = messageGroups.getNumCols(lineFromClusterNode);
 						Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
 						wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
@@ -207,6 +209,7 @@ public class SinkNode extends SimpleNode
 					}
 					// PAREI AQUI!!! - Fazer testes para verificar se os clusters estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
 				} // else if (wsnMsgResp.typeMsg == 3)
+				
 				else // If it is a message from a (Representative) node containing reading (sense) data
 				{
 					
@@ -258,7 +261,7 @@ public class SinkNode extends SimpleNode
 								} // if (!allSensorsMustContinuoslySense)
 								else // If all nodes in cluters must sensing, and not only the representative nodes
 								{
-									// TESTAR AQUI!
+									
 									for (int line=0; line < messageGroups.getNumRows(); line++) // For each line (group/cluster) from messageGroups
 									{
 										int numSensors = messageGroups.getNumCols(line);
@@ -267,11 +270,14 @@ public class SinkNode extends SimpleNode
 										for (int col=0; col < numSensors; col++) // For each colunm from that line in messageGroups
 										{
 											WsnMsgResponse wsnMsgResponseCurrent = messageGroups.get(line, col); // Get the Node
-											wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+											
+											//wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+											wsnMsgResponseCurrent.sizeTimeSlot = 0; // If all sensor nodes in Cluster must continuosly sense, so the sizeTimeSlot doesn't matter
+											
 											receiveMessage(wsnMsgResponseCurrent, chNode);
 										}
 									}
-									// ATÉ AQUI!!!
+									
 								} // end else
 							} // end if (messageGroups != null)
 						} // end if (numMessagesReceived >= numTotalOfSensors)
@@ -290,6 +296,7 @@ public class SinkNode extends SimpleNode
 						else
 						{
 							addNodeInClusterClassifiedByMessage(newCluster, wsnMsgResp);
+							
 							if (numMessagesExpectedReceived >= expectedNumberOfSensors) // If all messagesResponse (from all nodes in Cluster to be splited) already done received
 							{
 								classifyRepresentativeNodesByResidualEnergy(newCluster);
@@ -315,7 +322,7 @@ public class SinkNode extends SimpleNode
 									
 									else // If all nodes in cluters must sensing, and not only the representative nodes
 									{
-										// TESTAR AQUI!
+										
 										for (int line=0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from messageGroups
 										{
 											int numSensors = newCluster.getNumCols(line);
@@ -324,11 +331,14 @@ public class SinkNode extends SimpleNode
 											for (int col=0; col < numSensors; col++) // For each colunm from that line in newCluster
 											{
 												WsnMsgResponse wsnMsgResponseCurrent = newCluster.get(line, col); // Get the Node
-												wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+												
+												//wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+												wsnMsgResponseCurrent.sizeTimeSlot = 0; // If all sensor nodes in each cluster must continuosly sense, so the sizeTimeSlot doesn't matter
+												
 												receiveMessage(wsnMsgResponseCurrent, chNode);
 											} // end for (int col=0; col < numSensors; col++)
 										} // end for (int line=0; line < newCluster.getNumRows(); line++)
-										// ATÉ AQUI!!!
+										
 									} // else
 								} // end if (newCluster != null)
 																	
@@ -420,7 +430,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * It identifies which cluster (line number) where the "newWsnMsgResp" is 
 	 * @param newWsnMsgResp MessageResponse representing the sensor node to be localized in messageGroups
-	 * @return Line number (cluster) from message passed by
+	 * @return Line number (cluster) from message passed by; otherwise, returns -1 indicating that there is no such message("newWsnMsgResp") in any cluster
 	 */
 	private int identifyCluster(WsnMsgResponse newWsnMsgResp)
 	{

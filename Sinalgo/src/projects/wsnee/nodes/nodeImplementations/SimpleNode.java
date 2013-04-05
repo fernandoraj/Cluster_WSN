@@ -97,12 +97,27 @@ public class SimpleNode extends Node
 	 * Number / Identifier of cluster head sensor node that manages / represents
 	 * the cluster to which this node belongs
 	 */
-	private Integer clusterHeadId = -1;
+//	private Integer clusterHeadId = -1;
 	
 	/**
 	 * Sensor node that manages/represents the cluster to which this node belongs
 	 */
 	private Node clusterHead;
+
+	/**
+	 * Number of sensors in cluster of this node
+	 */
+//	private int numSensorsInCluster;	
+	
+	/**
+	 * Counter of message errors received by ClusterHead in this cluster
+	 */
+	private int errorsInThisCluster;
+	
+	/**
+	 * Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink
+	 */
+	private static final int maxErrorsPerCluster = 2;
 	
 	/**
 	 * Stores sensor readings of this node loaded from the sensor readings file.
@@ -284,9 +299,10 @@ public class SimpleNode extends Node
 /*
  * Neste caso, algum nó sensor pertencente ao mesmo cluster em que este nó (this) é o Cluster Head, está enviando uma mensagem para ele (CH)
  * informando que houve algum tipo de erro: de predição ou de número máximo de predições.
- * O CH irá verificar, a cada 2 ou mais mensagens de erro de predição e verificará se os sensores que enviaram tais mensagens estão dentro dos limiares de siilaridade.
+ * O CH irá verificar, a cada 2 ou mais mensagens de erro de predição e verificará se os sensores que enviaram tais mensagens estão dentro dos limiares de similaridade.
  */
 					
+					countErrorMessages(wsnMsgResp.typeMsg);
 					
 					
 					
@@ -306,6 +322,29 @@ public class SimpleNode extends Node
 		} //while (inbox.hasNext())
 		
 	} //public void handleMessages
+	
+	
+	/**
+	 * Contabiliza o número de mensagens de erro recebidas por cada Cluster Head (sensor representativo de um cluster / agrupamento) de acordo com o tipo de erro
+	 * @param type Código de tipo do erro detectado (pode ser erro de predição ou número limite(quantidade) de predições (máximo) ultrapassado)
+	 */
+	private void countErrorMessages(Integer type)
+	{
+		switch (type){
+			case 0:
+				break;
+			case 1:
+				break;
+			case 2: errorsInThisCluster++;
+				break;
+			case 3:
+				break;
+		}
+		if (errorsInThisCluster > maxErrorsPerCluster)
+		{
+			// Deve informar ao Sink tal problema, para que o mesmo providencie o tratamento correto (Qual seja!???)
+		}
+	}
 	
 	/**
 	 * Adiciona o nó atual no caminho do sink até o nó de origem (source) da mensagem
@@ -764,6 +803,10 @@ public class SimpleNode extends Node
 					Utils.printForDebug("* * * * O num. de erros de predicoes eh "+numPredictionErrors+"! NoID = "+this.ID+"\n");
 				}
 				
+/*
+ * NESTE PONTO DEVE-SE VERIFICAR SE O PARÂMETRO "ownTimeSlot"(sizeTimeSlot) É IGUAL A ZERO (0), POIS INDICA QUE A PREDIÇÃO DEVERÁ FICAR EM LAÇO CONTÍNUO, ATÉ ATINGIR O LIMITE DE ERROS DE PREDIÇÃO
+ */
+				
 				if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.ownTimeSlot)) // Se o número de erros de predição é menor do que o limite aceitável de erros (limitPredictionError) e o número de predições executadas é menor do que o máximo de predições para este nó sensor
 				{
 					PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
@@ -821,14 +864,14 @@ public class SimpleNode extends Node
 					} // end if (this.clusterHead == null)
 					else
 					{
-						DirectMessageTimer timer = new DirectMessageTimer(wsnMsgResp, clusterHead);
+						DirectMessageTimer timer = new DirectMessageTimer(wsnMsgResp, clusterHead); // Envia uma mensagem diretamente para o ClusterHead deste nó sensor
 						timer.startRelative(1, this);
 					}
 				}
 				
 			}//if (linhas.length > 4)
 		}//if (sensorReading != null && medida != 0)
-	}
+	}// end triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError)
 	
 	/**
 	 * It calls the method triggerPredictions
@@ -840,7 +883,7 @@ public class SimpleNode extends Node
 	public final void triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
 	{
 		triggerPredictions(dataSensedType, coefA, coefB, maxError);
-	}
+	} // end triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
 	
 	/**
 	 * It compares the read value('value') to the predict value('predictionValue') using 'maxError' as threshold error
