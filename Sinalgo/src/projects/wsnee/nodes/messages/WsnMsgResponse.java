@@ -234,6 +234,10 @@ public class WsnMsgResponse extends Message {
 	{
 		Utils.printForDebug("wsnMsgResponseRepresentative.sizeTimeSlot = "+this.sizeTimeSlot);
 		this.sizeTimeSlot = (int)(globalTimeSlot / numSensorsInThisCLuster);
+		if (this.sizeTimeSlot < 1) // sizeTimeSlot shouldn't be equal to 0 (or less than one)
+		{
+			this.sizeTimeSlot = 1;
+		}
 		Utils.printForDebug("New wsnMsgResponseRepresentative.sizeTimeSlot = "+this.sizeTimeSlot+"\n");
 	}
 
