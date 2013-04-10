@@ -93,6 +93,15 @@ public class SimpleNode extends Node
 	 */
 	private boolean loadSensorReadingsFromFile = true;
 	
+	/**
+	 * Number of prediction errors of the sensor node in this timeslot
+	 */
+	protected int numPredictionErrors = 0;
+	
+	/**
+	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
+	 */
+	private static final int limitPredictionError = 2;
 
 	@Override
 	public void preStep() {}
@@ -544,7 +553,7 @@ public class SimpleNode extends Node
 	 * @param coefB Coefficient B from the Regression Equation for this sensor
 	 * @param maxError Threshold error to the calculation of prediction for this sensor
 	 */
-	protected void triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError)
+	protected void triggerPredictions (String dataSensedType, double coefA, double coefB, double maxError)
 	{
 		int medida = 0;
 		if (dataSensedType != null)
@@ -579,7 +588,15 @@ public class SimpleNode extends Node
 				
 				addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
 				
+				if (!isValuePredictInValueReading(value, predictionValue, maxError))
+				{
+					numPredictionErrors++; // Contador do número de erros de predição
+				}
+/*				
 				if (isValuePredictInValueReading(value, predictionValue, maxError))
+				{
+*/
+				if (numPredictionErrors < limitPredictionError) // Se o número máximo de erros de predição for menor que o limite máximo permitido
 				{
 					ultimoRoundLido = Integer.parseInt(linhas[2]);
 //					lastValueRead = value;
@@ -591,7 +608,7 @@ public class SimpleNode extends Node
 					Utils.printForDebug(" @ @ O valor predito ESTA dentro da margem de erro do valor lido! NoID = "+this.ID);
 					Utils.printForDebug("Round = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
 */
-				}
+				} // end if (numPredictionErrors < limitPredictionError)
 				else
 				{
 					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 1, 2, dataSensedType);
@@ -605,7 +622,7 @@ public class SimpleNode extends Node
 					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), lastValueRead, lastTimeRead);
 */					
 					//Adds the last values ​​previously read to the message that goes to the sink
-					for(int cont=0; cont<dataRecordItens.size(); cont++) //for(int cont=0; cont<slidingWindowSize; cont++)
+					for (int cont=0; cont<dataRecordItens.size(); cont++) //for(int cont=0; cont<slidingWindowSize; cont++)
 					{
 						wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).type, dataRecordItens.get(cont).value, dataRecordItens.get(cont).time); 
 					}
@@ -618,10 +635,13 @@ public class SimpleNode extends Node
 					
 					Utils.printForDebug("\n\n * * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
 					Utils.printForDebug("\nRound = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
-				}
+					
+					numPredictionErrors = 0;
+				} // end else if (numPredictionErrors < limitPredictionError)
 				
-			}//if (linhas.length > 4)
-		}//if (sensorReading != null && medida != 0)
+			} // end if (linhas.length > 4)
+			
+		} // end if (sensorReading != null && medida != 0)
 	}
 	
 	/**
