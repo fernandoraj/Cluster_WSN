@@ -177,6 +177,19 @@ public class SinkNode extends SimpleNode
 						triggerSplitFromCluster(lineFromCluster);
 					}
 				
+// CASO O NÓ QUE TENHA ENVIADO A MsgResp SEJA UM CLUSTER HEAD???
+					if (wsnMsgResp.target != null)
+					{
+						
+						
+						
+						
+						
+						
+						
+						
+					}
+					
 					receiveMessage(wsnMsgResp, null); // Recebe a mensagem, para recálculo dos coeficientes e reenvio dos mesmos àquele nó sensor (Nó Representativo), mantendo o número de predições a serem executadas como complemento do total calculado inicialmente, ou seja, NÃO reinicia o ciclo de time slot daquele cluster
 				}
 				
@@ -205,6 +218,7 @@ public class SinkNode extends SimpleNode
 						int numSensors = messageGroups.getNumCols(lineFromClusterNode);
 						Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
 						wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+						
 						receiveMessage(wsnMsgResponseRepresentative, null);
 					}
 					// PAREI AQUI!!! - Fazer testes para verificar se os clusters estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
