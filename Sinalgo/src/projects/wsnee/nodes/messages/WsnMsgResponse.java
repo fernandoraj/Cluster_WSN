@@ -245,35 +245,35 @@ public class WsnMsgResponse extends Message {
 	/**
 	 * Construtor básico da Classe
 	 * @param seqID Identificador da mensagem
-	 * @param origem No de origem
-	 * @param destino No de destino
+	 * @param source No de origem
+	 * @param target No de destino
 	 * @param forwardingHop No que vai reencaminhar a mensagem
-	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
+	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
 	 */
-	public WsnMsgResponse(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo) {
+	public WsnMsgResponse(Integer seqID, Node source, Node target, Node forwardingHop, Integer type) {
 		this.sequenceID = seqID;
-		this.source = origem;
-		this.target = destino;
+		this.source = source;
+		this.target = target;
 		this.forwardingHop = forwardingHop;
-		this.typeMsg = tipo;
+		this.typeMsg = type;
 	}
 
 	/**
 	 * Construtor mediano da Classe //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer
 	 * @param seqID Identificador da mensagem
-	 * @param origem No de origem
-	 * @param destino No de destino
+	 * @param source No de origem
+	 * @param target No de destino
 	 * @param forwardingHop No que vai reencaminhar a mensagem
-	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
+	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
 	 * @param sizeTS Numero de dados sensoreados por time slot (Tamanho do time slot)
 	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 */
-	public WsnMsgResponse(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType) {
+	public WsnMsgResponse(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, String dataSensedType) {
 		this.sequenceID = seqID;
-		this.source = origem;
-		this.target = destino;
+		this.source = source;
+		this.target = target;
 		this.forwardingHop = forwardingHop;
-		this.typeMsg = tipo;
+		this.typeMsg = type;
 		this.sizeTimeSlot = sizeTS;
 		this.dataSensedType = dataSensedType;
 		this.hopsToTarget = 0;
@@ -282,20 +282,20 @@ public class WsnMsgResponse extends Message {
 	/**
 	 * Construtor estendido da Classe
 	 * @param seqID Identificador da mensagem
-	 * @param origem No de origem
-	 * @param destino No de destino
+	 * @param source No de origem
+	 * @param target No de destino
 	 * @param forwardingHop No que vai reencaminhar a mensagem
-	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
+	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
 	 * @param sizeTS Numero de dados sensoreados por time slot (Tamanho do time slot)
 	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 * @param thresholdEr Limiar de erro aceitavel
 	 */
-	public WsnMsgResponse(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType, double thresholdEr) {
+	public WsnMsgResponse(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, String dataSensedType, double thresholdEr) {
 		this.sequenceID = seqID;
-		this.source = origem;
-		this.target = destino;
+		this.source = source;
+		this.target = target;
 		this.forwardingHop = forwardingHop;
-		this.typeMsg = tipo;
+		this.typeMsg = type;
 		this.sizeTimeSlot = sizeTS;
 		this.dataSensedType = dataSensedType;
 		this.thresholdError = thresholdEr;
@@ -304,21 +304,21 @@ public class WsnMsgResponse extends Message {
 	/**
 	 * Construtor estendido da Classe
 	 * @param seqID Identificador da mensagem
-	 * @param origem No de origem
-	 * @param destino No de destino
+	 * @param source No de origem
+	 * @param target No de destino
 	 * @param forwardingHop No que vai reencaminhar a mensagem
-	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
+	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas, 1 para pacotes de dados, 2 para Info: #erros de predição excedido e 3 para Info: #timeSlot de predição excedido
 	 * @param sizeTS Numero de dados sensoreados por time slot (Tamanho do time slot)
 	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 * @param thresholdEr Limiar de erro aceitável
 	 * @param spatialThresholdEr Limiar de erro espacial aceitável
 	 */
-	public WsnMsgResponse(Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS, String dataSensedType, double thresholdEr, double spatialThresholdEr, double batLevel) {
+	public WsnMsgResponse(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, String dataSensedType, double thresholdEr, double spatialThresholdEr, double batLevel) {
 		this.sequenceID = seqID;
-		this.source = origem;
-		this.target = destino;
+		this.source = source;
+		this.target = target;
 		this.forwardingHop = forwardingHop;
-		this.typeMsg = tipo;
+		this.typeMsg = type;
 		this.sizeTimeSlot = sizeTS;
 		this.dataSensedType = dataSensedType;
 		this.thresholdError = thresholdEr;
