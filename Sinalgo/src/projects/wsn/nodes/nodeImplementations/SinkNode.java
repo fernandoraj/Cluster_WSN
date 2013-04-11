@@ -28,7 +28,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 */
-	private double thresholdError = 0.01;
+	private double thresholdError = 0.0;
 	
 	public SinkNode()
 	{
@@ -38,12 +38,14 @@ public class SinkNode extends SimpleNode
 		Utils.printForDebug("The type of data sensed is "+dataSensedType);
 		Utils.printForDebug("The threshold of error (max error) is "+thresholdError);
 		Utils.printForDebug("The size of sliding window is "+SimpleNode.slidingWindowSize);
+		Utils.printForDebug("The size of delay to send novelties is "+SimpleNode.limitPredictionError);
 		
 //		if(LogL.ROUND_DETAIL){
 			Global.log.logln("\nThe size of time slot is "+sizeTimeSlot);
 			Global.log.logln("The type of data sensed is "+dataSensedType);
 			Global.log.logln("The threshold of error (max error) is "+thresholdError);
-			Global.log.logln("The size of sliding window is "+SimpleNode.slidingWindowSize+"\n");
+			Global.log.logln("The size of sliding window is "+SimpleNode.slidingWindowSize);
+			Global.log.logln("The size of delay to send novelties is "+SimpleNode.limitPredictionError+"\n");
 //		}
 	}
 
@@ -84,11 +86,11 @@ public class SinkNode extends SimpleNode
 			int size = wsnMsgResp.dataRecordItens.size();
 			double[] valores = new double[size];
 			double[] tempos = new double[size];
-			char[] tipos = new char[size];
+//			char[] tipos = new char[size];
 			//Dados lidos do sensor correspondente
 			valores = wsnMsgResp.getDataRecordValues();
 			tempos = wsnMsgResp.getDataRecordTimes();
-			tipos = wsnMsgResp.getDataRecordTypes();
+//			tipos = wsnMsgResp.getDataRecordTypes();
 			//Coeficientes de regressão linear com os vetores acima
 			double coeficienteA, coeficienteB;
 			double mediaTempos, mediaValores;
