@@ -1,0 +1,604 @@
+> Starting SINALGO in GUI-Mode for project wsn.
+
+The size of time slot is 100
+The type of data sensed is h
+The threshold of error (max error) is 0.01
+The size of sliding window is 4
+
+> Initialisation terminated.
+
+------------------------------------------------------
+General Config
+------------------------------------------------------
+Command Line arguments: -project wsn -gen 54 wsn:SimpleNode PositionFile (/Users/fernando1/Documents/My Classes/UFC/Doutorado/Doutorado - PPGIA/Artigos/Redes de Sensores/Ferramentas/data/mote_locs_formatado.txt) -gen 1 wsn:SinkNode Random -overwrite SimulationName=WsnClusterWithIntelLabsDataset 
+Java VM arguments: -Xmx500m 
+Class path: binaries/bin:binaries/jdom.jar
+------------------------------------------------------
+Configuration settings
+------------------------------------------------------
+ Simulation Area
+    dimensions = 2
+    dimX = 45
+    dimY = 35
+    dimZ = 500
+ Simulation
+    asynchronousMode = false
+    mobility = false
+    interference = false
+    interferenceIsAdditive = true
+    canReceiveWhileSending = true
+    canReceiveMultiplePacketsInParallel = true
+    edgeType = sinalgo.nodes.edges.BidirectionalEdge
+    exitOnTerminationInGUI = false
+    initializeConnectionsOnStartup = false
+    refreshRate = 1
+    generateNAckMessages = false
+    handleEmptyEventQueue = true
+    javaCmd = java
+    javaVMmaxMem = 500
+ Random number generators
+    useSameSeedAsInPreviousRun = false
+    useFixedSeed = false
+    fixedSeed = 1597681057171967680
+ Logging
+    logFileName = logfile
+    outputToConsole = false
+    logToTimeDirectory = false
+    logConfiguration = true
+    eagerFlush = false
+ GUI
+    extendedControl = true
+    drawArrows = false
+    zoomStep = 1.2
+    wheelZoomStep = 1.05
+    minZoomFactor = 0.05
+    draw3DGraphNodesInProperOrder = true
+    usePerspectiveView = true
+    perspectiveViewDistance = 40
+ Background map in 2D
+    useMap = false
+    map = images/map.jpg
+ Models
+    DefaultMessageTransmissionModel = ConstantTime
+    DefaultConnectivityModel = UDG
+    DefaultDistributionModel = Random
+    DefaultInterferenceModel = NoInterference
+    DefaultMobilityModel = NoMobility
+    DefaultReliabilityModel = ReliableDelivery
+    DefaultNodeImplementation = wsn:SimpleNode
+    showModelsOfAllProjects = false
+ Node storage, position transformation
+    guiPositionTransformation2D = sinalgo.gui.transformation.Transformation2D
+    guiPositionTransformation3D = sinalgo.gui.transformation.Transformation3D
+    nodeCollection2D = sinalgo.runtime.nodeCollection.Geometric2DNodeCollection
+    nodeCollection3D = sinalgo.runtime.nodeCollection.Geometric3DNodeCollection
+ Export Settings
+    epsToPdfCommand = epstopdf %s
+    epsDrawDeploymentAreaBoundingBox = true
+    epsDrawBackgroundWhite = true
+ Animation Settings
+    showMessageAnimations = true
+    messageAnimationEnvelopeWidth = 1.0
+    messageAnimationEnvelopeHeight = 1.0
+    messageAnimationEnvelopeColor = r=255,g=255,b=0
+ Diverse Settings
+    showOptimizationHints = true
+    drawEdges = true
+    drawNodes = true
+    shownEventQueueSize = 10
+    outputTextFieldHeight = 200
+    arrowLength = 8
+    arrowWidth = 1
+    defaultRoundNumber = 1
+------------------------------------------------------
+Custom settings
+------------------------------------------------------
+ externalfilespath/sensorreadingsfilepath = data/sensor_readings/data_0.0_percent_min_500.txt
+ geometricnodecollection/rmax = 10
+ messagetransmission/constanttime = 1
+ node/defaultsize = 1
+ qudg/connectionprobability = 0.6
+ qudg/probabilitytype = constant
+ qudg/rmax = 6
+ qudg/rmin = 4
+ randomdirection/movetime/distribution = Uniform
+ randomdirection/movetime/max = 20
+ randomdirection/movetime/min = 5
+ randomdirection/nodespeed/distribution = Gaussian
+ randomdirection/nodespeed/mean = 10
+ randomdirection/nodespeed/variance = 20
+ randomdirection/waitingtime/distribution = Poisson
+ randomdirection/waitingtime/lambda = 10
+ randomwaypoint/speed/distribution = Gaussian
+ randomwaypoint/speed/mean = 10
+ randomwaypoint/speed/variance = 20
+ randomwaypoint/waitingtime/distribution = Poisson
+ randomwaypoint/waitingtime/lambda = 10
+ sensorreadingsloadblocksize = 500
+ simulationname = WsnClusterWithIntelLabsDataset
+ sinr/alpha = 2
+ sinr/beta = 0.7
+ sinr/noise = 0
+ udg/rmax = 7
+------------------------------------------------------
+Seed for Random Number Generators
+------------------------------------------------------
+ Randomly selected seed: 1597681057171967680
+------------------------------------------------------
+End of settings
+------------------------------------------------------
+
+> Starting the Simulation.
+
+Round; RMSE
+
+Round 1.0 finished
+In this round 4 Messages were sent
+Overall 4 Messages were sent
+
+Round 2.0 finished
+In this round 20 Messages were sent
+Overall 24 Messages were sent
+
+Round 3.0 finished
+In this round 24 Messages were sent
+Overall 48 Messages were sent
+
+Round 4.0 finished
+In this round 43 Messages were sent
+Overall 91 Messages were sent
+
+Round 5.0 finished
+In this round 45 Messages were sent
+Overall 136 Messages were sent
+
+Round 6.0 finished
+In this round 38 Messages were sent
+Overall 174 Messages were sent
+
+Round 7.0 finished
+In this round 29 Messages were sent
+Overall 203 Messages were sent
+
+Round 8.0 finished
+In this round 15 Messages were sent
+Overall 218 Messages were sent
+
+Round 9.0 finished
+In this round 10 Messages were sent
+Overall 228 Messages were sent
+
+Round 10.0 finished
+In this round 2 Messages were sent
+Overall 230 Messages were sent
+
+Round 11.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 12.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 13.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 14.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 15.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 16.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 17.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 18.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 19.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 20.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 21.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 22.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 23.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 24.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 25.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 26.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 27.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 28.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 29.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 30.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 31.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 32.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 33.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 34.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 35.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 36.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 37.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 38.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 39.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 40.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 41.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 42.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 43.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 44.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 45.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 46.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 47.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 48.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 49.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 50.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 51.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 52.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 53.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 54.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 55.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 56.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 57.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 58.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 59.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 60.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 61.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 62.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 63.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 64.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 65.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 66.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 67.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 68.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 69.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 70.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 71.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 72.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 73.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 74.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 75.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 76.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 77.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 78.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 79.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 80.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 81.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 82.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 83.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 84.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 85.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 86.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 87.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 88.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 89.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 90.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 91.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 92.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 93.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 94.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 95.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 96.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 97.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 98.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 99.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 100.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 101.0 finished
+In this round 0 Messages were sent
+Overall 230 Messages were sent
+
+Round 102.0 finished
+In this round 4 Messages were sent
+Overall 234 Messages were sent
+
+Round 103.0 finished
+In this round 5 Messages were sent
+Overall 239 Messages were sent
+
+Round 104.0 finished
+In this round 12 Messages were sent
+Overall 251 Messages were sent
+
+Round 105.0 finished
+In this round 15 Messages were sent
+Overall 266 Messages were sent
+
+The number of Hits (in round 105.0) is 4
+The TOTAL number of Hits (until this round 105.0) is 4
+105.0; 0.18617612441983167
+# # The Global RMSE is 0.18617612441983167
+
+Round 106.0 finished
+In this round 17 Messages were sent
+Overall 283 Messages were sent
+
+The number of Hits (in round 106.0) is 4
+The TOTAL number of Hits (until this round 106.0) is 8
+106.0; 0.22113903045222438
+# # The Global RMSE is 0.22113903045222438
+
+Round 107.0 finished
+In this round 24 Messages were sent
+Overall 307 Messages were sent
+
+The number of Hits (in round 107.0) is 4
+The TOTAL number of Hits (until this round 107.0) is 12
+107.0; 0.2115045053309092
+# # The Global RMSE is 0.2115045053309092
+
+Round 108.0 finished
+In this round 22 Messages were sent
+Overall 329 Messages were sent
+
+The number of Hits (in round 108.0) is 4
+The TOTAL number of Hits (until this round 108.0) is 16
+108.0; 0.2266679680666202
+# # The Global RMSE is 0.2266679680666202
+
+Round 109.0 finished
+In this round 27 Messages were sent
+Overall 356 Messages were sent
+
+The number of Hits (in round 109.0) is 4
+The TOTAL number of Hits (until this round 109.0) is 20
+109.0; 0.23259600356864668
+# # The Global RMSE is 0.23259600356864668
+
+Round 110.0 finished
+In this round 23 Messages were sent
+Overall 379 Messages were sent
+
+The number of Hits (in round 110.0) is 8
+The TOTAL number of Hits (until this round 110.0) is 28
+110.0; 0.22953027615133645
+# # The Global RMSE is 0.22953027615133645
+
