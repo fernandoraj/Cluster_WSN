@@ -174,6 +174,10 @@ public class SynchronousRuntimeThread extends Thread {
 			Global.numberOfHitsOverAll += Global.numberOfHitsInThisRound;
 			Global.numberOfMissesOverAll += Global.numberOfMissesInThisRound;
 			
+			Utils.printForDebug("Round "+(Global.currentTime)+" finished");
+			Utils.printForDebug("In this round: "+Global.numberOfMessagesInThisRound+" messages were sent");
+			Utils.printForDebug("Overall: "+Global.numberOfMessagesOverAll+" messages were sent\n");
+			
 			if (Global.numberOfHitsInThisRound > 0)
 			{
 				System.out.println("\n");
@@ -226,7 +230,7 @@ public class SynchronousRuntimeThread extends Thread {
 			double RMSE = Math.sqrt(Global.squaredError / Global.predictionsCount);
 			Utils.printForDebug("# # The Global RMSE is "+RMSE+" # #");
 			
-			Global.log.logln(Global.currentTime+"; "+RMSE);
+			Global.log.logln(Global.currentTime+"; "+RMSE+"; "+Global.numberOfMessagesOverAll);
 			
 			if(LogL.ROUND_DETAIL){
 				Global.log.logln("# # The Global RMSE is "+RMSE+"\n");
