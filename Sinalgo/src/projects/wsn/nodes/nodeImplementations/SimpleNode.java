@@ -101,7 +101,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	private static final int limitPredictionError = 2;
+	protected static final int limitPredictionError = 0;
 
 	@Override
 	public void preStep() {}
