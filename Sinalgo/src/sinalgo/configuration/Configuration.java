@@ -310,12 +310,12 @@ public class Configuration {
 	@DefaultInConfigFile("Name of the default log file, used by the system,\n" +
 	                       "but also for use by the end-user. (This log file\n" +
 	                       "is stored under sinalgo.runtime.Global.log.)")
-	public static String logFileName = "logfile.txt";
+	public static String logFileName = "logfile";
 	
 	/** */
 	@DefaultInConfigFile("Redirects the default log file to the console.\n" +
 	                       "No logfile will be created if set to true.")
-	public static boolean outputToConsole = true;
+	public static boolean outputToConsole = false;
 	
 	/** */
 	@DefaultInConfigFile("Indicates whether all log-files of the current simulation \n" +
