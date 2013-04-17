@@ -51,14 +51,14 @@ import sinalgo.tools.logging.Logging;
 /**
  * This is the class, where the global information is stored. Do not mistake it for the Configuration.
  * 
- * Do not add or change in this class bacause it is a part of the framework. For GUI_Methods and other custom global
+ * Do not add or change in this class because it is a part of the framework. For GUI_Methods and other custom global
  * information write a CustomGlobal class and put it in the your project folder. It is then accessible by the 
  * customGlobal variable in this class.
  */
 public class Global {
 	
 	/**
-	 * A boolean flag indicating whether the simulation is runing or not. This flag is used to block mouse input (like tooltip...) and 
+	 * A boolean flag indicating whether the simulation is running or not. This flag is used to block mouse input (like tooltip...) and 
 	 * zooming during the simulation.
 	 */
 	public static boolean isRunning = false;
@@ -78,7 +78,7 @@ public class Global {
 	
 	/**
 	 * The default log file generated for each run. You may add your own log output, 
-	 * or create a separete log file.
+	 * or create a separate log file.
 	 * <p>
 	 * Note: A log FILE is only created if outputToConsole is set to false in the 
 	 * config file of the project. Otherwise, the text written to this logger is printed
