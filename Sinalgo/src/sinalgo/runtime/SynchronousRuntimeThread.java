@@ -38,6 +38,7 @@ package sinalgo.runtime;
 
 
 import java.util.Date;
+import java.text.NumberFormat;
 
 import projects.wsnee.utils.Utils;
 //import projects.wsn.utils.Utils;
@@ -230,7 +231,7 @@ public class SynchronousRuntimeThread extends Thread {
 			double RMSE = Math.sqrt(Global.squaredError / Global.predictionsCount);
 			Utils.printForDebug("# # The Global RMSE is "+RMSE+" # #");
 			
-			Global.log.logln(Global.currentTime+"; "+RMSE+"; "+Global.numberOfMessagesOverAll);
+			Global.log.logln(NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE)+"\t"+Global.numberOfMessagesOverAll);
 			
 			if(LogL.ROUND_DETAIL){
 				Global.log.logln("# # The Global RMSE is "+RMSE+"\n");
