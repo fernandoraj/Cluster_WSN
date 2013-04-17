@@ -226,7 +226,7 @@ public class Main{
 			//initialize the appropriate runtime environment
 			runtime.initializeRuntimeSystem(args);
 			
-			Global.log.logln(LogL.ALWAYS, "> Initialisation terminated.");
+			Global.log.logln(LogL.ALWAYS, "> Initialization terminated.");
 			if(Configuration.logConfiguration) {
 				Configuration.printConfiguration(Global.log.getOutputStream());
 			} else {
@@ -234,7 +234,7 @@ public class Main{
 			}
 			Global.log.logln(LogL.ALWAYS, "> Starting the Simulation.\n");
 			
-			Global.log.logln(LogL.ALWAYS, "Round; RMSE\n");
+			Global.log.logln(LogL.ALWAYS, "Round; RMSE                ;Number of Messages\n");
 			
 			runtime.preRun();
 
