@@ -1,0 +1,186 @@
+> Starting SINALGO in GUI-Mode for project wsn.
+
+The size of time slot is 100
+The type of data sensed is t
+The threshold of error (max error) is 0.1
+The size of sliding window is 4
+The size of delay to send novelties is 2
+
+> Initialization terminated.
+
+------------------------------------------------------
+General Config
+------------------------------------------------------
+Command Line arguments: -project wsn -gen 54 wsn:SimpleNode PositionFile (/Users/fernando1/Documents/My Classes/UFC/Doutorado/Doutorado - PPGIA/Artigos/Redes de Sensores/Ferramentas/data/mote_locs_formatado.txt) -gen 1 wsn:SinkNode Random -overwrite SimulationName=WsnClusterWithIntelLabsDataset 
+Java VM arguments: -Xmx500m 
+Class path: binaries/bin:binaries/jdom.jar
+------------------------------------------------------
+Configuration settings
+------------------------------------------------------
+ Simulation Area
+    dimensions = 2
+    dimX = 45
+    dimY = 35
+    dimZ = 500
+ Simulation
+    asynchronousMode = false
+    mobility = false
+    interference = false
+    interferenceIsAdditive = true
+    canReceiveWhileSending = true
+    canReceiveMultiplePacketsInParallel = true
+    edgeType = sinalgo.nodes.edges.BidirectionalEdge
+    exitOnTerminationInGUI = false
+    initializeConnectionsOnStartup = false
+    refreshRate = 1
+    generateNAckMessages = false
+    handleEmptyEventQueue = true
+    javaCmd = java
+    javaVMmaxMem = 500
+ Random number generators
+    useSameSeedAsInPreviousRun = false
+    useFixedSeed = false
+    fixedSeed = 196696349673657173
+ Logging
+    logFileName = logfile
+    outputToConsole = false
+    logToTimeDirectory = true
+    logConfiguration = true
+    eagerFlush = false
+ GUI
+    extendedControl = true
+    drawArrows = false
+    zoomStep = 1.2
+    wheelZoomStep = 1.05
+    minZoomFactor = 0.05
+    draw3DGraphNodesInProperOrder = true
+    usePerspectiveView = true
+    perspectiveViewDistance = 40
+ Background map in 2D
+    useMap = false
+    map = images/map.jpg
+ Models
+    DefaultMessageTransmissionModel = ConstantTime
+    DefaultConnectivityModel = UDG
+    DefaultDistributionModel = Random
+    DefaultInterferenceModel = NoInterference
+    DefaultMobilityModel = NoMobility
+    DefaultReliabilityModel = ReliableDelivery
+    DefaultNodeImplementation = wsn:SimpleNode
+    showModelsOfAllProjects = false
+ Node storage, position transformation
+    guiPositionTransformation2D = sinalgo.gui.transformation.Transformation2D
+    guiPositionTransformation3D = sinalgo.gui.transformation.Transformation3D
+    nodeCollection2D = sinalgo.runtime.nodeCollection.Geometric2DNodeCollection
+    nodeCollection3D = sinalgo.runtime.nodeCollection.Geometric3DNodeCollection
+ Export Settings
+    epsToPdfCommand = epstopdf %s
+    epsDrawDeploymentAreaBoundingBox = true
+    epsDrawBackgroundWhite = true
+ Animation Settings
+    showMessageAnimations = true
+    messageAnimationEnvelopeWidth = 1.0
+    messageAnimationEnvelopeHeight = 1.0
+    messageAnimationEnvelopeColor = r=255,g=255,b=0
+ Diverse Settings
+    showOptimizationHints = true
+    drawEdges = true
+    drawNodes = true
+    shownEventQueueSize = 10
+    outputTextFieldHeight = 200
+    arrowLength = 8
+    arrowWidth = 1
+    defaultRoundNumber = 1
+------------------------------------------------------
+Custom settings
+------------------------------------------------------
+ externalfilespath/sensorreadingsfilepath = data/sensor_readings/data_0.0_percent_min_500.txt
+ geometricnodecollection/rmax = 10
+ messagetransmission/constanttime = 1
+ node/defaultsize = 1
+ qudg/connectionprobability = 0.6
+ qudg/probabilitytype = constant
+ qudg/rmax = 6
+ qudg/rmin = 4
+ randomdirection/movetime/distribution = Uniform
+ randomdirection/movetime/max = 20
+ randomdirection/movetime/min = 5
+ randomdirection/nodespeed/distribution = Gaussian
+ randomdirection/nodespeed/mean = 10
+ randomdirection/nodespeed/variance = 20
+ randomdirection/waitingtime/distribution = Poisson
+ randomdirection/waitingtime/lambda = 10
+ randomwaypoint/speed/distribution = Gaussian
+ randomwaypoint/speed/mean = 10
+ randomwaypoint/speed/variance = 20
+ randomwaypoint/waitingtime/distribution = Poisson
+ randomwaypoint/waitingtime/lambda = 10
+ sensorreadingsloadblocksize = 500
+ simulationname = WsnClusterWithIntelLabsDataset
+ sinr/alpha = 2
+ sinr/beta = 0.7
+ sinr/noise = 0
+ udg/rmax = 7
+------------------------------------------------------
+Seed for Random Number Generators
+------------------------------------------------------
+ Randomly selected seed: 196696349673657173
+------------------------------------------------------
+End of settings
+------------------------------------------------------
+
+> Starting the Simulation.
+
+Round; RMSE                ;Number of Messages
+
+105.0; 0.4305930216289817; 266
+115.0; 0.3942873666888724; 491
+125.0; 0.32788140287366263; 646
+135.0; 0.36073333832950644; 709
+145.0; 0.44416949884246376; 727
+155.0; 0.4702173168682176; 737
+165.0; 0.5008642881976443; 746
+175.0; 0.5229179702115384; 750
+185.0; 0.5936294465664961; 750
+195.0; 0.6445054287334356; 757
+205.0; 0.653795938102165; 770
+215.0; 0.6647284895511846; 791
+225.0; 0.6706130170472372; 809
+235.0; 0.7312788954588688; 818
+245.0; 0.7358065455983249; 831
+255.0; 0.7413051391309904; 850
+265.0; 0.747592877155328; 863
+275.0; 0.7544467793630072; 879
+285.0; 0.7818970339054253; 906
+295.0; 0.7854380490827914; 927
+305.0; 0.7901778626287651; 947
+315.0; 0.793971193343634; 952
+325.0; 0.8029227764141904; 960
+335.0; 0.8137004823387561; 970
+345.0; 0.8227628888938435; 986
+355.0; 0.8323662859487685; 996
+365.0; 0.8405841020283867; 1014
+375.0; 0.8479082466479226; 1039
+385.0; 0.8562650511247194; 1062
+395.0; 0.861873339331115; 1083
+405.0; 0.8663365664288807; 1096
+415.0; 0.8731774108343894; 1118
+425.0; 0.8832627404710147; 1153
+435.0; 0.8876589101077961; 1194
+445.0; 1.3154468338351153; 1225
+455.0; 1.3080801214346525; 1250
+465.0; 1.8536812717817528; 1269
+475.0; 1.8364202596741652; 1304
+485.0; 1.819844814477302; 1346
+495.0; 1.8035099983910539; 1389
+505.0; 1.7869093363144422; 1425
+515.0; 1.7708885024428243; 1446
+525.0; 1.7582603459052866; 1455
+535.0; 1.7480384396163433; 1468
+545.0; 1.7401983782685857; 1487
+555.0; 1.7346877222975627; 1510
+565.0; 1.7327641593477254; 1537
+575.0; 1.7309032239311866; 1550
+585.0; 1.7292107013020463; 1560
+595.0; 1.7275591594726027; 1570
+605.0; 1.7256952730764041; 1583
