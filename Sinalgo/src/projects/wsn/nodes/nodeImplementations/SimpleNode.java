@@ -101,7 +101,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	protected static final int limitPredictionError = 0;
+	protected static final int limitPredictionError = 4; // delay (abbrev.)
 
 	@Override
 	public void preStep() {}
@@ -596,7 +596,7 @@ public class SimpleNode extends Node
 				if (isValuePredictInValueReading(value, predictionValue, maxError))
 				{
 */
-				if (numPredictionErrors < limitPredictionError) // Se o número máximo de erros de predição for menor que o limite máximo permitido
+				if (numPredictionErrors <= limitPredictionError) // Se o número máximo de erros de predição for menor que o limite máximo permitido
 				{
 					ultimoRoundLido = Integer.parseInt(linhas[2]);
 //					lastValueRead = value;
