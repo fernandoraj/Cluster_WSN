@@ -23,7 +23,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 */
-	private String dataSensedType = "t"; // type (abbrev.)
+	private String dataSensedType = "l"; // type (abbrev.)
 	
 	/**
 	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
