@@ -259,7 +259,7 @@ public class FileHandler {
 	 */
 	public static void main(String[] args) {
 		try {
-			FileHandler.generatePercentageFile("data/sensor_readings/data.txt", null, 500);
+			FileHandler.generatePercentageFile("data/sensor_readings/data.txt", null, 1000);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
