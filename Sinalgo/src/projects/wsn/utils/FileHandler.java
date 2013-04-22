@@ -26,6 +26,11 @@ import sinalgo.configuration.CorruptConfigurationEntryException;
 public class FileHandler {
 	
 	/**
+	 * Number of initial sensor nodes readings (by each sensor) to be disregarded in the filtering process
+	 */
+	static final int quantLearning = 10;
+	
+	/**
 	 * Number of sensor nodes in the simulation (Intel Lab Data).
 	 */
 	public static final Integer NUMBER_OF_SENSOR_NODES = 54;
@@ -173,7 +178,7 @@ public class FileHandler {
 	 * @date 20/04/2013
 	 */
 	public static enum TypeData{
-		DATA, TIME, EPOCH, SENSORID, TEMP, LUM, HUM, VOLT;
+		DATE, TIME, EPOCH, SENSORID, TEMP, LUM, HUM, VOLT;
 	}
 	
 	/**
@@ -301,7 +306,7 @@ public class FileHandler {
 		}
 		// else if (sensorIDPrev == (sensorIDCur-1)) {
 		switch(td){
-			case DATA:
+			case DATE:
 				String dateStrPrevius = sensorReadingPreviousValues[0];
 				String dateStrCurrent = sensorReadingCurrentValues[0];
 				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -350,7 +355,7 @@ public class FileHandler {
 				try {
 					Double tempPrevius = ((tempStrPrevius != null)?Double.parseDouble(tempStrPrevius): 0.0);
 					Double tempCurrent = ((tempStrCurrent != null)?Double.parseDouble(tempStrCurrent): 0.0);
-					double diffTemp = tempCurrent - tempPrevius;
+					double diffTemp = Math.abs(tempCurrent - tempPrevius);
 					if (diffTemp > acceptInterval) {
 						includeLine = false;
 					}
@@ -366,7 +371,7 @@ public class FileHandler {
 				try {
 					Double lumPrevius = Double.parseDouble(lumStrPrevius);
 					Double lumCurrent = Double.parseDouble(lumStrCurrent);
-					double diffLum = lumCurrent - lumPrevius;
+					double diffLum = Math.abs(lumCurrent - lumPrevius);
 					if (diffLum > acceptInterval) {
 						includeLine = false;
 					}
@@ -382,7 +387,7 @@ public class FileHandler {
 				try {
 					Double humPrevius = Double.parseDouble(humStrPrevius);
 					Double humCurrent = Double.parseDouble(humStrCurrent);
-					double diffHum = humCurrent - humPrevius;
+					double diffHum = Math.abs(humCurrent - humPrevius);
 					if (diffHum > acceptInterval) {
 						includeLine = false;
 					}
@@ -398,7 +403,7 @@ public class FileHandler {
 				try {
 					Double voltPrevius = Double.parseDouble(voltStrPrevius);
 					Double voltCurrent = Double.parseDouble(voltStrCurrent);
-					double diffVolt = voltCurrent - voltPrevius;
+					double diffVolt = Math.abs(voltCurrent - voltPrevius);
 					if (diffVolt > acceptInterval) {
 						includeLine = false;
 					}
@@ -453,7 +458,7 @@ public class FileHandler {
 				
 				String sensorReadingCurrent = bufferedReader.readLine();
 				int quantSameID = 0;
-				final int quantLearning = 100;
+				//final int quantLearning = 100;
 				
 				while (sensorReadingCurrent != null) {
 					
@@ -557,7 +562,7 @@ public class FileHandler {
 			//FileHandler.generatePercentageFile("data/sensor_readings/data.txt", null, 1000);
 			
 			//TypeData.DATA, TypeData.TIME, TypeData.EPOCH, TypeData.SENSORID, TypeData.TEMP, TypeData.HUM, TypeData.LUM, TypeData.VOLT
-			FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_1000_5.0_filtrated_by_TEMP_10.0_filtrated_by_HUM.txt", TypeData.LUM , 10.0);
+			FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_1000_5.0_filtrated_by_LUM.txt", TypeData.TIME, 1.0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
