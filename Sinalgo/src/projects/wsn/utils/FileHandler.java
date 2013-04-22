@@ -6,7 +6,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -164,6 +168,63 @@ public class FileHandler {
 	}
 
 	/**
+	 * Type to represents the fields from data file of Intel Lab Data experience
+	 * @author Fernando Rodrigues
+	 * @date 20/04/2013
+	 */
+	public static enum TypeData{
+		DATA, TIME, EPOCH, SENSORID, TEMP, LUM, HUM, VOLT;
+	}
+	
+	/**
+	 * Generates a new file that is part of the file specified.
+	 * The new file will be a part of the file specified, filtrated by the field values specified in "typeDataToBeFiltrated" parameter, i.e., the
+	 * max difference acceptable between the sequential values of the same field is the value in "acceptDiff" parameter.
+	 * @param filePath File for which a new file is going to be created.
+	 * @param typeDataToBeFiltrated Types that can be filtrated are: TypeData.DATA, TypeData.TIME, TypeData.EPOCH, TypeData.SENSORID, TypeData.TEMP, 
+	 * TypeData.HUM, TypeData.LUM, TypeData.VOLT
+	 * @param acceptDiff A real number representing the threshold acceptable of the sequential values from field of file
+	 * @throws Exception
+	 */
+	public static void generateFiltratedFile(String filePath, TypeData typeDataToBeFiltrated, Double acceptDiff) throws Exception {
+		
+		if (filePath == null) {
+			throw new Exception("Filepath cannot be a null value.");
+		}
+		
+		if (typeDataToBeFiltrated == null) {
+			throw new Exception("Type cannot be a null value.");
+		}
+		
+		if (acceptDiff == null || (acceptDiff != null && acceptDiff == 0.0)) {
+			acceptDiff = 5.0; // Default difference 
+		}
+/*
+		if (acceptDiff < 0 || acceptDiff > 100) {
+			throw new Exception("Percentage must be a float value in the [0,100] interval.");
+		}
+*/
+		System.out.println("generating filtrated file...");
+		
+		String outputFilePath = filePath.substring(0, filePath.length() - 4) + "_" + acceptDiff + "_filtrated_by_" + typeDataToBeFiltrated + ".txt";
+		deletePreviousFile(outputFilePath);
+		
+		SortedMap<Integer, List<String>> sensorReadingsMap = getSensorReadingsMap(filePath, typeDataToBeFiltrated, acceptDiff);
+		int totalSize = 0;
+		long initTime = System.currentTimeMillis();
+		for (Integer sensorID : sensorReadingsMap.keySet()) {
+			List<String> sensorReadingsList = sensorReadingsMap.get(sensorID);
+			
+			System.out.println("Node " + sensorID + " has " + sensorReadingsList.size() + " sensor readings.");
+			totalSize++;
+			printToFile(outputFilePath, sensorReadingsList, sensorReadingsList.size());
+			
+		}
+		long finishTime = System.currentTimeMillis();
+		System.out.println(totalSize + " sensor readings printed to file " + outputFilePath + " in " + Utils.getTimeIntervalMessage(initTime, finishTime));
+	}
+	
+	/**
 	 * Deletes the file specified. This method can be used when you want to override a file, so you delete it before
 	 * creating a new one. It can be done to avoid that you append lines to the file rather than overringding it.
 	 * @param outputFilePath File to be deleted
@@ -213,6 +274,234 @@ public class FileHandler {
 	}
 	
 	/**
+	 * Compares the two lines (sensor readings) passed by parameters ("sensorReadingPrevious" and "sensorReadingCurrent") to test if the field 
+	 * specified in "td" parameter is inside the "acceptInterval" value, returning "true" if this is happening and "false" otherwise.
+	 * @param sensorReadingPrevious Line of data file (sensor reading) read before (previous)
+	 * @param sensorReadingCurrent Line of data file (sensor reading) read after (current)
+	 * @param td Type Data identifying the field of data to the compared (tested)  
+	 * @param acceptInterval A real number representing the threshold acceptable of the sequential values from field of file
+	 * @return "true" if the field specified in "td" parameter is inside the "acceptInterval" value and "false" otherwise.
+	 */
+	public static Boolean isSensorReadingsDataInsideAcceptInterval(String sensorReadingPrevious, String sensorReadingCurrent, TypeData td, Double acceptInterval) {
+		
+		Boolean includeLine = true;
+
+		String[] sensorReadingPreviousValues = sensorReadingPrevious.split(" ");
+		String[] sensorReadingCurrentValues = sensorReadingCurrent.split(" ");
+		
+		if (sensorReadingCurrentValues.length < 7) { //evita linhas quebradas que estão no final do arquivo
+			return false;
+		}
+		Integer sensorIDPrev = Integer.parseInt(sensorReadingPreviousValues[3]);
+		Integer sensorIDCur = Integer.parseInt(sensorReadingCurrentValues[3]);
+		
+		if (sensorIDPrev != (sensorIDCur)) { // In this case, the two sequential sensors (readings) are from two difference sensors (ID1 != ID2) 
+		//if (sensorIDPrev == (sensorIDCur-1)) { // In this case, the two sequential sensors (readings) are from two difference sensors (ID1 != ID2) 
+			return true; // So, there aren't relationship between the readings from two sensors.
+		}
+		// else if (sensorIDPrev == (sensorIDCur-1)) {
+		switch(td){
+			case DATA:
+				String dateStrPrevius = sensorReadingPreviousValues[0];
+				String dateStrCurrent = sensorReadingCurrentValues[0];
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+				Date datePrevius;
+				Date dateCurrent;
+				try {
+					datePrevius = df.parse(dateStrPrevius);
+					dateCurrent = df.parse(dateStrCurrent);
+					long diff = dateCurrent.getTime() - datePrevius.getTime();
+					long diffDays = diff / (24 * 60 * 60 * 1000);
+					if (diffDays > acceptInterval) {
+						includeLine = false;
+					}
+				}
+				catch (ParseException pe) {
+					pe.printStackTrace();
+				}
+				break;
+			case TIME:
+				String timeStrPrevius = sensorReadingPreviousValues[1];
+				String timeStrCurrent = sensorReadingCurrentValues[1];
+				df = new SimpleDateFormat("HH:mm:ss.SSSSSS"); // DateFormat df = new SimpleDateFormat("HH:mm:ss.SSSSS");
+				Date timePrevius;
+				Date timeCurrent;
+				try {
+					timePrevius = df.parse(timeStrPrevius);
+					timeCurrent = df.parse(timeStrCurrent);
+					long diff = timeCurrent.getTime() - timePrevius.getTime();
+					long diffMinutes = diff / (60 * 1000);
+					if (diffMinutes > acceptInterval) {
+						includeLine = false;
+					}
+				}
+				catch (ParseException pe) {
+					includeLine = false;
+					pe.printStackTrace();
+				}
+				break;
+			case EPOCH: // It doesn't apply
+				break;
+			case SENSORID: // It doesn't apply
+				break;
+			case TEMP:
+				String tempStrPrevius = sensorReadingPreviousValues[4];
+				String tempStrCurrent = sensorReadingCurrentValues[4];
+				try {
+					Double tempPrevius = ((tempStrPrevius != null)?Double.parseDouble(tempStrPrevius): 0.0);
+					Double tempCurrent = ((tempStrCurrent != null)?Double.parseDouble(tempStrCurrent): 0.0);
+					double diffTemp = tempCurrent - tempPrevius;
+					if (diffTemp > acceptInterval) {
+						includeLine = false;
+					}
+				}
+				catch (NumberFormatException pe) {
+					includeLine = false;
+					pe.printStackTrace();
+				}
+				break;
+			case LUM:
+				String lumStrPrevius = sensorReadingPreviousValues[5];
+				String lumStrCurrent = sensorReadingCurrentValues[5];
+				try {
+					Double lumPrevius = Double.parseDouble(lumStrPrevius);
+					Double lumCurrent = Double.parseDouble(lumStrCurrent);
+					double diffLum = lumCurrent - lumPrevius;
+					if (diffLum > acceptInterval) {
+						includeLine = false;
+					}
+				}
+				catch (NumberFormatException pe) {
+					includeLine = false;
+					pe.printStackTrace();
+				}
+				break;
+			case HUM:
+				String humStrPrevius = sensorReadingPreviousValues[6];
+				String humStrCurrent = sensorReadingCurrentValues[6];
+				try {
+					Double humPrevius = Double.parseDouble(humStrPrevius);
+					Double humCurrent = Double.parseDouble(humStrCurrent);
+					double diffHum = humCurrent - humPrevius;
+					if (diffHum > acceptInterval) {
+						includeLine = false;
+					}
+				}
+				catch (NumberFormatException pe) {
+					includeLine = false;
+					pe.printStackTrace();
+				}
+				break;
+			case VOLT:
+				String voltStrPrevius = sensorReadingPreviousValues[7];
+				String voltStrCurrent = sensorReadingCurrentValues[7];
+				try {
+					Double voltPrevius = Double.parseDouble(voltStrPrevius);
+					Double voltCurrent = Double.parseDouble(voltStrCurrent);
+					double diffVolt = voltCurrent - voltPrevius;
+					if (diffVolt > acceptInterval) {
+						includeLine = false;
+					}
+				}
+				catch (NumberFormatException pe) {
+					includeLine = false;
+					pe.printStackTrace();
+				}
+				break;
+			default:
+				includeLine = false;
+				System.out.println("This is NOT a valid TypeData: td = "+td+"!");
+								
+		}
+		return includeLine;
+	}
+	
+	/**
+	 * Loads the lines (sensor readings) of the specified file to a map of sensor readings grouped by sensor ID.
+	 * @param filePath File containing the sensor readings to be loaded to the map.
+	 * @param td Type Data identifying the field of data to the compared (tested)  
+	 * @param acceptInterval A real number representing the threshold acceptable of the sequential values from field of file
+	 * @return Returns a sorted map containing lists of sensor readings (String) grouped by sensor ID (String).
+	 * The map returned is of the type <em>map&lt;sensorID, List&lt;sensorReading&gt;&gt;</em>.
+	 * A sorted map is used because it keeps the sensor IDs in ascending order.
+	 */
+	private static SortedMap<Integer, List<String>> getSensorReadingsMap(String filePath, TypeData td, Double acceptInterval) {
+		System.out.println("Loading sensor readings map with typeData...");
+		long initTime = System.currentTimeMillis();
+		SortedMap<Integer, List<String>> sensorReadingsMap = new TreeMap<Integer, List<String>>();
+		BufferedReader bufferedReader = getBufferedReader(filePath);
+		try {
+			String sensorReadingPrevious = bufferedReader.readLine();
+			
+			Integer sensorIDPrevius = 1, sensorIDCurrent;
+			
+			if (sensorReadingPrevious != null) {
+				String[] sensorReadingPreviousValues = sensorReadingPrevious.split(" ");
+				if (sensorReadingPreviousValues.length > 7) { //evita linhas quebradas
+					
+					sensorIDPrevius = Integer.parseInt(sensorReadingPreviousValues[3]);
+					if (sensorIDPrevius <= NUMBER_OF_SENSOR_NODES) {
+						List<String> sensorReadingsList = sensorReadingsMap.get(sensorIDPrevius);
+						if (sensorReadingsList == null) {
+							sensorReadingsList = new ArrayList<String>();
+						}
+						
+						sensorReadingsList.add(sensorReadingPrevious);
+						sensorReadingsMap.put(sensorIDPrevius, sensorReadingsList);
+					}
+				}
+				
+				String sensorReadingCurrent = bufferedReader.readLine();
+				int quantSameID = 0;
+				final int quantLearning = 100;
+				
+				while (sensorReadingCurrent != null) {
+					
+					Boolean testAcceptance = isSensorReadingsDataInsideAcceptInterval(sensorReadingPrevious, sensorReadingCurrent, td, acceptInterval);
+					
+					// Tests case the sequential sensor readings are inside the acceptable interval OR case the quantity of sensor readings learning  
+					// is less than the threshold amount
+					if (testAcceptance || (quantSameID < quantLearning)) { 
+					// Tests only if the sequential sensor readings are inside the acceptable interval
+//					if (testAcceptance) { 
+						
+						String[] sensorReadingCurrentValues = sensorReadingCurrent.split(" ");
+						sensorIDCurrent = Integer.parseInt(sensorReadingCurrentValues[3]);
+						if (sensorIDCurrent <= NUMBER_OF_SENSOR_NODES) {
+							List<String> sensorReadingsList = sensorReadingsMap.get(sensorIDCurrent);
+							if (sensorReadingsList == null) {
+								sensorReadingsList = new ArrayList<String>();
+							}
+							
+							sensorReadingsList.add(sensorReadingCurrent);
+							sensorReadingsMap.put(sensorIDCurrent, sensorReadingsList);
+							
+							sensorReadingPrevious = sensorReadingCurrent;
+							
+							if (sensorIDCurrent == sensorIDPrevius) {
+								quantSameID++;
+							}
+							else {
+								quantSameID = 0;
+								sensorIDPrevius = sensorIDCurrent;
+							}
+							
+						}
+					}
+					sensorReadingCurrent = bufferedReader.readLine();
+					
+				}
+				bufferedReader.close();
+				long finishTime = System.currentTimeMillis();
+				System.out.println("Sensor readings map successfully loaded in " + Utils.getTimeIntervalMessage(initTime, finishTime));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return sensorReadingsMap;
+	}
+	
+	/**
 	 * Prints lines to the file specified according to the limit size informed.
 	 * @param filePath Path of the file to be printed to.
 	 * @param sensorReadingsList List of lines (sensor readings) to be printed to the file.
@@ -251,15 +540,24 @@ public class FileHandler {
 
 	
 	/**
-	 * Run the program, creating a new data file, using as a basis the past 3 parameters: 
-	 * 1) the path of the original data, 
-	 * 2) the percentage of data from each sensor to be copied to the new file, and 
-	 * 3) the minimum amount of readings from each sensor to be copied to the new file.
+	 * Run the program, creating a new data file, using as a basis the past 3 parameters, that can be: <p>
+	 * A) To use the "generatePercentageFile" method: <br>
+	 * 1) the path of the original data, <br>
+	 * 2) the percentage of data from each sensor to be copied to the new file, and <br> 
+	 * 3) the minimum amount of readings from each sensor to be copied to the new file; OR <p>
+	 * B) To use the "generateFiltratedFile" method: <br>
+	 * 1) the path of the original data, <br>
+	 * 2) the type (field) of data from each sensor to be filtrated to the new file, which can be one of these:
+	 * TypeData.DATA, TypeData.TIME, TypeData.EPOCH, TypeData.SENSORID, TypeData.TEMP, TypeData.HUM, TypeData.LUM, TypeData.VOLT, and <br> 
+	 * 3) the maximum difference acceptable between of two sequential readings from each sensor to be copied to the new file; <p>
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		try {
-			FileHandler.generatePercentageFile("data/sensor_readings/data.txt", null, 1000);
+			//FileHandler.generatePercentageFile("data/sensor_readings/data.txt", null, 1000);
+			
+			//TypeData.DATA, TypeData.TIME, TypeData.EPOCH, TypeData.SENSORID, TypeData.TEMP, TypeData.HUM, TypeData.LUM, TypeData.VOLT
+			FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_1000_5.0_filtrated_by_TEMP_10.0_filtrated_by_HUM.txt", TypeData.LUM , 10.0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
