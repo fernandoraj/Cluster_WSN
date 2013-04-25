@@ -3,6 +3,7 @@ package projects.wsn.nodes.nodeImplementations;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -94,6 +95,16 @@ public class SimpleNode extends Node
 	private boolean loadSensorReadingsFromFile = true;
 	
 	/**
+	 * Local variable to store the sum of square error(SE) used to calculate the RMSE (Root mean square error) from each sensor
+	 */
+	public double squaredError = 0;
+	
+	/**
+	 * Local counter of the number of predictions
+	 */
+	public int predictionsCount = 0;
+	
+	/**
 	 * Number of prediction errors of the sensor node in this timeslot
 	 */
 	protected int numPredictionErrors = 0;
@@ -101,7 +112,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	protected static final int limitPredictionError = 5; // delay (abbrev.)
+	protected static final int limitPredictionError = 0; // delay (abbrev.)
 
 	@Override
 	public void preStep() {}
@@ -667,6 +678,13 @@ public class SimpleNode extends Node
 	{
 		Global.predictionsCount++;
 		Global.squaredError += Math.pow((predictionValue - value), 2);
+
+		this.predictionsCount++;
+		this.squaredError += Math.pow((predictionValue - value), 2);
+/*
+		double RMSE = Math.sqrt(this.squaredError / this.predictionsCount);
+		System.out.println("SensorID\t"+this.ID+"\tRound\t"+NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE));
+*/
 		boolean hit;
 		if (value >= (predictionValue - value*maxError) && value <= (predictionValue + value*maxError))
 		{
