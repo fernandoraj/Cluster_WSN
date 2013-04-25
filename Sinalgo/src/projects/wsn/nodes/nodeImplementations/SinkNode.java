@@ -18,7 +18,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Numero de dados sensoreados por time slot (Tamanho do time slot) 
 	 */
-	private Integer sizeTimeSlot = 100;
+	private Integer sizeTimeSlot = 2600;
 	
 	/**
 	 * Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
@@ -28,7 +28,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 */
-	private double thresholdError = 0.05; // te (abbrev.)
+	private double thresholdError = 0.0; // te (abbrev.)
 	
 	public SinkNode()
 	{
