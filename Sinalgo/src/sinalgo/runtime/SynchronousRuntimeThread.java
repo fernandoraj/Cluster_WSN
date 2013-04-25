@@ -46,6 +46,7 @@ import sinalgo.configuration.Configuration;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.nodes.Node;
 import sinalgo.tools.logging.LogL;
+import projects.wsn.nodes.nodeImplementations.SimpleNode;
 
 
 /**
@@ -228,8 +229,17 @@ public class SynchronousRuntimeThread extends Thread {
 		
 		if(Global.predictionsCount > 0)
 		{
+			for(Node n : Runtime.nodes) {
+				if (n instanceof SimpleNode) {
+					if (((SimpleNode)n).predictionsCount != 0) {
+						double rmsNode = Math.sqrt(((SimpleNode)n).squaredError / ((SimpleNode)n).predictionsCount);
+						System.out.println("SensorID\t"+n.ID+"\tRound\t"+NumberFormat.getIntegerInstance().format(Global.currentTime)+"\tRMS\t"+NumberFormat.getNumberInstance().format(rmsNode));
+					}
+				}
+			}
+			
 			double RMSE = Math.sqrt(Global.squaredError / Global.predictionsCount);
-			Utils.printForDebug("# # The Global RMSE is "+RMSE+" # #");
+			System.out.println(NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE)+"\t"+Global.numberOfMessagesOverAll);
 			
 			Global.log.logln(NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE)+"\t"+Global.numberOfMessagesOverAll);
 			
