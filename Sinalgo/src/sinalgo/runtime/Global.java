@@ -177,6 +177,8 @@ public class Global {
 	 */
 	public static String projectName = "";
 
+	//public static Vector<Double> rmses = new Vector();
+	
 	/**
 	 * @return The base-directory of the source-files of the currently used project.
 	 */
