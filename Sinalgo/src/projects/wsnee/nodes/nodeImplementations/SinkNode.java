@@ -98,7 +98,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Indicates that sink node signalize to all other nodes must continuously sensing (naive using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = false;
+	private boolean allSensorsMustContinuoslySense = true;
 	
 	/**
 	 * Flag to indicate that the sink still not clustered all nodes for the first time
@@ -124,13 +124,13 @@ public class SinkNode extends SimpleNode
 			Global.log.logln("The threshold of error (max error) is "+thresholdError);
 			Global.log.logln("The size of sliding window is "+SimpleNode.slidingWindowSize+"\n");
 //		}
-	}
+	} // end SinkNode()
 
 	@Override
 	public void draw(Graphics g, PositionTransformation pt, boolean highlight) {
 		String text = "S";
 		super.drawNodeAsSquareWithText(g, pt, highlight, text, 1, Color.WHITE);
-	}
+	} // end draw(Graphics g, PositionTransformation pt, boolean highlight)
 	
 	@NodePopupMethod(menuText="Definir Sink como Raiz de Roteamento")
 	public void construirRoteamento()
@@ -145,7 +145,7 @@ public class SinkNode extends SimpleNode
 		
 		WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
 		timer.startRelative(1, this);
-	}
+	} // end construirRoteamento()
 	
 	@Override
 	public void handleMessages(Inbox inbox) 
@@ -181,7 +181,7 @@ public class SinkNode extends SimpleNode
 					if (wsnMsgResp.target != null)
 					{
 						
-						
+						Utils.printForDebug("Inside the code => if (wsnMsgResp.target != null)");
 						
 						
 						
@@ -236,9 +236,10 @@ public class SinkNode extends SimpleNode
 						{
 							messageGroups = new ArrayList2d<WsnMsgResponse>();
 							messageGroups.ensureCapacity(numTotalOfSensors); // Ensure the capacity as the total number of sensors (nodes) in the data set
+							
 							messageGroups.add(wsnMsgResp, 0); // Add the initial message to the group (ArrayList2d of WsnMsgResponse)
 						}
-						else
+						else // If there is a message group (SensorCluster), then adds the wsnMsgResp representing a sensor to group, classifing this message/sensor in correct cluster/line
 						{
 							addNodeInClusterClassifiedByMessage(messageGroups, wsnMsgResp);
 						}
@@ -286,7 +287,7 @@ public class SinkNode extends SimpleNode
 											WsnMsgResponse wsnMsgResponseCurrent = messageGroups.get(line, col); // Get the Node
 											
 											//wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-											wsnMsgResponseCurrent.sizeTimeSlot = 0; // If all sensor nodes in Cluster must continuosly sense, so the sizeTimeSlot doesn't matter
+											wsnMsgResponseCurrent.sizeTimeSlot = 1; // If all sensor nodes in Cluster must continuosly sense, so the sizeTimeSlot doesn't matter
 											
 											receiveMessage(wsnMsgResponseCurrent, chNode);
 										}
@@ -347,7 +348,7 @@ public class SinkNode extends SimpleNode
 												WsnMsgResponse wsnMsgResponseCurrent = newCluster.get(line, col); // Get the Node
 												
 												//wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-												wsnMsgResponseCurrent.sizeTimeSlot = 0; // If all sensor nodes in each cluster must continuosly sense, so the sizeTimeSlot doesn't matter
+												wsnMsgResponseCurrent.sizeTimeSlot = 1; // If all sensor nodes in each cluster must continuosly sense, so the sizeTimeSlot doesn't matter
 												
 												receiveMessage(wsnMsgResponseCurrent, chNode);
 											} // end for (int col=0; col < numSensors; col++)
@@ -368,7 +369,7 @@ public class SinkNode extends SimpleNode
 				} // end else
 			} // end if (message instanceof WsnMsg)
 		} //end while (inbox.hasNext())
-	} //end public void handleMessages()
+	} //end handleMessages()
 	
 	/**
 	 * Adds the clusters (lines) from tempClusterGiver in the tempClusterReceiver
@@ -403,12 +404,13 @@ public class SinkNode extends SimpleNode
 		messageGroups.remove(lineFromCluster);
 		// Armazenar quantos nós existiam neste cluster, para saber quando todos terminaram de responder
 		// Identificá-los pelo clusterHeadID
-	}
+	} // end triggerSplitFromCluster(int lineFromCluster)
 	
 	/**
-	 * When a sensor node sends a message to sink indicating a novelty, the sink must shoot messages to all sensors in that cluster requiring new readings from sensors to verify the similarity of the cluster 
+	 * When a sensor node sends a message to sink indicating a novelty, the sink must shoot/send messages to all sensors in that cluster requiring new readings from sensors to verify the current similarity of the readings from cluster`s sensors 
+	 * @param tempCluster Cluster (set of clusters) to be used as base - The structure actually is a set of clusters, where each cluster is represented by a different line
 	 * @param lineFromCluster Line number from current cluster
-	 * @return Number of sensors in the cluster from lineFromCluster
+	 * @return Number of sensors (#columns) in the cluster/line from lineFromCluster
 	 */
 	private int sendSenseRequestMessageToAllSensorsInCluster(ArrayList2d<WsnMsgResponse> tempCluster, int lineFromCluster)
 	{
@@ -436,10 +438,10 @@ public class SinkNode extends SimpleNode
 				timer.startRelative(1, this);
 */
 				col++;
-			}
+			} // end while (col < numSensorsInThisCluster)
 		}
 		return numSensorsInThisCluster;
-	}
+	} // end sendSenseRequestMessageToAllSensorsInCluster(ArrayList2d<WsnMsgResponse> tempCluster, int lineFromCluster)
 	
 	/**
 	 * It identifies which cluster (line number) where the "newWsnMsgResp" is 
@@ -483,7 +485,7 @@ public class SinkNode extends SimpleNode
 			}
 		}
 		return lineCLuster;
-	}
+	} // end identifyCluster(WsnMsgResponse newWsnMsgResp)
 	
 	/**
 	 * It selects the Representative Node for each line (cluster) from sensors by the max residual energy and puts him in the first position (in line)
@@ -521,7 +523,7 @@ public class SinkNode extends SimpleNode
 				} // end while (bubbleLevel < (tempCluster.getNumCols(line) - 1))
 			} // end for (int line=0; line < tempCluster.getNumRows(); line++)
 		} // end if (tempCluster != null)
-	} // classifyRepresentativeNodesByResidualEnergy(ArrayList2d<WsnMsgResponse> tempCluster)
+	} // end classifyRepresentativeNodesByResidualEnergy(ArrayList2d<WsnMsgResponse> tempCluster)
 	
 	/**
 	 * It classifies the Nodes for each line (cluster) from sensors by the min distance (in number of hops) to sink among them who have the same max residual energy and puts him in the first position (in line)
@@ -610,7 +612,7 @@ public class SinkNode extends SimpleNode
 			}
 			Utils.printForDebug("Number of Lines / Clusters = "+messageGroups.getNumRows()+"\n");
 		}
-	}
+	} // end printMessageGroupsArray2d()
 	
 	/**
 	 * Change the message from "index" position for the first position [0] in that line from array
@@ -620,7 +622,7 @@ public class SinkNode extends SimpleNode
 	private void changeMessagePositionInLine(int line, int index)
 	{
 		messageGroups.move(line, index, 0);
-	}
+	} // end changeMessagePositionInLine(int line, int index)
 	
 	/**
 	 * Adds the WsnMsgResponse object (newWsnMsgResp), passed by parameter, in the correct line ("Cluster") from the tempCluster (ArrayList2d) according with the Dissimilarity Measure 
@@ -682,7 +684,7 @@ public class SinkNode extends SimpleNode
 				}
 			}
 */			
-	}
+	} // end addNodeInClusterClassifiedByMessage(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
 
 	/**
 	 * Search the WsnMsgResponse object with the same source node, in the correct position in "Cluster" from the messageGroups (ArrayList2d) and replace him with the one passed by parameter  
@@ -729,7 +731,7 @@ public class SinkNode extends SimpleNode
 			}
 		}
 		return lineCLuster;
-	}
+	} // end searchAndReplaceNodeInClusterByMessage(WsnMsgResponse newWsnMsgResp)
 
 	
 	/**
@@ -760,12 +762,12 @@ public class SinkNode extends SimpleNode
 			distanceOK = true;
 		}
 		return distanceOK;
-	}
+	} // end testDistanceBetweenSensorPositions(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 	
 	private boolean isEqualNodeSourceFromMessages(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 	{
 		return (currentWsnMsg.source.ID == newWsnMsg.source.ID);
-	}
+	} // end isEqualNodeSourceFromMessages(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 	
 /*
 	private boolean testDissimilarityMeasureWithoutPairRounds(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
@@ -787,8 +789,15 @@ public class SinkNode extends SimpleNode
 		boolean mSimilarityMagnitude = false;
 		boolean tSimilarityTrend = false;
 		
-		int currentSize = currentWsnMsg.dataRecordItens.size();
-		double[] currentValues = new double[currentSize];
+		int currentSize;
+		double[] currentValues;
+		if (currentWsnMsg.dataRecordItens != null) {
+			currentSize = currentWsnMsg.dataRecordItens.size();
+			currentValues = new double[currentSize];
+		}
+		else {
+			return (mSimilarityMagnitude && tSimilarityTrend);
+		}
 /*
 		double[] currentTimes = new double[currentSize];
 		char[] currentTypes = new char[currentSize];
@@ -805,9 +814,15 @@ public class SinkNode extends SimpleNode
 */
 		currentRound = currentWsnMsg.getDataRecordRounds();
 
-		
-		int newSize = newWsnMsg.dataRecordItens.size();
-		double[] newValues = new double[newSize];
+		int newSize;
+		double[] newValues;
+		if (newWsnMsg.dataRecordItens != null) {
+			newSize = newWsnMsg.dataRecordItens.size();
+			newValues = new double[newSize];
+		}
+		else {
+			return (mSimilarityMagnitude && tSimilarityTrend);
+		}
 /*
 		double[] newTimes = new double[newSize];
 		char[] newTypes = new char[newSize];
@@ -905,7 +920,7 @@ public class SinkNode extends SimpleNode
 		}
 */	
 		return (mSimilarityMagnitude && tSimilarityTrend);
-	}
+	} // end testSimilarityMeasureWithPairRounds(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 
 	private boolean compareDataSetValuesPairToPair(double[] valuesC, double[] valuesN, int size)
 	{
@@ -920,7 +935,7 @@ public class SinkNode extends SimpleNode
 			cont++;
 		}
 		return ok;
-	}
+	} // end compareDataSetValuesPairToPair(double[] valuesC, double[] valuesN, int size)
 	
 	/**
 	 * Recebe a mensagem passada, lê os parâmetros (itens) no dataRecordItens,
@@ -933,6 +948,8 @@ public class SinkNode extends SimpleNode
 	 * 
 	 * @param wsnMsgResp
 	 *            Mensagem recebida com os parâmetros a serem lidos
+	 * @param clusterHeadNode
+	 *            Indica(seta) o ClusterHead daquele cluster
 	 */
 	private void receiveMessage(WsnMsgResponse wsnMsgResp, Node clusterHeadNode)
 	{
@@ -957,7 +974,7 @@ public class SinkNode extends SimpleNode
 			coeficienteA = calculaA(mediaValores, mediaTempos, coeficienteB);
 			sendCoefficients(wsnMsgResp, coeficienteA, coeficienteB, clusterHeadNode);
 		}
-	}
+	} // end receiveMessage(WsnMsgResponse wsnMsgResp, Node clusterHeadNode)
 	
 	/**
 	 * Calcula e retorna a média aritmética dos valores reais passados
@@ -976,7 +993,7 @@ public class SinkNode extends SimpleNode
 			mean = sum/values.length;
 		}
 		return mean;
-	}
+	} // end calculaMedia(double[] values)
 			
 	/**
 	 * Calcula o coeficiente B da equação de regressão
@@ -1000,7 +1017,7 @@ public class SinkNode extends SimpleNode
 			return (numerador/denominador);
 		}
 		return 0.0;
-	}
+	} // end calculaB(double[] valores, double[] tempos, double mediaValores, double mediaTempos)
 	
 	/**
 	 * Calcula o coeficiente A da equação de regressão
@@ -1012,7 +1029,7 @@ public class SinkNode extends SimpleNode
 	private double calculaA(double mediaValores, double mediaTempos, double B)
 	{
 		return (mediaValores - B*mediaTempos);
-	}
+	} // end calculaA(double mediaValores, double mediaTempos, double B)
 	
 	/**
 	 * Cria uma nova mensagem (WsnMsg) para envio dos coeficientes recebidos
@@ -1035,5 +1052,5 @@ public class SinkNode extends SimpleNode
 		wsnMessage.setCoefs(coeficienteA, coeficienteB);
 		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath());
 		sendToNextNodeInPath(wsnMessage);
-	}
+	} // end sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB, Node clusterHeadNode)
 }
