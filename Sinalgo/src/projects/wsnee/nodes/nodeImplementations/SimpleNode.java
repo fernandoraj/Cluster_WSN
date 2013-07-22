@@ -845,7 +845,7 @@ public class SimpleNode extends Node
 				}
 				
 /*
- * NESTE PONTO DEVE-SE VERIFICAR SE O PARÂMETRO "ownTimeSlot"(sizeTimeSlot) É IGUAL A ZERO (0), POIS INDICA QUE A PREDIÇÃO DEVERÁ FICAR EM LAÇO CONTÍNUO, ATÉ ATINGIR O LIMITE DE ERROS DE PREDIÇÃO
+ * NESTE PONTO DEVE-SE VERIFICAR SE O PARÂMETRO "ownTimeSlot"(sizeTimeSlot) É IGUAL A UM (1), POIS INDICA QUE A PREDIÇÃO DEVERÁ FICAR EM LAÇO CONTÍNUO, ATÉ ATINGIR O LIMITE DE ERROS DE PREDIÇÃO
  */
 				if (this.clusterHead != null) // Se existe um CH, ou seja, se o modo de sensoriamento é contínuo (SinkNode.allSensorsMustContinuoslySense = true)
 				{
@@ -944,7 +944,8 @@ public class SimpleNode extends Node
 						if (this.clusterHead == null) // It means that there isn't a cluster head, so the response message must be send to sink node (base station)
 						{
 							WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
-							timer.startRelative(1, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+							timer.startRelative(1, this); // Espera por 1 round e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+							// ERA: Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
 						} // end if (this.clusterHead == null)
 						
 						else
