@@ -28,7 +28,7 @@ public class FileHandler {
 	/**
 	 * Number of initial sensor nodes readings (by each sensor) to be disregarded in the filtering process
 	 */
-	static final int quantLearning = 10;
+	static final int quantLearning = 1300;
 	
 	/**
 	 * Number of sensor nodes in the simulation (Intel Lab Data).
@@ -365,14 +365,14 @@ public class FileHandler {
 					pe.printStackTrace();
 				}
 				break;
-			case LUM:
-				String lumStrPrevius = sensorReadingPreviousValues[5];
-				String lumStrCurrent = sensorReadingCurrentValues[5];
+			case HUM:
+				String humStrPrevius = sensorReadingPreviousValues[5];
+				String humStrCurrent = sensorReadingCurrentValues[5];
 				try {
-					Double lumPrevius = Double.parseDouble(lumStrPrevius);
-					Double lumCurrent = Double.parseDouble(lumStrCurrent);
-					double diffLum = Math.abs(lumCurrent - lumPrevius);
-					if (diffLum > acceptInterval) {
+					Double humPrevius = Double.parseDouble(humStrPrevius);
+					Double humCurrent = Double.parseDouble(humStrCurrent);
+					double diffHum = Math.abs(humCurrent - humPrevius);
+					if (diffHum > acceptInterval) {
 						includeLine = false;
 					}
 				}
@@ -381,14 +381,14 @@ public class FileHandler {
 					pe.printStackTrace();
 				}
 				break;
-			case HUM:
-				String humStrPrevius = sensorReadingPreviousValues[6];
-				String humStrCurrent = sensorReadingCurrentValues[6];
+			case LUM:
+				String lumStrPrevius = sensorReadingPreviousValues[6];
+				String lumStrCurrent = sensorReadingCurrentValues[6];
 				try {
-					Double humPrevius = Double.parseDouble(humStrPrevius);
-					Double humCurrent = Double.parseDouble(humStrCurrent);
-					double diffHum = Math.abs(humCurrent - humPrevius);
-					if (diffHum > acceptInterval) {
+					Double lumPrevius = Double.parseDouble(lumStrPrevius);
+					Double lumCurrent = Double.parseDouble(lumStrCurrent);
+					double diffLum = Math.abs(lumCurrent - lumPrevius);
+					if (diffLum > acceptInterval) {
 						includeLine = false;
 					}
 				}
@@ -559,10 +559,10 @@ public class FileHandler {
 	 */
 	public static void main(String[] args) {
 		try {
-			//FileHandler.generatePercentageFile("data/sensor_readings/data.txt", null, 1000);
+			//FileHandler.generatePercentageFile("data/sensor_readings/data.txt", null, 10000);
 			
 			//TypeData.DATA, TypeData.TIME, TypeData.EPOCH, TypeData.SENSORID, TypeData.TEMP, TypeData.HUM, TypeData.LUM, TypeData.VOLT
-			FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_1000_5.0_filtrated_by_LUM.txt", TypeData.TIME, 1.0);
+			FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_10000.txt", TypeData.LUM, 800.0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
