@@ -290,7 +290,9 @@ public class WsnMsg extends Message {
 		msg.dataSensedType = this.dataSensedType;
 		msg.thresholdError = this.thresholdError;
 		msg.coefs = this.coefs;
+		msg.hasCoefs = this.hasCoefs;
 		msg.pathToSenderNode = this.pathToSenderNode;
+		msg.clusterHead = this.clusterHead;
 		return msg;
 	}
 
