@@ -244,8 +244,19 @@ public class SimpleNode extends Node
 							//...não deve mais encaminhar esta mensagem
 						}
 						else // Else this message request (new) node sense (reading)
-//		CASO O CLUSTER PRECISE SOFRER UM SPLIT, CADA UM DOS NÓS DO CLUSTER DEVE RECEBER UMA MENS. SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK
 						{
+
+
+							
+							
+
+							
+//		CASO O CLUSTER PRECISE SOFRER UM SPLIT, CADA UM DOS NÓS DO CLUSTER DEVE RECEBER UMA MENS. SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK
+
+							
+							
+							
+							
 							
 							WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, "");
 							
@@ -277,10 +288,20 @@ public class SimpleNode extends Node
 					
 					if (wsnMessage != null)
 					{
+
+						
+						
+						
+						
 //	CASO O CLUSTER PRECISE SOFRER UM SPLIT, CADA UM DOS NÓS DO CLUSTER DEVE RECEBER UMA MENS. SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK
+
+						
+						
+						
 						
 						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType); 
 						prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
+					
 					}
 					addThisNodeToPath(wsnMsgResp);
 					
@@ -296,12 +317,22 @@ public class SimpleNode extends Node
 					
 				} //if (encaminhar)
 			} //if (message instanceof WsnMsg)
+
+			
 			
 			else if (message instanceof WsnMsgResponse) // Mensagem de resposta dos nós sensores, ou para o sink, que deve ser repassada para o "proximoNoAteEstacaoBase", ou para o cluster head, que deve ser recebida retida pelo mesmo
 			{
+			
+				
+				
+				
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
 				
+				
 				// TRATAR AQUI DO CASO EM QUE OS CLUSTER HEADS DEVEM ASSUMIR O CONTROLE DA SITUAÇÃO!!!
+				
+				
+				
 				if (wsnMsgResp.target != null && wsnMsgResp.target.ID == this.ID) // ou (wsnMsgResp.target == this) ou (this.clusterHead == this) // This is the cluster head sensor which is receiving a message from another sensor of this same clsuter
 				{ 
 
@@ -330,7 +361,7 @@ public class SimpleNode extends Node
 			
 		} // end while (inbox.hasNext())
 		
-	} // end public void handleMessages
+	} // end handleMessages(Inbox inbox)
 	
 	
 	/**
@@ -355,6 +386,11 @@ public class SimpleNode extends Node
 			// Deve informar ao Sink tal problema, para que o mesmo providencie o tratamento correto (Qual seja!???)
 			
 			addThisNodeToPath(wsnMsgResp);
+
+			Utils.printForDebug("@ @ The number of prediction errors in this Cluster ("+errorsInThisCluster+") EXCEEDED the maximum limit of the prediction errors per Cluster ("+maxErrorsPerCluster+")! NoID = "+this.ID+"\n");
+
+			
+			
 			
 			WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
 			
@@ -378,7 +414,7 @@ public class SimpleNode extends Node
 	{
 		wsnMsgResp.pushToPath(this.ID);
 //		wsnMsgResp.saltosAteDestino++; // Transferido para o método pushToPath() da classe WsnMsgResponse
-	}
+	} // end addThisNodeToPath(WsnMsgResponse wsnMsgResp)
 	
 	/**
 	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual
@@ -474,7 +510,7 @@ public class SimpleNode extends Node
 		}//while (i<sizeTimeSlot && dataLine != null)
 		wsnMsgResp.batLevel = lastBatLevel; // Level of battery from last reading of sensor node
 		wsnMsgResp.spatialPos = wsnMsgResp.source.getPosition(); // Spacial position from the source node from message response
-	}
+	} // end prepararMensagem(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 	
 	/**
 	 * Verifies whether the sensor ID passed as parameter is equal to the ID of this node.
@@ -489,7 +525,7 @@ public class SimpleNode extends Node
 			}
 		}
 		return false;
-	}
+	} // end isMyID(String sensorID)
 	
 	/**
 	 * <p>Simulates a physical sensor data reading performed for all the sensing devices available in this
@@ -512,7 +548,7 @@ public class SimpleNode extends Node
 			return data;
 		}
 		return null;
-	}
+	} // end performSensorReading()
 
 	/**
 	 * Loads the sensor readings to the <code>sensorReadingsQueue</code>
@@ -530,7 +566,7 @@ public class SimpleNode extends Node
 		} else {
 			loadSensorReadingsFromMemory();
 		}
-	}
+	} // end loadSensorReadings()
 	
 	/**
 	 * Fills the <code>sensorReadingsQueue</code> with sensor readings from the file.
@@ -580,7 +616,7 @@ public class SimpleNode extends Node
 			System.out.println("Problems while reading lines (fileReader.readLine()) from  sensorReadingsFilePath at simpleNode.loadSensorReadingFromFile()");
 			e.printStackTrace();
 		}
-	}
+	} // end loadSensorReadingsFromFile()
 	
 	/**
 	 * Fills the <code>sensorReadingsQueue</code> list with sensor readings from the {@link FileHandler}.
@@ -598,7 +634,7 @@ public class SimpleNode extends Node
 		long finishTime = System.currentTimeMillis();
 		Utils.printForDebug("Node ID " + this.ID + " successfully loaded " + sensorReadingsQueue.size() + " sensor readings from the memory in " + Utils.getTimeIntervalMessage(initTime, finishTime));
 		System.out.println("");
-	}
+	} // end loadSensorReadingsFromMemory()
 	
 	/**
 	 * Places the bufferedReader on the line position specified.
@@ -622,7 +658,7 @@ public class SimpleNode extends Node
 		}
 			
 		return bufferedReader;
-	}
+	} // end putOnLinePosition(BufferedReader bufferedReader, Integer linePosition)
 
 	/**
 	 * Identifica o tipo de dados a ser lido (posição na linha) de acordo com a string passada, conforme o exemplo abaixo:
@@ -652,7 +688,7 @@ public class SimpleNode extends Node
 		else if (tipo.equals("v"))
 			return 7;	
 		return 0;
-	}
+	} // end identificarTipo(String tipo)
 	
 	/**
 	 * Transforma os valores de data (AnoMesDia) e hora (hora) passados em uma grandeza inteira com a quantidade de milisegundos total
@@ -677,7 +713,7 @@ public class SimpleNode extends Node
 		GregorianCalendar gc = new GregorianCalendar(Integer.parseInt(datas[0]), Integer.parseInt(datas[1]) -1, Integer.parseInt(datas[2]),Integer.parseInt(horas[0]),Integer.parseInt(horas[1]), Integer.parseInt(horas[2]));
 		long quantTime = (gc.getTimeInMillis() + Long.parseLong(millesegundos)/1000);
 		return quantTime;
-	}
+	} // end parseCalendarHoras(String AnoMesDia, String hora)
 	
 	/**
 	 * Faz o cálculo da predição do valor sensoreado de acordo com os coeficientes (A e B) informados e o parâmetro de tempo; incrementa o contador de predições (numTotalPredictions) <p>
@@ -693,7 +729,7 @@ public class SimpleNode extends Node
 		time = A + B*tempo;
 		this.numTotalPredictions++;
 		return time;
-	}
+	} // end makePrediction(double A, double B, double tempo)
 	
 	/**
 	 * Inicia um temporizador (timer) para enviar a mensagem passada para o próximo nó no caminho até o nó de destino <p>
@@ -711,7 +747,7 @@ public class SimpleNode extends Node
 			timer = new WsnMessageTimer(wsnMessage, nextNode);
 			timer.startRelative(1, this);
 		}
-	}
+	} // end sendToNextNodeInPath(WsnMsg wsnMessage)
 	
 	/**
 	 * Get the coefficients from the Regression Equation and the threshold error
@@ -734,7 +770,7 @@ public class SimpleNode extends Node
 			this.ownTimeSlot = wsnMessage.sizeTimeSlot;
 			triggerPredictions(wsnMessage.dataSensedType, coefA, coefB, maxError);
 		}
-	}
+	} // end receiveCoefficients(WsnMsg wsnMessage)
 	
 	/**
 	 * Adiciona os últimos valores lidos anteriormente a mensagem que vai para o sink<p>
@@ -750,10 +786,11 @@ public class SimpleNode extends Node
 				wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).type, dataRecordItens.get(cont).value, dataRecordItens.get(cont).time, dataRecordItens.get(cont).batLevel, dataRecordItens.get(cont).round); 
 			}
 		}
-	}
+	} // end addDataRecordItensInWsnMsgResponse(WsnMsgResponse wsnMsgResp)
 	
 	/**
-	 * Read the next value from present sensor, make the prediction and, according with the predition (hit or miss), trigges the next action 
+	 * Lê o próximo valor do sensor atual, executa a predição e, de acordo com a predição (acerto ou erro), dispara a próxima ação<p>
+	 * [Eng]Read the next value from present sensor, make the prediction and, according with the predition (hit or miss), trigges the next action 
 	 * @param dataSensedType Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 * @param coefA Coefficient A from the Regression Equation for this sensor
 	 * @param coefB Coefficient B from the Regression Equation for this sensor
@@ -765,7 +802,7 @@ public class SimpleNode extends Node
 		int numSequenceVoltageData = 7; //According the data structure in "data*.txt" file
 		int numSequenceRound = 2; //According the data structure in "data*.txt" file
 /*
- * Exemple:
+ * Example:
  * 				2004-03-21 19:02:26.792489 65528 4 87.383 45.4402 5.52 2.31097
  * Position         [0]         [1]         [2] [3]  [4]    [5]    [6]   [7]
  * Data type       Data         Hora       Round ID  Temp   Hum    Lum   Volt
@@ -837,11 +874,11 @@ public class SimpleNode extends Node
 					numPredictionErrors++; // Contador do número de erros de predição
 				}
 
-				Utils.printForDebug("* * O num. total de predicoes eh "+numTotalPredictions+"! NoID = "+this.ID+" Maximo de Predicoes = "+this.ownTimeSlot);
+				Utils.printForDebug("* * The total number of predictions is "+numTotalPredictions+"! NoID = "+this.ID+" Maximum of predictions = "+this.ownTimeSlot);
 				
 				if (numPredictionErrors > 0) // Se há erros de predição, então exibe uma mensagem
 				{
-					Utils.printForDebug("* * * * O num. de erros de predicoes eh "+numPredictionErrors+"! NoID = "+this.ID+"\n");
+					Utils.printForDebug("* * * * The number of prediction errors is "+numPredictionErrors+"! NoID = "+this.ID+"\n");
 				}
 				
 /*
@@ -849,14 +886,15 @@ public class SimpleNode extends Node
  */
 				if (this.clusterHead != null) // Se existe um CH, ou seja, se o modo de sensoriamento é contínuo (SinkNode.allSensorsMustContinuoslySense = true)
 				{
-					if (numPredictionErrors >= limitPredictionError) // Se o número máximo de erros de predição foi atingido
+					if (numPredictionErrors >= limitPredictionError) // Se o número máximo de erros de predição por sensor foi atingido para este 
+													// sensor e o mesmo tem um ClusterHead (!=null), então este último deve ser reportado (avisado)
 					{
 						WsnMsgResponse wsnMsgResp;
 						
 						wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, this.ownTimeSlot, dataSensedType);
 						
-						Utils.printForDebug("* O num. de erros de predicao ("+numPredictionErrors+") ALCANCOU o limite maximo de erros de predicao ("+limitPredictionError+")! NoID = "+this.ID+"\n");
-						Utils.printForDebug("* * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
+						Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+limitPredictionError+")! NoID = "+this.ID+"\n");
+						Utils.printForDebug("* * * * The predicted value NO is within the margin of error of the value read! NoID = "+this.ID);
 						Utils.printForDebug("Round = "+lastRoundRead+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError+"\n");
 						
 						addDataRecordItensInWsnMsgResponse(wsnMsgResp);
@@ -865,10 +903,12 @@ public class SimpleNode extends Node
 						
 						wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
 						
-						DirectMessageTimer timer = new DirectMessageTimer(wsnMsgResp, clusterHead); // Envia uma mensagem diretamente para o ClusterHead deste nó sensor
+						DirectMessageTimer timer = new DirectMessageTimer(wsnMsgResp, clusterHead); // Envia uma mensagem diretamente para o 
+																									// ClusterHead deste nó sensor
 						timer.startRelative(1, this);
 						
-						numPredictionErrors = 0; // Reinicia a contagem dos erros de predição, depois de ter enviado uma mensagem inicial para o ClusterHead
+						numPredictionErrors = 0; // Reinicia a contagem dos erros de predição, depois de ter enviado uma mensagem inicial para o 
+												// ClusterHead
 						
 					} // end if (numPredictionErrors >= limitPredictionError)
 					
@@ -880,8 +920,11 @@ public class SimpleNode extends Node
 							WsnMsgResponse wsnMsgResp;
 					
 							
+
 // QUAL CÓDIGO UTILIZAR PARA INFORMAR AO SINK QUE ESTE CLUSTER HEAD ATINGIU O MIN. DE BATERIA???
 							Integer messageType = 3;
+
+							
 							
 							
 							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, messageType, 0, dataSensedType);
@@ -907,7 +950,7 @@ public class SimpleNode extends Node
 					
 				} // end if (this.clusterHead != null)
 				
-				else // if (this.clusterHead == null)
+				else // if (this.clusterHead == null) - Se não existe ClusterHead, mas sim apenas Nó Representativo
 				{
 				
 					if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.ownTimeSlot)) // Se o número de erros de predição é menor do que o limite aceitável de erros (limitPredictionError) e o número de predições executadas é menor do que o máximo de predições para este nó sensor
@@ -924,15 +967,15 @@ public class SimpleNode extends Node
 						{
 							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, (this.ownTimeSlot - numTotalPredictions), dataSensedType);
 							
-							Utils.printForDebug("* O num. de erros de predicao ("+numPredictionErrors+") ALCANCOU o limite maximo de erros de predicao ("+limitPredictionError+")! NoID = "+this.ID+"\n");
-							Utils.printForDebug("* * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
+							Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+limitPredictionError+")! NoID = "+this.ID+"\n");
+							Utils.printForDebug("* * * * The predicted value NO is within the margin of error of the value read! NoID = "+this.ID);
 							Utils.printForDebug("Round = "+lastRoundRead+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError+"\n");
 						}
 						else // if (numTotalPredictions >= this.ownTimeSlot) // Caso tenha saído do laço de predições por ter excedido o limite do seu time slot próprio(número máximo de predições a serem feitas por este Nó Representativo)
 						{
 							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 3, 0, dataSensedType);
 							
-							Utils.printForDebug("* * O total de lacos de predicoes ("+numTotalPredictions+") CHEGOU ao maximo de lacos de predicoes (TimeSlot proprio = "+this.ownTimeSlot+") deste noh representativo / cluster! NoID = "+this.ID+"\n");						
+							Utils.printForDebug("* * The total loops predictions ("+numTotalPredictions+") REACHED the maximum of loops predictions (TimeSlot proprio = "+this.ownTimeSlot+") deste noh representativo / cluster! NoID = "+this.ID+"\n");						
 						}					
 						
 						addDataRecordItensInWsnMsgResponse(wsnMsgResp);
@@ -999,7 +1042,7 @@ public class SimpleNode extends Node
 			hit = false;
 		}
 		return hit;
-	}
+	} // end isValuePredictInValueReading(double value, double predictionValue, double maxError)
 	
 	/**
 	 * Inner class (structure) to store important data from sersors readings, like: type 
@@ -1014,7 +1057,7 @@ public class SimpleNode extends Node
 		double time;
 		double batLevel;
 		int round;
-	}
+	} // end DataRecord
 	
 	public Vector<DataRecord> dataRecordItens;
 	
@@ -1046,5 +1089,5 @@ public class SimpleNode extends Node
 		{
 			dataRecordItens.removeElementAt(0);
 		}
-	}
+	} // end addDataRecordItens(char typ, double val, double tim, double bat, int rnd)
 }
