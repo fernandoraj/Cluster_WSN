@@ -281,7 +281,7 @@ public class SinkNode extends SimpleNode
 									{
 										int numSensors = messageGroups.getNumCols(line);
 										Node chNode = (messageGroups.get(line, 0)).source; // Cluster Head from the current cluster/line
-										Utils.printForDebug("Cluster / Line number = "+line);
+										Utils.printForDebug("Cluster / Line number = "+line+"; ClusterHead / IDnumber = "+chNode.ID+"; #Sensors = "+numSensors);
 										for (int col=0; col < numSensors; col++) // For each colunm from that line in messageGroups
 										{
 											WsnMsgResponse wsnMsgResponseCurrent = messageGroups.get(line, col); // Get the Node
@@ -342,7 +342,7 @@ public class SinkNode extends SimpleNode
 										{
 											int numSensors = newCluster.getNumCols(line);
 											Node chNode = (newCluster.get(line, 0)).source; // Cluster Head from the current cluster/line
-											Utils.printForDebug("Cluster / Line number = "+line);
+											Utils.printForDebug("Cluster / Line number = "+line+"; ClusterHead / IDnumber = "+chNode.ID+"; #Sensors = "+numSensors);
 											for (int col=0; col < numSensors; col++) // For each colunm from that line in newCluster
 											{
 												WsnMsgResponse wsnMsgResponseCurrent = newCluster.get(line, col); // Get the Node
