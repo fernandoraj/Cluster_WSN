@@ -320,7 +320,7 @@ public class SimpleNode extends Node
 
 			
 			
-			else if (message instanceof WsnMsgResponse) // Mensagem de resposta dos nós sensores, ou para o sink, que deve ser repassada para o "proximoNoAteEstacaoBase", ou para o cluster head, que deve ser recebida retida pelo mesmo
+			else if (message instanceof WsnMsgResponse) // Mensagem de resposta dos nós sensores, ou para o sink, que deve ser repassada para o "proximoNoAteEstacaoBase", ou para o cluster head, que deve ser recebida/retida pelo mesmo
 			{
 			
 				
@@ -379,6 +379,8 @@ public class SimpleNode extends Node
 			case 2: errorsInThisCluster++;
 				break;
 			case 3:
+				break;
+			case 4: //Nível mínimo de bateria atingido (pelo ClusterHead) - Minimum battery level reached (by ClusterHead)
 				break;
 		}
 		if (errorsInThisCluster > maxErrorsPerCluster)
@@ -882,52 +884,21 @@ public class SimpleNode extends Node
 				}
 				
 /*
- * NESTE PONTO DEVE-SE VERIFICAR SE O PARÂMETRO "ownTimeSlot"(sizeTimeSlot) É IGUAL A UM (1), POIS INDICA QUE A PREDIÇÃO DEVERÁ FICAR EM LAÇO CONTÍNUO, ATÉ ATINGIR O LIMITE DE ERROS DE PREDIÇÃO
+ * Neste ponto deve-se verificar se o parâmetro "clusterHead" é diferente de "null", pois indica que existe um ClusterHead (e não um nó representativo)
+ * e que, portanto, a predição deverá ficar em laço contínuo, até atingir o limite de erros de predição.
  */
 				if (this.clusterHead != null) // Se existe um CH, ou seja, se o modo de sensoriamento é contínuo (SinkNode.allSensorsMustContinuoslySense = true)
 				{
-					if (numPredictionErrors >= limitPredictionError) // Se o número máximo de erros de predição por sensor foi atingido para este 
-													// sensor e o mesmo tem um ClusterHead (!=null), então este último deve ser reportado (avisado)
-					{
-						WsnMsgResponse wsnMsgResp;
-						
-						wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, this.ownTimeSlot, dataSensedType);
-						
-						Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+limitPredictionError+")! NoID = "+this.ID+"\n");
-						Utils.printForDebug("* * * * The predicted value NO is within the margin of error of the value read! NoID = "+this.ID);
-						Utils.printForDebug("Round = "+lastRoundRead+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError+"\n");
-						
-						addDataRecordItensInWsnMsgResponse(wsnMsgResp);
-
-						addThisNodeToPath(wsnMsgResp);
-						
-						wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
-						
-						DirectMessageTimer timer = new DirectMessageTimer(wsnMsgResp, clusterHead); // Envia uma mensagem diretamente para o 
-																									// ClusterHead deste nó sensor
-						timer.startRelative(1, this);
-						
-						numPredictionErrors = 0; // Reinicia a contagem dos erros de predição, depois de ter enviado uma mensagem inicial para o 
-												// ClusterHead
-						
-					} // end if (numPredictionErrors >= limitPredictionError)
-					
-					
-					if (this.clusterHead == this) // Se ESTE (this) nó é o/um Cluster Head
+					Boolean exit = false;
+					if (this.clusterHead == this) // Se ESTE (this) nó é o/um Cluster Head de seu cluster
 					{
 						if ((batLevel != 0.0) && (batLevel <= minBatLevelInClusterHead)) // Se o nível da bateria está abaixo do mínimo possível (permitido)
 						{
 							WsnMsgResponse wsnMsgResp;
 					
-							
+							Integer messageType = 4; // CÓDIGO PARA INFORMAR AO SINK QUE ESTE CLUSTER HEAD ATINGIU O MIN. DE BATERIA
 
-// QUAL CÓDIGO UTILIZAR PARA INFORMAR AO SINK QUE ESTE CLUSTER HEAD ATINGIU O MIN. DE BATERIA???
-							Integer messageType = 3;
-
-							
-							
-							
-							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, messageType, 0, dataSensedType);
+							wsnMsgResp = new WsnMsgResponse(1, this, null, this, messageType, 0, dataSensedType);
 							
 							addDataRecordItensInWsnMsgResponse(wsnMsgResp);
 
@@ -939,14 +910,44 @@ public class SimpleNode extends Node
 							
 							timer.startRelative(1, this); // Envia a mensagem para o nó sink (próximo nó no caminho do sink)
 							
-							
+							exit = true; // Caso este seja o ClusterHead e esteja com a bateria fraca, então não deve continuar sensoreando 
 						} // end if ((batLevel != 0.0) && (batLevel <= minBatLevelInClusterHead))
 						
 					} // end if (this.clusterHead == this)
-					
-					// Se o modo de sensoriamento é contínuo, continua fazendo predição
-					PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
-					newPredictionTimer.startRelative(1, this); 
+
+					if (!exit) {
+
+						if (numPredictionErrors >= limitPredictionError) { // Se o número máximo de erros de predição por sensor foi atingido para este 
+							// sensor e o mesmo tem um ClusterHead (!=null), então este último deve ser reportado (avisado)
+
+							WsnMsgResponse wsnMsgResp;
+							
+							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, this.ownTimeSlot, dataSensedType);
+							
+							Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+limitPredictionError+")! NoID = "+this.ID+"\n");
+							Utils.printForDebug("* * * * The predicted value NO is within the margin of error of the value read! NoID = "+this.ID);
+							Utils.printForDebug("Round = "+lastRoundRead+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError+"\n");
+							
+							addDataRecordItensInWsnMsgResponse(wsnMsgResp);
+							
+							addThisNodeToPath(wsnMsgResp);
+							
+							wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
+							
+							DirectMessageTimer timer = new DirectMessageTimer(wsnMsgResp, clusterHead); // Envia uma mensagem diretamente para o 
+																										// ClusterHead deste nó sensor
+							timer.startRelative(1, this);
+							
+							numPredictionErrors = 0; // Reinicia a contagem dos erros de predição, depois de ter enviado uma mensagem inicial para o 
+													// ClusterHead
+						
+						} // end if (numPredictionErrors >= limitPredictionError)
+						
+						// Se o modo de sensoriamento é contínuo, continua fazendo predição
+						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
+						newPredictionTimer.startRelative(1, this); 
+						
+					} // end (!exit)
 					
 				} // end if (this.clusterHead != null)
 				
@@ -975,7 +976,7 @@ public class SimpleNode extends Node
 						{
 							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 3, 0, dataSensedType);
 							
-							Utils.printForDebug("* * The total loops predictions ("+numTotalPredictions+") REACHED the maximum of loops predictions (TimeSlot proprio = "+this.ownTimeSlot+") deste noh representativo / cluster! NoID = "+this.ID+"\n");						
+							Utils.printForDebug("* * The total loops predictions ("+numTotalPredictions+") REACHED the maximum of loops predictions (TimeSlot proprio = "+this.ownTimeSlot+") of this representative node / cluster! NoID = "+this.ID+"\n");						
 						}					
 						
 						addDataRecordItensInWsnMsgResponse(wsnMsgResp);
@@ -990,13 +991,15 @@ public class SimpleNode extends Node
 							timer.startRelative(1, this); // Espera por 1 round e envia a mensagem para o nó sink (próximo nó no caminho do sink)
 							// ERA: Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
 						} // end if (this.clusterHead == null)
-						
+
+/* Dispensável devido a restrição anterior, ou seja, por se tratar de else do if (this.clusterHead != null), i.e., dentro de um bloco igual a if (this.clusterHead == null)
 						else
 						{
 							DirectMessageTimer timer = new DirectMessageTimer(wsnMsgResp, clusterHead); // Envia uma mensagem diretamente para o ClusterHead deste nó sensor
 							timer.startRelative(1, this);
 						} // end else from if (this.clusterHead == null)
-						
+*/						
+
 					} // end else from if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.ownTimeSlot))
 					
 				} // end else from if (this.clusterHead != null)
