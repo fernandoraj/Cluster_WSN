@@ -224,6 +224,45 @@ public class SinkNode extends SimpleNode
 					// PAREI AQUI!!! - Fazer testes para verificar se os clusters estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
 				} // else if (wsnMsgResp.typeMsg == 3)
 				
+				else if (wsnMsgResp.typeMsg == 4) // Se é uma mensagem de um Nó Representativo/Cluster Head cujo nível da bateria está abaixo do mínimo (SimpleNode.minBatLevelInClusterHead)
+				{
+					
+					
+					
+					// Se for um ClusterHead (ClusterHead != null)
+					
+// PREENCHER COM CÓDIGO CORRETO !!!					
+					
+					// Se for um Nó Representativo (ClusterHead == null) - VERIFICAR ESTE CÓDIGO!!!
+					
+					int lineFromClusterNode = searchAndReplaceNodeInClusterByMessage(wsnMsgResp); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
+					
+					if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
+					{
+						Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
+						printMessageGroupsArray2d();
+						
+						classifyRepresentativeNodesByResidualEnergy(messageGroups); // (Re)classifica os nós dos clusters por energia residual
+						
+						Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
+						printMessageGroupsArray2d();
+						
+						classifyRepresentativeNodesByHopsToSink(messageGroups); // (Re)classifica os nós dos clusters por saltos até o sink node 
+						
+						Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
+						printMessageGroupsArray2d();
+						
+						WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(lineFromClusterNode, 0); // Get the (new) Representative Node (or Cluster Head)
+						int numSensors = messageGroups.getNumCols(lineFromClusterNode);
+						Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
+						wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+						
+						receiveMessage(wsnMsgResponseRepresentative, null);
+					}
+
+					
+				}
+				
 				else // If it is a message from a (Representative) node containing reading (sense) data
 				{
 					
