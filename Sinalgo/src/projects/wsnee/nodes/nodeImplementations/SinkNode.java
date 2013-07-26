@@ -201,18 +201,7 @@ public class SinkNode extends SimpleNode
 					
 					if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
 					{
-						Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
-						printMessageGroupsArray2d();
-						
-						classifyRepresentativeNodesByResidualEnergy(messageGroups); // (Re)classifica os nós dos clusters por energia residual
-						
-						Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
-						printMessageGroupsArray2d();
-						
-						classifyRepresentativeNodesByHopsToSink(messageGroups); // (Re)classifica os nós dos clusters por saltos até o sink node 
-						
-						Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
-						printMessageGroupsArray2d();
+						classifyNodesByAllParams(messageGroups);
 						
 						WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(lineFromClusterNode, 0); // Get the (new) Representative Node (or Cluster Head)
 						int numSensors = messageGroups.getNumCols(lineFromClusterNode);
@@ -226,41 +215,29 @@ public class SinkNode extends SimpleNode
 				
 				else if (wsnMsgResp.typeMsg == 4) // Se é uma mensagem de um Nó Representativo/Cluster Head cujo nível da bateria está abaixo do mínimo (SimpleNode.minBatLevelInClusterHead)
 				{
-					
+					if (allSensorsMustContinuoslySense) {
 					
 					
 					// Se for um ClusterHead (ClusterHead != null)
 					
 // PREENCHER COM CÓDIGO CORRETO !!!					
-					
+					}
 					// Se for um Nó Representativo (ClusterHead == null) - VERIFICAR ESTE CÓDIGO!!!
 					
-					int lineFromClusterNode = searchAndReplaceNodeInClusterByMessage(wsnMsgResp); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
-					
-					if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
-					{
-						Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
-						printMessageGroupsArray2d();
+					else { //if (!allSensorsMustContinuoslySense) {
+						int lineFromClusterNode = searchAndReplaceNodeInClusterByMessage(wsnMsgResp); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
 						
-						classifyRepresentativeNodesByResidualEnergy(messageGroups); // (Re)classifica os nós dos clusters por energia residual
-						
-						Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
-						printMessageGroupsArray2d();
-						
-						classifyRepresentativeNodesByHopsToSink(messageGroups); // (Re)classifica os nós dos clusters por saltos até o sink node 
-						
-						Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
-						printMessageGroupsArray2d();
-						
-						WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(lineFromClusterNode, 0); // Get the (new) Representative Node (or Cluster Head)
-						int numSensors = messageGroups.getNumCols(lineFromClusterNode);
-						Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
-						wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-						
-						receiveMessage(wsnMsgResponseRepresentative, null);
+						if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
+						{
+							classifyNodesByAllParams(messageGroups);
+							
+							WsnMsgResponse wsnMsgResponseRepresentative = messageGroups.get(lineFromClusterNode, 0); // Get the (new) Representative Node (or Cluster Head)
+							int numSensors = messageGroups.getNumCols(lineFromClusterNode);
+							Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
+							wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);						
+							receiveMessage(wsnMsgResponseRepresentative, null);
+						}
 					}
-
-					
 				}
 				
 				else // If it is a message from a (Representative) node containing reading (sense) data
@@ -285,18 +262,7 @@ public class SinkNode extends SimpleNode
 						
 						if (numMessagesReceived >= numTotalOfSensors) // In this point, clusters should be "closed", and the sensors inside them being classified
 						{
-							Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
-							printMessageGroupsArray2d();
-							
-							classifyRepresentativeNodesByResidualEnergy(messageGroups);
-							
-							Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
-							printMessageGroupsArray2d();
-							
-							classifyRepresentativeNodesByHopsToSink(messageGroups);
-							
-							Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
-							printMessageGroupsArray2d();
+							classifyNodesByAllParams(messageGroups);
 							
 							stillNonclustered = false;
 						 	
@@ -353,9 +319,7 @@ public class SinkNode extends SimpleNode
 							
 							if (numMessagesExpectedReceived >= expectedNumberOfSensors) // If all messagesResponse (from all nodes in Cluster to be splited) already done received
 							{
-								classifyRepresentativeNodesByResidualEnergy(newCluster);
-								
-								classifyRepresentativeNodesByHopsToSink(newCluster);
+								classifyNodesByAllParams(newCluster);
 
 								//NESTE PONTO, É PRECISO MANDAR MENSAGEM PARA OS NOVOS NÓS REPRESENTATIVOS PARA QUE OS MESMOS INICIEM UMA NOVA FASE (Novo ciclo de sensoriamento)
 								
@@ -409,6 +373,26 @@ public class SinkNode extends SimpleNode
 			} // end if (message instanceof WsnMsg)
 		} //end while (inbox.hasNext())
 	} //end handleMessages()
+	
+	/**
+	 * It classify the clusters' nodes by 'residual energy' and by 'hops to sink' and prints cluster configuration before, during and after new order
+	 * @param cluster
+	 */
+	void classifyNodesByAllParams(ArrayList2d<WsnMsgResponse> cluster) {
+		Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
+		printClusterArray2d(cluster);
+		
+		classifyRepresentativeNodesByResidualEnergy(cluster); // (Re)classifica os nós dos clusters por energia residual
+		
+		Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
+		printClusterArray2d(cluster);
+		
+		classifyRepresentativeNodesByHopsToSink(cluster); // (Re)classifica os nós dos clusters por saltos até o sink node 
+		
+		Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
+		printClusterArray2d(cluster);
+	} // end classifyNodesByAllParams(ArrayList2d<WsnMsgResponse> cluster)
+	
 	
 	/**
 	 * Adds the clusters (lines) from tempClusterGiver in the tempClusterReceiver
@@ -596,11 +580,11 @@ public class SinkNode extends SimpleNode
 	} // end classifyRepresentativeNodesByHopsToSink(ArrayList2d<WsnMsgResponse> tempCluster)
 	
 	/**
-	 * It prints and colore nodes by the clusters (message groups) formed
+	 * It prints and colore nodes by the clusters (param) formed
 	 */
-	private void printMessageGroupsArray2d()
+	private void printClusterArray2d(ArrayList2d<WsnMsgResponse> cluster)
 	{
-		if (messageGroups != null) // If there is a message group created
+		if (cluster != null) // If there is a message group created
 		{
 			int codColor = 0;
 			Color[] arrayColor = {
@@ -635,11 +619,11 @@ public class SinkNode extends SimpleNode
 					Color.BLACK};
 			Color currentRandomColor = arrayColor[codColor]; 
 //			Color currentRandomColor = new Color(codColor); 
-			for (int line=0; line < messageGroups.getNumRows(); line++)
+			for (int line=0; line < cluster.getNumRows(); line++)
 			{
-				for (int col=0; col < messageGroups.getNumCols(line); col++)
+				for (int col=0; col < cluster.getNumCols(line); col++)
 				{
-					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
+					WsnMsgResponse currentWsnMsgResp = cluster.get(line, col);
 					currentWsnMsgResp.source.setColor(currentRandomColor);
 					Utils.printForDebug("Line = "+line+", Col = "+col+": NodeID = "+currentWsnMsgResp.source.ID+" BatLevel = "+currentWsnMsgResp.batLevel+" Round = "+((SimpleNode)currentWsnMsgResp.source).lastRoundRead);
 				}
@@ -649,9 +633,9 @@ public class SinkNode extends SimpleNode
 				currentRandomColor = arrayColor[codColor];
 //				currentRandomColor = new Color(codColor);
 			}
-			Utils.printForDebug("Number of Lines / Clusters = "+messageGroups.getNumRows()+"\n");
+			Utils.printForDebug("Number of Lines / Clusters = "+cluster.getNumRows()+"\n");
 		}
-	} // end printMessageGroupsArray2d()
+	} // end printClusterArray2d(ArrayList2d<WsnMsgResponse> cluster)
 	
 	/**
 	 * Change the message from "index" position for the first position [0] in that line from array
