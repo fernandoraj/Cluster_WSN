@@ -215,16 +215,33 @@ public class SinkNode extends SimpleNode
 				
 				else if (wsnMsgResp.typeMsg == 4) // Se é uma mensagem de um Nó Representativo/Cluster Head cujo nível da bateria está abaixo do mínimo (SimpleNode.minBatLevelInClusterHead)
 				{
-					if (allSensorsMustContinuoslySense) {
+					if (allSensorsMustContinuoslySense) { // Se é uma mensagem de um Cluster Head // Se for um ClusterHead (ClusterHead != null)
+						
+						int lineFromClusterNode = searchAndReplaceNodeInClusterByMessage(wsnMsgResp); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
+						
+						if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
+						{
+							classifyNodesByAllParams(messageGroups); // Reclassifica todos os nós do cluster atual - cujo Cluster Head teve decaimento do nível de bateria
+							
+							int numSensors = messageGroups.getNumCols(lineFromClusterNode);
+							Node chNode = (messageGroups.get(lineFromClusterNode, 0)).source; // Get the (new) Cluster Head from the current cluster/line
+
+							Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"; ClusterHead / IDnumber = "+chNode.ID+"; #Sensors = "+numSensors);
+							for (int col=0; col < numSensors; col++) // For each node from that cluster (in messageGroups), it must communicate who is the new ClusterHead
+							{
+								WsnMsgResponse wsnMsgResponseCurrent = messageGroups.get(lineFromClusterNode, col); // Get the Node
+								
+								wsnMsgResponseCurrent.sizeTimeSlot = 1; // If all sensor nodes in Cluster must continuosly sense, so the sizeTimeSlot doesn't matter
+								
+								receiveMessage(wsnMsgResponseCurrent, chNode);
+							} // end for (int col=0; col < numSensors; col++)
+						} // end if (lineFromClusterNode >= 0)
 					
 					
-					// Se for um ClusterHead (ClusterHead != null)
+					} // end if (allSensorsMustContinuoslySense)
 					
-// PREENCHER COM CÓDIGO CORRETO !!!					
-					}
 					// Se for um Nó Representativo (ClusterHead == null) - VERIFICAR ESTE CÓDIGO!!!
-					
-					else { //if (!allSensorsMustContinuoslySense) {
+					else { //if (!allSensorsMustContinuoslySense) { // Se é uma mensagem de um Nó Representativo
 						int lineFromClusterNode = searchAndReplaceNodeInClusterByMessage(wsnMsgResp); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
 						
 						if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
@@ -236,9 +253,9 @@ public class SinkNode extends SimpleNode
 							Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
 							wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);						
 							receiveMessage(wsnMsgResponseRepresentative, null);
-						}
-					}
-				}
+						} // end if (lineFromClusterNode >= 0)
+					}  // end else
+				} // end else if (wsnMsgResp.typeMsg == 4)
 				
 				else // If it is a message from a (Representative) node containing reading (sense) data
 				{
@@ -710,11 +727,12 @@ public class SinkNode extends SimpleNode
 	} // end addNodeInClusterClassifiedByMessage(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
 
 	/**
-	 * Search the WsnMsgResponse object with the same source node, in the correct position in "Cluster" from the messageGroups (ArrayList2d) and replace him with the one passed by parameter  
-	 * PS.: Each line in "messageGroups" (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.origem), 
+	 * Search the WsnMsgResponse object with the same source node, in the correct position in "Cluster" from the messageGroups (ArrayList2d) 
+	 * and replace him with the one passed by parameter<p>  
+	 * PS.: Each line in "messageGroups" (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.source), 
 	 * classified by Dissimilarity Measure from yours data sensed, stored on WsnMsgResponse.dataRecordItens
 	 *  
-	 * @param wsnMsgResp Message to be used for classify the sensor node
+	 * @param newWsnMsgResp Message to be used for classify the sensor node
 	 */
 	private int searchAndReplaceNodeInClusterByMessage(WsnMsgResponse newWsnMsgResp)
 	{
