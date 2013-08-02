@@ -392,19 +392,14 @@ public class SimpleNode extends Node
 			Utils.printForDebug("@ @ The number of prediction errors in this Cluster ("+errorsInThisCluster+") EXCEEDED the maximum limit of the prediction errors per Cluster ("+maxErrorsPerCluster+")! NoID = "+this.ID+"\n");
 
 			
-			
-			
 			WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
 			
 			timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
 			
-			
-			
-			
-			
+			errorsInThisCluster = 0; // Depois de enviar a mensagem para o Sink, reseta (reinicia) o contador de erros deste cluster
 			
 		} // end if (errorsInThisCluster > maxErrorsPerCluster)
-		errorsInThisCluster = 0;
+		//errorsInThisCluster = 0;
 	} // end private void countErrorMessages(
 	
 	/**
@@ -871,17 +866,21 @@ public class SimpleNode extends Node
  *  HERE IS THE POINT OF TEST FROM PREDICT VALUE FOR CHOICE WHAT TO DO !!!
  */
 
-				if (!isValuePredictInValueReading(value, predictionValue, maxError))
-				{
+				if (!isValuePredictInValueReading(value, predictionValue, maxError)) {
 					numPredictionErrors++; // Contador do número de erros de predição
-				}
-
-				Utils.printForDebug("* * The total number of predictions is "+numTotalPredictions+"! NoID = "+this.ID+" Maximum of predictions = "+this.ownTimeSlot);
+				} // end if (!isValuePredictInValueReading(value, predictionValue, maxError))
 				
-				if (numPredictionErrors > 0) // Se há erros de predição, então exibe uma mensagem
-				{
+				if (this.clusterHead == null) { // Se existe um CH, ou seja, se o modo de sensoriamento é contínuo (SinkNode.allSensorsMustContinuoslySense = true)
+					Utils.printForDebug("* * The total number of predictions is "+numTotalPredictions+"! NoID = "+this.ID+" Maximum of predictions = "+this.ownTimeSlot);					
+				} // end if (this.clusterHead == null)
+				else { // if (this.clusterHead != null)
+					Utils.printForDebug("* * The total number of predictions is "+numTotalPredictions+"! NoID = "+this.ID);
+				} // end else
+
+				
+				if (numPredictionErrors > 0) { // Se há erros de predição, então exibe uma mensagem
 					Utils.printForDebug("* * * * The number of prediction errors is "+numPredictionErrors+"! NoID = "+this.ID+"\n");
-				}
+				} // end if (numPredictionErrors > 0)
 				
 /*
  * Neste ponto deve-se verificar se o parâmetro "clusterHead" é diferente de "null", pois indica que existe um ClusterHead (e não um nó representativo)
