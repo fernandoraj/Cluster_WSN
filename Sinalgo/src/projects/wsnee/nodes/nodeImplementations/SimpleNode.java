@@ -122,7 +122,7 @@ public class SimpleNode extends Node
 	/**
 	 * Minimum (limit) level of cluster head's battery level - below this limit, the cluster head communicates to sink
 	 */
-	private static final double minBatLevelInClusterHead = 0.1;
+	private static final double minBatLevelInClusterHead = 2.1; // According KAMAL, A. R. M.; HAMID, M. A. Reliable data approximation in wireless sensor network. Ad Hoc Networks, n. July, jul. 2013. (l. 540)
 	
 	/**
 	 * Stores sensor readings of this node loaded from the sensor readings file.
