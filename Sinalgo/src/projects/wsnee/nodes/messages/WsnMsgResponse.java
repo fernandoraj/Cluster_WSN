@@ -95,12 +95,18 @@ public class WsnMsgResponse extends Message {
 	 */
 	public void pushToPath(Integer no)
 	{
-		if (pathToSenderNode == null)
-		{
-			pathToSenderNode = new Stack<Integer>();
+		boolean thisNodeAlreadyExists = false;
+		if (pathToSenderNode == null) { // Se o atributo "pathToSenderNode" (path) ainda não existe (não foi instanciado)
+			pathToSenderNode = new Stack<Integer>(); // Então instancia tal atributo
 		}
-		hopsToTarget++; // Incrementa o contador de saltos (passos) de caminho (de rota) de nós
-		pathToSenderNode.push(no); // Adiciona/empilha o nó passado (noID) ao caminho (path) para o nó de origem
+		else if (pathToSenderNode.search(no) > -1) { // Se "pathToSenderNode" já existe e o nó a ser empilhado (inserido) já for encontrado no mesmo (path)
+			thisNodeAlreadyExists = true; // Flag indica que o nó em questão (noID) já existe (está empilhado)
+		}
+		
+		if (!thisNodeAlreadyExists) { // Se o nó em questão (noID) ainda não existe (na pilha)
+			hopsToTarget++; // Incrementa o contador de saltos (passos) de caminho (de rota) de nós
+			pathToSenderNode.push(no); // Adiciona/empilha o nó passado (noID) ao caminho (path) para o nó de origem
+		}
 	}
 	
 	/**
