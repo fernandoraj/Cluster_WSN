@@ -47,7 +47,7 @@
 		<initializeConnectionsOnStartup value="false" />
 
 		<!--Defines how often the GUI is updated. The GUI is redrawn after every refreshRate-th round.-->
-		<refreshRate value="1" />
+		<refreshRate value="130" />
 
 		<!--If set to true, the framework will inform a sender whenever  a unicast message is dropped. In synchronous mode, the sender  is informed in the round after the message should have arrived, and  immediately upon arrival in asynchronous mode.-->
 		<generateNAckMessages value="false" />
@@ -221,7 +221,7 @@
 		<arrowWidth value="1" />
 
 		<!--The dsfault value of the rounds field.-->
-		<defaultRoundNumber value="1" />
+		<defaultRoundNumber value="130" />
 
 	</Framework>
 	<Custom>
@@ -257,10 +257,10 @@
 		<!--  Our Own Settings                                                      -->
 		<!--***********************************************************************-->
 		<ExternalFilesPath>
-			<SensorReadingsFilePath value="data/sensor_readings/data_0.0_percent_min_500.txt"/> <!-- file containing the sensor readings from the Intel Lab WSN -->
+			<SensorReadingsFilePath value="data/sensor_readings/data_0.0_percent_min_10000_1.0_filtrated_by_DATE.txt"/> <!-- file containing the sensor readings from the Intel Lab WSN -->
 		</ExternalFilesPath>
 		
-		<SensorReadingsLoadBlockSize value = "500"/> <!-- amount of sensor readings (file lines) to be loaded from the file to the memory of the node -->
+		<SensorReadingsLoadBlockSize value = "10000"/> <!-- amount of sensor readings (file lines) to be loaded from the file to the memory of the node -->
 		
 	</Custom>
 </Document>
