@@ -182,7 +182,7 @@ public class SynchronousRuntimeThread extends Thread {
 			
 			if (Global.numberOfHitsInThisRound > 0)
 			{
-				System.out.println("\n");
+				Utils.printForDebug("\n");
 				Utils.printForDebug("The number of Hits (in round "+Global.currentTime+") is "+ Global.numberOfHitsInThisRound);
 			}
 			if (Global.numberOfMissesInThisRound > 0)
@@ -191,7 +191,7 @@ public class SynchronousRuntimeThread extends Thread {
 			}
 			if (Global.numberOfHitsOverAll > 0)
 			{
-				System.out.println("\n");
+				Utils.printForDebug("\n");
 				Utils.printForDebug(" * * The TOTAL number of Hits (until the round "+Global.currentTime+") is "+Global.numberOfHitsOverAll);
 			}
 			if (Global.numberOfMissesOverAll > 0)
@@ -229,6 +229,7 @@ public class SynchronousRuntimeThread extends Thread {
 		
 		if(Global.predictionsCount > 0)
 		{
+/*			
 			for(Node n : Runtime.nodes) {
 				if (n instanceof SimpleNode) {
 					if (((SimpleNode)n).predictionsCount != 0) {
@@ -237,7 +238,7 @@ public class SynchronousRuntimeThread extends Thread {
 					}
 				}
 			}
-			
+*/			
 			double RMSE = Math.sqrt(Global.squaredError / Global.predictionsCount);
 			System.out.println(NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE)+"\t"+Global.numberOfMessagesOverAll);
 			
