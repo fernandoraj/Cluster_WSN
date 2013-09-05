@@ -91,7 +91,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	private static final double limitPredictionError = 2; // SensorDelay
+	private static final double limitPredictionError = 0; // SensorDelay
 	
 	/**
 	 * Number / Identifier of cluster head sensor node that manages / represents
