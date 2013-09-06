@@ -21,14 +21,14 @@ import sinalgo.configuration.CorruptConfigurationEntryException;
 /**
  * Class responsible for managing data text files.
  * @author Alex Lacerda
- *
+ * @author Fernando Rodrigues
  */
 public class FileHandler {
 	
 	/**
 	 * Number of initial sensor nodes readings (by each sensor) to be disregarded in the filtering process
 	 */
-	static final int quantLearning = 1300;
+	static final int quantLearning = 10;
 	
 	/**
 	 * Number of sensor nodes in the simulation (Intel Lab Data).
@@ -353,8 +353,13 @@ public class FileHandler {
 				String tempStrPrevius = sensorReadingPreviousValues[4];
 				String tempStrCurrent = sensorReadingCurrentValues[4];
 				try {
-					Double tempPrevius = ((tempStrPrevius != null)?Double.parseDouble(tempStrPrevius): 0.0);
-					Double tempCurrent = ((tempStrCurrent != null)?Double.parseDouble(tempStrCurrent): 0.0);
+					Double tempPrevius = ((tempStrPrevius != null && tempStrPrevius != "")?Double.parseDouble(tempStrPrevius): 0.0);
+					Double tempCurrent = ((tempStrCurrent != null && tempStrCurrent != "")?Double.parseDouble(tempStrCurrent): 0.0);
+/*					
+					if (tempPrevius==122.153 || tempCurrent==122.153){
+						System.out.println("AQUI!!");
+					}
+*/					
 					double diffTemp = Math.abs(tempCurrent - tempPrevius);
 					if (diffTemp > acceptInterval) {
 						includeLine = false;
@@ -362,6 +367,8 @@ public class FileHandler {
 				}
 				catch (NumberFormatException pe) {
 					includeLine = false;
+					//System.out.println("tempStrPrevius = ("+tempStrPrevius+")");
+					//System.out.println("tempStrCurrent = ("+tempStrCurrent+")");
 					pe.printStackTrace();
 				}
 				break;
@@ -553,7 +560,7 @@ public class FileHandler {
 	 * B) To use the "generateFiltratedFile" method: <br>
 	 * 1) the path of the original data, <br>
 	 * 2) the type (field) of data from each sensor to be filtrated to the new file, which can be one of these:
-	 * TypeData.DATA, TypeData.TIME, TypeData.EPOCH, TypeData.SENSORID, TypeData.TEMP, TypeData.HUM, TypeData.LUM, TypeData.VOLT, and <br> 
+	 * TypeData.DATE, TypeData.TIME, TypeData.EPOCH, TypeData.SENSORID, TypeData.TEMP, TypeData.HUM, TypeData.LUM, TypeData.VOLT, and <br> 
 	 * 3) the maximum difference acceptable between of two sequential readings from each sensor to be copied to the new file; <p>
 	 * @param args
 	 */
@@ -561,8 +568,9 @@ public class FileHandler {
 		try {
 			//FileHandler.generatePercentageFile("data/sensor_readings/data.txt", null, 10000);
 			
-			//TypeData.DATA, TypeData.TIME, TypeData.EPOCH, TypeData.SENSORID, TypeData.TEMP, TypeData.HUM, TypeData.LUM, TypeData.VOLT
-			FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_10000.txt", TypeData.LUM, 800.0);
+			//TypeData.DATE, TypeData.TIME, TypeData.EPOCH, TypeData.SENSORID, TypeData.TEMP, TypeData.HUM, TypeData.LUM, TypeData.VOLT
+			//Remember of configuring "quantLearning" attribute value
+			FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_10000.txt", TypeData.TEMP, 10.0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
