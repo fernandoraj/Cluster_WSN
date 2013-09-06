@@ -24,6 +24,7 @@ import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 import sinalgo.runtime.Global;
 import sinalgo.tools.Tools;
+import projects.wsn.nodes.timers.ReadingSendingTimer;
 
 /**
  * Class that represents an ordinary sensor node that is able to sense natural phenomena
@@ -223,6 +224,14 @@ public class SimpleNode extends Node
 					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
 					
 					timer.startRelative(wsnMessage.sizeTimeSlot, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+
+					
+					
+					
+					
+					
+					
+					
 					
 					//Devemos alterar o campo forwardingHop(da mensagem) para armazenar o noh que vai encaminhar a mensagem.
 					wsnMessage.forwardingHop = this; 
@@ -595,6 +604,9 @@ public class SimpleNode extends Node
 					}//catch
 				}//else
 				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
+				
+				
+				
 				double predictionValue = makePrediction(coefA, coefB, quantTime);
 				
 				addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
@@ -698,6 +710,85 @@ public class SimpleNode extends Node
 		}
 		return hit;
 	}
+	
+
+	/**
+	 * Read the next value from present sensor, send to sink and trigger the next reading 
+	 * @param dataSensedType Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
+	 */
+	protected void makeSensorReadingAndSendind (String dataSensedType)
+	{
+		int medida = 0;
+		if (dataSensedType != null)
+		{
+			medida = identificarTipo(dataSensedType);
+		}
+		
+		String sensorReading = performSensorReading();
+		
+		if (sensorReading != null && medida != 0)
+		{
+			String linhas[] = sensorReading.split(" ");
+			double value;
+			double quantTime;
+			if (linhas.length > 4)
+			{
+				if (linhas[medida] == null || linhas[medida].equals(""))
+				{
+					value = 0.0;
+				}
+				else
+				{
+					try
+					{
+						value = Double.parseDouble(linhas[medida]);
+					}//try
+					catch (NumberFormatException e)
+					{
+						value = 0.0;
+					}//catch
+				}//else
+				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
+				
+				
+				
+				addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
+				
+					
+				ReadingSendingTimer newReadingSendingTimer = new ReadingSendingTimer(dataSensedType);
+				newReadingSendingTimer.startRelative(1, this);
+
+				WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 1, 2, dataSensedType);
+
+				//Adds the last values ​​previously read to the message that goes to the sink
+				for (int cont=0; cont<dataRecordItens.size(); cont++) //for(int cont=0; cont<slidingWindowSize; cont++)
+				{
+					wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).type, dataRecordItens.get(cont).value, dataRecordItens.get(cont).time); 
+				}
+				
+				addThisNodeToPath(wsnMsgResp);
+				
+				WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
+				
+				timer.startRelative(1, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+
+			} // end if (linhas.length > 4)
+			
+		} // end if (sensorReading != null && medida != 0)
+	}
+	
+	/**
+	 * Calls the method makeSensorReadingAndSendind in looping
+	 * @param dataSensedType Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
+	 * @param coefA Coefficient A from the Regression Equation for this sensor
+	 * @param coefB Coefficient B from the Regression Equation for this sensor
+	 * @param maxError Threshold error to the calculation of prediction for this sensor
+	 */
+	public final void makeSensorReadingAndSendingLoop(String dataSensedType)
+	{
+		makeSensorReadingAndSendind(dataSensedType);
+	}
+	
 	
 	public class DataRecord
 	{
