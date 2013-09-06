@@ -18,7 +18,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Numero de dados sensoreados por time slot (Tamanho do time slot) 
 	 */
-	private Integer sizeTimeSlot = 2600;
+	private Integer sizeTimeSlot = 1;
 	
 	/**
 	 * Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
@@ -29,6 +29,11 @@ public class SinkNode extends SimpleNode
 	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
 	 */
 	private double thresholdError = 0.0; // te (abbrev.)
+	
+	/**
+	 * Indicates what type of approach the sink node should signal to all other nodes must follow (Adaga-P*, continuously sensing-and-send (naive with or without learning initial time))
+	 */
+	private Integer approachType = 2; // 0(default) = temporal correlation (Adaga-P*); 2 = Naive
 	
 	public SinkNode()
 	{
@@ -59,7 +64,7 @@ public class SinkNode extends SimpleNode
 	public void construirRoteamento(){
 		this.proximoNoAteEstacaoBase = this;
 		//WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0); //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo
-		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedType); 
+		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, approachType, sizeTimeSlot, dataSensedType); 
 		WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
 		timer.startRelative(1, this);
 	}
