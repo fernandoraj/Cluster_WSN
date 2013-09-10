@@ -3,6 +3,7 @@ package projects.wsnee.nodes.nodeImplementations;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -91,7 +92,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	private static final double limitPredictionError = 0; // SensorDelay
+	private static final double limitPredictionError = 4; // SensorDelay
 	
 	/**
 	 * Number / Identifier of cluster head sensor node that manages / represents
@@ -117,12 +118,17 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink
 	 */
-	private static final int maxErrorsPerCluster = 0; // ClusterDelay
+	private static final int maxErrorsPerCluster = 4; // ClusterDelay
 	
 	/**
 	 * Minimum (limit) level of cluster head's battery level - below this limit, the cluster head communicates to sink
 	 */
 	private static final double minBatLevelInClusterHead = 2.1; // According KAMAL, A. R. M.; HAMID, M. A. Reliable data approximation in wireless sensor network. Ad Hoc Networks, n. July, jul. 2013. (l. 540)
+	
+	private double predictionsCount = 0.0;
+	
+	private double squaredError = 0.0;
+	
 	
 	/**
 	 * Stores sensor readings of this node loaded from the sensor readings file.
@@ -870,10 +876,10 @@ public class SimpleNode extends Node
 					numPredictionErrors++; // Contador do número de erros de predição
 				} // end if (!isValuePredictInValueReading(value, predictionValue, maxError))
 				
-				if (this.clusterHead == null) { // Se existe um CH, ou seja, se o modo de sensoriamento é contínuo (SinkNode.allSensorsMustContinuoslySense = true)
+				if (this.clusterHead != null) { // Se NÃO existe um CH, ou seja, se o modo de sensoriamento NÃO é contínuo (SinkNode.allSensorsMustContinuoslySense = false)
 					Utils.printForDebug("* * The total number of predictions is "+numTotalPredictions+"! NoID = "+this.ID+" Maximum of predictions = "+this.ownTimeSlot);					
-				} // end if (this.clusterHead == null)
-				else { // if (this.clusterHead != null)
+				} // end if (this.clusterHead != null)
+				else { // if (this.clusterHead == null)
 					Utils.printForDebug("* * The total number of predictions is "+numTotalPredictions+"! NoID = "+this.ID);
 				} // end else
 
@@ -1021,6 +1027,16 @@ public class SimpleNode extends Node
 		triggerPredictions(dataSensedType, coefA, coefB, maxError);
 	} // end triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
 	
+	public void printNodeRMSE(){
+		double RMSE = 0.0;
+		if(this.predictionsCount > 0)
+		{
+			RMSE = Math.sqrt(this.squaredError / this.predictionsCount);
+		}
+		System.out.println(this.ID+"\t"+NumberFormat.getNumberInstance().format(RMSE));
+
+	}
+	
 	/**
 	 * It compares the read value('value') to the predict value('predictionValue') using 'maxError' as threshold error
 	 * @param value Value read from the sensor
@@ -1031,7 +1047,11 @@ public class SimpleNode extends Node
 	protected boolean isValuePredictInValueReading(double value, double predictionValue, double maxError)
 	{
 		Global.predictionsCount++;
+		this.predictionsCount++;
+
 		Global.squaredError += Math.pow((predictionValue - value), 2);
+		this.squaredError += Math.pow((predictionValue - value), 2);
+		
 		boolean hit;
 		if (value >= (predictionValue - value*maxError) && value <= (predictionValue + value*maxError))
 		{
