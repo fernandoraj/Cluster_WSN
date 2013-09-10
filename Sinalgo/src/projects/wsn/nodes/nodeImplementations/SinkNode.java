@@ -18,12 +18,12 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Numero de dados sensoreados por time slot (Tamanho do time slot) 
 	 */
-	private Integer sizeTimeSlot = 1;
+	private Integer sizeTimeSlot = 100;
 	
 	/**
 	 * Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 */
-	private String dataSensedType = "l"; // type (abbrev.)
+	private String dataSensedType = "t"; // type (abbrev.)
 	
 	/**
 	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro)
@@ -44,6 +44,7 @@ public class SinkNode extends SimpleNode
 		Utils.printForDebug("The threshold of error (max error) is "+thresholdError);
 		Utils.printForDebug("The size of sliding window is "+SimpleNode.slidingWindowSize);
 		Utils.printForDebug("The size of delay to send novelties is "+SimpleNode.limitPredictionError);
+		Utils.printForDebug("The approach type is "+approachType+" (0 = temporal correlation (Adaga-P*); 2 = Naive)");
 		
 //		if(LogL.ROUND_DETAIL){
 			Global.log.logln("\nThe size of time slot is "+sizeTimeSlot);
@@ -51,6 +52,7 @@ public class SinkNode extends SimpleNode
 			Global.log.logln("The threshold of error (max error) is "+thresholdError);
 			Global.log.logln("The size of sliding window is "+SimpleNode.slidingWindowSize);
 			Global.log.logln("The size of delay to send novelties is "+SimpleNode.limitPredictionError+"\n");
+			Global.log.logln("The approach type is "+approachType+" (0 = temporal correlation (Adaga-P*); 2 = Naive)");
 //		}
 	}
 
@@ -84,10 +86,26 @@ public class SinkNode extends SimpleNode
 		} //while (inbox.hasNext())
 	} //public void handleMessages
 	
+	/**
+	 * Recebe a mensagem passada. Caso a abordagem utilizada seja a de correlação
+	 * temporal (Adaga-P*), lê os parâmetros (itens) no dataRecordItens,
+	 * calcula os coeficientes A e B de acordo com estes parâmetros e envia tais
+	 * coeficientes para o nó sensor de origem; Caso contrário (Aborbagem naive ->
+	 * approachType = 2), "descarta" a mensagem.
+	 * <p>
+	 * [Eng] Receives the message, reads the parameters (items) in
+	 * dataRecordItens, calculates the coefficients A and B according to these
+	 * parameters and sends these coefficients for the sensor node of origin
+	 * @param wsnMsgResp Mensagem recebida com os parâmetros a serem lidos
+	 * @param sizeTimeSlot Tamanho do vetor de dados (série temporal) da mensagem
+	 * @param dataSensedType Tipo de dados (da série temporal) da mensagem
+	 */
 	private void receiveMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 	{
-		if (wsnMsgResp != null && wsnMsgResp.dataRecordItens != null)
-		{
+		if (approachType == 2){ // Abordagem Naive
+			// Tratar mensagem recebida com dados do sensor
+		}
+		else if (wsnMsgResp != null && wsnMsgResp.dataRecordItens != null){
 			int size = wsnMsgResp.dataRecordItens.size();
 			double[] valores = new double[size];
 			double[] tempos = new double[size];

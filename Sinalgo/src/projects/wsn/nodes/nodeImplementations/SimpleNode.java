@@ -113,7 +113,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	protected static final int limitPredictionError = 4; // delay (abbrev.)
+	protected static final int limitPredictionError = 0; // delay (abbrev.)
 
 	@Override
 	public void preStep() {}
@@ -147,7 +147,8 @@ public class SimpleNode extends Node
 					
 //					Utils.printForDebug("** Entrou em if (wsnMessage.forwardingHop.equals(this)) ** NoID = "+this.ID);
 				}
-				else if (wsnMessage.tipoMsg == 0)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
+//				else if (wsnMessage.tipoMsg == 0)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
+				else if (wsnMessage.tipoMsg != 1)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
 				{ 
 					this.setColor(Color.BLUE);
 
@@ -228,6 +229,18 @@ public class SimpleNode extends Node
 					
 					
 					
+					if (wsnMessage.tipoMsg == 2 && wsnMessage != null){ // approachType = 2 = Naive
+
+						makeSensorReadingAndSendind (wsnMessage.dataSensedType); // Chama o método de sensoriamento / envio de dados da abordagem naive
+
+					}
+					else if (wsnMessage == null){
+						
+						Utils.printForDebug("wsnMessage é NULL!");
+
+					}
+					
+					
 					
 					
 					
@@ -275,7 +288,7 @@ public class SimpleNode extends Node
 			medida = identificarTipo(dataSensedType);
 		}
 		String dataLine = performSensorReading();
-		int cont = 0, i=0;
+		int i=0;//cont = 0;
 		while (i<sizeTimeSlot && dataLine != null)
 		{
 			i++;
@@ -288,7 +301,7 @@ public class SimpleNode extends Node
 //				Utils.printForDebug("cont = "+cont);
 				if (linhas.length > 4)
 				{
-					cont++;
+//					cont++;
 					ultimoRoundLido = Integer.parseInt(linhas[2]); //Número do round 
 					if (linhas[medida] == null || linhas[medida].equals(""))
 					{
@@ -755,8 +768,6 @@ public class SimpleNode extends Node
 				addDataRecordItens(dataSensedType.charAt(0), value, quantTime);
 				
 					
-				ReadingSendingTimer newReadingSendingTimer = new ReadingSendingTimer(dataSensedType);
-				newReadingSendingTimer.startRelative(1, this);
 
 				WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 1, 2, dataSensedType);
 
@@ -772,6 +783,9 @@ public class SimpleNode extends Node
 				
 				timer.startRelative(1, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
 
+				ReadingSendingTimer newReadingSendingTimer = new ReadingSendingTimer(dataSensedType);
+				newReadingSendingTimer.startRelative(1, this);
+				
 			} // end if (linhas.length > 4)
 			
 		} // end if (sensorReading != null && medida != 0)
