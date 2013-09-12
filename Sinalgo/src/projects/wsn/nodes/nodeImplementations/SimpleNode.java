@@ -113,7 +113,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	protected static final int limitPredictionError = 0; // delay (abbrev.)
+	protected static final int limitPredictionError = 20; // delay (abbrev.)
 
 	@Override
 	public void preStep() {}
@@ -801,6 +801,18 @@ public class SimpleNode extends Node
 	public final void makeSensorReadingAndSendingLoop(String dataSensedType)
 	{
 		makeSensorReadingAndSendind(dataSensedType);
+	}
+	
+	/**
+	 * It prints the RMSE (Root Mean Square Error) for this sensor
+	 */
+	public void printNodeRMSE(){
+		double RMSE = 0.0;
+		if(this.predictionsCount > 0)
+		{
+			RMSE = Math.sqrt(this.squaredError / this.predictionsCount);
+		}
+		System.out.println(this.ID+"\t"+NumberFormat.getNumberInstance().format(RMSE));
 	}
 	
 	
