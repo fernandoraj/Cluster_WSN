@@ -71,7 +71,7 @@ public class SinkNode extends SimpleNode
 	 * Número total de nós sensores presentes na rede
 	 * Total number of sensor nodes in the network
 	 */
-	private static int numTotalOfSensors = 54;
+	private static int numTotalOfSensors = 44;
 	
 	/**
 	 * Array 2D (clusters) from sensors (Messages from sensors = WsnMsgResponse).
@@ -96,9 +96,9 @@ public class SinkNode extends SimpleNode
 	private int numMessagesOfTimeSlotFinishedReceived = 0;
 	
 	/**
-	 * Indicates that sink node signalize to all other nodes must continuously sensing (naive using Cluster Heads)
+	 * Indicates that sink node signalize to all other nodes must continuously sensing ("naive" using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = true; // ACS
+	private boolean allSensorsMustContinuoslySense = false; // ACS
 	
 	/**
 	 * Flag to indicate that the sink still not clustered all nodes for the first time

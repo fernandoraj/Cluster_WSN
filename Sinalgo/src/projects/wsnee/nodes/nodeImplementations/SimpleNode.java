@@ -92,7 +92,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	private static final double limitPredictionError = 4; // SensorDelay
+	private static final double limitPredictionError = 20; // SensorDelay
 	
 	/**
 	 * Number / Identifier of cluster head sensor node that manages / represents
@@ -118,7 +118,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink
 	 */
-	private static final int maxErrorsPerCluster = 4; // ClusterDelay
+	private static final int maxErrorsPerCluster = 5; // ClusterDelay
 	
 	/**
 	 * Minimum (limit) level of cluster head's battery level - below this limit, the cluster head communicates to sink
@@ -1027,6 +1027,9 @@ public class SimpleNode extends Node
 		triggerPredictions(dataSensedType, coefA, coefB, maxError);
 	} // end triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
 	
+	/**
+	 * It prints the RMSE (Root Mean Square Error) for this sensor
+	 */
 	public void printNodeRMSE(){
 		double RMSE = 0.0;
 		if(this.predictionsCount > 0)
@@ -1034,7 +1037,6 @@ public class SimpleNode extends Node
 			RMSE = Math.sqrt(this.squaredError / this.predictionsCount);
 		}
 		System.out.println(this.ID+"\t"+NumberFormat.getNumberInstance().format(RMSE));
-
 	}
 	
 	/**
