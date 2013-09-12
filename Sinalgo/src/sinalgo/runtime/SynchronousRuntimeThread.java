@@ -227,8 +227,6 @@ public class SynchronousRuntimeThread extends Thread {
 
 		}
 		
-		if(Global.predictionsCount > 0)
-		{
 /*			
 			for(Node n : Runtime.nodes) {
 				if (n instanceof SimpleNode) {
@@ -238,18 +236,34 @@ public class SynchronousRuntimeThread extends Thread {
 					}
 				}
 			}
-*/			
-			double RMSE = Math.sqrt(Global.squaredError / Global.predictionsCount);
-			System.out.println(NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE)+"\t"+Global.numberOfMessagesOverAll);
-			
-			Global.log.logln(NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE)+"\t"+Global.numberOfMessagesOverAll);
-			
-			if(LogL.ROUND_DETAIL){
-				Global.log.logln("# # The Global RMSE is "+RMSE+"\n");
-			}
+*/		
+		// Full print from RMSE for each Sensor Node
+/*		
+		System.out.println("NodeID \t RMSE");
+		for(Node n : Runtime.nodes) {
+			((projects.wsnee.nodes.nodeImplementations.SimpleNode)n).printNodeRMSE();
 		}
+*/
+/*
+		System.out.println("NodeID \t RMSE");
+		for(Node n : Runtime.nodes) {
+			((projects.wsn.nodes.nodeImplementations.SimpleNode)n).printNodeRMSE();
+		}		
+*/
 		
+		double RMSE = 0.0;
+		if(Global.predictionsCount > 0)
+		{
+			RMSE = Math.sqrt(Global.squaredError / Global.predictionsCount);
+		}
+		System.out.println(NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE)+"\t"+Global.numberOfMessagesOverAll);
 		
+		Global.log.logln(NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE)+"\t"+Global.numberOfMessagesOverAll);
+		
+		if(LogL.ROUND_DETAIL){
+			Global.log.logln("# # The Global RMSE is "+RMSE+"\n");
+		}
+
 		if(Global.isGuiMode) {
 			runtime.getGUI().redrawGUINow();
 			runtime.getGUI().setStartButtonEnabled(true);
