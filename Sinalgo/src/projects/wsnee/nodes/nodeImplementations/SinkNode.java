@@ -20,10 +20,15 @@ public class SinkNode extends SimpleNode
 {
 
 	/**
-	 * Número de dados sensoriados por time slot (Tamanho do time slot)
-	 * Number of sensed data per time slot (time slot size)
+	 * Número de dados sensoriados por time slot (Tamanho do time slot inicial)
+	 * Number of sensed data per time slot (initial time slot size)
 	 */
 	private Integer sizeTimeSlot = 100;
+	
+	/**
+	 * Quantidade de rounds (ciclos) a ser saltado para cada leitura sequencial dos sensores, no caso de uso da abordagem de ClusterHeads (ACS=True)
+	 */
+	public static final int sensorTimeSlot = 1;
 	
 	/**
 	 * Número de dados sensoriados por time slot (Tamanho do time slot)
@@ -71,7 +76,7 @@ public class SinkNode extends SimpleNode
 	 * Número total de nós sensores presentes na rede
 	 * Total number of sensor nodes in the network
 	 */
-	private static int numTotalOfSensors = 44;
+	private static int numTotalOfSensors = 54;
 	
 	/**
 	 * Array 2D (clusters) from sensors (Messages from sensors = WsnMsgResponse).
@@ -98,7 +103,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Indicates that sink node signalize to all other nodes must continuously sensing ("naive" using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = false; // ACS
+	private boolean allSensorsMustContinuoslySense = true; // ACS
 	
 	/**
 	 * Flag to indicate that the sink still not clustered all nodes for the first time
@@ -309,7 +314,7 @@ public class SinkNode extends SimpleNode
 											WsnMsgResponse wsnMsgResponseCurrent = messageGroups.get(line, col); // Get the Node
 											
 											//wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-											wsnMsgResponseCurrent.sizeTimeSlot = 1; // If all sensor nodes in Cluster must continuosly sense, so the sizeTimeSlot doesn't matter
+											wsnMsgResponseCurrent.sizeTimeSlot = sensorTimeSlot; // If all sensor nodes in Cluster must continuosly sense, so the sizeTimeSlot doesn't matter
 											
 											receiveMessage(wsnMsgResponseCurrent, chNode);
 										}
@@ -368,7 +373,7 @@ public class SinkNode extends SimpleNode
 												WsnMsgResponse wsnMsgResponseCurrent = newCluster.get(line, col); // Get the Node
 												
 												//wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-												wsnMsgResponseCurrent.sizeTimeSlot = 1; // If all sensor nodes in each cluster must continuosly sense, so the sizeTimeSlot doesn't matter
+												wsnMsgResponseCurrent.sizeTimeSlot = sensorTimeSlot; // If all sensor nodes in each cluster must continuosly sense, so the sizeTimeSlot doesn't matter
 												
 												receiveMessage(wsnMsgResponseCurrent, chNode);
 											} // end for (int col=0; col < numSensors; col++)
