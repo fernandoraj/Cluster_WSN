@@ -92,7 +92,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	private static final double limitPredictionError = 20; // SensorDelay
+	private static final double limitPredictionError = 5; // SensorDelay
 	
 	/**
 	 * Number / Identifier of cluster head sensor node that manages / represents
@@ -157,6 +157,11 @@ public class SimpleNode extends Node
 	 * file on demand by each node.
 	 */
 	private boolean loadSensorReadingsFromFile = true;
+
+	/**
+	 * Saves the round in which the first ClusterError occurred
+	 */
+	private double initialErrorRound;
 	
 
 	@Override
@@ -239,7 +244,7 @@ public class SimpleNode extends Node
 					else if (wsnMessage.target == this) //Se este for o nó de destino da mensagem...
 					{ 
 //						sequenceNumber = wsnMessage.sequenceID;
-						this.setColor(Color.RED);
+						//this.setColor(Color.RED);
 						
 //						Utils.printForDebug("@@@ Entrou em else if (wsnMessage.destino == this && nextNodeId == null) @@@ NoID = "+this.ID);
 						
@@ -377,6 +382,11 @@ public class SimpleNode extends Node
 	private void countErrorMessages(WsnMsgResponse wsnMsgResp)
 	{
 		Integer type = wsnMsgResp.typeMsg;
+		
+		if (errorsInThisCluster == 0) { //Se é o primeiro erro (notificação de novidade) deste cluster
+			initialErrorRound = Global.currentTime; // Salva o número do round (ticket/ciclo) atual
+		}
+		
 		switch (type){
 			case 0:
 				break;
@@ -389,6 +399,11 @@ public class SimpleNode extends Node
 			case 4: //Nível mínimo de bateria atingido (pelo ClusterHead) - Minimum battery level reached (by ClusterHead)
 				break;
 		}
+		
+		if (Global.currentTime > (initialErrorRound + maxErrorsPerCluster)) { // Se o tempo (round/ciclo/ticket) atual for maior do que o inicial mais o número máximo de erros por cluster
+			errorsInThisCluster = 0; // Então zera a quantidade de erros deste cluster
+		}
+		
 		if (errorsInThisCluster > maxErrorsPerCluster)
 		{
 			// Deve informar ao Sink tal problema, para que o mesmo providencie o tratamento correto (Qual seja!???)
@@ -876,10 +891,10 @@ public class SimpleNode extends Node
 					numPredictionErrors++; // Contador do número de erros de predição
 				} // end if (!isValuePredictInValueReading(value, predictionValue, maxError))
 				
-				if (this.clusterHead != null) { // Se NÃO existe um CH, ou seja, se o modo de sensoriamento NÃO é contínuo (SinkNode.allSensorsMustContinuoslySense = false)
+				if (this.clusterHead == null) { // Se NÃO existe um CH, ou seja, se o modo de sensoriamento NÃO é contínuo (SinkNode.allSensorsMustContinuoslySense = false)
 					Utils.printForDebug("* * The total number of predictions is "+numTotalPredictions+"! NoID = "+this.ID+" Maximum of predictions = "+this.ownTimeSlot);					
 				} // end if (this.clusterHead != null)
-				else { // if (this.clusterHead == null)
+				else { // if (this.clusterHead != null)
 					Utils.printForDebug("* * The total number of predictions is "+numTotalPredictions+"! NoID = "+this.ID);
 				} // end else
 
@@ -950,7 +965,8 @@ public class SimpleNode extends Node
 						
 						// Se o modo de sensoriamento é contínuo, continua fazendo predição
 						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
-						newPredictionTimer.startRelative(1, this); 
+//						newPredictionTimer.startRelative(1, this); 
+						newPredictionTimer.startRelative(SinkNode.sensorTimeSlot, this); 
 						
 					} // end (!exit)
 					
