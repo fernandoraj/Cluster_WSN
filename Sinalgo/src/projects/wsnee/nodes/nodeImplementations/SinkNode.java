@@ -81,7 +81,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Array 2D (clusters) from sensors (Messages from sensors = WsnMsgResponse).
 	 */
-	private ArrayList2d<WsnMsgResponse> messageGroups;
+	private static ArrayList2d<WsnMsgResponse> messageGroups;
 	
 	private ArrayList2d<WsnMsgResponse> newCluster;
 	
@@ -236,7 +236,7 @@ public class SinkNode extends SimpleNode
 							{
 								WsnMsgResponse wsnMsgResponseCurrent = messageGroups.get(lineFromClusterNode, col); // Get the Node
 								
-								wsnMsgResponseCurrent.sizeTimeSlot = 1; // If all sensor nodes in Cluster must continuosly sense, so the sizeTimeSlot doesn't matter
+								wsnMsgResponseCurrent.sizeTimeSlot = sensorTimeSlot; // If all sensor nodes in Cluster must continuosly sense, so the sizeTimeSlot will be the sensorTimeSlot
 								
 								receiveMessage(wsnMsgResponseCurrent, chNode);
 							} // end for (int col=0; col < numSensors; col++)
@@ -531,6 +531,51 @@ public class SinkNode extends SimpleNode
 		}
 		return lineCLuster;
 	} // end identifyCluster(WsnMsgResponse newWsnMsgResp)
+
+	/**
+	 * It identifies which cluster (line number) where the "representativeNode" is 
+	 * @param representativeNode Node representing the representative sensor node to be localized in messageGroups
+	 * @return Line number (cluster) from node passed by; otherwise, returns -1 indicating that there is no such node("representativeNode") in any cluster
+	 */
+	private static int identifyCluster(Node representativeNode)
+	{
+		int lineCLuster = -1;
+		if (messageGroups == null) // If there isn't a message group yet
+		{
+			Utils.printForDebug("ERROR in identifyCluster(Node) method: There isn't messageGroups object instanciated yet!");
+		}
+		else
+		{
+			boolean found = false;
+			int line = 0, col = 0;
+			while ((!found) && (line < messageGroups.getNumRows()))
+			{
+				col = 0;
+				while ((!found) && (col < messageGroups.getNumCols(line)))
+				{
+					Node currentNode = messageGroups.get(line, col).source;
+					if (isEqualNode(currentNode, representativeNode))
+					{
+						found = true;
+					}
+					else
+					{
+						col++;
+					}
+				}
+				if (!found)
+				{
+					line++;
+				}
+			}
+			if (found)
+			{
+				lineCLuster = line;
+			}
+		}
+		return lineCLuster;
+	} // end identifyCluster(WsnMsgResponse newWsnMsgResp)
+
 	
 	/**
 	 * It selects the Representative Node for each line (cluster) from sensors by the max residual energy and puts him in the first position (in line)
@@ -815,12 +860,10 @@ public class SinkNode extends SimpleNode
 		return (currentWsnMsg.source.ID == newWsnMsg.source.ID);
 	} // end isEqualNodeSourceFromMessages(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 	
-/*
-	private boolean testDissimilarityMeasureWithoutPairRounds(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
+	private static boolean isEqualNode(Node currentNode, Node newNode)
 	{
-		return true;
-	}
-*/
+		return (currentNode == newNode);
+	} // end isEqualNodeSourceFromMessages(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 	
 	/**
 	 * It tests if there is dissimilarity (lack of similarity) between the 2 set of measure from 2 sensor brought by the 2 messages
@@ -1099,4 +1142,10 @@ public class SinkNode extends SimpleNode
 		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath());
 		sendToNextNodeInPath(wsnMessage);
 	} // end sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB, Node clusterHeadNode)
+	
+	public static Node[] getNodesFromThisCluster(Node rn) {
+		int numClusterLine = identifyCluster(rn);
+		return new Node[1];
+	}
+	
 }
