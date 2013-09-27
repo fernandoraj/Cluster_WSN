@@ -3,6 +3,7 @@ package projects.wsnee.nodes.messages;
 import java.util.Stack;
 import java.util.Vector;
 
+import projects.wsnee.nodes.nodeImplementations.SimpleNode;
 import projects.wsnee.utils.Utils;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.Position;
@@ -239,9 +240,15 @@ public class WsnMsgResponse extends Message {
 	public void calculatesTheSizeTimeSlotFromRepresentativeNode(int globalTimeSlot, int numSensorsInThisCLuster)
 	{
 		Utils.printForDebug("wsnMsgResponseRepresentative.sizeTimeSlot = "+this.sizeTimeSlot);
+		
+		if (numSensorsInThisCLuster == 0) {
+			numSensorsInThisCLuster = 1;
+		}
+			
 		this.sizeTimeSlot = (int)(globalTimeSlot / numSensorsInThisCLuster);
-		if (this.sizeTimeSlot < 1) // sizeTimeSlot shouldn't be equal to 0 (or less than one)
-		{
+		//this.sizeTimeSlot = SimpleNode.maxErrorsPerCluster; // O NR realizará os testes de novidades de tal forma que, apenas quando o número máximo de ciclos (rounds) for atingido (maxErrorsPerCluster) um novo NR será calculado;
+		
+		if (this.sizeTimeSlot < 1) { // sizeTimeSlot shouldn't be equal to 0 (or less than one)
 			this.sizeTimeSlot = 1;
 		}
 		Utils.printForDebug("New wsnMsgResponseRepresentative.sizeTimeSlot = "+this.sizeTimeSlot+"\n");
