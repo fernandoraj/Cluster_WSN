@@ -118,7 +118,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink
 	 */
-	private static final int maxErrorsPerCluster = 5; // ClusterDelay
+	public static final int maxErrorsPerCluster = 5; // ClusterDelay
 	
 	/**
 	 * Minimum (limit) level of cluster head's battery level - below this limit, the cluster head communicates to sink
@@ -454,7 +454,7 @@ public class SimpleNode extends Node
  */
 		if (dataSensedType != null)
 		{
-			medida = identificarTipo(dataSensedType);
+			medida = identifyNumberSequenceByType(dataSensedType);
 		}
 		String dataLine = performSensorReading();
 		int i=0; //cont = 0 
@@ -679,31 +679,31 @@ public class SimpleNode extends Node
 	} // end putOnLinePosition(BufferedReader bufferedReader, Integer linePosition)
 
 	/**
-	 * Identifica o tipo de dados a ser lido (posição na linha) de acordo com a string passada, conforme o exemplo abaixo:
-	 * 				2004-03-21 19:02:26.792489 65528 4 87.383 45.4402 5.52 2.31097
-	 * Posição          [0]         [1]         [2] [3]  [4]    [5]    [6]   [7]
-	 * Tipo de dado    Data         Hora       Round ID  Temp   Hum    Lum   Volt
+	 * Identifica o tipo de dados a ser lido (posição na linha) de acordo com a string passada, conforme o exemplo abaixo: <br>
+	 *  			2004-03-21 19:02:26.792489 65528 4 87.383 45.4402 5.52 2.31097 <br>
+	 * Posição          [0]         [1]         [2] [3]  [4]    [5]    [6]   [7] <br>
+	 * Tipo de dado    Data         Hora       Round ID  Temp   Hum    Lum   Volt <p>
 	 * 
-	 * Onde: Data e Hora são a data e o horário em que ocorreu a leitura dos valores sensoreados
-	 *       Round é o número da rodada (execução) da leitura, que ocorre a cada 31 segundos
-	 *       ID é o número identificador do sensor
-	 *       Temp é a medida (grandeza) da temperatura aferida
-	 *       Hum é a medida (grandeza) da humidade aferida
-	 *       Lum é a medida (grandeza) da luminosidade aferida
+	 * Onde: Data e Hora são a data e o horário em que ocorreu a leitura dos valores sensoreados <br>
+	 *       Round é o número da rodada (execução) da leitura, que ocorre a cada 31 segundos <br>
+	 *       ID é o número identificador do sensor <br>
+	 *       Temp é a medida (grandeza) da temperatura aferida <br>
+	 *       Hum é a medida (grandeza) da humidade aferida <br>
+	 *       Lum é a medida (grandeza) da luminosidade aferida <br>
 	 *       Volt é a medida (grandeza) do nível de bateria do sensor (voltagem aferida)
 	 * 
-	 * @param tipo Pode ser t: temperatura, h: humidade, l: luminosidade ou v: voltagem
+	 * @param type Pode ser t: temperatura, h: humidade, l: luminosidade ou v: voltagem
 	 * @return Posição correspondente do tipo de dado a ser aferido na string lida do arquivo de dados (data.txt)
 	 */
-	private int identificarTipo(String tipo) 
+	private int identifyNumberSequenceByType(String type) 
 	{
-		if (tipo.equals("t"))
+		if (type.equals("t"))
 			return 4;
-		else if (tipo.equals("h"))
+		else if (type.equals("h"))
 			return 5;
-		else if (tipo.equals("l"))
+		else if (type.equals("l"))
 			return 6;
-		else if (tipo.equals("v"))
+		else if (type.equals("v"))
 			return 7;	
 		return 0;
 	} // end identificarTipo(String tipo)
@@ -807,6 +807,96 @@ public class SimpleNode extends Node
 	} // end addDataRecordItensInWsnMsgResponse(WsnMsgResponse wsnMsgResp)
 	
 	/**
+	 * Retorna os dados do sensor de acordo com o tipo de dados indicado<p>
+	 * 
+	 * [Eng]Returns the sensor (currentNode) data (in DataRecord) according to the data type (dataType) indicated
+	 * @param currentNode
+	 * @param dataType
+	 * @return Data from sensor (currentNode)
+	 */
+	private DataRecord getData(SimpleNode currentNode, String dataType) {
+		DataRecord temp = new DataRecord();
+		int numSequenceValueData = 0; //Temporary value
+		int numSequenceVoltageData = 7; //According the data structure in "data*.txt" file
+		int numSequenceRound = 2; //According the data structure in "data*.txt" file
+/*
+ * Example:
+ * 				2004-03-21 19:02:26.792489 65528 4 87.383 45.4402 5.52 2.31097
+ * Position         [0]         [1]         [2] [3]  [4]    [5]    [6]   [7]
+ * Data type       Data         Hora       Round ID  Temp   Hum    Lum   Volt
+ */
+		
+		
+		if (dataType != null) {
+			numSequenceValueData = identifyNumberSequenceByType(dataType);
+		}
+		
+		String sensorReading = currentNode.performSensorReading();
+		
+		if (sensorReading != null && numSequenceValueData != 0)
+		{
+			double value;
+			double quantTime;
+			double batLevel;
+
+			String linhas[] = sensorReading.split(" ");
+
+			if (linhas.length > 4)
+			{
+				if (linhas[numSequenceValueData] == null || linhas[numSequenceValueData].equals(""))
+				{
+					value = 0.0;
+				}
+				else
+				{
+					try
+					{
+						value = Double.parseDouble(linhas[numSequenceValueData]);
+					}//try
+					catch (NumberFormatException e)
+					{
+						value = 0.0;
+					}//catch
+				}//else
+				
+				if (linhas[numSequenceVoltageData] == null || linhas[numSequenceVoltageData].equals(""))
+				{
+					batLevel = 0.0;
+				}
+				else
+				{
+					try
+					{
+						batLevel = Double.parseDouble(linhas[numSequenceVoltageData]);
+					}//try
+					catch (NumberFormatException e)
+					{
+						batLevel = 0.0;
+					}//catch
+				}//else
+
+				int round = Integer.parseInt(linhas[numSequenceRound]); // Número do round
+				
+				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
+				
+//				temp = new DataRecord();
+				temp.type = dataType.charAt(0);
+				temp.value = value;
+				temp.time = quantTime;
+				temp.batLevel = batLevel;
+				temp.round = round;
+				
+			} // end if (linhas.length > 4)
+			
+		} // end if (sensorReading != null && numSequenceValueData != 0)
+		else {
+			temp = null;
+		}
+		
+		return temp;
+	}
+	
+	/**
 	 * Lê o próximo valor do sensor atual, executa a predição e, de acordo com a predição (acerto ou erro), dispara a próxima ação<p>
 	 * [Eng]Read the next value from present sensor, make the prediction and, according with the predition (hit or miss), trigges the next action 
 	 * @param dataSensedType Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
@@ -816,6 +906,13 @@ public class SimpleNode extends Node
 	 */
 	protected void triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError)
 	{
+
+		// USAR O MÉTODO getData(SimpleNode currentNode, String dataType) CRIADO !!!
+		
+		
+		// SUBSTITUIR DAQUI ... 
+		
+		
 		int medida = 0;
 		int numSequenceVoltageData = 7; //According the data structure in "data*.txt" file
 		int numSequenceRound = 2; //According the data structure in "data*.txt" file
@@ -828,7 +925,7 @@ public class SimpleNode extends Node
 
 		if (dataSensedType != null)
 		{
-			medida = identificarTipo(dataSensedType);
+			medida = identifyNumberSequenceByType(dataSensedType);
 		}
 		String sensorReading = performSensorReading();
 		
@@ -875,6 +972,16 @@ public class SimpleNode extends Node
 				int round = Integer.parseInt(linhas[numSequenceRound]); // Número do round
 				
 				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
+
+				
+				
+				
+				// ATÉ AQUI !!!
+				
+				
+				
+				
+				
 				double predictionValue = makePrediction(coefA, coefB, quantTime); // Incrementa o contador numTotalPredictions (numTotalPredictions++)
 				
 				addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
@@ -902,6 +1009,36 @@ public class SimpleNode extends Node
 				if (numPredictionErrors > 0) { // Se há erros de predição, então exibe uma mensagem
 					Utils.printForDebug("* * * * The number of prediction errors is "+numPredictionErrors+"! NoID = "+this.ID+"\n");
 				} // end if (numPredictionErrors > 0)
+				
+				
+				
+				
+				
+				
+				
+				
+				if (this.clusterHead == null) { // Se é um Nó Representativo, ler os valores de todos os outros nós naquele mesmo cluster naquele momento e calcular 
+					// o RMSE de cada valor em relação ao predictionValue do Nó Representativo
+					
+					Node[] nodes = SinkNode.getNodesFromThisCluster(this);
+					
+					for(int i=0; i < nodes.length ;i++) { // Para cada um dos nós no mesmo clustes deste Nó Representativo
+						DataRecord nodeData = getData((SimpleNode)nodes[i], dataSensedType); // Calcular o RMSE 
+		
+						
+						
+						
+						// DEVE PEGAR OS VALORES LIDOS DE/POR CADA NÓ E CALCULAR O RMSE EM RELAÇÃO AO VALOR PREDITO PARA O NÓ REPRESENTATIVO !!! 
+						
+						
+						
+					}
+					
+					
+					
+					
+				}
+				
 				
 /*
  * Neste ponto deve-se verificar se o parâmetro "clusterHead" é diferente de "null", pois indica que existe um ClusterHead (e não um nó representativo)
@@ -1064,16 +1201,26 @@ public class SimpleNode extends Node
 	 */
 	protected boolean isValuePredictInValueReading(double value, double predictionValue, double maxError)
 	{
+/*		// Code moved to else block below - according to Prof. Everardo request in 25/09/2013: RMSE should only be computed when data are not sent to the sink
 		Global.predictionsCount++;
 		this.predictionsCount++;
 
 		Global.squaredError += Math.pow((predictionValue - value), 2);
 		this.squaredError += Math.pow((predictionValue - value), 2);
-		
+*/		
 		boolean hit;
 		if (value >= (predictionValue - value*maxError) && value <= (predictionValue + value*maxError))
 		{
 			Global.numberOfHitsInThisRound++;
+
+			// Code inserted in else block according to Prof. Everardo request in 25/09/2013
+			Global.predictionsCount++;
+			this.predictionsCount++;
+
+			Global.squaredError += Math.pow((predictionValue - value), 2);
+			this.squaredError += Math.pow((predictionValue - value), 2);
+			// End of Code inserted
+			
 			hit = true;
 		}
 		else
@@ -1085,9 +1232,12 @@ public class SimpleNode extends Node
 	} // end isValuePredictInValueReading(double value, double predictionValue, double maxError)
 	
 	/**
-	 * Inner class (structure) to store important data from sersors readings, like: type 
-	 * (Type of sensor data, like t=Temp., h=Hum., l=Lum. or v=Volt.), value (Absolute value),
-	 * time (Date/time from value reading), batLevel (Battery power level sensor) and round (Round number)
+	 * Inner class (structure) to store important data from sersors readings, like: <p>
+	 * char type (Type of sensor data, e.g.: t=Temp., h=Hum., l=Lum. or v=Volt.), <br>
+	 * double value (Absolute value), <br>
+	 * double time (Date/time from value reading), <br> 
+	 * double batLevel (Battery power level sensor) and <br> 
+	 * int round (Round number) 
 	 * @author Fernando Rodrigues
 	 */
 	public class DataRecord
