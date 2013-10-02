@@ -15,6 +15,7 @@ import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 import sinalgo.runtime.Global;
 import sinalgo.nodes.Node;
+import java.util.ArrayList;
 
 public class SinkNode extends SimpleNode 
 {
@@ -103,7 +104,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Indicates that sink node signalize to all other nodes must continuously sensing ("naive" using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = true; // ACS
+	private boolean allSensorsMustContinuoslySense = false; // ACS
 	
 	/**
 	 * Flag to indicate that the sink still not clustered all nodes for the first time
@@ -186,11 +187,7 @@ public class SinkNode extends SimpleNode
 					if (wsnMsgResp.target != null)
 					{
 						
-						Utils.printForDebug("Inside the code => if (wsnMsgResp.target != null)");
-						
-						
-						
-						
+						Utils.printForDebug("Inside the code => if (wsnMsgResp.target != null)");						
 						
 						
 					}
@@ -1143,9 +1140,25 @@ public class SinkNode extends SimpleNode
 		sendToNextNodeInPath(wsnMessage);
 	} // end sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB, Node clusterHeadNode)
 	
+	/**
+	 * Returns all sensor nodes in the same cluster from representative node
+	 * @param rn Representative Node
+	 * @return All sensor nodes in the same cluster
+	 */
 	public static Node[] getNodesFromThisCluster(Node rn) {
+		Node[] nodes = null;
+		ArrayList<WsnMsgResponse> messages;
 		int numClusterLine = identifyCluster(rn);
-		return new Node[1];
+		int cont = 0;
+		if (numClusterLine >= 0) {
+			messages = messageGroups.get(numClusterLine);
+			nodes = new Node[messages.size()];
+			for (WsnMsgResponse message : messages) {
+				nodes[cont] = message.source;
+				cont++;
+			}
+		}
+		return nodes;
 	}
 	
 }
