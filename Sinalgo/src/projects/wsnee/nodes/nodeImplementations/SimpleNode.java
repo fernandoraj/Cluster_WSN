@@ -810,8 +810,8 @@ public class SimpleNode extends Node
 	 * Retorna os dados do sensor de acordo com o tipo de dados indicado<p>
 	 * 
 	 * [Eng]Returns the sensor (currentNode) data (in DataRecord) according to the data type (dataType) indicated
-	 * @param currentNode
-	 * @param dataType
+	 * @param currentNode Nó sensor que deve ler dados
+	 * @param dataType Tipo de dados a ser lido
 	 * @return Data from sensor (currentNode)
 	 */
 	private DataRecord getData(SimpleNode currentNode, String dataType) {
@@ -1011,33 +1011,43 @@ public class SimpleNode extends Node
 				} // end if (numPredictionErrors > 0)
 				
 				
-				
-				
-				
-				
-				
-				
 				if (this.clusterHead == null) { // Se é um Nó Representativo, ler os valores de todos os outros nós naquele mesmo cluster naquele momento e calcular 
 					// o RMSE de cada valor em relação ao predictionValue do Nó Representativo
-					
+					if (this.ID == 49) {
+						System.out.println("DEBUG !!!");
+					}
 					Node[] nodes = SinkNode.getNodesFromThisCluster(this);
 					
-					for(int i=0; i < nodes.length ;i++) { // Para cada um dos nós no mesmo clustes deste Nó Representativo
-						DataRecord nodeData = getData((SimpleNode)nodes[i], dataSensedType); // Calcular o RMSE 
-		
+					if (nodes != null && nodes.length > 1) {
+						for (int i=0; i < nodes.length ;i++) { // Para cada um dos nós no mesmo cluste deste Nó Representativo
+							if (nodes[i].ID != this.ID) { // Caso não seja o próprio Nó Representativo
+							
+								DataRecord nodeData = getData((SimpleNode)nodes[i], dataSensedType); // Calcular o RMSE
+								
+								double sensorValue = nodeData.value;
+								
+								// Code inserted in else block according to Prof. Everardo request in 25/09/2013
+								Global.predictionsCount++;
+								((SimpleNode)nodes[i]).predictionsCount++;
+	
+								Global.squaredError += Math.pow((predictionValue - sensorValue), 2);
+								((SimpleNode)nodes[i]).squaredError += Math.pow((predictionValue - sensorValue), 2);
+								// End of Code inserted		
+								
+								
+								
+								// DEVE PEGAR OS VALORES LIDOS DE/POR CADA NÓ E CALCULAR O RMSE EM RELAÇÃO AO VALOR PREDITO PARA O NÓ REPRESENTATIVO !!! 
+							}
+
+						} // end for (int i=0; i < nodes.length ;i++)
 						
-						
-						
-						// DEVE PEGAR OS VALORES LIDOS DE/POR CADA NÓ E CALCULAR O RMSE EM RELAÇÃO AO VALOR PREDITO PARA O NÓ REPRESENTATIVO !!! 
-						
-						
-						
+					} // end if (nodes != null)
+					
+					else { // if (nodes == null)
+						System.out.println("Node with NULL CLuster = "+this.ID);
 					}
 					
-					
-					
-					
-				}
+				} // end if (this.clusterHead == null)
 				
 				
 /*
