@@ -63,6 +63,16 @@ public class ArrayList2d<Type>
 		return array.get(row).get(col);
 	}
  
+	/**
+	 * Returns the arrayList of elements at the specified line (row) in this list2d, without removing it from list2d
+	 * @param row Line number in which the element is 
+	 * @return The arrayList of elements required
+	 */
+	public ArrayList<Type> get(int row)
+	{
+		return array.get(row);
+	}
+	
 	public void set(int row, int col, Type data)
 	{
 		array.get(row).set(col,data);
