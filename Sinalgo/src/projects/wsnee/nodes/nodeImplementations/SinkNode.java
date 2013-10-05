@@ -2,6 +2,7 @@ package projects.wsnee.nodes.nodeImplementations;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -11,11 +12,10 @@ import projects.wsnee.nodes.timers.WsnMessageTimer;
 import projects.wsnee.utils.ArrayList2d;
 import projects.wsnee.utils.Utils;
 import sinalgo.gui.transformation.PositionTransformation;
+import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 import sinalgo.runtime.Global;
-import sinalgo.nodes.Node;
-import java.util.ArrayList;
 
 public class SinkNode extends SimpleNode 
 {
