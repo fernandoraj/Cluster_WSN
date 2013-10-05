@@ -92,7 +92,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	private static final double limitPredictionError = 5; // SensorDelay
+	private static final double limitPredictionError = 10; // SensorDelay
 	
 	/**
 	 * Number / Identifier of cluster head sensor node that manages / represents
@@ -118,7 +118,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink
 	 */
-	public static final int maxErrorsPerCluster = 5; // ClusterDelay
+	public static final int maxErrorsPerCluster = 10; // ClusterDelay
 	
 	/**
 	 * Minimum (limit) level of cluster head's battery level - below this limit, the cluster head communicates to sink
@@ -984,7 +984,7 @@ public class SimpleNode extends Node
 				
 				double predictionValue = makePrediction(coefA, coefB, quantTime); // Incrementa o contador numTotalPredictions (numTotalPredictions++)
 				
-				addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
+//				addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
 
 				lastRoundRead = round;
 //				lastValueRead = value;
@@ -996,6 +996,7 @@ public class SimpleNode extends Node
 
 				if (!isValuePredictInValueReading(value, predictionValue, maxError)) {
 					numPredictionErrors++; // Contador do número de erros de predição
+					addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round); // Removido (comentado) da linha 987
 				} // end if (!isValuePredictInValueReading(value, predictionValue, maxError))
 				
 				if (this.clusterHead == null) { // Se NÃO existe um CH, ou seja, se o modo de sensoriamento NÃO é contínuo (SinkNode.allSensorsMustContinuoslySense = false)
@@ -1014,7 +1015,7 @@ public class SimpleNode extends Node
 				if (this.clusterHead == null) { // Se é um Nó Representativo, ler os valores de todos os outros nós naquele mesmo cluster naquele momento e calcular 
 					// o RMSE de cada valor em relação ao predictionValue do Nó Representativo
 					if (this.ID == 49) {
-						System.out.println("DEBUG !!!");
+//						System.out.println("DEBUG !!!");
 					}
 					Node[] nodes = SinkNode.getNodesFromThisCluster(this);
 					
@@ -1044,7 +1045,7 @@ public class SimpleNode extends Node
 					} // end if (nodes != null)
 					
 					else { // if (nodes == null)
-						System.out.println("Node with NULL CLuster = "+this.ID);
+//						System.out.println("Node with NULL CLuster = "+this.ID);
 					}
 					
 				} // end if (this.clusterHead == null)
