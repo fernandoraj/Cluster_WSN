@@ -12,6 +12,7 @@ import java.util.Vector;
 import projects.wsn.nodes.messages.WsnMsg;
 import projects.wsn.nodes.messages.WsnMsgResponse;
 import projects.wsn.nodes.timers.PredictionTimer;
+import projects.wsn.nodes.timers.ReadingSendingTimer;
 import projects.wsn.nodes.timers.WsnMessageResponseTimer;
 import projects.wsn.nodes.timers.WsnMessageTimer;
 import projects.wsn.utils.FileHandler;
@@ -24,7 +25,6 @@ import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 import sinalgo.runtime.Global;
 import sinalgo.tools.Tools;
-import projects.wsn.nodes.timers.ReadingSendingTimer;
 
 /**
  * Class that represents an ordinary sensor node that is able to sense natural phenomena
@@ -113,7 +113,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	protected static final int limitPredictionError = 20; // delay (abbrev.)
+	protected static final int limitPredictionError = 5; // delay (abbrev.)
 
 	@Override
 	public void preStep() {}
@@ -701,11 +701,13 @@ public class SimpleNode extends Node
 	 */
 	protected boolean isValuePredictInValueReading(double value, double predictionValue, double maxError)
 	{
+/*
 		Global.predictionsCount++;
 		Global.squaredError += Math.pow((predictionValue - value), 2);
 
 		this.predictionsCount++;
 		this.squaredError += Math.pow((predictionValue - value), 2);
+*/
 /*
 		double RMSE = Math.sqrt(this.squaredError / this.predictionsCount);
 		System.out.println("SensorID\t"+this.ID+"\tRound\t"+NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE));
@@ -714,6 +716,13 @@ public class SimpleNode extends Node
 		if (value >= (predictionValue - value*maxError) && value <= (predictionValue + value*maxError))
 		{
 			Global.numberOfHitsInThisRound++;
+
+			Global.predictionsCount++;
+			Global.squaredError += Math.pow((predictionValue - value), 2);
+
+			this.predictionsCount++;
+			this.squaredError += Math.pow((predictionValue - value), 2);
+
 			hit = true;
 		}
 		else
