@@ -102,9 +102,9 @@ public class SinkNode extends SimpleNode
 	private int numMessagesOfTimeSlotFinishedReceived = 0;
 	
 	/**
-	 * Indicates that sink node signalize to all other nodes must continuously sensing ("naive" using Cluster Heads)
+	 * Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = false; // ACS
+	private boolean allSensorsMustContinuoslySense = false; // ACS: false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Flag to indicate that the sink still not clustered all nodes for the first time
