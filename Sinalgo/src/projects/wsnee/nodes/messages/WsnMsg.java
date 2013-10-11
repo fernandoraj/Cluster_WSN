@@ -194,9 +194,10 @@ public class WsnMsg extends Message {
 		return pathToSenderNode.pop(); // Remove/Desempilha o próximo nó (noID) do caminho (path) para o nó de origem e o retorna
 	}
 	
-	public void setPathToSenderNode(Stack<Integer> pathToSenderNode)
+	public void setPathToSenderNode(Stack<Integer> pathToSenderNode, Integer hopsToTarget)
 	{
 		this.pathToSenderNode = pathToSenderNode;
+		this.hopsToTarget = hopsToTarget;
 	}
 
 	/**
