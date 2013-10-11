@@ -92,6 +92,12 @@ public class ArrayList2d<Type>
 	{
 		array.remove(row);
 	}
+	
+	public void transferRowTo(int row, ArrayList2d<Type> target)
+	{
+		target.array.add(array.get(row));
+		array.remove(row);
+	}
  
 	public void move(int row, int colSource, int colDest)
 	{
