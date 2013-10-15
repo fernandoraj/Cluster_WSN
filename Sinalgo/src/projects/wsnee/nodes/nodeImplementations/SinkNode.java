@@ -186,7 +186,8 @@ public class SinkNode extends SimpleNode
 					
 // CASO O CLUSTER PRECISE SOFRER UM SPLIT, UMA MENSAGEM SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK DEVE SER ENVIADA PARA CADA UM DOS NÓS DO CLUSTER 
 					
-					int lineFromCluster = identifyCluster(wsnMsgResp);
+					//int lineFromCluster = identifyCluster(wsnMsgResp);
+					int lineFromCluster = searchAndReplaceNodeInClusterByMessage(wsnMsgResp);
 					if (lineFromCluster >= 0)
 					{
 						expectedNumberOfSensors += sendSenseRequestMessageToAllSensorsInCluster(messageGroups, lineFromCluster);
