@@ -116,6 +116,15 @@ public class ArrayList2d<Type>
 		return false;
 	}
  
+	public boolean containsInRow(Type data, int i)
+	{
+		if (array.get(i).contains(data))
+		{
+			return true;
+		}
+		return false;
+	}
+	
 	public int getNumRows()
 	{
 		return array.size();
