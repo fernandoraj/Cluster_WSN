@@ -60,13 +60,13 @@ public class SinkNode extends SimpleNode
 	 * Percentual mínimo do número de rounds iguais das medições de 2 sensores para que os mesmos sejam classificados no mesmo cluster <br>
 	 * Minimum percentage of the number of equal measurement rounds of 2 sensors so that they are classified in the same cluster
 	 */
-	private double equalRoundsThreshold = 0.5;
+//	private double equalRoundsThreshold = 0.5;
 	
 	/**
 	 * Percentual mínimo das medições de 2 sensores (no mesmo round) a ficar dentro dos limiares aceitáveis para que os mesmos sejam classificados no mesmo cluster <br>
 	 * Minimum percentage of measurements of two sensors (in the same round) to stay within the acceptable thresholds for them to be classified in the same cluster
 	 */
-	private double metaThreshold = 0.5;
+//	private double metaThreshold = 0.5;
 	
 	/**
 	 * Distância máxima aceitável para a formação de clusters. Se for igual a zero (0,0), não considerar tal limite (distância) <br>
@@ -79,6 +79,16 @@ public class SinkNode extends SimpleNode
 	 * Total number of sensor nodes in the network
 	 */
 	private static int numTotalOfSensors = 54;
+
+	/**
+	 * Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
+	 */
+	private boolean allSensorsMustContinuoslySense = false; // ACS: false = Representative Nodes; true = Cluster Heads
+	
+	/**
+	 * Flag to indicate that the sink still not clustered all nodes for the first time
+	 */
+	private boolean stillNonclustered = true;
 	
 	/**
 	 * Array 2D (clusters) from sensors (Messages from sensors = WsnMsgResponse).
@@ -88,6 +98,8 @@ public class SinkNode extends SimpleNode
 	private ArrayList2d<WsnMsgResponse> newCluster;
 	
 	private ArrayList2d<WsnMsgResponse> nodesToReceiveDataReading;
+	
+	private ArrayList<WsnMsgResponse> blackList;
 	
 	/**
 	 * Número de mensagens recebidas pelo nó sink de todos os outros nós sensores <br> 
@@ -99,7 +111,7 @@ public class SinkNode extends SimpleNode
 	 * Número de rounds (ciclos) para reagrupamento (reclustering) dos sensores no caso de uso de Nós Representativos <br>
 	 * Number of rounds (cycles) for reclustering of the sensors in use cases of Representatives Nodes
 	 */
-	private int numRoundsForReclustering = 30;
+//	private int numRoundsForReclustering = 30;
 	
 	/**
 	 * Number of messages of error prediction received by sink node from all other sensors nodes
@@ -112,16 +124,12 @@ public class SinkNode extends SimpleNode
 	private int numMessagesOfTimeSlotFinishedReceived = 0;
 	
 	/**
-	 * Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
+	 * Number of messages of time slot finished received by sink node from all other sensors nodes
 	 */
-	private boolean allSensorsMustContinuoslySense = false; // ACS: false = Representative Nodes; true = Cluster Heads
+	private int numMessagesOfLowBatteryReceived = 0;
 	
-	/**
-	 * Flag to indicate that the sink still not clustered all nodes for the first time
-	 */
-	private boolean stillNonclustered = true;
-	
-	private int expectedNumberOfSensors = 0, numMessagesExpectedReceived = 0;
+	private int expectedNumberOfSensors = 0;
+	private int numMessagesExpectedReceived = 0;
 	
 	public SinkNode()
 	{
@@ -224,6 +232,8 @@ public class SinkNode extends SimpleNode
 				
 				else if (wsnMsgResp.typeMsg == 4) // Se é uma mensagem de um Nó Representativo/Cluster Head cujo nível da bateria está abaixo do mínimo (SimpleNode.minBatLevelInClusterHead)
 				{
+					numMessagesOfLowBatteryReceived++;
+					
 					if (allSensorsMustContinuoslySense) { // Se é uma mensagem de um Cluster Head // Se for um ClusterHead (ClusterHead != null)
 						
 						int lineFromClusterNode = searchAndReplaceNodeInClusterByMessage(wsnMsgResp); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
@@ -332,6 +342,7 @@ public class SinkNode extends SimpleNode
 					else // otherwise, if the sink have already been clustered all nodes for the first time
 					{
 						numMessagesExpectedReceived++;
+						
 						System.out.println("CHEGOU O NODE ID "+wsnMsgResp.source.ID+" NO SINK!");
 						
 						if (newCluster == null) // If a new cluster (temp) has not yet been created (instanciated)
@@ -340,70 +351,91 @@ public class SinkNode extends SimpleNode
 							newCluster.ensureCapacity(expectedNumberOfSensors);
 							newCluster.add(wsnMsgResp, 0); // Adds the new response message sensor to new cluster 
 						} // end if (newCluster == null)
-						else
+						else // If already there is a new cluster (created)
 						{
 							addNodeInClusterClassifiedByMessage(newCluster, wsnMsgResp);
-							
-							if (removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(nodesToReceiveDataReading, wsnMsgResp))
+						} // end else if (newCluster == null)
+
+						if (removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(nodesToReceiveDataReading, wsnMsgResp, blackList))
 //							if (numMessagesExpectedReceived >= expectedNumberOfSensors) // If all messagesResponse (from all nodes in Cluster to be splited) already done received
+						{
+							classifyNodesByAllParams(newCluster);
+
+//								expectedNumberOfSensors = 0;
+
+							//NESTE PONTO, É PRECISO MANDAR MENSAGEM PARA OS NOVOS NÓS REPRESENTATIVOS PARA QUE OS MESMOS INICIEM UMA NOVA FASE (Novo ciclo de sensoriamento)
+							
+							// (CICLO) DE SENSORIAMENTO
+							ArrayList<Integer> linesToBeUnified = new ArrayList<Integer>();
+							for (int line = 0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from newCluster
 							{
-								classifyNodesByAllParams(newCluster);
+								if (isAllNodesInThisClusterLineInList(newCluster, line, blackList)) {
 
-								expectedNumberOfSensors = 0;
+									linesToBeUnified.add(line);
 
-								//NESTE PONTO, É PRECISO MANDAR MENSAGEM PARA OS NOVOS NÓS REPRESENTATIVOS PARA QUE OS MESMOS INICIEM UMA NOVA FASE (Novo ciclo de sensoriamento)
-								
-								// (CICLO) DE SENSORIAMENTO
-								if (newCluster != null) // If there is a message group created
-								{
-									if (!allSensorsMustContinuoslySense) // If only the representative nodes must sensing
-									{
-										for (int line=0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from newCluster
-										{
-											WsnMsgResponse wsnMsgResponseRepresentative = newCluster.get(line, 0); // Get the Representative Node (or Cluster Head)
-											int numSensors = newCluster.getNumCols(line);
-											Utils.printForDebug("Cluster / Line number = "+line);
-											wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-											receiveMessage(wsnMsgResponseRepresentative, null);
-										} // end for (int line=0; line < newCluster.getNumRows(); line++)
+									int numSensors = newCluster.getNumCols(line);
+									Utils.printForDebug("Cluster / Line number = "+line);
+
+									if (!allSensorsMustContinuoslySense) { // If only the representative nodes must sensing (Representative nodes approach)
+										WsnMsgResponse wsnMsgResponseRepresentative = newCluster.get(line, 0); // Get the Representative Node (or Cluster Head)
+										wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+										receiveMessage(wsnMsgResponseRepresentative, null);
 									} // end if (!allSensorsMustContinuoslySense)
 									
-									else // If all nodes in cluters must sensing, and not only the representative nodes
-									{
-										
-										for (int line=0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from messageGroups
+									else { // If all nodes in cluters must sensing, and not only the representative nodes (Cluster heads approach)
+										Node chNode = (newCluster.get(line, 0)).source; // Cluster Head from the current cluster/line
+										for (int col=0; col < numSensors; col++) // For each colunm from that line in newCluster
 										{
-											int numSensors = newCluster.getNumCols(line);
-											Node chNode = (newCluster.get(line, 0)).source; // Cluster Head from the current cluster/line
-											Utils.printForDebug("Cluster / Line number = "+line+"; ClusterHead / IDnumber = "+chNode.ID+"; #Sensors = "+numSensors);
-											for (int col=0; col < numSensors; col++) // For each colunm from that line in newCluster
-											{
-												WsnMsgResponse wsnMsgResponseCurrent = newCluster.get(line, col); // Get the Node
-												
-												//wsnMsgResponseCurrent.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-												wsnMsgResponseCurrent.sizeTimeSlot = sensorTimeSlot; // If all sensor nodes in each cluster must continuosly sense, so the sizeTimeSlot doesn't matter
-												
-												receiveMessage(wsnMsgResponseCurrent, chNode);
-											} // end for (int col=0; col < numSensors; col++)
-										} // end for (int line=0; line < newCluster.getNumRows(); line++)
-										
-									} // else
-								} // end if (newCluster != null)
-																	
-								unifyClusters(messageGroups, newCluster); // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
-								
-								numMessagesExpectedReceived = 0;
-								newCluster = null;
-								
- 							} // end if (removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(nodesToReceiveDataReading, wsnMsgResp))
-							// end if (numMessagesExpectedReceived >= expectedNumberOfSensors)
-						} // end else
-					}
+											WsnMsgResponse wsnMsgResponseCurrent = newCluster.get(line, col); // Get the current node
+											wsnMsgResponseCurrent.sizeTimeSlot = sensorTimeSlot; // If all sensor nodes in each cluster must continuosly sense, so the sizeTimeSlot doesn't matter
+											receiveMessage(wsnMsgResponseCurrent, chNode);
+										} // end for (int col=0; col < numSensors; col++)
+									} // end else if (!allSensorsMustContinuoslySense)
+									
+									
+								}
+							} // end for (int line=0; line < newCluster.getNumRows(); line++)
+							
+							
+							unifyClusters(messageGroups, newCluster, linesToBeUnified); // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
+							
+						} // end if (removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(nodesToReceiveDataReading, wsnMsgResp))
+						// end if (numMessagesExpectedReceived >= expectedNumberOfSensors)
+						
+					} // end else if (stillNonclustered)
 					
 				} // end else
 			} // end if (message instanceof WsnMsg)
 		} //end while (inbox.hasNext())
 	} //end handleMessages()
+	
+	/**
+	 * Test if all nodes in line number "row" of "tempCluster" are in "blkList", ie, if the sink have already received message responses from all nodes in the respective Cluster  
+	 * @param tempCluster New GroupCluster with the nodes to be "merged" 
+	 * @param row Line from the New GroupCluster to be tested
+	 * @param blkList Black List with the nodes that have already received by the sink
+	 * @return True if all nodes in line number "row" of "tempCluster" are in "blkList"
+	 */
+	private boolean isAllNodesInThisClusterLineInList(ArrayList2d<WsnMsgResponse> tempCluster, int row, ArrayList<WsnMsgResponse> blkList) {
+		
+		for (int i = 0; i < tempCluster.get(row).size(); i++) {
+			boolean found = false;
+			int j = 0;
+			while (!(found) && (j < blkList.size())) {
+				if (isEqualNodeSourceFromMessages(tempCluster.get(row,i), blkList.get(j))) {
+					found = true;
+				}
+				else {
+					j++;
+				}
+			}
+			if (!found)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	/**
 	 * It classify the clusters' nodes by 'residual energy' and by 'hops to sink' and prints cluster configuration before, during and after new order
@@ -426,14 +458,31 @@ public class SinkNode extends SimpleNode
 	
 	
 	/**
-	 * Adds the clusters (lines) from tempClusterGiver in the tempClusterReceiver
+	 * Adds the clusters (lines) from "tempClusterGiver" in "rowIndexes" lines inside the "tempClusterReceiver" and removes this lines from "tempClusterGiver" at the end
 	 * @param tempClusterReceiver Cluster structure that will receive the sensors/clusters from the tempClusterGiver structure
 	 * @param tempClusterGiver Cluster structure that will give the sensors/clusters to the tempClusterReceiver structure
+	 * @param rowIndexes Line indexes from "tempClusterGiver" to be moved to "tempClusterReceiver"
 	 */
-	private void unifyClusters(ArrayList2d<WsnMsgResponse> tempClusterReceiver, ArrayList2d<WsnMsgResponse> tempClusterGiver)
+	private void unifyClusters(ArrayList2d<WsnMsgResponse> tempClusterReceiver, ArrayList2d<WsnMsgResponse> tempClusterGiver, ArrayList<Integer> rowIndexes)
 	{
 		int rowReceiver, rowGiver = 0, col;
 		rowReceiver = tempClusterReceiver.getNumRows();
+		while (rowGiver < rowIndexes.size())
+		{
+			col = 0;
+			while (col < tempClusterGiver.getNumCols(rowIndexes.get(rowGiver)))
+			{
+				tempClusterReceiver.add(tempClusterGiver.get(rowIndexes.get(rowGiver), col), rowReceiver);
+				col++;
+			} // end while (col < tempClusterGiver.getNumCols(rowIndexes.get(rowGiver)))
+			rowGiver++;
+			rowReceiver++;
+		} // end while (rowGiver < rowIndexes.size())
+		for (int i = (rowIndexes.size()-1); i >= 0; i--) {
+			tempClusterGiver.remove(rowIndexes.get(i));
+		}
+		
+/*		
 		while (rowGiver < tempClusterGiver.getNumRows())
 		{
 			col = 0;
@@ -445,6 +494,7 @@ public class SinkNode extends SimpleNode
 			rowGiver++;
 			rowReceiver++;
 		} // end while (rowGiver < tempClusterGiver.getNumRows())
+*/
 	} // end unifyClusters(ArrayList2d<WsnMsgResponse> tempClusterReceiver, ArrayList2d<WsnMsgResponse> tempClusterGiver)
 	
 	/**
@@ -615,14 +665,18 @@ public class SinkNode extends SimpleNode
 	 * It removes the node (newWsnMsgResp.source passed by param) from the group/cluster indicated by "tempCluster" and indicate if the cluster became empty
 	 * @param tempCluster Group of clusters which the node (newWsnMsgResp.source) will be removed
 	 * @param newWsnMsgResp Message that contains the node (newWsnMsgResp.source) which will be removed from group of cluster
+	 * @param bList "BlackList" is the list of messages (source nodes) already removed from "tempCluster" (nodesToReceiveDataReading in case of "handleMessages(Inbox inbox)" call)
 	 * @return If the cluster of this message / node became empty after removal of the node in "newWsnMsgResp.source"
 	 */
-	private boolean removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
+	private boolean removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp, ArrayList<WsnMsgResponse> bList)
 	{
 		boolean receivedAll = false;
 		if (tempCluster == null) // If there isn't a message group yet
 		{
-			Utils.printForDebug("ERROR in dataReceivedFromAllNodesInCluster method: There isn't tempCluster object instanciated yet!");
+			Utils.printForDebug("ERROR in removeNodeAndChecksIfDataReceivedFromAllNodesInCluster method: There isn't tempCluster object instanciated yet!");
+		}
+		else if (newWsnMsgResp == null) {
+			Utils.printForDebug("ERROR in removeNodeAndChecksIfDataReceivedFromAllNodesInCluster method: The newWsnMsgResp object received is NULL!");
 		}
 		else
 		{
@@ -650,15 +704,24 @@ public class SinkNode extends SimpleNode
 			}
 			if (found)
 			{
+				if (bList == null) {
+					bList = new ArrayList<WsnMsgResponse>();
+				}
+				bList.add(newWsnMsgResp);
+				
 				if (tempCluster.getNumCols(line) == 1) { // It means that this is the last node in this line (cluster), and it will be removed so the cluster will be empty
 					tempCluster.remove(line);
+					receivedAll = true; // Then the sink have received all data node message from the current cluster
+/*					
 					if (tempCluster.getNumRows() == 0) { // If the group (total cluster) became empty
 						receivedAll = true; // Then the sink have received all data node message 
 					}
+*/
 				}
 				else {
 					tempCluster.remove(line,col);
 				}
+				expectedNumberOfSensors--;
 			}
 		}
 		return receivedAll;
@@ -736,6 +799,7 @@ public class SinkNode extends SimpleNode
 	
 	/**
 	 * It prints and colore nodes by the clusters (param) formed
+	 * @param cluster
 	 */
 	private void printClusterArray2d(ArrayList2d<WsnMsgResponse> cluster)
 	{
