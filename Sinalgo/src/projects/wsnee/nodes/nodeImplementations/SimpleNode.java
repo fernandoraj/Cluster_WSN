@@ -426,7 +426,8 @@ public class SimpleNode extends Node
 	/**
 	 * Adiciona o nó atual no caminho do sink até o nó de origem (source) da mensagem / Adiciona o nó atual para o caminho de retorno da mensagem de volta do sink para este nó<p>
 	 * [Eng] Adds the current node to the return path of the message back from the sink node to this node
-	 * @param wsnMsgResp Mensagem de resposta a ter o nó atual adicionado (empilhado) em seu caminho do sink para o nó de origem 
+	 * @param wsnMsgResp Mensagem de resposta a ter o nó atual adicionado (empilhado) em seu caminho do sink para o nó de origem<p>
+	 * @param wsnMsgResp [Eng] Message Response which current node to be add (pushed) in the path from the sink to the source node 
 	 */
 	private void addThisNodeToPath(WsnMsgResponse wsnMsgResp)
 	{
