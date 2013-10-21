@@ -184,7 +184,7 @@ public class SinkNode extends SimpleNode
 	
 	private void sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB)
 	{
-		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.origem , this, 1, 1, dataSensedType, thresholdError);
+		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.source , this, 1, 1, dataSensedType, thresholdError);
 		wsnMessage.setCoefs(coeficienteA, coeficienteB);
 		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath());
 		sendToNextNodeInPath(wsnMessage);
