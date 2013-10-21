@@ -148,7 +148,7 @@ public class SimpleNode extends Node
 //					Utils.printForDebug("** Entrou em if (wsnMessage.forwardingHop.equals(this)) ** NoID = "+this.ID);
 				}
 //				else if (wsnMessage.tipoMsg == 0)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
-				else if (wsnMessage.tipoMsg != 1)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
+				else if (wsnMessage.typeMsg != 1)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
 				{ 
 					this.setColor(Color.BLUE);
 
@@ -177,7 +177,7 @@ public class SimpleNode extends Node
 //						Utils.printForDebug("****** Entrou em encaminhar = Boolean.FALSE; ****** NoID = "+this.ID);
 					}
 				} //if (wsnMessage.tipoMsg == 0)
-				else if (wsnMessage.tipoMsg == 1)// Mensagem que vai do sink para os nós sensores e é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
+				else if (wsnMessage.typeMsg == 1)// Mensagem que vai do sink para os nós sensores e é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
 				{ 
 //					this.setColor(Color.YELLOW);
 //					Integer nextNodeId = wsnMessage.popFromPath();
@@ -187,13 +187,13 @@ public class SimpleNode extends Node
 					encaminhar = Boolean.FALSE;
 					
 					//Definir roteamento de mensagem
-					if (wsnMessage.destino != this)
+					if (wsnMessage.target != this)
 					{
 //						Utils.printForDebug("@@ Entrou em if (nextNodeId != null && wsnMessage.destino != this) @@ NoID = "+this.ID);
 						
 						sendToNextNodeInPath(wsnMessage);
 					}
-					else if (wsnMessage.destino == this) //Se este for o nó de destino da mensagem...
+					else if (wsnMessage.target == this) //Se este for o nó de destino da mensagem...
 					{ 
 //						sequenceNumber = wsnMessage.sequenceID;
 						this.setColor(Color.RED);
@@ -206,7 +206,7 @@ public class SimpleNode extends Node
 					}
 				} //if (wsnMessage.tipoMsg == 0)
 				
-				if (encaminhar && wsnMessage.tipoMsg == 1)
+				if (encaminhar && wsnMessage.typeMsg == 1)
 				{
 					wsnMessage.forwardingHop = this; 
 					broadcast(wsnMessage);
@@ -229,7 +229,7 @@ public class SimpleNode extends Node
 					
 					
 					
-					if (wsnMessage.tipoMsg == 2 && wsnMessage != null){ // approachType = 2 = Naive
+					if (wsnMessage.typeMsg == 2 && wsnMessage != null){ // approachType = 2 = Naive
 
 						makeSensorReadingAndSendind (wsnMessage.dataSensedType); // Chama o método de sensoriamento / envio de dados da abordagem naive
 
