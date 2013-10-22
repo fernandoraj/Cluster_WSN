@@ -37,45 +37,57 @@ import sinalgo.tools.Tools;
 public class SimpleNode extends Node 
 {
 	/**
-	 * Indicates the size of Sliding Window from sensor readings to be send to sink node 
-	 * when there is a "novelty".
+	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"
+	 * [Eng] Indicates the size of Sliding Window from sensor readings to be send to sink node when there is a "novelty".
 	 */
 	protected static int slidingWindowSize = 4;
 	
 	/**
 	 * Armazenar o nó que será usado para alcançar a Estação-Base
+	 * [Eng] Stores the node that will be used to get the Base-Station
 	 */
 	protected Node proximoNoAteEstacaoBase;
 	
 	/**
 	 * Armazena o número de sequencia da última mensagem recebida
+	 * [Eng] Stores the sequence number from the last received message
 	 */
 	protected Integer sequenceNumber = 0;
 	
 	/**
 	 * Valor do último round em que houve leitura do sensor (que teve valor lido do arquivo) 
+	 * [Eng] Value of the last round that had reading from the sensor (that had value read from the file)
 	 */
 	protected int ultimoRoundLido;
 	
 	/**
 	 * Valor (grandeza/magnitude) da última leitura do sensor 
+	 * [Eng] Value (size) of the last read of the sensor
 	 */
 	protected double lastValueRead;
 	
 	/**
 	 * Tempo (data/hora em milisegundos) da última leitura do sensor 
+	 * [Eng] Time (date/hour in miliseconds) of the last read of the sensor
 	 */
 	protected double lastTimeRead;
 	
 	/**
-	 * Stores sensor readings of this node loaded from the sensor readings file.
+	 * Armazena as leituras do sensor desse nó carregadas do arquivo de leituras do sensor.
+	 * Uma lista referenciada está sendo usada aqui porque como as leituras
+	 * (lidas dessa lista) estão sendo feitas por esse nó sensor elas são descartadas.
+	 * [Eng] Stores sensor readings of this node loaded from the sensor readings file.
 	 * A linked list is being used here because as the readings are being performed 
 	 * (being read from this list) by this sensor node they are discarded.
 	 */
 	private LinkedList<String> sensorReadingsQueue = new LinkedList<String>();
 	
 	/**
-	 * Stores the value referring to the last line loaded from the sensor readings file in order that
+	 * Armazena o valor referente a ultima linha carregada do arquivo de leituras do sensor, para que
+	 * quando o <code>sensorReadingQueue</code> estiver vazio um novo carregamente terá que ser executado
+	 * com o fim de preencher a lista <code>SensorReadingsLoadedFromFile</code>, o carregamento começa da
+	 * ultima linha lida do arquivo.
+	 * [Eng] Stores the value referring to the last line loaded from the sensor readings file in order that
 	 * when the <code>sensorReadingsQueue</code> is empty and a new load from the file has to be
 	 * executed to fill the <code>SensorReadingsLoadedFromFile</code> list, the loading starts from the last
 	 * line read from the file.
@@ -83,7 +95,15 @@ public class SimpleNode extends Node
 	private int lastLineLoadedFromSensorReadingsFile;
 
 	/**
-	 * Indicates whether the sensor readings must be loaded from the file or from the memory.
+	 * Indica se as leituras do sensor deverão ser carregadas do arquivo ou da memória.
+	 * Se esse atributo for "true" (verdadeiro), o nó deverá carregar as leituras diretamente do arquivo de leituras.
+	 * Se não, deverá carregar as leituras da memória, isto é, da lista de leituras do sensor de todos os nós que
+	 * estavam carregadas na memoria previamente pela classe {@link FileHandler}. Esse procedimento é necessário
+	 * porque o arquivo de leituras do sensor é muito grande e pode demorar muito mais para serem carregador dependendo
+	 * da configuração do computador. Para os casos que não for possível carregar todas as leituras do sensor para
+	 * a memoria (no <code>FileHandler</code>), as leituras do sensor serão carregadas apartir do arquivo na demanda 
+	 * por cada nó.
+	 * [Eng] Indicates whether the sensor readings must be loaded from the file or from the memory.
 	 * If this attribute is true, the node must load the sensor readings direct from the
 	 * sensor readings file. Otherwise, it must load the sensor readings from the memory, 
 	 * that is, from the list of the sensor readings from all nodes that is loaded in memory 
@@ -96,22 +116,26 @@ public class SimpleNode extends Node
 	private boolean loadSensorReadingsFromFile = true;
 	
 	/**
-	 * Local variable to store the sum of square error(SE) used to calculate the RMSE (Root mean square error) from each sensor
+	 * Variavel local para armazenar a soma do "square error" (SE) usada para calcular o RMSE (Root mean square error - "media de erro") para cada sensor
+	 * [Eng] Local variable to store the sum of square error(SE) used to calculate the RMSE (Root mean square error) from each sensor
 	 */
 	public double squaredError = 0;
 	
 	/**
-	 * Local counter of the number of predictions
+	 * Contador local do numero de previsões
+	 * [Eng] Local counter of the number of predictions
 	 */
 	public int predictionsCount = 0;
 	
 	/**
-	 * Number of prediction errors of the sensor node in this timeslot
+	 * Numero de erros previstos do nó do sensor nesse slot de tempo
+	 * [Eng] Number of prediction errors of the sensor node in this timeslot
 	 */
 	protected int numPredictionErrors = 0;
 	
 	/**
-	 * Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
+	 * Máxino (limite) de numero de erros previstos de qualquer nó de sensor - Isso também pode ser expressado em porcentagem (Ex: double - real) do total do slot de tempo
+	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
 	protected static final int limitPredictionError = 5; // delay (abbrev.)
 
@@ -134,7 +158,7 @@ public class SimpleNode extends Node
 	public void handleMessages(Inbox inbox) {
 		while (inbox.hasNext()){
 			Message message = inbox.next();
-			if (message instanceof WsnMsg) //Mensagem que vai do sink para os nós sensores 
+			if (message instanceof WsnMsg) //Mensagem que vai do sink para os nós sensores <p> [Eng] Message that go from the sink to the sensor nodes
 			{
 				Boolean encaminhar = Boolean.TRUE;
 				WsnMsg wsnMessage = (WsnMsg) message;
@@ -147,8 +171,8 @@ public class SimpleNode extends Node
 					
 //					Utils.printForDebug("** Entrou em if (wsnMessage.forwardingHop.equals(this)) ** NoID = "+this.ID);
 				}
-//				else if (wsnMessage.tipoMsg == 0)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
-				else if (wsnMessage.typeMsg != 1)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
+//				else if (wsnMessage.tipoMsg == 0)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota <p> [Eng] Message that go from the sink to the sensor nodes and is a flood. We should refresh the rote
+				else if (wsnMessage.typeMsg != 1)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota <p> [Eng] Message that go from the sink to the sensor nodes and is a flood. We should refresh the rote
 				{ 
 					this.setColor(Color.BLUE);
 
@@ -275,9 +299,10 @@ public class SimpleNode extends Node
 	
 	/**
 	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual
-	 * @param wsnMsgResp Mensagem a ser preparada para envio
-	 * @param sizeTimeSlot Tamanho do slot de tempo (intervalo) a ser lido pelo nó sensor, ou tamanho da quantidade de dados a ser enviado para o sink
-	 * @param dataSensedType Tipo de dado (temperatura, humidade, luminosidade, etc) a ser sensoreado (lido) pelo nó sensor
+	 * [Eng] Prepare the message "wsnMsgResp" to be sensed to the sink plus the data readed by the current node
+	 * @param wsnMsgResp Mensagem a ser preparada para envio <p> [Eng] <b>wsnMsgResp</b> Message to be prepared to send
+	 * @param sizeTimeSlot Tamanho do slot de tempo (intervalo) a ser lido pelo nó sensor, ou tamanho da quantidade de dados a ser enviado para o sink <p> [Eng] <b>sizeTimeSlot</b> Size of the time slot to be read by the sensor node, or the quantity size of data to be sended to the sink
+	 * @param dataSensedType Tipo de dado (temperatura, humidade, luminosidade, etc) a ser sensoriado (lido) pelo nó sensor <p> [Eng] <b>dateSensedType</b> Type of data (temperature, humidity, luminosity, etc) to be shown
 	 */
 	private void prepararMensagem(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 	{
@@ -336,9 +361,10 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Verifies whether the sensor ID passed as parameter is equal to the ID of this node.
-	 * @param sensorID Sensor ID to be compared to this node's ID
-	 * @return Returns <code>true</code> if the IDs are the same. Returns <code>false</code> otherwise.
+	 * Verifica se o ID do sensor passado como paramêtro é igual ao ID desse nó.
+	 * [Eng] Verifies whether the sensor ID passed as parameter is equal to the ID of this node.
+	 * @param sensorID ID do sensor a ser comparado com o ID desse nó <p> [Eng] <b>Sensor ID</b> to be compared to this node's ID
+	 * @return Retorna <code>true</code> se os IDs forem os mesmos, se não, retorna <code>false</code> <p> [Eng] Returns <code>true</code> if the IDs are the same. Returns <code>false</code> otherwise.
 	 */
 	private boolean isMyID(String sensorID) {
 		if(!sensorID.equals("")){
@@ -351,6 +377,10 @@ public class SimpleNode extends Node
 	}
 	
 	/**
+	 * <p>Simula uma leitura física de dadps dp sensor, feita para todos os dispositivos sensiveis disponiveis nesse nó (ex: temperatura, pressão, humidade).</p>
+	 * <p>Em fato, uma leitura real do sensor não é feita por esse nó. Em vez disso, uma leitura do sensor é coletada do seu atributo <code>sensorReadingQueue</code></p>
+	 * <p>No caso de a lista estar vazia, ela é preenchida com leituras do sensor carregadas do arquivo de leituras do sensor.</p>
+	 * [Eng]
 	 * <p>Simulates a physical sensor data reading performed for all the sensing devices available in this
 	 * node (e.g. temperature, pressure, humidity).</p>
 	 * <p>In fact, a real sensor data reading is not done by this node. Instead, a sensor reading is
@@ -373,7 +403,12 @@ public class SimpleNode extends Node
 	}
 
 	/**
-	 * Loads the sensor readings to the <code>sensorReadingsQueue</code>
+	 * Carrega as leituras do sensor para o <code>sensorReadingsQueue</code>
+	 * Se o atributo <code>loadSensorReadingsFromFile</code> for verdadeiro, o nó deverá carrecgar as leituras do sensor diretamente do arquivo de leituras do sensor.
+	 * Caso contrário, ele deverá carregar as leituras do sensor da memória, ou seja, da lista de leituras do sensor de todos os nós que foram previamente carregados na memória pela classe {@link FileHandler}.
+	 * Esse procedimento é necessário porque o arquivo de leituras do sensor é muito grande e pode demorar muito para ser carregado dependendo da configuração do computador. Para os casos que não for possivel carregar
+	 * todas as leituras do sensor para a memória (no <code>FileHandler</code>), as leituras do sensor serão carregadas do arquivo por demanda de cada nó.
+	 * [Eng] Loads the sensor readings to the <code>sensorReadingsQueue</code>
 	 * If the attribute <code>loadSensorReadingsFromFile</code> is true, the node must load the sensor readings direct from the sensor readings file.
 	 * Otherwise, it must load the sensor readings from the memory, that is, from the list of the sensor readings from
 	 * all nodes that is loaded in memory beforehand by the {@link FileHandler} class.
@@ -391,7 +426,9 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Fills the <code>sensorReadingsQueue</code> with sensor readings from the file.
+	 * Preenche o <code>sensorReadingQueue<code> com as leituras do sensor apartir do arquivo.
+	 * A quantidade de leituras (linhas do arquivo) a serem carregadas são informadas no arquivo<code>Config.xml</code> na tag (<code>SensorReadingsBlockSize</code>).
+	 * [Eng] Fills the <code>sensorReadingsQueue</code> with sensor readings from the file.
 	 * The amount of readings (file lines) to be loaded is informed in the <code>Config.xml</code> file (<code>SensorReadingsLoadBlockSize</code>) tag.
 	 */
 	private void loadSensorReadingsFromFile(){
