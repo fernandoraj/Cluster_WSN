@@ -20,25 +20,25 @@ public class WsnMsg extends Message {
 	public Integer ttl;
 	
 	/**
-	 * No de destino<p>
+	 * Nó de destino<p>
 	 * [Eng] Target node
 	 */
 	public Node target;
 	
 	/**
-	 * No de origem<p>
+	 * Nó de origem<p>
 	 * [Eng] Source node
 	 */
 	public Node source;
 	
 	/**
-	 * No que vai reencaminhar a mensagem<p>
+	 * Nó que vai reencaminhar a mensagem<p>
 	 * [Eng] Node which will forward the message
 	 */
 	public Node forwardingHop;
 	
 	/**
-	 * Numero de saltos até o destino<p>
+	 * Número de saltos até o destino<p>
 	 * [Eng] Number of hops to the target
 	 */
 	public Integer hopsToTarget;
@@ -50,7 +50,7 @@ public class WsnMsg extends Message {
 	public Integer typeMsg = 0;
 	
 	/**
-	 * Numero de dados sensoreados por time slot (Tamanho do time slot) <p>
+	 * Número de dados sensoreados por time slot (Tamanho do time slot) <p>
 	 * [Eng] Number of sensed data per time slot (Time slot size)
 	 */
 	public Integer sizeTimeSlot = 0;

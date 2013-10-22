@@ -21,26 +21,26 @@ public class WsnMsgResponse extends Message {
 	public Integer ttl;
 	
 	/**
-	 * No de destino<p>
+	 * Nó de destino<p>
 	 * [Eng] Target node
 	 */
 	public Node target;
 	
 	/**
-	 * No de origem<p>
+	 * Nó de origem<p>
 	 * [Eng] Source node
 	 * 
 	 */
 	public Node source;
 	
 	/**
-	 * No que vai reencaminhar a mensagem<p>
+	 * Nó que vai reencaminhar a mensagem<p>
 	 * [Eng] Node which will forward the message
 	 */
 	public Node forwardingHop;
 	
 	/**
-	 * Numero de saltos até o destino<p>
+	 * Número de saltos até o destino<p>
 	 * [Eng] Number of hops to the target
 	 */
 	public Integer hopsToTarget;
@@ -52,7 +52,7 @@ public class WsnMsgResponse extends Message {
 	public Integer typeMsg = 0;
 	
 	/**
-	 * Numero de dados sensoreados por time slot (Tamanho do time slot)<p>
+	 * Número de dados sensoreados por time slot (Tamanho do time slot)<p>
 	 * [Eng] Number of sensed data per time slot (Time slot size)
 	 */
 	public Integer sizeTimeSlot = 0;
@@ -71,14 +71,14 @@ public class WsnMsgResponse extends Message {
 	
 	/**
 	 * Caminho de nós do nó que envia a mensagem de resposta até o sink node, em forma de pilha<p>
-	 * [Eng]Path nodes of the node that sends the reply message to the sink node, in the form of stack
+	 * [Eng] Path nodes of the node that sends the reply message to the sink node, in form of stack
 	 */
 	private Stack<Integer> pathToSenderNode;
 	
 	/**
 	 * Empilha um nó no caminho de nós<p>
 	 * [Eng] Stack one node on path nodes
-	 * @param no Nó a ser empilhado
+	 * @param no Nó a ser empilhado <p> [Eng] <b>no</b> Node to be stacked
 	 */
 	public void pushToPath(Integer no)
 	{
