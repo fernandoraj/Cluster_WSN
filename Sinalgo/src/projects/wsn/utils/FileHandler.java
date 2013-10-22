@@ -19,30 +19,34 @@ import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 
 /**
- * Class responsible for managing data text files.
+ * Classe responsável por administrar os arquivos de dados. <p>
+ * [Eng] Class responsible for managing data text files.
  * @author Alex Lacerda
  * @author Fernando Rodrigues
  */
 public class FileHandler {
 	
 	/**
-	 * Number of initial sensor nodes readings (by each sensor) to be disregarded in the filtering process
+	 * Número de leituras iniciais de nós sensores (para cada sensor) para ser ignorado no processo de filtragem<p>
+	 * [Eng] Number of initial sensor nodes readings (by each sensor) to be disregarded in the filtering process
 	 */
 	static final int quantLearning = 10;
 	
 	/**
-	 * Number of sensor nodes in the simulation (Intel Lab Data).
+	 * Número de nós sensores na simulação (Intel Lab Data)<p>
+	 * [Eng] Number of sensor nodes in the simulation (Intel Lab Data).
 	 */
 	public static final Integer NUMBER_OF_SENSOR_NODES = 54;
 	
 	/**
-	 * Stores all the lines of the sensor readings file.
-	 * The sensor readings file contains sensor readings from all sensor nodes of the network.
+	 * Armazena todas as linhas do arquivo de leitura dos sensores. O arquivo de leitura dos sensores contém leituras de todos os sensores da rede.<p>
+	 * [Eng] Stores all the lines of the sensor readings file. The sensor readings file contains sensor readings from all sensor nodes of the network.
 	 */
 	private static List<String> nodesSensorReadingsList = new ArrayList<String>();
 
 	/**
-	 * Loads all the lines of the sensor readings file into the memory (<code>nodesSensorReadingsList</code> static variable).
+	 * Carrega todas as linhas do arquivo de leitura dos sensores na memória (<code>nodesSensorReadingsList</code> variável estática). O arquivo de leitura dos sensores contém leituras de todos os sensores da rede.<p>
+	 * [Eng] Loads all the lines of the sensor readings file into the memory (<code>nodesSensorReadingsList</code> static variable).
 	 * The sensor readings file contains sensor readings from all sensor nodes of the network.
 	 */
 	private static void loadNodesSensorReadingsFromFile(){
@@ -67,11 +71,13 @@ public class FileHandler {
 	}
 	
 	/**
-	 * Returns <code>bufferedReader</code> object for the file path (<code>filePath</code>) specified as parameter.
+	 * Retorna o objeto <code>bufferedReader</code> do caminho do arquivo (<code>filePath</code>) especificado como parametro.
+	 * Um <code>bufferedReader</code> pode ser usado para leitura de linhas de um arquivo de texto de maneira mais fácil.<p>
+	 * [Eng] Returns <code>bufferedReader</code> object for the file path (<code>filePath</code>) specified as parameter.
 	 * A <code>bufferedReader</code> can be used for reading lines of text files in a easier manner.
-	 * @param filePath Path of the file for which the <code>bufferedReader</code> is going to be created.
-	 * @return Returns a <code>bufferedReader</code> created for the <code>filePath</code> passed as parameter. 
-	 * Returns <code>null</code> if the filePath does not exist or if <code>filePath</code> is null.
+	 * @param filePath Caminho do arquivo onde o <code>bufferedReader</code> será criado.<p> [Eng] <b>filePath</b> Path of the file for which the <code>bufferedReader</code> is going to be created.
+	 * @return Retorna um <code>bufferedReader</code> criado através do <code>filePath</code> passado como parametro. Returns  <code>null</code>  se o caminho do arquivo náo existir ou se <code>filePath</code> for nulo <p>
+	 * [Eng] Returns a <code>bufferedReader</code> created for the <code>filePath</code> passed as parameter. <code>null</code> if the filePath does not exist or if <code>filePath</code> is null.
 	 */
 	public static BufferedReader getBufferedReader(String filePath)
 	{

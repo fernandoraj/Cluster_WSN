@@ -12,10 +12,10 @@ public class ArrayList2d<Type>
 	}
  
 	/**
-	 * ensures a minimum capacity of num rows. Note that this does not guarantee
-	 * that there are that many rows.
+	 * Garante uma capacidade mínima de linhas. Note que isso não garante que há esta quantidade de linhas. <p>
+	 * [Eng]ensures a minimum capacity of num rows. Note that this does not guarantee that there are that many rows.
 	 * 
-	 * @param num
+	 * @param num capacidade mínima de linhas <p> [Eng] <b>num</b> minimum capacity of rows
 	 */
 	public void ensureCapacity(int num)
 	{
@@ -23,8 +23,8 @@ public class ArrayList2d<Type>
 	}
  
 	/**
-	 * Ensures that the given row has at least the given capacity. Note that
-	 * this method will also ensure that getNumRows() >= row
+	 * Garante que a linha dada tem ao menos a capacidade dada. Note que este método também garante que getNumRows() >= row<p>
+	 * [Eng] Ensures that the given row has at least the given capacity. Note that this method will also ensure that getNumRows() >= row
 	 * 
 	 * @param row
 	 * @param num
@@ -40,7 +40,8 @@ public class ArrayList2d<Type>
 	}
  
 	/**
-	 * Adds an item at the end of the specified row. This will guarantee that at least row rows exist.
+	 * Adiciona um item ao final da linha especificada. Isso irá garantir que ao menos a linha existe<p>
+	 * [Eng] Adds an item at the end of the specified row. This will guarantee that at least row rows exist
 	 */
 	public void Add(Type data, int row)
 	{
