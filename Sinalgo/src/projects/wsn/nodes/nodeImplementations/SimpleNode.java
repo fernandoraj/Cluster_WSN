@@ -552,15 +552,13 @@ public class SimpleNode extends Node
 	 */
 	private int identificarTipo(String tipo) 
 	{
-		if (tipo.equals("t"))
-			return 4;
-		else if (tipo.equals("h"))
-			return 5;
-		else if (tipo.equals("l"))
-			return 6;
-		else if (tipo.equals("v"))
-			return 7;	
-		return 0;
+		switch (tipo) {
+		case "t" : return 4;
+		case "h" : return 5;
+		case "l" : return 6;
+		case "v" : return 7;
+		default : return 0;
+		}
 	}
 	
 	/**
