@@ -27,6 +27,9 @@ import sinalgo.runtime.Global;
 import sinalgo.tools.Tools;
 
 /**
+ * Classe que representa um nó de sensor ordinário que está habilitado a sentir fenomenos naturais
+ * (ex. temperatura, pressão, umidade) e manda para os sink nodes.
+ * Em nossa simulação, esse nó também é capaz de fazer predição de dados in-networking usando os modelos de regressão.<p>
  * Class that represents an ordinary sensor node that is able to sense natural phenomena
  * (e.g. temperature, pressure, humidity) and send to sink nodes.
  * In our simulation, this node is also able to do in-networking data prediction using 
@@ -37,37 +40,37 @@ import sinalgo.tools.Tools;
 public class SimpleNode extends Node 
 {
 	/**
-	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"
+	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"<p>
 	 * [Eng] Indicates the size of Sliding Window from sensor readings to be send to sink node when there is a "novelty".
 	 */
 	protected static int slidingWindowSize = 4;
 	
 	/**
-	 * Armazenar o nó que será usado para alcançar a Estação-Base
+	 * Armazenar o nó que será usado para alcançar a Estação-Base<p>
 	 * [Eng] Stores the node that will be used to get the Base-Station
 	 */
 	protected Node proximoNoAteEstacaoBase;
 	
 	/**
-	 * Armazena o número de sequencia da última mensagem recebida
+	 * Armazena o número de sequencia da última mensagem recebida<p>
 	 * [Eng] Stores the sequence number from the last received message
 	 */
 	protected Integer sequenceNumber = 0;
 	
 	/**
-	 * Valor do último round em que houve leitura do sensor (que teve valor lido do arquivo) 
+	 * Valor do último round em que houve leitura do sensor (que teve valor lido do arquivo) <p>
 	 * [Eng] Value of the last round that had reading from the sensor (that had value read from the file)
 	 */
 	protected int ultimoRoundLido;
 	
 	/**
-	 * Valor (grandeza/magnitude) da última leitura do sensor 
+	 * Valor (grandeza/magnitude) da última leitura do sensor <p>
 	 * [Eng] Value (size) of the last read of the sensor
 	 */
 	protected double lastValueRead;
 	
 	/**
-	 * Tempo (data/hora em milisegundos) da última leitura do sensor 
+	 * Tempo (data/hora em milisegundos) da última leitura do sensor <p>
 	 * [Eng] Time (date/hour in miliseconds) of the last read of the sensor
 	 */
 	protected double lastTimeRead;
@@ -75,7 +78,7 @@ public class SimpleNode extends Node
 	/**
 	 * Armazena as leituras do sensor desse nó carregadas do arquivo de leituras do sensor.
 	 * Uma lista referenciada está sendo usada aqui porque como as leituras
-	 * (lidas dessa lista) estão sendo feitas por esse nó sensor elas são descartadas.
+	 * (lidas dessa lista) estão sendo feitas por esse nó sensor elas são descartadas.<p>
 	 * [Eng] Stores sensor readings of this node loaded from the sensor readings file.
 	 * A linked list is being used here because as the readings are being performed 
 	 * (being read from this list) by this sensor node they are discarded.
@@ -86,7 +89,7 @@ public class SimpleNode extends Node
 	 * Armazena o valor referente a ultima linha carregada do arquivo de leituras do sensor, para que
 	 * quando o <code>sensorReadingQueue</code> estiver vazio um novo carregamente terá que ser executado
 	 * com o fim de preencher a lista <code>SensorReadingsLoadedFromFile</code>, o carregamento começa da
-	 * ultima linha lida do arquivo.
+	 * ultima linha lida do arquivo.<p>
 	 * [Eng] Stores the value referring to the last line loaded from the sensor readings file in order that
 	 * when the <code>sensorReadingsQueue</code> is empty and a new load from the file has to be
 	 * executed to fill the <code>SensorReadingsLoadedFromFile</code> list, the loading starts from the last
@@ -102,7 +105,7 @@ public class SimpleNode extends Node
 	 * porque o arquivo de leituras do sensor é muito grande e pode demorar muito mais para serem carregador dependendo
 	 * da configuração do computador. Para os casos que não for possível carregar todas as leituras do sensor para
 	 * a memoria (no <code>FileHandler</code>), as leituras do sensor serão carregadas apartir do arquivo na demanda 
-	 * por cada nó.
+	 * por cada nó.<p>
 	 * [Eng] Indicates whether the sensor readings must be loaded from the file or from the memory.
 	 * If this attribute is true, the node must load the sensor readings direct from the
 	 * sensor readings file. Otherwise, it must load the sensor readings from the memory, 
@@ -116,25 +119,25 @@ public class SimpleNode extends Node
 	private boolean loadSensorReadingsFromFile = true;
 	
 	/**
-	 * Variavel local para armazenar a soma do "square error" (SE) usada para calcular o RMSE (Root mean square error - "media de erro") para cada sensor
+	 * Variavel local para armazenar a soma do "square error" (SE) usada para calcular o RMSE (Root mean square error - "media de erro") para cada sensor<p>
 	 * [Eng] Local variable to store the sum of square error(SE) used to calculate the RMSE (Root mean square error) from each sensor
 	 */
 	public double squaredError = 0;
 	
 	/**
-	 * Contador local do numero de previsões
+	 * Contador local do numero de predições<p>
 	 * [Eng] Local counter of the number of predictions
 	 */
 	public int predictionsCount = 0;
 	
 	/**
-	 * Numero de erros previstos do nó do sensor nesse slot de tempo
+	 * Numero de erros de predições do nó do sensor nesse slot de tempo<p>
 	 * [Eng] Number of prediction errors of the sensor node in this timeslot
 	 */
 	protected int numPredictionErrors = 0;
 	
 	/**
-	 * Máxino (limite) de numero de erros previstos de qualquer nó de sensor - Isso também pode ser expressado em porcentagem (Ex: double - real) do total do slot de tempo
+	 * Máxino (limite) de numero de erros de predições de qualquer nó de sensor - Isso também pode ser expressado em porcentagem (Ex: double - real) do total do slot de tempo<p>
 	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
 	protected static final int limitPredictionError = 5; // delay (abbrev.)
@@ -298,7 +301,7 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual
+	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual<p>
 	 * [Eng] Prepare the message "wsnMsgResp" to be sensed to the sink plus the data readed by the current node
 	 * @param wsnMsgResp Mensagem a ser preparada para envio <p> [Eng] <b>wsnMsgResp</b> Message to be prepared to send
 	 * @param sizeTimeSlot Tamanho do slot de tempo (intervalo) a ser lido pelo nó sensor, ou tamanho da quantidade de dados a ser enviado para o sink <p> [Eng] <b>sizeTimeSlot</b> Size of the time slot to be read by the sensor node, or the quantity size of data to be sended to the sink
@@ -361,7 +364,7 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Verifica se o ID do sensor passado como paramêtro é igual ao ID desse nó.
+	 * Verifica se o ID do sensor passado como paramêtro é igual ao ID desse nó.<p>
 	 * [Eng] Verifies whether the sensor ID passed as parameter is equal to the ID of this node.
 	 * @param sensorID ID do sensor a ser comparado com o ID desse nó <p> [Eng] <b>Sensor ID</b> to be compared to this node's ID
 	 * @return Retorna <code>true</code> se os IDs forem os mesmos, se não, retorna <code>false</code> <p> [Eng] Returns <code>true</code> if the IDs are the same. Returns <code>false</code> otherwise.
@@ -379,7 +382,7 @@ public class SimpleNode extends Node
 	/**
 	 * <p>Simula uma leitura física de dadps dp sensor, feita para todos os dispositivos sensiveis disponiveis nesse nó (ex: temperatura, pressão, humidade).</p>
 	 * <p>Em fato, uma leitura real do sensor não é feita por esse nó. Em vez disso, uma leitura do sensor é coletada do seu atributo <code>sensorReadingQueue</code></p>
-	 * <p>No caso de a lista estar vazia, ela é preenchida com leituras do sensor carregadas do arquivo de leituras do sensor.</p>
+	 * <p>No caso de a lista estar vazia, ela é preenchida com leituras do sensor carregadas do arquivo de leituras do sensor.</p><p>
 	 * [Eng]
 	 * <p>Simulates a physical sensor data reading performed for all the sensing devices available in this
 	 * node (e.g. temperature, pressure, humidity).</p>
@@ -407,7 +410,7 @@ public class SimpleNode extends Node
 	 * Se o atributo <code>loadSensorReadingsFromFile</code> for verdadeiro, o nó deverá carrecgar as leituras do sensor diretamente do arquivo de leituras do sensor.
 	 * Caso contrário, ele deverá carregar as leituras do sensor da memória, ou seja, da lista de leituras do sensor de todos os nós que foram previamente carregados na memória pela classe {@link FileHandler}.
 	 * Esse procedimento é necessário porque o arquivo de leituras do sensor é muito grande e pode demorar muito para ser carregado dependendo da configuração do computador. Para os casos que não for possivel carregar
-	 * todas as leituras do sensor para a memória (no <code>FileHandler</code>), as leituras do sensor serão carregadas do arquivo por demanda de cada nó.
+	 * todas as leituras do sensor para a memória (no <code>FileHandler</code>), as leituras do sensor serão carregadas do arquivo por demanda de cada nó.<p>
 	 * [Eng] Loads the sensor readings to the <code>sensorReadingsQueue</code>
 	 * If the attribute <code>loadSensorReadingsFromFile</code> is true, the node must load the sensor readings direct from the sensor readings file.
 	 * Otherwise, it must load the sensor readings from the memory, that is, from the list of the sensor readings from
@@ -427,7 +430,7 @@ public class SimpleNode extends Node
 	
 	/**
 	 * Preenche o <code>sensorReadingQueue<code> com as leituras do sensor apartir do arquivo.
-	 * A quantidade de leituras (linhas do arquivo) a serem carregadas são informadas no arquivo<code>Config.xml</code> na tag (<code>SensorReadingsBlockSize</code>).
+	 * A quantidade de leituras (linhas do arquivo) a serem carregadas são informadas no arquivo<code>Config.xml</code> na tag (<code>SensorReadingsBlockSize</code>).<p>
 	 * [Eng] Fills the <code>sensorReadingsQueue</code> with sensor readings from the file.
 	 * The amount of readings (file lines) to be loaded is informed in the <code>Config.xml</code> file (<code>SensorReadingsLoadBlockSize</code>) tag.
 	 */
@@ -495,12 +498,11 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Places the bufferedReader on the line position specified.
-	 * @param bufferedReader Buffered Reader to be used
-	 * @param linePosition position in the file that the buffered reader must be
-	 * @return the buffered reader in the line corresponding to the position specified. That is,
-	 * when bufferedReader.readline() is called, the line returned will correspond position specified.
-	 * For example, if linePosition = 3 then bufferedReader.readline() will get the forth line. 
+	 * Coloca o bufferedReader na posição especifica da linha.<p>
+	 * [Eng] Places the bufferedReader on the line position specified.
+	 * @param bufferedReader leitor de buffer a ser usado <p> [Eng] <b>bufferedReader</b> Buffered Reader to be used
+	 * @param linePosition posição que o leitor de buffer deve estar no arquivo <p> [Eng] <b>linePosition</b> position in the file that the buffered reader must be
+	 * @return Retorna o leitor de buffer na linha correspondente a posição especifica. Isto é, quando o bufferedReader.readline() é chamado, a linha retornada vai corresponder a posição especifica. por exemplo, se a linePosition = 3 então o bufferedReader.readline() vai pegar a quarta linha. <p> [Eng] the buffered reader in the line corresponding to the position specified. That is, when bufferedReader.readline() is called, the line returned will correspond position specified. For example, if linePosition = 3 then bufferedReader.readline() will get the forth line. 
 	 */
 	private BufferedReader putOnLinePosition(BufferedReader bufferedReader, Integer linePosition) {
 		try {
@@ -530,9 +532,22 @@ public class SimpleNode extends Node
 	 *       Temp é a medida (grandeza) da temperatura aferida
 	 *       Hum é a medida (grandeza) da humidade aferida
 	 *       Lum é a medida (grandeza) da luminosidade aferida
-	 *       Volt é a medida (grandeza) do nível de bateria do sensor (voltagem aferida)
+	 *       Volt é a medida (grandeza) do nível de bateria do sensor (voltagem aferida)<p>
+	 *       
+	 * [Eng] Identify the data type to be read (line position) according to the string passed, as the example bellow:
+	 * 				2004-03-21 19:02:26.792489 65528 4 87.383 45.4402 5.52 2.31097
+	 * Position          [1]         [2]         [3] [4]  [5]    [6]    [7]   [8]
+	 * Data type        Data         Hora       Roundp ID  Temp   Hum    Lum   Volt
 	 * 
-	 * @param tipo Pode ser t: temperatura, h: humidade, l: luminosidade ou v: voltagem
+	 * Where: Data and Hora are the date and time that the sensed values reading were done
+	 *        Round is the number of the round (execution) of the reading, that occurs each 31 seconds
+	 *        ID is the identifier number of the sensor
+	 *        Temp is the dimension of the measured temperature
+	 *        Hum is the dimension of the measured humidity
+	 *        Lum is the dimension of the measured luminositiy
+	 *        Volt is the dimension of the battery level of the sensor (measured voltage)
+	 * 
+	 * @param tipo Pode ser t: temperatura, h: humidade, l: luminosidade ou v: voltagem <p> [Eng] <b>tipo</b> Can be t: temperature, h: humidity, l:luminosity or v: voltage.
 	 * @return Posição correspondente do tipo de dado a ser aferido na string lida do arquivo de dados (data.txt)
 	 */
 	private int identificarTipo(String tipo) 
@@ -549,10 +564,11 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Transforma os valores de data (AnoMesDia) e hora (hora) passados em uma grandeza inteira com a quantidade de milisegundos total
-	 * @param AnoMesDia String no formato AAAA-MM-DD representando a data da leitura do valor pelo sensor (A-Ano, M-Mes, D-Dia)
-	 * @param hora String no formato HH:MM:SS.LLLLL representando a hora da leitura do valor pelo sensor (H-Hora, M-Minuto, S-Segundo, L-Milisegundo)
-	 * @return Quantidade de milisegundos total representando aquele instante de tempo (Data + Hora) segundo o padrão do Java 
+	 * Transforma os valores de data (AnoMesDia) e hora (hora) passados em uma grandeza inteira com a quantidade de milisegundos total<p>
+	 * [Eng] Turn the data values (AnoMesDia) and hour (hora) passed in long number with the total quantity of miliseconds
+	 * @param AnoMesDia String no formato AAAA-MM-DD representando a data da leitura do valor pelo sensor (A-Ano, M-Mes, D-Dia) <p> [Eng] <b>AnoMesDia</b> String in the format YY-MM-DD representing the date of the reading value by the sensor (Y - Year, M - Month, D - Day)
+	 * @param hora String no formato HH:MM:SS.LLLLL representando a hora da leitura do valor pelo sensor (H-Hora, M-Minuto, S-Segundo, L-Milisegundo) <p> [Eng] <b>hora</b> String in the format HH:MM:SS.LLLLL representing the time of the reading value by the sensor (H - Hour, M - Minute, S-Second, L- Milisecond)
+	 * @return Quantidade de milisegundos total representando aquele instante de tempo (Data + Hora) segundo o padrão do Java <p> [Eng] Quantity of total miliseconds represented in that instant of time  (Date + hour) by the java default.
 	 */
 	private long parseCalendarHoras(String AnoMesDia, String hora)
 	{
@@ -574,11 +590,12 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Faz o cálculo da predição do valor sensoreado de acordo com os coeficientes (A e B) informados e o parâmetro de tempo
-	 * @param A Coeficiente A (interceptor) da equação de regressão, dada por S(t) = A + B.t 
-	 * @param B Coeficiente B (slope, inclinação) da equação de regressão, dada por S(t) = A + B.t
-	 * @param tempo Parâmetro de tempo a ter o valor da grandeza predito 
-	 * @return Valor predito para o parâmetro sensoreado no tempo dado
+	 * Faz o cálculo da predição do valor sensoreado de acordo com os coeficientes (A e B) informados e o parâmetro de tempo<p>
+	 * [Eng] Calculate the prediction of the sensed value according with the other coefficients (A and B) informed and the param of time
+	 * @param A Coeficiente A (interceptor) da equação de regressão, dada por S(t) = A + B.t <p> [Eng] <b>A</b> Coefficient A (interceptor) of the regression equation, given by S(t) = A + B.t
+	 * @param B Coeficiente B (slope, inclinação) da equação de regressão, dada por S(t) = A + B.t <p> [Eng] <b>B</b> Coefficient B (slope, initiantion) of the regression equation, given by S(t) = A + B.t
+	 * @param tempo Parâmetro de tempo a ter o valor da grandeza predito <p> [Eng] <b>tempo</b> Time param has the value of the predicted hugeness 
+	 * @return Valor predito para o parâmetro sensoreado no tempo dado <p> [Eng] Predicted value to the sensed param in the given time
 	 */
 	private double makePrediction(double A, double B, double tempo)
 	{
@@ -588,8 +605,9 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * It starts a timer to send the message passed to the next node in path to destination node 
-	 * @param wsnMessage Message to be sended to destination node
+	 * Começa um timer para mandsr as messagens passadas para o próximo nó no caminho para o nó de destino <p>
+	 * [Eng] It starts a timer to send the message passed to the next node in path to destination node 
+	 * @param wsnMessage Mensagem a ser mandada para o nó de destino <p> [Eng] <b>wsnMessage</b> Message to be sended to destination node
 	 */
 	protected void sendToNextNodeInPath(WsnMsg wsnMessage)
 	{
@@ -605,8 +623,9 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Get the coefficients from the Regression Equation and the threshold error from the message passed by and trigger the predictions for this node 
-	 * @param wsnMessage Message to have the coefficients read
+	 * Pega os coeficientes da equação de regressão e a limiar de erro da mensagem passara por um gatilho de predições desse nó <p>
+	 * [Eng] Get the coefficients from the Regression Equation and the threshold error from the message passed by and trigger the predictions for this node 
+	 * @param wsnMessage Mensagem que conterá os coeficientes lidos <p> [Eng] <b>wsnMessage</b> Message to have the coefficients read
 	 */
 	protected void receiveCoefficients(WsnMsg wsnMessage)
 	{
@@ -617,11 +636,12 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Read the next value from present sensor, make the prediction and, according with the predition (hit or miss), trigges the next action 
-	 * @param dataSensedType Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
-	 * @param coefA Coefficient A from the Regression Equation for this sensor
-	 * @param coefB Coefficient B from the Regression Equation for this sensor
-	 * @param maxError Threshold error to the calculation of prediction for this sensor
+	 * Lê o próximo valor do sensor atual, faz a predição e, de acordo com a predição (certa ou errada), engatilha a próxima ação <p>
+	 * [Eng] Read the next value from present sensor, make the prediction and, according with the predition (hit or miss), trigges the next action 
+	 * @param dataSensedType Tipo de dado a ser lido pelo sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade or "v"=voltagem <p> [Eng] <b>dataSensedType</b> Type of data to be read from sensor: "t"=temperature, "h"=humity, "l"=luminosity or "v"=voltage
+	 * @param coefA Coeficiente A da equação de regressão para esse sensor <p> [Eng] <b>coefA</b> Coefficient A from the Regression Equation for this sensor
+	 * @param coefB Coeficiente B da equação de regressão para esse sensor <p> [eng] <b>coefB</b> Coefficient B from the Regression Equation for this sensor
+	 * @param maxError Limiar de erro para o calculo da predição desse sensor <p> [Eng] <b>maxError</b> Threshold error to the calculation of prediction for this sensor
 	 */
 	protected void triggerPredictions (String dataSensedType, double coefA, double coefB, double maxError)
 	{
@@ -718,11 +738,12 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Calls the method triggerPredictions
-	 * @param dataSensedType Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
-	 * @param coefA Coefficient A from the Regression Equation for this sensor
-	 * @param coefB Coefficient B from the Regression Equation for this sensor
-	 * @param maxError Threshold error to the calculation of prediction for this sensor
+	 * Chama o método triggerPredictions<p>
+	 * [Eng] Calls the method triggerPredictions
+	 * @param dataSensedType Tipo de dado a serem lidos pelo sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p> [Eng] <b>dataSnsedType</b> Type of data to be read from sensor: "t"=temperature, "h"=humidity, "l"=luminosity or "v"=voltage
+	 * @param coefA Coeficiente A da equação de regressão para esse sensor <p> [Eng] <b>coefA</b> Coefficient A from the Regression Equation for this sensor
+	 * @param coefB Coeficiente B da equação de regressão para esse sensor <p> [Eng] <b>coefB</b> Coefficient B from the Regression Equation for this sensor
+	 * @param maxError Limiar de erro para o calculo da predição desse sensor <p> [Eng] <b>maxError</b> Threshold error to the calculation of prediction for this sensor
 	 */
 	public final void triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
 	{
@@ -731,10 +752,10 @@ public class SimpleNode extends Node
 	
 	/**
 	 * Compares the read value('value') to the predict value('predictionValue') using 'maxError' as threshold error
-	 * @param value Value read from the sensor
-	 * @param predictionValue Value predict to be compared
-	 * @param maxError Threshold error to the calculation of prediction for this sensor
-	 * @return True if the sensed (read) value is in the predicted value (more or less the threshold error) ou False, otherwise
+	 * @param value Valor lido apartir do sensor <p> [Eng] <b>value</b> Value read from the sensor
+	 * @param predictionValue Valor predito a ser comparado <p> [Eng] <b>predictionValue</b> Value predict to be compared
+	 * @param maxError Limiar de erro para o calculo da predição desse sensor <p> [Eng] <b>maxError</b> Threshold error to the calculation of prediction for this sensor
+	 * @return True se o valor sensorado (lido) está no valor predito (mais ou menos o limiar de erro), senão False <p> [Eng] True if the sensed (read) value is in the predicted value (more or less the threshold error) ou False, otherwise
 	 */
 	protected boolean isValuePredictInValueReading(double value, double predictionValue, double maxError)
 	{
@@ -772,8 +793,9 @@ public class SimpleNode extends Node
 	
 
 	/**
-	 * Read the next value from present sensor, send to sink and trigger the next reading 
-	 * @param dataSensedType Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
+	 * Lê o próximo valor do sensor atual, manda para o sink e engatilha a proxima leitura<p>
+	 * [Eng] Read the next value from present sensor, send to sink and trigger the next reading 
+	 * @param dataSensedType Tipo de dado a ser lido pelo sensor <p> [Eng] <b>dataSensedType</b> Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 */
 	protected void makeSensorReadingAndSendind (String dataSensedType)
 	{
@@ -838,11 +860,12 @@ public class SimpleNode extends Node
 	}
 	
 	/**
-	 * Calls the method makeSensorReadingAndSendind in looping
-	 * @param dataSensedType Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
-	 * @param coefA Coefficient A from the Regression Equation for this sensor
-	 * @param coefB Coefficient B from the Regression Equation for this sensor
-	 * @param maxError Threshold error to the calculation of prediction for this sensor
+	 * Chama o método makeSensorReagingAndSending em loop<p>
+	 * [Eng] Calls the method makeSensorReadingAndSendind in looping
+	 * @param dataSensedType Tipo de dado a serem lidos pelo sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p> [Eng] <b>dataSnsedType</b> Type of data to be read from sensor: "t"=temperature, "h"=humidity, "l"=luminosity or "v"=voltage
+	 * @param coefA Coeficiente A da equação de regressão para esse sensor <p> [Eng] <b>coefA</b> Coefficient A from the Regression Equation for this sensor
+	 * @param coefB Coeficiente B da equação de regressão para esse sensor <p> [Eng] <b>coefB</b> Coefficient B from the Regression Equation for this sensor
+	 * @param maxError Limiar de erro para o calculo da predição desse sensor <p> [Eng] <b>maxError</b> Threshold error to the calculation of prediction for this sensor
 	 */
 	public final void makeSensorReadingAndSendingLoop(String dataSensedType)
 	{
