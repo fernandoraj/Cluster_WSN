@@ -16,14 +16,14 @@ public class SinkNode extends SimpleNode
 {
 
 	/**
-	 * Sensed data number per slot (size of the time slot)<p>
-	 * [Eng] Numero de dados sensoreados por time slot (Tamanho do time slot) 
+	 * Numero de dados sensoriados por time slot (Tamanho do time slot) <p> 
+	 * [Eng] Sensed data number per slot (size of the time slot)
 	 */
 	private Integer sizeTimeSlot = 100;
 	
 	/**
-	 * Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem<p>
-	 * Data type to be sensed (read in the sensor nodes), it can be: "t"=temperature, "h"=humidity, "l"=luminosity or "v"=voltage
+	 * Tipo de dado a ser sensoriado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=umidade, "l"=luminosidade ou "v"=voltagem<p>
+	 * [Eng] Data type to be sensed (read in the sensor nodes), it can be: "t"=temperature, "h"=humidity, "l"=luminosity or "v"=voltage
 	 */
 	private String dataSensedType = "t"; // type (abbrev.)
 	
