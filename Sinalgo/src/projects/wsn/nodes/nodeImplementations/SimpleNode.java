@@ -313,7 +313,7 @@ public class SimpleNode extends Node
 		int medida = 0;
 		if (dataSensedType != null)
 		{
-			medida = identificarTipo(dataSensedType);
+			medida = identifyType(dataSensedType);
 		}
 		String dataLine = performSensorReading();
 		int i=0;//cont = 0;
@@ -550,7 +550,7 @@ public class SimpleNode extends Node
 	 * @param tipo Pode ser t: temperatura, h: humidade, l: luminosidade ou v: voltagem <p> [Eng] <b>tipo</b> Can be t: temperature, h: humidity, l:luminosity or v: voltage.
 	 * @return Posição correspondente do tipo de dado a ser aferido na string lida do arquivo de dados (data.txt)
 	 */
-	private int identificarTipo(String tipo) 
+	private int identifyType(String tipo) 
 	{
 		switch (tipo) {
 		case "t" : return 4;
@@ -646,7 +646,7 @@ public class SimpleNode extends Node
 		int medida = 0;
 		if (dataSensedType != null)
 		{
-			medida = identificarTipo(dataSensedType);
+			medida = identifyType(dataSensedType);
 		}
 		String sensorReading = performSensorReading();
 		if (sensorReading != null && medida != 0)
@@ -800,7 +800,7 @@ public class SimpleNode extends Node
 		int medida = 0;
 		if (dataSensedType != null)
 		{
-			medida = identificarTipo(dataSensedType);
+			medida = identifyType(dataSensedType);
 		}
 		
 		String sensorReading = performSensorReading();
