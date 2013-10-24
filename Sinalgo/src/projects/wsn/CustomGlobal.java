@@ -42,7 +42,24 @@ import javax.swing.JOptionPane;
 import sinalgo.runtime.AbstractCustomGlobal;
 
 /**
- * This class holds customized global state and methods for the framework. 
+ * Esta classe contém estados e métodos personalizados globais para o framework.
+ * O único método obrigatório a ser sobrescrito é 
+ * <code>hasTerminated</code>
+ * <br>
+ * Métodos opcionais a serem sobrescritos são
+ * <ul>
+ * <li><code>customPaint</code></li>
+ * <li><code>handleEmptyEventQueue</code></li>
+ * <li><code>onExit</code></li>
+ * <li><code>preRun</code></li>
+ * <li><code>preRound</code></li>
+ * <li><code>postRound</code></li>
+ * <li><code>checkProjectRequirements</code></li>
+ * </ul>
+ * sinalgo.runtime.AbstractCustomGlobal para maiores detalhes.
+ * <br>
+ * Em adição, esta classe também fornece a possibilidade de extender o framework com métodos personalizados que podem ser chamados através do menu ou via um botão adicionado ao GUI. <p>
+ * [Eng] This class holds customized global state and methods for the framework. 
  * The only mandatory method to overwrite is 
  * <code>hasTerminated</code>
  * <br>
@@ -56,7 +73,7 @@ import sinalgo.runtime.AbstractCustomGlobal;
  * <li><code>postRound</code></li>
  * <li><code>checkProjectRequirements</code></li>
  * </ul>
- * @see sinalgo.runtime.AbstractCustomGlobal for more details.
+ * sinalgo.runtime.AbstractCustomGlobal for more details.
  * <br>
  * In addition, this class also provides the possibility to extend the framework with
  * custom methods that can be called either through the menu or via a button that is

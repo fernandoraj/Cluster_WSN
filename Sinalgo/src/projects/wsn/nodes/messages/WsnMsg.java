@@ -115,7 +115,7 @@ public class WsnMsg extends Message {
 	 * Lê o coeficiente A da equação<p>
 	 * [Eng] Reads the coefficient A of equation
 	 *
-	 * @return valor do coeficiente A <p> [Eng] valor of coefficient A
+	 * @return valor do coeficiente A <p> [Eng] value of coefficient A
 	 */
 	public Double getCoefA()
 	{
@@ -129,7 +129,7 @@ public class WsnMsg extends Message {
 	/**
 	 * Lê o coeficiente B da equação<p> 
 	 * [Eng] Reads the coefficient B of equation
-	 * @return valor do coeficiente B <p> [Eng] valor of coefficient B
+	 * @return valor do coeficiente B <p> [Eng] value of coefficient B
 	 */
 	public Double getCoefB()
 	{
@@ -142,9 +142,9 @@ public class WsnMsg extends Message {
 	
 	/**
 	 * Configura os valores dos coeficientes (A e B) da equação<p>
-	 * [Eng] Configures the valors of the coefficients(A and B) of equation
-	 * @param A valor do coeficiente A <p> [Eng] <b>A</b> valor of coefficient A
-	 * @param B valor do coeficiente B <p> [Eng] <b>B</b> valor of coefficient B
+	 * [Eng] Configures the values of the coefficients(A and B) of equation
+	 * @param A valor do coeficiente A <p> [Eng] <b>A</b> value of coefficient A
+	 * @param B valor do coeficiente B <p> [Eng] <b>B</b> value of coefficient B
 	 */
 	public void setCoefs(Double A, Double B)
 	{

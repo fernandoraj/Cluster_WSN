@@ -37,7 +37,8 @@
 package projects.wsn;
 
 /**
- * Enumerates the log-levels. Levels above THRESHOLD will be included
+ * Enumera o log-levels. Níveis acima do TRESHOLD serão incluidos no log-file. Níveis abaixo (com um grande valor de enumeração) não.<p>
+ * [Eng] Enumerates the log-levels. Levels above THRESHOLD will be included
  * in the log-file. The levels below (with a higher enumeration value) not.
  */
 public class LogL extends sinalgo.tools.logging.LogL{
