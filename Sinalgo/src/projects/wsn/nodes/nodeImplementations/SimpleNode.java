@@ -296,7 +296,7 @@ public class SimpleNode extends Node
 							value = 0.0;
 						}//catch
 					}//else
-					quantTime = parseCalendarHoras(linhas[0], linhas[1]);
+					quantTime = parseCalendarHours(linhas[0], linhas[1]);
 					
 					lastValueRead = value;
 					lastTimeRead = quantTime;
@@ -497,12 +497,12 @@ public class SimpleNode extends Node
 	 *        Lum is the dimension of the measured luminositiy
 	 *        Volt is the dimension of the battery level of the sensor (measured voltage)
 	 * 
-	 * @param tipo Pode ser t: temperatura, h: humidade, l: luminosidade ou v: voltagem <p> [Eng] <b>tipo</b> Can be t: temperature, h: humidity, l:luminosity or v: voltage.
-	 * @return Posição correspondente do tipo de dado a ser aferido na string lida do arquivo de dados (data.txt)
+	 * @param type Pode ser t: temperatura, h: humidade, l: luminosidade ou v: voltagem <p> [Eng] <b>type</b> Can be t: temperature, h: humidity, l:luminosity or v: voltage.
+	 * @return Posição correspondente do tipo de dado a ser aferido na string lida do arquivo de dados (data.txt) <p> [Eng] Position corresponding to the data type to be measured on the read String of the data archive (data.txt)
 	 */
-	private int identifyType(String tipo) 
+	private int identifyType(String type) 
 	{
-		switch (tipo) {
+		switch (type) {
 		case "t" : return 4;
 		case "h" : return 5;
 		case "l" : return 6;
@@ -514,14 +514,14 @@ public class SimpleNode extends Node
 	/**
 	 * Transforma os valores de data (AnoMesDia) e hora (hora) passados em uma grandeza inteira com a quantidade de milisegundos total<p>
 	 * [Eng] Turn the data values (AnoMesDia) and hour (hora) passed in long number with the total quantity of miliseconds
-	 * @param AnoMesDia String no formato AAAA-MM-DD representando a data da leitura do valor pelo sensor (A-Ano, M-Mes, D-Dia) <p> [Eng] <b>AnoMesDia</b> String in the format YY-MM-DD representing the date of the reading value by the sensor (Y - Year, M - Month, D - Day)
-	 * @param hora String no formato HH:MM:SS.LLLLL representando a hora da leitura do valor pelo sensor (H-Hora, M-Minuto, S-Segundo, L-Milisegundo) <p> [Eng] <b>hora</b> String in the format HH:MM:SS.LLLLL representing the time of the reading value by the sensor (H - Hour, M - Minute, S-Second, L- Milisecond)
+	 * @param yearMonthDay String no formato AAAA-MM-DD representando a data da leitura do valor pelo sensor (A-Ano, M-Mes, D-Dia) <p> [Eng] <b>yearMonthDay</b> String in the format YY-MM-DD representing the date of the reading value by the sensor (Y - Year, M - Month, D - Day)
+	 * @param hour String no formato HH:MM:SS.LLLLL representando a hora da leitura do valor pelo sensor (H-Hora, M-Minuto, S-Segundo, L-Milisegundo) <p> [Eng] <b>hour</b> String in the format HH:MM:SS.LLLLL representing the time of the reading value by the sensor (H - Hour, M - Minute, S-Second, L- Milisecond)
 	 * @return Quantidade de milisegundos total representando aquele instante de tempo (Data + Hora) segundo o padrão do Java <p> [Eng] Quantity of total miliseconds represented in that instant of time  (Date + hour) by the java default.
 	 */
-	private long parseCalendarHoras(String AnoMesDia, String hora)
+	private long parseCalendarHours(String yearMonthDay, String hour)
 	{
-		String[] datas = AnoMesDia.split("-");
-		String[] horas = hora.split(":");
+		String[] datas = yearMonthDay.split("-");
+		String[] horas = hour.split(":");
 		String certo = "";
 		String millesegundos = "";
 		for (String mille : horas){
@@ -542,13 +542,13 @@ public class SimpleNode extends Node
 	 * [Eng] Calculate the prediction of the sensed value according with the other coefficients (A and B) informed and the param of time
 	 * @param A Coeficiente A (interceptor) da equação de regressão, dada por S(t) = A + B.t <p> [Eng] <b>A</b> Coefficient A (interceptor) of the regression equation, given by S(t) = A + B.t
 	 * @param B Coeficiente B (slope, inclinação) da equação de regressão, dada por S(t) = A + B.t <p> [Eng] <b>B</b> Coefficient B (slope, initiantion) of the regression equation, given by S(t) = A + B.t
-	 * @param tempo Parâmetro de tempo a ter o valor da grandeza predito <p> [Eng] <b>tempo</b> Time param has the value of the predicted hugeness 
+	 * @param timeParam Parâmetro de tempo a ter o valor da grandeza predito <p> [Eng] <b>timeParam</b> Time param has the value of the predicted hugeness 
 	 * @return Valor predito para o parâmetro sensoreado no tempo dado <p> [Eng] Predicted value to the sensed param in the given time
 	 */
-	private double makePrediction(double A, double B, double tempo)
+	private double makePrediction(double A, double B, double timeParam)
 	{
 		double time;
-		time = A + B*tempo;
+		time = A + B*timeParam;
 		return time;
 	}
 	
@@ -621,7 +621,7 @@ public class SimpleNode extends Node
 						value = 0.0;
 					}//catch
 				}//else
-				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
+				quantTime = parseCalendarHours(linhas[0], linhas[1]);
 				
 				
 				
@@ -777,7 +777,7 @@ public class SimpleNode extends Node
 						value = 0.0;
 					}//catch
 				}//else
-				quantTime = parseCalendarHoras(linhas[0], linhas[1]);
+				quantTime = parseCalendarHours(linhas[0], linhas[1]);
 				
 				
 				
