@@ -159,141 +159,91 @@ public class SimpleNode extends Node
 	
 	@Override
 	public void handleMessages(Inbox inbox) {
-		while (inbox.hasNext()){
+		while (inbox.hasNext()) {
 			Message message = inbox.next();
-			if (message instanceof WsnMsg) //Mensagem que vai do sink para os nós sensores <p> [Eng] Message that go from the sink to the sensor nodes
-			{
-				Boolean encaminhar = Boolean.TRUE;
-				WsnMsg wsnMessage = (WsnMsg) message;
-				
-//				Utils.printForDebug("* Entrou em if (message instanceof WsnMsg) * NoID = "+this.ID);
-				
-				if (wsnMessage.forwardingHop.equals(this)) // A mensagem voltou. O nó deve descarta-la
-				{ 
-					encaminhar = Boolean.FALSE;
+			if (message instanceof WsnMsg) {
+					Boolean encaminhar = Boolean.TRUE;
+					WsnMsg wsnMessage = (WsnMsg) message;
 					
-//					Utils.printForDebug("** Entrou em if (wsnMessage.forwardingHop.equals(this)) ** NoID = "+this.ID);
-				}
-//				else if (wsnMessage.tipoMsg == 0)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota <p> [Eng] Message that go from the sink to the sensor nodes and is a flood. We should refresh the rote
-				else if (wsnMessage.typeMsg != 1)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota <p> [Eng] Message that go from the sink to the sensor nodes and is a flood. We should refresh the rote
-				{ 
-					this.setColor(Color.BLUE);
-
-//					Utils.printForDebug("*** Entrou em else if (wsnMessage.tipoMsg == 0) *** NoID = "+this.ID);
-					
-					if (proximoNoAteEstacaoBase == null)
-					{
-						proximoNoAteEstacaoBase = inbox.getSender();
-						sequenceNumber = wsnMessage.sequenceID;
-						
-//						Utils.printForDebug("**** Entrou em if (proximoNoAteEstacaoBase == null) **** NoID = "+this.ID);
-					}
-					else if (sequenceNumber < wsnMessage.sequenceID)
-					{ 
-					//Recurso simples para evitar loop.
-					//Exemplo: Nó A transmite em brodcast. Nó B recebe a msg e retransmite em broadcast.
-					//Consequentemente, nó A irá receber a msg. Sem esse condicional, nó A iria retransmitir novamente, gerando um loop.
-						sequenceNumber = wsnMessage.sequenceID;
-						
-//						Utils.printForDebug("***** Entrou em else if (sequenceNumber < wsnMessage.sequenceID) ***** NoID = "+this.ID);
-					}
-					else
-					{
+					if (wsnMessage.forwardingHop.equals(this)) { //A mensagem voltou, o nó vai descartá-la
 						encaminhar = Boolean.FALSE;
-						
-//						Utils.printForDebug("****** Entrou em encaminhar = Boolean.FALSE; ****** NoID = "+this.ID);
 					}
-				} //if (wsnMessage.tipoMsg == 0)
-				else if (wsnMessage.typeMsg == 1)// Mensagem que vai do sink para os nós sensores e é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
-				{ 
-//					this.setColor(Color.YELLOW);
-//					Integer nextNodeId = wsnMessage.popFromPath();
-					
-//					Utils.printForDebug("@ Entrou em else if (wsnMessage.tipoMsg == 1) @ NoID = "+this.ID+" nextNodeId = "+nextNodeId);
+					else if (wsnMessage.typeMsg != 1) {// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
+						this.setColor(Color.BLUE);
+						if (proximoNoAteEstacaoBase == null) {
 
-					encaminhar = Boolean.FALSE;
-					
-					//Definir roteamento de mensagem
-					if (wsnMessage.target != this)
-					{
-//						Utils.printForDebug("@@ Entrou em if (nextNodeId != null && wsnMessage.destino != this) @@ NoID = "+this.ID);
-						
-						sendToNextNodeInPath(wsnMessage);
-					}
-					else if (wsnMessage.target == this) //Se este for o nó de destino da mensagem...
-					{ 
-//						sequenceNumber = wsnMessage.sequenceID;
-						this.setColor(Color.RED);
-						
-//						Utils.printForDebug("@@@ Entrou em else if (wsnMessage.destino == this && nextNodeId == null) @@@ NoID = "+this.ID);
-						
-						//...então o nó deve receber os coeficientes enviados pelo sink e...
-						receiveCoefficients(wsnMessage);
-						//...não deve mais encaminhar esta mensagem
-					}
-				} //if (wsnMessage.tipoMsg == 0)
-				
-				if (encaminhar && wsnMessage.typeMsg == 1)
-				{
-					wsnMessage.forwardingHop = this; 
-					broadcast(wsnMessage);
-				}
-				else if (encaminhar) //Nó sensor recebe uma mensagem de flooding (com wsnMessage) e deve responder ao sink com uma WsnMsgResponse... (continua em "...além de") 
-				{
-					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, "");
-					
-					if (wsnMessage != null)
-					{
-						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType); 
-						prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
-					}
-					addThisNodeToPath(wsnMsgResp);
-					
-					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
-					
-					timer.startRelative(wsnMessage.sizeTimeSlot, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+							proximoNoAteEstacaoBase = inbox.getSender();
+							sequenceNumber = wsnMessage.sequenceID;
 
-					
-					
-					
-					if (wsnMessage.typeMsg == 2 && wsnMessage != null){ // approachType = 2 = Naive
-
-						makeSensorReadingAndSendind (wsnMessage.dataSensedType); // Chama o método de sensoriamento / envio de dados da abordagem naive
-
+						} else if (sequenceNumber < wsnMessage.sequenceID) {
+							//Recurso simples para evitar loop.
+							//Exemplo: Nó A transmite em brodcast. Nó B recebe a msg e retransmite em broadcast.
+							//Consequentemente, nó A irá receber a msg. Sem esse condicional, nó A iria retransmitir novamente, gerando um loop.
+							
+							sequenceNumber = wsnMessage.sequenceID;
+						} else {
+							encaminhar = Boolean.FALSE;
+						}
 					}
-					else if (wsnMessage == null){
+
+					else if (wsnMessage.typeMsg == 1) {// Mensagem que vai do sink para os nós sensores e é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
+							
+							encaminhar = Boolean.FALSE;
+
+							//Definir roteamento de mensagem
+							if (wsnMessage.target != this) {
+								
+								sendToNextNodeInPath(wsnMessage);
+
+							} else if (wsnMessage.target == this)  {//Se este for o nó de destino da mensagem...
+								this.setColor(Color.RED);
+								//...então o nó deve receber os coeficientes enviados pelo sink e...
+								receiveCoefficients(wsnMessage);
+								//...não deve mais encaminhar esta mensagem
+							}
+					}
+
+					if (encaminhar && wsnMessage.typeMsg == 1) {
+						wsnMessage.forwardingHop = this;
+						broadcast(wsnMessage);
+					}
+					else if (encaminhar) {//Nó sensor recebe uma mensagem de flooding (com wsnMessage) e deve responder ao sink com uma WsnMsgResponse... (continua em "...além de") 
+						WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, "");
+
+						if (wsnMessage != null) {
+
+							wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType); 
+							prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
+
+						}
+
+						addThisNodeToPath(wsnMsgResp);
+						WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
+						timer.startRelative(wsnMessage.sizeTimeSlot, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+
+						if (wsnMessage.typeMsg == 2 && wsnMessage != null){ // approachType = 2 = Naive
+							makeSensorReadingAndSendind (wsnMessage.dataSensedType); // Chama o método de sensoriamento / envio de dados da abordagem naive
+						}
+						else if (wsnMessage == null){
 						
 						Utils.printForDebug("wsnMessage é NULL!");
 
+						}
+
+						wsnMessage.forwardingHop = this; //Devemos alterar o campo forwardingHop(da mensagem) para armazenar o noh que vai encaminhar a mensagem.
+						broadcast(wsnMessage);//...além de repassar a wsnMessage para os próximos nós
 					}
-					
-					
-					
-					
-					
-					
-					
-					//Devemos alterar o campo forwardingHop(da mensagem) para armazenar o noh que vai encaminhar a mensagem.
-					wsnMessage.forwardingHop = this; 
-					//...além de repassar a wsnMessage para os próximos nós
-					broadcast(wsnMessage);
-					
-				} //if (encaminhar)
-			} //if (message instanceof WsnMsg)
-			else if (message instanceof WsnMsgResponse) //Mensagem de resposta dos nós sensores para o sink que deve ser repassada para o "proximoNoAteEstacaoBase"
-			{
-				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
-				
-//				this.setColor(Color.YELLOW);
-				
-				addThisNodeToPath(wsnMsgResp);
-				
-				WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
-				
-				timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
-			} // else if (message instanceof WsnMsgResponse)
-		} //while (inbox.hasNext())
-	} //public void handleMessages
+			}//if (message instanceof WsnMsg)
+
+			else if (message instanceof WsnMsgResponse ) {
+					WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
+					addThisNodeToPath(wsnMsgResp);
+					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
+					timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
+
+			}//else if (message instanceof WsnMsgResponse )
+		}//while (inbox.hasnext())
+	}//public void handleMessages
 	
 	private void addThisNodeToPath(WsnMsgResponse wsnMsgResp)
 	{
