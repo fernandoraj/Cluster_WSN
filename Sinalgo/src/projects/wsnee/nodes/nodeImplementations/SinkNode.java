@@ -83,7 +83,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = false; // ACS: false = Representative Nodes; true = Cluster Heads
+	private boolean allSensorsMustContinuoslySense = true; // ACS: false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Flag to indicate that the sink still not clustered all nodes for the first time
@@ -99,6 +99,9 @@ public class SinkNode extends SimpleNode
 	
 	private ArrayList2d<WsnMsgResponse> nodesToReceiveDataReading;
 	
+	/**
+	 * "BlackList" is the list of messages (source nodes) already received by sink (and removed from nodesToReceiveDataReading)
+	 */
 	private ArrayList<WsnMsgResponse> blackList;
 	
 	/**
@@ -299,6 +302,7 @@ public class SinkNode extends SimpleNode
 						if (numMessagesReceived >= numTotalOfSensors) // In this point, clusters should be "closed", and the sensors inside them being classified
 						{
 							classifyNodesByAllParams(messageGroups);
+							setClustersFromNodes(messageGroups);
 							
 							stillNonclustered = false;
 						 	
@@ -343,25 +347,32 @@ public class SinkNode extends SimpleNode
 					{
 						numMessagesExpectedReceived++;
 						
-						System.out.println("CHEGOU O NODE ID "+wsnMsgResp.source.ID+" NO SINK!");
+//						System.out.println("CHEGOU O NODE ID "+wsnMsgResp.source.ID+" NO SINK!");
 						
 						if (newCluster == null) // If a new cluster (temp) has not yet been created (instanciated)
 						{
 							newCluster = new ArrayList2d<WsnMsgResponse>(); // Instanciate him
 							newCluster.ensureCapacity(expectedNumberOfSensors);
-							newCluster.add(wsnMsgResp, 0); // Adds the new response message sensor to new cluster 
+							newCluster.add(wsnMsgResp, 0); // Adds the new response message sensor to new cluster
+
 						} // end if (newCluster == null)
 						else // If already there is a new cluster (created)
 						{
 							addNodeInClusterClassifiedByMessage(newCluster, wsnMsgResp);
 						} // end else if (newCluster == null)
 
-						if (removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(nodesToReceiveDataReading, wsnMsgResp, blackList))
+						if (blackList == null) { // If BlackList is not created / instanciate yet...
+							blackList = new ArrayList<WsnMsgResponse>(); // Instanciate him
+						}
+						blackList.add(wsnMsgResp); // ... até aqui
+						
+						expectedNumberOfSensors--;
+
+						if (removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(nodesToReceiveDataReading, wsnMsgResp))
 //							if (numMessagesExpectedReceived >= expectedNumberOfSensors) // If all messagesResponse (from all nodes in Cluster to be splited) already done received
 						{
 							classifyNodesByAllParams(newCluster);
-
-//								expectedNumberOfSensors = 0;
+							setClustersFromNodes(newCluster);
 
 							//NESTE PONTO, É PRECISO MANDAR MENSAGEM PARA OS NOVOS NÓS REPRESENTATIVOS PARA QUE OS MESMOS INICIEM UMA NOVA FASE (Novo ciclo de sensoriamento)
 							
@@ -397,7 +408,7 @@ public class SinkNode extends SimpleNode
 							} // end for (int line=0; line < newCluster.getNumRows(); line++)
 							
 							
-							unifyClusters(messageGroups, newCluster, linesToBeUnified); // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
+							unifyClusters(messageGroups, newCluster, linesToBeUnified, blackList); // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
 							
 						} // end if (removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(nodesToReceiveDataReading, wsnMsgResp))
 						// end if (numMessagesExpectedReceived >= expectedNumberOfSensors)
@@ -417,21 +428,29 @@ public class SinkNode extends SimpleNode
 	 * @return True if all nodes in line number "row" of "tempCluster" are in "blkList"
 	 */
 	private boolean isAllNodesInThisClusterLineInList(ArrayList2d<WsnMsgResponse> tempCluster, int row, ArrayList<WsnMsgResponse> blkList) {
-		
-		for (int i = 0; i < tempCluster.get(row).size(); i++) {
-			boolean found = false;
-			int j = 0;
-			while (!(found) && (j < blkList.size())) {
-				if (isEqualNodeSourceFromMessages(tempCluster.get(row,i), blkList.get(j))) {
-					found = true;
+		if (tempCluster == null) { // If there isn't a message group yet
+			System.out.println("ERROR in isAllNodesInThisClusterLineInList method: There isn't tempCluster object instanciated yet!");
+			return false;
+		}
+		else if (blkList == null) { // If there isn't a black list yet
+			System.out.println("ERROR in isAllNodesInThisClusterLineInList method: There isn't blkList object instanciated yet!");
+			return false;
+		}
+		else {
+			for (int i = 0; i < tempCluster.get(row).size(); i++) {
+				boolean found = false;
+				int j = 0;
+				while (!(found) && (j < blkList.size())) {
+					if (isEqualNodeSourceFromMessages(tempCluster.get(row,i), blkList.get(j))) {
+						found = true;
+					}
+					else {
+						j++;
+					}
 				}
-				else {
-					j++;
+				if (!found) {
+					return false;
 				}
-			}
-			if (!found)
-			{
-				return false;
 			}
 		}
 		return true;
@@ -439,7 +458,7 @@ public class SinkNode extends SimpleNode
 	
 	/**
 	 * It classify the clusters' nodes by 'residual energy' and by 'hops to sink' and prints cluster configuration before, during and after new order
-	 * @param cluster
+	 * @param cluster Group of messages (representing clusters) which will be classified according with params ('residual energy' and 'hops to sink')
 	 */
 	void classifyNodesByAllParams(ArrayList2d<WsnMsgResponse> cluster) {
 		Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
@@ -456,14 +475,50 @@ public class SinkNode extends SimpleNode
 		printClusterArray2d(cluster);
 	} // end classifyNodesByAllParams(ArrayList2d<WsnMsgResponse> cluster)
 	
+	/**
+	 * It sets all clusters for each WsnMsgResponse representing the source nodes 
+	 * @param clusterGroup Group of messages (representing clusters) to have the clusters configurated
+	 */
+	void setClustersFromNodes(ArrayList2d<WsnMsgResponse> clusterGroup) {
+		if (clusterGroup != null) // If there is a message group created
+		{
+			for (int line=0; line < clusterGroup.getNumRows(); line++)
+			{
+				Cluster currentCluster = new Cluster(clusterGroup.get(line, 0).source);
+				currentCluster.setMembers( convertArrayListMsgResponsesToArrayListNodes(clusterGroup.get(line)) );
+				for (int col=0; col < clusterGroup.getNumCols(line); col++)
+				{
+					WsnMsgResponse currentWsnMsgResp = clusterGroup.get(line, col);
+					currentWsnMsgResp.cluster = currentCluster;
+				} // end for (int col=0; col < clusterGroup.getNumCols(line); col++)
+			} // end for (int line=0; line < clusterGroup.getNumRows(); line++)
+		} // end if (clusterGroup != null)
+	} // end setClustersFromNodes(ArrayList2d<WsnMsgResponse> clusterGroup)
 	
 	/**
-	 * Adds the clusters (lines) from "tempClusterGiver" in "rowIndexes" lines inside the "tempClusterReceiver" and removes this lines from "tempClusterGiver" at the end
+	 * It receives an ArrayList of WsnMsgResponse and returns an ArrayList of Node with source nodes from that messages
+	 * @param lineMessages ArrayList of WsnMsgResponse
+	 * @return ArrayList of source nodes
+	 */
+	ArrayList<Node> convertArrayListMsgResponsesToArrayListNodes(ArrayList<WsnMsgResponse> lineMessages) {
+		ArrayList<Node> tempNodes = null;
+		if (lineMessages != null) {
+			tempNodes = new ArrayList<Node>(); 
+			for (int cont=0; cont < lineMessages.size(); cont++) {
+				tempNodes.add(lineMessages.get(cont).source);
+			}
+		}
+		return tempNodes;
+	} // end convertArrayListMsgResponsesToArrayListNodes(ArrayList<WsnMsgResponse> lineMessages)
+	
+	/**
+	 * Adds the clusters (lines) from "tempClusterGiver" (in "rowIndexes" lines) inside the "tempClusterReceiver", remove the elements from "blackList" and removes this lines from "tempClusterGiver" at the end
 	 * @param tempClusterReceiver Cluster structure that will receive the sensors/clusters from the tempClusterGiver structure
 	 * @param tempClusterGiver Cluster structure that will give the sensors/clusters to the tempClusterReceiver structure
 	 * @param rowIndexes Line indexes from "tempClusterGiver" to be moved to "tempClusterReceiver"
+	 * @param blackList List which the elements will be removed from
 	 */
-	private void unifyClusters(ArrayList2d<WsnMsgResponse> tempClusterReceiver, ArrayList2d<WsnMsgResponse> tempClusterGiver, ArrayList<Integer> rowIndexes)
+	private void unifyClusters(ArrayList2d<WsnMsgResponse> tempClusterReceiver, ArrayList2d<WsnMsgResponse> tempClusterGiver, ArrayList<Integer> rowIndexes, ArrayList<WsnMsgResponse> blackList)
 	{
 		int rowReceiver, rowGiver = 0, col;
 		rowReceiver = tempClusterReceiver.getNumRows();
@@ -472,6 +527,7 @@ public class SinkNode extends SimpleNode
 			col = 0;
 			while (col < tempClusterGiver.getNumCols(rowIndexes.get(rowGiver)))
 			{
+				removeFromList(blackList, tempClusterGiver.get(rowIndexes.get(rowGiver), col));
 				tempClusterReceiver.add(tempClusterGiver.get(rowIndexes.get(rowGiver), col), rowReceiver);
 				col++;
 			} // end while (col < tempClusterGiver.getNumCols(rowIndexes.get(rowGiver)))
@@ -482,20 +538,31 @@ public class SinkNode extends SimpleNode
 			tempClusterGiver.remove(rowIndexes.get(i));
 		}
 		
-/*		
-		while (rowGiver < tempClusterGiver.getNumRows())
-		{
-			col = 0;
-			while (col < tempClusterGiver.getNumCols(rowGiver))
-			{
-				tempClusterReceiver.add(tempClusterGiver.get(rowGiver, col), rowReceiver);
-				col++;
-			} // end while (col < tempClusterGiver.getNumCols(rowGiver))
-			rowGiver++;
-			rowReceiver++;
-		} // end while (rowGiver < tempClusterGiver.getNumRows())
-*/
 	} // end unifyClusters(ArrayList2d<WsnMsgResponse> tempClusterReceiver, ArrayList2d<WsnMsgResponse> tempClusterGiver)
+	
+	/**
+	 * It removes the "msgToRemoveFromList" from the list "list" (blackList) passed by param
+	 * @param list An ArrayList(WsnMsgResponse) object
+	 * @param msgToRemoveFromList A WsnMsgResponse object
+	 */
+	private void removeFromList(ArrayList<WsnMsgResponse> list, WsnMsgResponse msgToRemoveFromList) {
+		if (list == null) { // 
+			System.out.println("ERROR in removeFromList method: There isn't listToRemove object instanciated!");
+		} // end if (listToRemove == null)
+		else if (msgToRemoveFromList == null) { 
+			System.out.println("ERROR in removeFromList method: There isn't msgToRemove object instanciated!");
+		} // end else if (msgToRemove == null)
+		else {
+			int cont = 0;
+			while (cont < list.size())
+			{
+				if (isEqualNodeSourceFromMessages(list.get(cont), msgToRemoveFromList)) {
+					list.remove(cont);
+				} // end if (isEqualNodeSourceFromMessages(listToRemove.get(cont), msgToRemove))
+				cont++;
+			} // end while (cont < listToRemove.size())
+		} // end else
+	} // end removeFromList(ArrayList<WsnMsgResponse> listToRemove, WsnMsgResponse msgToRemove)
 	
 	/**
 	 * It triggers the process to split a cluster, through the exclusion (remove) from the line from old cluster - to be splited
@@ -508,14 +575,14 @@ public class SinkNode extends SimpleNode
 		nodesToReceiveDataReading = ensuresArrayList2d(nodesToReceiveDataReading);
 		
 		if (messageGroups != null && nodesToReceiveDataReading != null) {
-			System.out.println("Antes: messageGroups.numRows = "+messageGroups.getNumRows()+" and nodesToReceiveDataReading.numRows = "+nodesToReceiveDataReading.getNumRows());
-			System.out.println("messageGroups");
+			Utils.printForDebug("Antes: messageGroups.numRows = "+messageGroups.getNumRows()+" and nodesToReceiveDataReading.numRows = "+nodesToReceiveDataReading.getNumRows());
+			Utils.printForDebug("messageGroups");
 			printClusterArray(messageGroups);
 			messageGroups.transferRowTo(lineFromCluster, nodesToReceiveDataReading);
-			System.out.println("Depois: messageGroups.numRows = "+messageGroups.getNumRows()+" and nodesToReceiveDataReading.numRows = "+nodesToReceiveDataReading.getNumRows());
-			System.out.println("messageGroups");
+			Utils.printForDebug("Depois: messageGroups.numRows = "+messageGroups.getNumRows()+" and nodesToReceiveDataReading.numRows = "+nodesToReceiveDataReading.getNumRows());
+			Utils.printForDebug("messageGroups");
 			printClusterArray(messageGroups);
-			System.out.println("nodesToReceiveDataReading");
+			Utils.printForDebug("nodesToReceiveDataReading");
 			printClusterArray(nodesToReceiveDataReading);
 		}
 		else {
@@ -555,13 +622,15 @@ public class SinkNode extends SimpleNode
 			while (col < numSensorsInThisCluster)
 			{
 				WsnMsgResponse currentWsnMsgResp = tempCluster.get(lineFromCluster, col);
+				currentWsnMsgResp.hopsToTarget--;
 
 				WsnMsg wsnMessage = new WsnMsg(1, this, currentWsnMsgResp.source, this, 1, sizeTimeUpdate, dataSensedType);
 								
 				wsnMessage.removeCoefs(); // Identifies this message as requesting sensing and not sending coefficients
 				wsnMessage.setPathToSenderNode(currentWsnMsgResp.clonePath(), currentWsnMsgResp.hopsToTarget); // Sets the path (route) to destination node (source) - same "currentWsnMsgResp.origem"
-				System.out.println("Mensagem solicitando dados enviada para o node ID = "+currentWsnMsgResp.source.ID);
+//				System.out.println("Mensagem solicitando dados enviada para o node ID = "+currentWsnMsgResp.source.ID);
 				
+				//wsnMessage.hopsToTarget--;
 				sendToNextNodeInPath(wsnMessage);
 /*				
 				WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
@@ -665,10 +734,9 @@ public class SinkNode extends SimpleNode
 	 * It removes the node (newWsnMsgResp.source passed by param) from the group/cluster indicated by "tempCluster" and indicate if the cluster became empty
 	 * @param tempCluster Group of clusters which the node (newWsnMsgResp.source) will be removed
 	 * @param newWsnMsgResp Message that contains the node (newWsnMsgResp.source) which will be removed from group of cluster
-	 * @param bList "BlackList" is the list of messages (source nodes) already removed from "tempCluster" (nodesToReceiveDataReading in case of "handleMessages(Inbox inbox)" call)
 	 * @return If the cluster of this message / node became empty after removal of the node in "newWsnMsgResp.source"
 	 */
-	private boolean removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp, ArrayList<WsnMsgResponse> bList)
+	private boolean removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
 	{
 		boolean receivedAll = false;
 		if (tempCluster == null) // If there isn't a message group yet
@@ -704,11 +772,6 @@ public class SinkNode extends SimpleNode
 			}
 			if (found)
 			{
-				if (bList == null) {
-					bList = new ArrayList<WsnMsgResponse>();
-				}
-				bList.add(newWsnMsgResp);
-				
 				if (tempCluster.getNumCols(line) == 1) { // It means that this is the last node in this line (cluster), and it will be removed so the cluster will be empty
 					tempCluster.remove(line);
 					receivedAll = true; // Then the sink have received all data node message from the current cluster
@@ -721,7 +784,6 @@ public class SinkNode extends SimpleNode
 				else {
 					tempCluster.remove(line,col);
 				}
-				expectedNumberOfSensors--;
 			}
 		}
 		return receivedAll;
@@ -865,17 +927,17 @@ public class SinkNode extends SimpleNode
 		{
 			for (int line=0; line < cluster.getNumRows(); line++)
 			{
-				System.out.print("Line = "+line+": ");
+				Utils.printForDebug("Line = "+line+": ");
 				for (int col=0; col < cluster.getNumCols(line); col++)
 				{
 					WsnMsgResponse currentWsnMsgResp = cluster.get(line, col);
-					System.out.print("NodeID = "+currentWsnMsgResp.source.ID+" ");
+					Utils.printForDebug("NodeID = "+currentWsnMsgResp.source.ID+" ");
 //					System.out.print("Line = "+line+", Col = "+col+": NodeID = "+currentWsnMsgResp.source.ID+" ");
 //					System.out.println("Line = "+line+", Col = "+col+": NodeID = "+currentWsnMsgResp.source.ID+" BatLevel = "+currentWsnMsgResp.batLevel+" Round = "+((SimpleNode)currentWsnMsgResp.source).lastRoundRead);
 				}
-				System.out.println("");
+				Utils.printForDebug("");
 			}
-			System.out.println("Number of Lines / Clusters = "+cluster.getNumRows()+"\n");
+			Utils.printForDebug("Number of Lines / Clusters = "+cluster.getNumRows()+"\n");
 		}
 	} // end printClusterArray(ArrayList2d<WsnMsgResponse> cluster)
 	
@@ -1317,6 +1379,7 @@ public class SinkNode extends SimpleNode
 		// WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.source , this, 1, wsnMsgResp.sizeTimeSlot, dataSensedType, thresholdError);
 		wsnMessage.setCoefs(coeficienteA, coeficienteB);
 		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
+		wsnMessage.hopsToTarget--;
 		sendToNextNodeInPath(wsnMessage);
 	} // end sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB, Node clusterHeadNode)
 	
