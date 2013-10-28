@@ -95,10 +95,9 @@ public class SimpleNode extends Node
 	private static final double limitPredictionError = 5; // SensorDelay
 	
 	/**
-	 * Number / Identifier of cluster head sensor node that manages / represents
-	 * the cluster to which this node belongs
+	 * Cluster to which this node belongs
 	 */
-//	private Integer clusterHeadId = -1;
+	private Cluster myCluster;
 	
 	/**
 	 * Sensor node that manages/represents the cluster to which this node belongs
@@ -118,7 +117,7 @@ public class SimpleNode extends Node
 	/**
 	 * Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink
 	 */
-	public static final int maxErrorsPerCluster = 2; // ClusterDelay
+	public static final int maxErrorsPerCluster = 5; // ClusterDelay
 	
 	/**
 	 * Minimum (limit) level of cluster head's battery level - below this limit, the cluster head communicates to sink
@@ -237,17 +236,14 @@ public class SimpleNode extends Node
 					//Definir roteamento de mensagem
 					if (wsnMessage.target != this)
 					{
-//						Utils.printForDebug("@@ Entrou em if (nextNodeId != null && wsnMessage.destino != this) @@ NoID = "+this.ID);
-						
+						wsnMessage.hopsToTarget--;
 						sendToNextNodeInPath(wsnMessage);
 					}
 					else if (wsnMessage.target == this) //Se este for o nó de destino da mensagem...
 					{ 
 //						sequenceNumber = wsnMessage.sequenceID;
 						//this.setColor(Color.RED);
-						
-//						Utils.printForDebug("@@@ Entrou em else if (wsnMessage.destino == this && nextNodeId == null) @@@ NoID = "+this.ID);
-						
+												
 						if (wsnMessage.hasCoefs()) // If this message contains / has coefficients (A and B), then 
 						{
 							//...então o nó deve receber os coeficientes enviados pelo sink e...
@@ -767,7 +763,7 @@ public class SimpleNode extends Node
 			timer.startRelative(1, this); // timer.startRelative(1, this);
 		}
 	} // end sendToNextNodeInPath(WsnMsg wsnMessage)
-	
+		
 	/**
 	 * Get the coefficients from the Regression Equation and the threshold error
 	 * from the message passed by and trigger the predictions for this node
