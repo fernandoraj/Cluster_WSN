@@ -4,6 +4,7 @@ import java.util.Stack;
 import java.util.Vector;
 
 import projects.wsnee.nodes.nodeImplementations.SimpleNode;
+import projects.wsnee.nodes.nodeImplementations.Cluster;
 import projects.wsnee.utils.Utils;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.Position;
@@ -89,6 +90,11 @@ public class WsnMsgResponse extends Message {
 	 * Caminho de nós do nó que envia a mensagem de resposta até o sink node, em forma de pilha
 	 */
 	private Stack<Integer> pathToSenderNode;
+	
+	/**
+	 * Cluster which the source node belongs to
+	 */
+	public Cluster cluster;
 	
 	/**
 	 * Empilha um nó no caminho de nós
