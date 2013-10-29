@@ -1011,9 +1011,6 @@ public class SimpleNode extends Node
 				
 				if (this.clusterHead == null) { // Se é um Nó Representativo, ler os valores de todos os outros nós naquele mesmo cluster naquele momento e calcular 
 					// o RMSE de cada valor em relação ao predictionValue do Nó Representativo
-					if (this.ID == 49) {
-//						System.out.println("DEBUG !!!");
-					}
 					Node[] nodes = SinkNode.getNodesFromThisCluster(this);
 					
 					if (nodes != null && nodes.length > 1) {
