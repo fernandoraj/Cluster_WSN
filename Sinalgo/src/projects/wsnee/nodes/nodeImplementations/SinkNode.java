@@ -163,7 +163,6 @@ public class SinkNode extends SimpleNode
 	public void construirRoteamento()
 	{
 		this.nextNodeToBaseStation = this;
-		//WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0); //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo
 		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedType);
 		
 		// The numberOfMessagesOverAll and sensorReadingsCount attribs are used to define a param from energy consumption of the overall network
@@ -302,6 +301,7 @@ public class SinkNode extends SimpleNode
 						if (numMessagesReceived >= numTotalOfSensors) // In this point, clusters should be "closed", and the sensors inside them being classified
 						{
 							classifyNodesByAllParams(messageGroups);
+							Global.clustersCount = messageGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
 							setClustersFromNodes(messageGroups);
 							
 							stillNonclustered = false;
@@ -372,6 +372,7 @@ public class SinkNode extends SimpleNode
 //							if (numMessagesExpectedReceived >= expectedNumberOfSensors) // If all messagesResponse (from all nodes in Cluster to be splited) already done received
 						{
 							classifyNodesByAllParams(newCluster);
+							
 							setClustersFromNodes(newCluster);
 
 							//NESTE PONTO, É PRECISO MANDAR MENSAGEM PARA OS NOVOS NÓS REPRESENTATIVOS PARA QUE OS MESMOS INICIEM UMA NOVA FASE (Novo ciclo de sensoriamento)
@@ -407,9 +408,9 @@ public class SinkNode extends SimpleNode
 								}
 							} // end for (int line=0; line < newCluster.getNumRows(); line++)
 							
-							
 							unifyClusters(messageGroups, newCluster, linesToBeUnified, blackList); // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
-							
+							Global.clustersCount = messageGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
+
 						} // end if (removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(nodesToReceiveDataReading, wsnMsgResp))
 						// end if (numMessagesExpectedReceived >= expectedNumberOfSensors)
 						
