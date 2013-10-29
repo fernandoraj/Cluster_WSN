@@ -138,6 +138,11 @@ public class Global {
 	public static int sensorReadingsCount = 0;
 	
 	/**
+	 * Global counter of the number of clusters
+	 */
+	public static int clustersCount = 0;
+	
+	/**
 	 * The current time of the simulation.
 	 * <p>
 	 * In synchronous simulation, this time is incremented by 1 at the end of every round, in
