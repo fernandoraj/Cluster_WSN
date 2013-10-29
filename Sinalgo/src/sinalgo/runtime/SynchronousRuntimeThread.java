@@ -83,6 +83,11 @@ public class SynchronousRuntimeThread extends Thread {
 		runtime = null;
 	}
 	
+	/**
+	 * Flag to the prints for only the 1rst time of execution (header)
+	 */
+	public static boolean firstTime = true;
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
@@ -252,13 +257,18 @@ public class SynchronousRuntimeThread extends Thread {
 */
 		
 		double RMSE = 0.0;
-		if(Global.predictionsCount > 0)
-		{
+		if(Global.predictionsCount > 0) {
 			RMSE = Math.sqrt(Global.squaredError / Global.predictionsCount);
 		}
-		System.out.println(NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE)+"\t"+Global.numberOfMessagesOverAll);
+		if (firstTime) {
+			System.out.println("\n"+"Round"+"\t"+"RMSE"+"\t"+"NumMsg"+"\t"+"#Clust"+"\t"+"#SRead");
+			Global.log.logln("\n"+"Round"+"\t"+"RMSE"+"\t"+"NumMsg"+"\t"+"#Clust"+"\t"+"#SRead");
+			firstTime = false;
+		}
+
+		System.out.println(NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE)+"\t"+Global.numberOfMessagesOverAll+"\t"+Global.clustersCount+"\t"+Global.sensorReadingsCount);
 		
-		Global.log.logln(NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE)+"\t"+Global.numberOfMessagesOverAll);
+		Global.log.logln(NumberFormat.getIntegerInstance().format(Global.currentTime)+"\t"+NumberFormat.getNumberInstance().format(RMSE)+"\t"+Global.numberOfMessagesOverAll+"\t"+Global.clustersCount+"\t"+Global.sensorReadingsCount);
 		
 		if(LogL.ROUND_DETAIL){
 			Global.log.logln("# # The Global RMSE is "+RMSE+"\n");
