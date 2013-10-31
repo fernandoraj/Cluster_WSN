@@ -395,11 +395,11 @@ public class SimpleNode extends Node
 			case 4: //Nível mínimo de bateria atingido (pelo ClusterHead) - Minimum battery level reached (by ClusterHead)
 				break;
 		}
-		
+/*		
 		if (Global.currentTime > (initialErrorRound + maxErrorsPerCluster)) { // Se o tempo (round/ciclo/ticket) atual for maior do que o inicial mais o número máximo de erros por cluster
 			errorsInThisCluster = 0; // Então zera a quantidade de erros deste cluster
 		}
-		
+*/		
 		if (errorsInThisCluster > maxErrorsPerCluster)
 		{
 			// Deve informar ao Sink tal problema, para que o mesmo providencie o tratamento correto (Qual seja!???)
@@ -408,7 +408,7 @@ public class SimpleNode extends Node
 
 			Utils.printForDebug("@ @ The number of prediction errors in this Cluster ("+errorsInThisCluster+") EXCEEDED the maximum limit of the prediction errors per Cluster ("+maxErrorsPerCluster+")! NoID = "+this.ID+"\n");
 
-			
+			wsnMsgResp.target = null;
 			WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
 			
 			timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
@@ -761,6 +761,9 @@ public class SimpleNode extends Node
 			nextNode = Tools.getNodeByID(nextNodeId);
 			timer = new WsnMessageTimer(wsnMessage, nextNode);
 			timer.startRelative(1, this); // timer.startRelative(1, this);
+		}
+		else {
+			Utils.printForDebug("@ @ The nextNodeId == null in sendToNextNodeInPath(WsnMsg wsnMessage) method for this.ID = ("+this.ID+")!"+"\n");
 		}
 	} // end sendToNextNodeInPath(WsnMsg wsnMessage)
 		
