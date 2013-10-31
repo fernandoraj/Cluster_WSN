@@ -190,7 +190,7 @@ public class SinkNode extends SimpleNode
 				
 				Utils.printForDebug("@ @ @ Message Received by SINK from the NodeID = "+wsnMsgResp.source.ID +" with MsgType = "+wsnMsgResp.typeMsg+"\n");
 				
-				if (wsnMsgResp.typeMsg == 2) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de erros de predição
+				if (wsnMsgResp.typeMsg == 2) // Se é uma mensagem de um Nó Representativo / Cluster Head que excedeu o #máximo de erros de predição
 				{
 					numMessagesOfErrorPredictionReceived++;
 					
@@ -1033,12 +1033,13 @@ public class SinkNode extends SimpleNode
 		{
 			boolean found = false;
 			int line = 0, col = 0;
+			WsnMsgResponse currentWsnMsgResp = null;
 			while ((!found) && (line < messageGroups.getNumRows()))
 			{
 				col = 0;
 				while ((!found) && (col < messageGroups.getNumCols(line)))
 				{
-					WsnMsgResponse currentWsnMsgResp = messageGroups.get(line, col);
+					currentWsnMsgResp = messageGroups.get(line, col);
 					if (isEqualNodeSourceFromMessages(currentWsnMsgResp, newWsnMsgResp))
 					{
 						found = true;
@@ -1056,6 +1057,7 @@ public class SinkNode extends SimpleNode
 			if (found)
 			{
 				lineCLuster = line;
+				newWsnMsgResp.cluster = currentWsnMsgResp.cluster;
 				messageGroups.set(line, col, newWsnMsgResp); // It sets the new message "wsnMsgResp" in the line and col (cluster) of messageGroup 
 			}
 		}
