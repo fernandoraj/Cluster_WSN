@@ -197,9 +197,10 @@ public class WsnMsg extends Message {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	public void setPathToSenderNode(Stack<Integer> pathToSenderNode, Integer hopsToTarget)
 	{
-		this.pathToSenderNode = pathToSenderNode;
+		this.pathToSenderNode = (Stack<Integer>)pathToSenderNode.clone();
 		this.hopsToTarget = hopsToTarget;
 	}
 
