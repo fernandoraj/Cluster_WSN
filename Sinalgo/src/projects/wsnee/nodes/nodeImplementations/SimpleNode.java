@@ -408,7 +408,14 @@ public class SimpleNode extends Node
 
 			Utils.printForDebug("@ @ The number of prediction errors in this Cluster ("+errorsInThisCluster+") EXCEEDED the maximum limit of the prediction errors per Cluster ("+maxErrorsPerCluster+")! NoID = "+this.ID+"\n");
 
-			wsnMsgResp.target = null;
+			wsnMsgResp.target = null; // wsnMsgResp.target = SinkNode; || wsnMsgResp.target = null; || wsnMsgResp.target = Tools.getNodeByID(55);
+			
+			
+			
+			
+			
+			
+			
 			WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
 			
 			timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
@@ -1107,12 +1114,13 @@ public class SimpleNode extends Node
 													// ClusterHead
 						
 						} // end if (numPredictionErrors >= limitPredictionError)
+//						else {
 						
 						// Se o modo de sensoriamento é contínuo, continua fazendo predição
 						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
-//						newPredictionTimer.startRelative(1, this); 
-						newPredictionTimer.startRelative(SinkNode.sensorTimeSlot, this); 
-						
+						//newPredictionTimer.startRelative(1, this); 
+						newPredictionTimer.startRelative(SinkNode.sensorTimeSlot, this);
+//						}
 					} // end (!exit)
 					
 				} // end if (this.clusterHead != null)
