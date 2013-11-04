@@ -197,6 +197,11 @@ public class SinkNode extends SimpleNode
 // CASO O CLUSTER PRECISE SOFRER UM SPLIT, UMA MENSAGEM SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK DEVE SER ENVIADA PARA CADA UM DOS NÓS DO CLUSTER 
 					
 					//int lineFromCluster = identifyCluster(wsnMsgResp);
+					
+					
+					
+					
+					
 					int lineFromCluster = searchAndReplaceNodeInClusterByMessage(wsnMsgResp);
 					if (lineFromCluster >= 0)
 					{
@@ -623,7 +628,7 @@ public class SinkNode extends SimpleNode
 			while (col < numSensorsInThisCluster)
 			{
 				WsnMsgResponse currentWsnMsgResp = tempCluster.get(lineFromCluster, col);
-				currentWsnMsgResp.hopsToTarget--;
+				//currentWsnMsgResp.hopsToTarget--;
 
 				WsnMsg wsnMessage = new WsnMsg(1, this, currentWsnMsgResp.source, this, 1, sizeTimeUpdate, dataSensedType);
 								
@@ -631,7 +636,7 @@ public class SinkNode extends SimpleNode
 				wsnMessage.setPathToSenderNode(currentWsnMsgResp.clonePath(), currentWsnMsgResp.hopsToTarget); // Sets the path (route) to destination node (source) - same "currentWsnMsgResp.origem"
 //				System.out.println("Mensagem solicitando dados enviada para o node ID = "+currentWsnMsgResp.source.ID);
 				
-				//wsnMessage.hopsToTarget--;
+				wsnMessage.hopsToTarget--;
 				sendToNextNodeInPath(wsnMessage);
 /*				
 				WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
@@ -973,7 +978,6 @@ public class SinkNode extends SimpleNode
 				WsnMsgResponse currentWsnMsgResp = tempCluster.get(line, col);
 				if (testDistanceBetweenSensorPositions(currentWsnMsgResp, newWsnMsgResp))
 				{
-// DANDO ERRO NO TESTE DE DIST.
 					if (testSimilarityMeasureWithPairRounds(currentWsnMsgResp, newWsnMsgResp)) // If this (new)message (with sensor readings) already is dissimilar to current message
 					{
 						continueThisLine = true; // Then this (new)message doesn't belong to this cluster / line / group
@@ -1003,15 +1007,6 @@ public class SinkNode extends SimpleNode
 		{
 			tempCluster.add(newWsnMsgResp, tempCluster.getNumRows()); // It adds the new message "wsnMsgResp" in a new line (cluster) of messageGroup 
 		}
-/*				
-			for (int line = 0; line < tempCluster.getNumRows(); line++)
-			{
-				for (int col = 0; col < tempCluster.getNumCols(line); col++)
-				{
-					
-				}
-			}
-*/			
 	} // end addNodeInClusterClassifiedByMessage(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
 
 	/**
