@@ -1,0 +1,64 @@
+Este é um exemplo de projeto implementado para demonstrar o uso do SINALGO. Nos sensores
+são colocados em um cubo 3D, onde eles trocam mensagem para formar uma rota que vai do sink
+até os nós alcançáveis da rede.
+
+1  Como executar este exemplo
+-----------------------------------------------------------------------------------
+
+ a) Clique no botão Run.
+Perceba que o único evento que ocorreu foi a montagem do grafo de conectividade, ou seja, 
+qual nó está ao alcance do rádio de outro nó:
+    - Pare a simulação, clicando no botão “Abort Simulation”
+     
+ b) Nosso próximo passo é criar os nós da nossa simulação:
+– Clique no menu “Simulation” -> “Generate Nodes” (ou F3)
+– Na tela seguinte, selecione o número de nós (p.e.: 200) e o 
+modelo de Distribuição. Detalhe importante: escolha como implementação de nó (node
+implementation) a classe “wsn:SimpleNode”
+As outras propriedades dos nós podem ter seus valores padrões mantidos.
+
+ c) Em seguida, escolha um nó da rede qualquer para ser a estação base.
+ 
+ d) Clique, em cima do nó escolhido, com o botão direito. Ao aparecer o menu popup 
+ clique na opção “Construir arvore de roteamento”
+
+ e) Esse método será disparado no próximo round, ou seja, quando o botão Run for clicado
+
+ f) Inicie a simulação selecionando o botão (seta para baixo ao lado do botão Run)
+ de nome "Run Specified # of Rounds" e indicando o valor de "Rounds to do" como '1' e
+ pressionando o botão Run.
+
+Obs.: Alteramos alguns valores (default) diretamente no arquivo \src\projects\wsn\Config.xml
+
+2  Behavior
+-----------------------------------------------------------------------------------
+
+ Each S1Node behaves as an infinite, but delayed repeater of messages it receives.
+ This works as following: Whenever an S1Node receives a S1Message (whose content is
+ an int value), it starts a timer to forward the message. When the timer fires, the 
+ node selects its neighbor with the smallest ID and forwards the message to this 
+ node. Then, the timer is reset and the process is repeated forever.
+
+ The delay is determined by the int value of the message, and an increment value, 
+ specified in the config file. 
+  
+ Note: This is a rather academic example and not intended to represent any 
+       realistic algorithm!
+
+
+3  GIU
+-----------------------------------------------------------------------------------
+
+ The nodes are drawn as circles with two numbers: The total number of messages 
+ sent by the node, and the number of messages sent in this round. 
+  
+
+4  Diverse
+-----------------------------------------------------------------------------------
+
+ Note that the project uses a log file and accesses custom entries of the 
+ project configuration file.
+  
+ To generate an initial point-sent from the command-line, the following parameters
+ can be used:
+    -project sample1 -gen 500 sample1:S1Node Random RandomDirection
