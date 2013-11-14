@@ -253,9 +253,6 @@ public class SimpleNode extends Node
 					//Definir roteamento de mensagem
 					if (wsnMessage.target != this)
 					{
-						if (wsnMessage.hopsToTarget > 0) {
-							wsnMessage.hopsToTarget--;
-						}
 						sendToNextNodeInPath(wsnMessage);
 					}
 					else if (wsnMessage.target == this) //Se este for o nó de destino da mensagem...
@@ -773,9 +770,6 @@ public class SimpleNode extends Node
 	protected void sendToNextNodeInPath(WsnMsg wsnMessage)
 	{
 		Integer nextNodeId = wsnMessage.popFromPath();
-		if (hopsToTarget > 0) {
-			hopsToTarget--;			
-		}
 		WsnMessageTimer timer;
 		Node nextNode;
 		if (nextNodeId != null)
@@ -1146,19 +1140,19 @@ public class SimpleNode extends Node
 				else // if (this.clusterHead == null) - Se não existe ClusterHead, mas sim apenas Nó Representativo
 				{
 				
-					if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.ownTimeSlot)) // Se o número de erros de predição é menor do que o limite aceitável de erros (limitPredictionError) e o número de predições executadas é menor do que o máximo de predições para este nó sensor
+					if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Se o número de erros de predição é menor do que o limite aceitável de erros (limitPredictionError) e o número de predições executadas é menor do que o máximo de predições para o cluster deste nó sensor
 					{
 						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
 						newPredictionTimer.startRelative(1, this); 
-					} // end if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.ownTimeSlot))
+					} // end if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot))
 					
 					else
 					{
 						WsnMsgResponse wsnMsgResp;
 						
-						if (!(numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.ownTimeSlot)) // Caso tenha saído do laço de predição por ter excedido o número máximo de erros de predição e não pelo limite do seu time slot (número máximo de predições a serem feitas por este Nó Representativo - ou Cluster Head)
+						if (!(numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Caso tenha saído do laço de predição por ter excedido o número máximo de erros de predição e não pelo limite do seu time slot (número máximo de predições a serem feitas por este Nó Representativo - ou Cluster Head - deste cluster)
 						{
-							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, (this.ownTimeSlot - numTotalPredictions), dataSensedType);
+							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, (this.myCluster.sizeTimeSlot - numTotalPredictions), dataSensedType);
 							
 							Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+limitPredictionError+")! NoID = "+this.ID+"\n");
 							Utils.printForDebug("* * * * The predicted value NO is within the margin of error of the value read! NoID = "+this.ID);
@@ -1176,6 +1170,17 @@ public class SimpleNode extends Node
 						addThisNodeToPath(wsnMsgResp);
 						
 						wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
+						
+						Node[] nodes = SinkNode.getNodesFromThisCluster(this); // Se é um Nó Representativo, ler os valores de todos os outros nós naquele mesmo cluster naquele momento 
+						
+						if (nodes != null && nodes.length > 1) {
+							for (int i=0; i < nodes.length ;i++) { // For each sensor in same cluster from representative node - Para cada um dos nós no mesmo cluster deste Nó Representativo
+								if (nodes[i].ID != this.ID) { // Caso não seja o próprio Nó Representativo
+									updateDataRecordItens((SimpleNode)nodes[i], dataSensedType);
+								} // end if (nodes[i].ID != this.ID)
+							} // end for (int i=0; i < nodes.length ;i++)
+						} // end if (nodes != null && nodes.length > 1)
+							
 						
 						if (this.clusterHead == null) // It means that there isn't a cluster head, so the response message must be send to sink node (base station)
 						{
@@ -1292,6 +1297,21 @@ public class SimpleNode extends Node
 	
 	public Stack<Integer> getPathToSenderNode() {
 		return this.pathToSenderNode;
+	}
+	
+	/**
+	 * Updates the "dataRecordItens" structure from the "currentNode" by the reading of "windowSize" quantity of data from type "dataType"
+	 * @param currentNode Sensor node to have the dataRecordItens updated
+	 * @param dataType Type of data to be read by sensor
+	 */
+	private void updateDataRecordItens(SimpleNode currentNode, String dataType) {
+		for (int i=0; i < windowSize; i++) {
+			currentNode.dataRecordItens.add(getData(currentNode, dataType));
+		}
+		while (currentNode.dataRecordItens.size() > windowSize)
+		{
+			currentNode.dataRecordItens.removeElementAt(0);
+		}
 	}
 	
 	/**
