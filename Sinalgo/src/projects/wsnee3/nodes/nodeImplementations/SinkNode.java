@@ -84,7 +84,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = false; // ACS: false = Representative Nodes; true = Cluster Heads
+	private boolean allSensorsMustContinuoslySense = true; // ACS: false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Flag to indicate that the sink still not clustered all nodes for the first time
@@ -287,7 +287,7 @@ public class SinkNode extends SimpleNode
 						SimpleNode representativeNode = nodeGroups.get(lineFromClusterNode, 0); // Get the (new) Representative Node (or Cluster Head)
 						int numSensors = nodeGroups.getNumCols(lineFromClusterNode);
 						Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
-						Integer nodeSizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+						representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
 						
 						receiveMessage(representativeNode, null);
 					}
@@ -334,7 +334,7 @@ public class SinkNode extends SimpleNode
 							SimpleNode representativeNode = nodeGroups.get(lineFromClusterNode, 0); // Get the (new) Representative Node (or Cluster Head)
 							int numSensors = nodeGroups.getNumCols(lineFromClusterNode);
 							Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
-							Integer nodeSizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);						
+							representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);						
 							receiveMessage(representativeNode, null);
 						} // end if (lineFromClusterNode >= 0)
 					}  // end else
@@ -381,7 +381,7 @@ public class SinkNode extends SimpleNode
 										SimpleNode representativeNode = nodeGroups.get(line, 0); // Get the Representative Node (or Cluster Head)
 										int numSensors = nodeGroups.getNumCols(line);
 										Utils.printForDebug("Cluster / Line number = "+line);
-										Integer nodeSizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+										representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
 										receiveMessage(representativeNode, null);
 									} // for (int line=0; line < messageGroups.getNumRows(); line++)
 								} // if (!allSensorsMustContinuoslySense)
@@ -411,9 +411,9 @@ public class SinkNode extends SimpleNode
 					
 					else // otherwise, if the sink have already been clustered all nodes for the first time
 					{
-/*
+
 						numMessagesExpectedReceived++;
-						
+/*						
 //						System.out.println("CHEGOU O NODE ID "+wsnMsgResp.source.ID+" NO SINK!");
 						
 						if (newCluster == null) // If a new cluster (temp) has not yet been created (instanciated)
@@ -1509,9 +1509,6 @@ public class SinkNode extends SimpleNode
 		WsnMsg wsnMessage = new WsnMsg(1, this, sourceNode, this, 1, sourceNode.myCluster.sizeTimeSlot, dataSensedType, thresholdError, clusterHeadNode);
 		wsnMessage.setCoefs(coeficienteA, coeficienteB);
 		wsnMessage.setPathToSenderNode(sourceNode.getPathToSenderNode(), sourceNode.hopsToTarget);
-		if (wsnMessage.hopsToTarget > 0) {
-			wsnMessage.hopsToTarget--;
-		}
 		sendToNextNodeInPath(wsnMessage);
 	} // end sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB, Node clusterHeadNode)
 	
