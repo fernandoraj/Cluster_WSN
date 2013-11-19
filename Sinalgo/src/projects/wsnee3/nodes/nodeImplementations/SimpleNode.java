@@ -1012,11 +1012,16 @@ public class SimpleNode extends Node
 /*
  *  HERE IS THE POINT OF TEST FROM PREDICT VALUE FOR CHOICE WHAT TO DO !!!
  */
-
+/*
+				if (this.ID == 11)
+				{
+					System.out.println("* * * ID = 11 ! ! !");
+				}
+*/
 				if (!isValuePredictInValueReading(value, predictionValue, maxError)) {
 					numPredictionErrors++; // Contador do número de erros de predição
-					addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round); // Removido (comentado) da linha 987
 				} // end if (!isValuePredictInValueReading(value, predictionValue, maxError))
+				addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round); // Removido (comentado) da linha 987
 				
 				if (this.clusterHead == null) { // Se NÃO existe um CH, ou seja, se o modo de sensoriamento NÃO é contínuo (SinkNode.allSensorsMustContinuoslySense = false)
 					Utils.printForDebug("* * The total number of predictions is "+numTotalPredictions+"! NoID = "+this.ID+" Maximum of predictions = "+this.ownTimeSlot);					
@@ -1175,6 +1180,12 @@ public class SimpleNode extends Node
 						
 						if (nodes != null && nodes.length > 1) {
 							for (int i=0; i < nodes.length ;i++) { // For each sensor in same cluster from representative node - Para cada um dos nós no mesmo cluster deste Nó Representativo
+/*
+								if (nodes[i].ID == 11 || this.ID == 11 || nodes[i].ID == 12 || this.ID == 12)
+								{
+									System.out.println("* * * ID = 11 OR ID = 12 ! ! !");
+								}
+*/
 								if (nodes[i].ID != this.ID) { // Caso não seja o próprio Nó Representativo
 									updateDataRecordItens((SimpleNode)nodes[i], dataSensedType);
 								} // end if (nodes[i].ID != this.ID)
@@ -1362,6 +1373,7 @@ public class SimpleNode extends Node
 		{
 			dataRecordItens.removeElementAt(0);
 		}
+		nonRead = true;
 	} // end addDataRecordItens(char typ, double val, double tim, double bat, int rnd)
 	
 	private boolean nonRead = true;
