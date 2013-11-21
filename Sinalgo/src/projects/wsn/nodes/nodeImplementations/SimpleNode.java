@@ -343,6 +343,7 @@ public class SimpleNode extends Node
 	 */
 	public String performSensorReading()
 	{
+		Global.sensorReadingsCount++;
 		if (sensorReadingsQueue != null && sensorReadingsQueue.isEmpty())
 		{
 			loadSensorReadings();
