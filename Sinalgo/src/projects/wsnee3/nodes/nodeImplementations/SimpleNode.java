@@ -42,7 +42,7 @@ public class SimpleNode extends Node
 	 * Indicates the default size of Sliding Window from sensor readings to be send to sink node 
 	 * when there is a "novelty".
 	 */
-	protected static int slidingWindowSize = 4;
+	protected static int slidingWindowSize = 10;
 	
 	/**
 	 * Indicates the current size of Sliding Window from sensor readings to be send to sink node 
@@ -71,7 +71,12 @@ public class SimpleNode extends Node
 	 * Valor do último round em que houve leitura do sensor (que teve valor lido do arquivo) 
 	 */
 	protected int lastRoundRead;
-	
+
+	/**
+	 * Number of predictions made by the sensor node in this timeslot
+	 */
+	protected int numTotalSensorReadings = 0;
+
 	/**
 	 * Valor (grandeza/magnitude) da última leitura do sensor 
 	 */
@@ -174,6 +179,11 @@ public class SimpleNode extends Node
 	 */
 	private boolean loadSensorReadingsFromFile = true;
 
+	/**
+	 * Indicates whether all the sensor readings have already been loaded from the file
+	 */
+	private boolean loadAllSensorReadingsFromFile = false;
+	
 	/**
 	 * Saves the round in which the first ClusterError occurred
 	 */
@@ -569,6 +579,7 @@ public class SimpleNode extends Node
 	public String performSensorReading()
 	{
 		Global.sensorReadingsCount++; // Increments the global count of sensor readings
+		numTotalSensorReadings++; // Increments the local count of sensor readings
 		if (sensorReadingsQueue != null && sensorReadingsQueue.isEmpty())
 		{
 			loadSensorReadings();
@@ -631,7 +642,8 @@ public class SimpleNode extends Node
 				line = bufferedReader.readLine();
 			}			
 			bufferedReader.close();
-		if (sensorReadingsQueue.size() < sensorReadingsLoadBlockSize) {
+		if (sensorReadingsQueue.size() < sensorReadingsLoadBlockSize && !(loadAllSensorReadingsFromFile)) {
+			loadAllSensorReadingsFromFile = true;
 			System.err.println("NodeID: " + this.ID + " has already read all the sensor readings of the file. " +
 					"\n It has only " + sensorReadingsQueue.size() + " readings in its memory (sensorReadingsLoadedFromFile list)");
 		}
