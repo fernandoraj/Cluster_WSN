@@ -191,13 +191,17 @@ public class SinkNode extends SimpleNode
 				
 				Utils.printForDebug("@ @ @ Message Received by SINK from the NodeID = "+wsnMsgResp.source.ID +" with MsgType = "+wsnMsgResp.typeMsg+"\n");
 				
-				if (wsnMsgResp.typeMsg == 2) // Se é uma mensagem de um Nó Representativo / Cluster Head que excedeu o #máximo de erros de predição
+				if (wsnMsgResp.typeMsg == 2 || wsnMsgResp.typeMsg == 3) // Se é uma mensagem de um Nó Representativo / Cluster Head que excedeu o #máximo de erros de predição
 				{
-					numMessagesOfErrorPredictionReceived++;
-					
+					if (wsnMsgResp.typeMsg == 2) {
+						numMessagesOfErrorPredictionReceived++;
+					}
+					if (wsnMsgResp.typeMsg == 3) {
+						numMessagesOfTimeSlotFinishedReceived++;
+					}
 // CASO O CLUSTER PRECISE SOFRER UM SPLIT, UMA MENSAGEM SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK DEVE SER ENVIADA PARA CADA UM DOS NÓS DO CLUSTER 
 					
-					numMessagesExpectedReceived++;
+					//numMessagesExpectedReceived++;
 					
 					int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source);
 					if (lineFromCluster >= 0)
@@ -211,6 +215,7 @@ public class SinkNode extends SimpleNode
 					newCluster = ensuresArrayList2d(newCluster);
 					
 					addNodesInNewCluster(nodesToReceiveDataReading, newCluster);
+					classifyNodesByAllParams(newCluster);
 					setClustersFromNodes(newCluster);
 					nodesToReceiveDataReading = new ArrayList2d<SimpleNode>();
 
@@ -276,6 +281,7 @@ public class SinkNode extends SimpleNode
 				
 				else if (wsnMsgResp.typeMsg == 3) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
 				{
+/*					
 					numMessagesOfTimeSlotFinishedReceived++;
 					
 					int lineFromClusterNode = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
@@ -292,6 +298,7 @@ public class SinkNode extends SimpleNode
 						receiveMessage(representativeNode, null);
 					}
 					// PAREI AQUI!!! - Fazer testes para verificar se os clusters estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
+*/				
 				} // else if (wsnMsgResp.typeMsg == 3)
 				
 				else if (wsnMsgResp.typeMsg == 4) // Se é uma mensagem de um Nó Representativo/Cluster Head cujo nível da bateria está abaixo do mínimo (SimpleNode.minBatLevelInClusterHead)
