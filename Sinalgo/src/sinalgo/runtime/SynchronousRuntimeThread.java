@@ -40,7 +40,7 @@ package sinalgo.runtime;
 import java.util.Date;
 import java.text.NumberFormat;
 
-import projects.wsnee.utils.Utils;
+import projects.wsnee3.utils.Utils;
 //import projects.wsn.utils.Utils;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.WrongConfigurationException;
