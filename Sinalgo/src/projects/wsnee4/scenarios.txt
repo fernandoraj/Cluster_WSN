@@ -1,0 +1,4 @@
+#Intel Lab Data Scenario
+-project wsn -gen 54 wsn:SimpleNode PositionFile (data\mote_locs_formatado.txt) 
+             -gen 1 wsn:SinkNode Random  
+             -overwrite dimX=40 dimY=30
