@@ -1,19 +1,22 @@
 package projects.wsnee.utils;
 
 /**
- * Class containing auxiliary methods to ease the development.
+ * Classe que contém métodos auxiliares para facilitar o desenvolvimento.<p>
+ * [Eng]Class containing auxiliary methods to ease the development.
  * @author Alex Lacerda
  *
  */
 public class Utils {
 	
 	/**
-	 * the mode of debug is used to print debug messages that are spread throughout the project.
+	 * O modo de debug é usado para imprimir mensagens de depuração que estão espalhados por todo o projeto.<p>
+	 * [Eng]the mode of debug is used to print debug messages that are spread throughout the project.
 	 */
 	private static boolean inDebugMode = true; // true => "Verbose mode" (for debug) | false =>"Non verbose mode" (normal mode)
 	
 	/**
-	 * Print debug messages only if the <code>inDebugMode</code> static variable is <code>true</code>.
+	 * Imprimir mensagens de depuração somente se o<code>inDebugMode</code>variável estática é <code>true</code>.<p>
+	 * [Eng]Print debug messages only if the <code>inDebugMode</code> static variable is <code>true</code>.
 	 * @param message Message to be printed in the console.
 	 */
 	public static void printForDebug(String message) {
@@ -23,7 +26,8 @@ public class Utils {
 	}
 	
 	/**
-	 * Prints to the console the time interval between the two values passed as parameter.
+	 * Prints para o console o intervalo de tempo entre os dois valores passados como parâmetro.<p>
+	 * [Eng]Prints to the console the time interval between the two values passed as parameter.
 	 * @param initTime Initial time in milliseconds.
 	 * @param finishTime Finish Time in milliseconds.
 	 * @return 
@@ -44,3 +48,4 @@ public class Utils {
 		}
 	}
 }
+
