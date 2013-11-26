@@ -44,7 +44,7 @@ public class SimpleNode extends Node
 	protected static int slidingWindowSize = 4;
 	
 	/**
-	 * Nosso Slot de tempo para cada (representativo) sensor.<p>
+	 * Slot de tempo próprio para cada sensor(representativo).<p>
 	 * [Eng] Own slot time from each (representative) sensor - cluster head.
 	 */
 	protected Integer ownTimeSlot;
@@ -85,19 +85,20 @@ public class SimpleNode extends Node
 	 */
 	protected double lastBatLevel;
 	
-	/**Número de predições feito pelo nó do sensor nesse tempo de slot.<p>
+	/**
+	 * Número de predições feito pelo nó do sensor nesse timeslot.<p>
 	 * [Eng] Number of predictions made by the sensor node in this timeslot.
 	 */
 	protected int numTotalPredictions;
 	
 	/**
-	 * Número de predições de erros do nó do sensor nesse tempo de slot.<p>
+	 * Número de predições de erros do nó do sensor nesse timeslot.<p>
 	 * [Eng] Number of prediction errors of the sensor node in this timeslot.
 	 */
 	protected int numPredictionErrors;
 	
 	/**
-	 * Número máximo(limite) de predições dos erros de qualquer nó de sensor - Isso também pode ser expressado em percentual(double) do total de tempo do slot.<p> 
+	 * Número máximo(limite) de predições dos erros de qualquer nó de sensor - Isso também pode ser expressado em percentual(double) do total de timeslot.<p> 
 	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
 	private static final double limitPredictionError = 5; // SensorDelay
@@ -114,22 +115,26 @@ public class SimpleNode extends Node
 	 */
 	private Node clusterHead;
 
-	/** Número de sensores no cluster desse nó.<p>
+	/** 
+	 * Número de sensores no cluster desse nó.<p>
 	 * [Eng] Number of sensors in cluster of this node.
 	 */
 //	private int numSensorsInCluster;	
 	
-	/** Contador de mensagens de erro recebido pelo ClusterHead nesse cluster.<p>
+	/**
+	 *  Contador de mensagens de erro recebido pelo ClusterHead nesse cluster.<p>
 	 * [Eng] Counter of message errors received by ClusterHead in this cluster.
 	 */
 	private int errorsInThisCluster;
 	
-	/** Número máximo(limite) de erro dos nós dos sensores por cluster -  Sobre o limite, o cluster head comunica-se com o sink.<p>
+	/**
+	 *  Número máximo(limite) de erro dos nós dos sensores por cluster -  Sobre o limite, o cluster head comunica-se com o sink.<p>
 	 * [Eng] Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink.
 	 */
 	public static final int maxErrorsPerCluster = 5; // ClusterDelay
 	
-	/** Mínimo(limite) de leveis da bateria dos cluster head's - Abaixo do limite, o cluster head comunica-se com o sink.<p>
+	/**
+	 *  Mínimo(limite) de leveis da bateria dos cluster head's - Abaixo do limite, o cluster head comunica-se com o sink.<p>
 	 * [Eng] Minimum (limit) level of cluster head's battery level - below this limit, the cluster head communicates to sink.
 	 */
 	private static final double minBatLevelInClusterHead = 2.1; // According KAMAL, A. R. M.; HAMID, M. A. Reliable data approximation in wireless sensor network. Ad Hoc Networks, n. July, jul. 2013. (l. 540)
@@ -139,7 +144,8 @@ public class SimpleNode extends Node
 	private double squaredError = 0.0;
 	
 	
-	/**Armazena as leituras dos sensores deste nó carregados do arquivo de leitura do sensor.
+	/**
+	 * Armazena as leituras dos sensores deste nó carregados do arquivo de leitura do sensor.
 	 * Uma lista de link está começando a ser usado aqui por que como as leituras estão sendo realizadas
 	 * (sendo lidas desta lista) por um nó de um sensor eles são discartados.<p>
 	 * [Eng] Stores sensor readings of this node loaded from the sensor readings file.
@@ -148,7 +154,8 @@ public class SimpleNode extends Node
 	 */
 	private LinkedList<String> sensorReadingsQueue = new LinkedList<String>();
 	
-	/**Armazena o valor referenciando à última linha carregada do arquivo de leituras do sensor em ordem que 
+	/**
+	 * Armazena o valor referenciando à última linha carregada do arquivo de leituras do sensor em ordem que 
 	 * quando o <code>sensorReadingsQueue</code> está vazio e o novo carregamento do arquivo tem de ser 
 	 * executado para preencher a lista <code>SensorReadingsLoadedFromFile</code>, o carregamento começa da última
 	 * linha lida do arquivo.<p>
@@ -183,7 +190,7 @@ public class SimpleNode extends Node
 	private boolean loadSensorReadingsFromFile = true;
 
 	/**
-	 * Salva o round em que o primeiro CluterError ocorreu.<p>
+	 * Salva o round(ciclo) em que o primeiro CluterError ocorreu.<p>
 	 * [Eng]Saves the round in which the first ClusterError occurred.
 	 */
 	private double initialErrorRound;
@@ -567,7 +574,8 @@ public class SimpleNode extends Node
 		wsnMsgResp.spatialPos = wsnMsgResp.source.getPosition(); // Spacial position from the source node from message response
 	} // end prepararMensagem(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 	
-	/** Verifica se o ID do sensor passado como parâmetro é igual ao ID deste nó.
+	/** 
+	 * Verifica se o ID do sensor passado como parâmetro é igual ao ID deste nó.
 	 * @param sensorID ID do sensor para ser comparado ao ID deste nó.
 	 * @return Retorna <code>true</code> se os ID's são os mesmos. Retorna <code>false</code> caso contrário.<p>
 	 * [Eng] Verifies whether the sensor ID passed as parameter is equal to the ID of this node.
@@ -584,7 +592,8 @@ public class SimpleNode extends Node
 		return false;
 	} // end isMyID(String sensorID)
 	
-	/** <p>Simula a leitura dos dados do sensor físico realizado para todos os dispositivos de detecção disponíveis neste nó.</p>
+	/** 
+	 * <p>Simula a leitura dos dados do sensor físico realizado para todos os dispositivos de detecção disponíveis neste nó.</p>
 	 * <p>De fato, a real leitura dos dados do sensor não foram feitos por esse nó. Em vez disso, as leituras do sensor são
 	 * coletados do seu <code>sensorReadingsQueue</code> atributo</p>
 	 * <p>Nesse caso que a lista está vazia, ele é preenchido com as leituras do sensor carregadas do 
@@ -637,7 +646,8 @@ public class SimpleNode extends Node
 		}
 	} // end loadSensorReadings()
 	
-	/**Preenche o <code>sensorReadingsQueue</code> com as leituras do sensor do arquivo.
+	/**
+	 * Preenche o <code>sensorReadingsQueue</code> com as leituras do sensor do arquivo.
 	 * A quantidade de leituras(linhas do arquivo) para serem carregadas são informadas dentro do <code>Config.xml</code> arquivo(<code>SensorReadingsLoadBlockSize</code>)  marcador.<p>
 	 * [Eng]Fills the <code>sensorReadingsQueue</code> with sensor readings from the file.
 	 * The amount of readings (file lines) to be loaded is informed in the <code>Config.xml</code> file (<code>SensorReadingsLoadBlockSize</code>) tag.
@@ -688,7 +698,8 @@ public class SimpleNode extends Node
 		}
 	} // end loadSensorReadingsFromFile()
 	
-	/**Preencher a <code>sensorReadingsQueue</code> lista com as leituras do sensor do {@link FileHandler}.<p> 
+	/**
+	 * Preencher a <code>sensorReadingsQueue</code> lista com as leituras do sensor do {@link FileHandler}.<p> 
 	 * [Eng]Fills the <code>sensorReadingsQueue</code> list with sensor readings from the {@link FileHandler}.
 	 */
 	private void loadSensorReadingsFromMemory() {
@@ -706,7 +717,8 @@ public class SimpleNode extends Node
 		Utils.printForDebug("");
 	} // end loadSensorReadingsFromMemory()
 	
-	/** Coloca o bufferedReader na posição da linha especificada.
+	/** 
+	 * Coloca o bufferedReader na posição da linha especificada.
 	 * @param bufferedReader Buffered Reader sendo usado.
 	 * @param linePosition posição no arquivo que o Buffered reader deve estar
 	 * @return o buffered reader na linha correspondente para a posição especificada. Que é,
@@ -814,7 +826,7 @@ public class SimpleNode extends Node
 	} // end parseCalendarHoras(String AnoMesDia, String hora)
 	
 	/**
-	 * Faz o cálculo da predição do valor sensoreado de acordo com os coeficientes (A e B) informados e o parâmetro de tempo; incrementa o contador de predições (numTotalPredictions) <p>
+	 * Isso calcula a predição do valor sensoreado de acordo com os coeficientes (A e B) informados e o parâmetro de tempo; incrementa o contador de predições (numTotalPredictions) <p>
 	 * [Eng]It calculates the prediction sensed value according to coefficients (A and B) informed and time parameter; it increments the prediction count (numTotalPredictions)
 	 * @param A Coeficiente A (interceptor) da equação de regressão, dada por S(t) = A + B.t 
 	 * @param B Coeficiente B (slope, inclinação) da equação de regressão, dada por S(t) = A + B.t
@@ -834,9 +846,9 @@ public class SimpleNode extends Node
 	} // end makePrediction(double A, double B, double tempo)
 	
 	/**
-	 * Inicia um temporizador (timer) para enviar a mensagem passada para o próximo nó no caminho até o nó de destino
-	 * @param wsnMessage messagem a ser enviado para o nó destinado <p>
-	 * [Eng] It starts a timer to send the message passed to the next node in path to destination node 
+	 * Inicia um temporizador para enviar a mensagem passada para o próximo nó no caminho até o nó destino.
+	 * @param wsnMessage Messagem a ser enviado para o nó destino. <p>
+	 * [Eng] It starts a timer to send the message passed to the next node in path to destination node. 
 	 * @param wsnMessage Message to be sended to destination node
 	 */
 	protected void sendToNextNodeInPath(WsnMsg wsnMessage)
@@ -855,7 +867,8 @@ public class SimpleNode extends Node
 		}
 	} // end sendToNextNodeInPath(WsnMsg wsnMessage)
 		
-	/**Pegar os coeficientes da equação de regressão e o erro threshold
+	/**
+	 * Pegar os coeficientes da equação de regressão e o erro threshold
 	 * da mensagem passada e acionar as predições para este nó.
 	 * 
 	 * @param wsnMessage
@@ -883,7 +896,8 @@ public class SimpleNode extends Node
 	} // end receiveCoefficients(WsnMsg wsnMessage)
 	
 	/**
-	 * Adiciona os últimos valores lidos anteriormente a mensagem que vai para o sink<p>
+	 * Adiciona os últimos valores lidos anteriormente a mensagem que vai para o sink.
+	 * @param wsnMsgResp Mensagem resposta que recebe os itens dataRecordItens <p>
 	 * [Eng]Adds all itens in dataRecordItens vector for the (WsnMsgResponse) wsnMsgResp / Adds the last values previously read to the message that goes to the sink
 	 * @param wsnMsgResp Message Response that receives the dataRecordItens itens
 	 */
@@ -899,12 +913,15 @@ public class SimpleNode extends Node
 	} // end addDataRecordItensInWsnMsgResponse(WsnMsgResponse wsnMsgResp)
 	
 	/**
-	 * Retorna os dados do sensor de acordo com o tipo de dados indicado<p>
+	 * Retorna os dados(no DataRecord) do sensor(currentNode) de acordo com o tipo de dados(dataType) indicado<p>
 	 * 
 	 * [Eng]Returns the sensor (currentNode) data (in DataRecord) according to the data type (dataType) indicated
-	 * @param currentNode Nó sensor que deve ler dados
-	 * @param dataType Tipo de dados a ser lido
-	 * @return Data from sensor (currentNode)
+	 * @param currentNode Nó sensor que deve ler dados<p>
+	 * [Eng] @param currentNode sensor node that must read data.
+	 * @param dataType Tipo de dados a ser lido<p>
+	 * [Eng] @param dataType Type of data to be read.
+	 * @return Dado do sensor (currentNode)<p>
+	 * [Eng] @return Data from sensor (currentNode)
 	 */
 	private DataRecord getData(SimpleNode currentNode, String dataType) {
 		DataRecord temp = new DataRecord();
@@ -991,10 +1008,14 @@ public class SimpleNode extends Node
 	/**
 	 * Lê o próximo valor do sensor atual, executa a predição e, de acordo com a predição (acerto ou erro), dispara a próxima ação<p>
 	 * [Eng]Read the next value from present sensor, make the prediction and, according with the predition (hit or miss), trigges the next action 
-	 * @param dataSensedType Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
-	 * @param coefA Coefficient A from the Regression Equation for this sensor
-	 * @param coefB Coefficient B from the Regression Equation for this sensor
-	 * @param maxError Threshold error to the calculation of prediction for this sensor
+	 * @param dataSensedType Tipo de data para ser lido pelo sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem<p>
+	 * [Eng] @param dataSensedType Type of data to be read from sensor: "t"=temperature, "h"=humidity, "l"=luminosity or "v"=voltage
+	 * @param coefA Coeficiente A da equação de regressão para este sensor<p>
+	 * [Eng] @param coefA Coefficient A from the Regression Equation for this sensor
+	 * @param coefB Coeficiente B da equação de regressão para este sensor<p>
+	 * [Eng] @param coefB Coefficient B from the Regression Equation for this sensor
+	 * @param maxError threshold Erro para o cálculo de previsão para este sensor<p>
+	 * [Eng] @param maxError Threshold error to the calculation of prediction for this sensor
 	 */
 	protected void triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError)
 	{
@@ -1269,7 +1290,8 @@ public class SimpleNode extends Node
 		
 	}// end triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError)
 	
-	/**Isso chama o método triggerPredictions
+	/**
+	 * Isso chama o método triggerPredictions
 	 * @param dataSensedType Tipo de dado a ser lido pelo sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 * @param coefA Coeficiente A da equação de regressão para esse sensor
 	 * @param coefB Coeficiente B da equação de regressão para esse sensor
@@ -1285,7 +1307,8 @@ public class SimpleNode extends Node
 		triggerPredictions(dataSensedType, coefA, coefB, maxError);
 	} // end triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
 	
-	/**Isso imprime o RMSE(erro quadrático médio) para esse sensor<p>
+	/**
+	 * Isso imprime o EQM(erro quadrático médio) para esse sensor<p>
 	 * [Eng] It prints the RMSE (Root Mean Square Error) for this sensor
 	 */
 	public void printNodeRMSE(){
@@ -1367,7 +1390,8 @@ public class SimpleNode extends Node
 	
 	public Vector<DataRecord> dataRecordItens;
 	
-	/**Adiciona os respectivos valores para o atributo dataRecordItens do sensor (Simple Node)
+	/**
+	 * Adiciona os respectivos valores para o atributo dataRecordItens do sensor (SimpleNode)
 	 * @param typ Tipo de dado do sensor, como t=Temp., h=Hum., l=Lum. or v=Volt.
 	 * @param val Valor Absoluto
 	 * @param tim Data/Tempo do valor lido no formato double
