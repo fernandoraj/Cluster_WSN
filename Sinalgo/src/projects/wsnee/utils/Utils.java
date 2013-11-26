@@ -26,7 +26,7 @@ public class Utils {
 	}
 	
 	/**
-	 * Prints para o console o intervalo de tempo entre os dois valores passados como parâmetro.<p>
+	 * Imprime para o console o intervalo de tempo entre os dois valores passados como parâmetro.<p>
 	 * [Eng]Prints to the console the time interval between the two values passed as parameter.
 	 * @param initTime Initial time in milliseconds.
 	 * @param finishTime Finish Time in milliseconds.
