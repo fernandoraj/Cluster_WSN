@@ -21,7 +21,7 @@ public class SinkNode extends SimpleNode
 {
 
 	/**
-	 * Número de dados sensoriados por time slot (Tamanho do time slot inicial) <p>
+	 * Número de dados sensoriados por time slot (Tamanho do time slot inicial)<p>
 	 * [Eng] Number of sensed data per time slot (initial time slot size)
 	 */
 	private Integer sizeTimeSlot = 100;
@@ -39,7 +39,7 @@ public class SinkNode extends SimpleNode
 	private Integer sizeTimeUpdate = 5;
 	
 	/**
-	 * Tipo de dado a ser sensoriado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>
+	 * Tipo de dado a ser sensoriado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=umidade, "l"=luminosidade ou "v"=voltagem <p>
 	 * [Eng] Type of data to be sensed (read in the sensor nodes), which can be: "t" = temperature, "h" = humidity, "l" = brightness or "v" = voltage
 	 */
 	private String dataSensedType = "t";
@@ -116,7 +116,7 @@ public class SinkNode extends SimpleNode
 	
 	/**
 	 * Número de rounds (ciclos) para reagrupamento (reclustering) dos sensores no caso de uso de Nós Representativos <p>
-	 * Number of rounds (cycles) for reclustering of the sensors in use cases of Representatives Nodes
+	 * [Eng] Number of rounds (cycles) for reclustering of the sensors in use cases of Representatives Nodes
 	 */
 //	private int numRoundsForReclustering = 30;
 	
@@ -436,14 +436,14 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Testa se todos os nós em número de linha "row" do "tempCluster" estão dentro do "blkList", se o sink(sumidouro) já recebeu respostas de mensagens de todos os nós do respectivo Cluster<p> 
 	 * [Eng]Test if all nodes in line number "row" of "tempCluster" are in "blkList", ie, if the sink have already received message responses from all nodes in the respective Cluster 
-	 * @param tempCluster Novo GroupCluster com os nós para serem "Unidos" <b> tempCluster </b><p>
-	 * [Eng] @param tempCluster New GroupCluster with the nodes to be "merged" <b> tempCluster </b>
-	 * @param row Linha do Novo GroupCluster a ser testada <b> row </b><p>
-	 * [Eng] @param row Line from the New GroupCluster to be tested <b> row </b>
-	 * @param blkList Lista Negra com os nós que já receberam do sink <b> blkList </b><p>
-	 * [Eng] @param blkList Black List with the nodes that have already received by the sink <b> blkList </b>
+	 * @param tempCluster Novo GroupCluster com os nós para serem "Unidos" <p>
+	 * [Eng] New GroupCluster with the nodes to be "merged" 
+	 * @param row Linha do Novo GroupCluster a ser testada <p>
+	 * [Eng] Line from the New GroupCluster to be tested 
+	 * @param blkList Lista Negra com os nós que já receberam do sink <p>
+	 * [Eng] Black List with the nodes that have already received by the sink 
 	 * @return Verdadeiro se todos os nós em linha "linha" de "tempCluster" estão na "blkList" <p>
-	 * [Eng] @return True if all nodes in line number "row" of "tempCluster" are in "blkList"
+	 * [Eng] True if all nodes in line number "row" of "tempCluster" are in "blkList"
 	 */
 	private boolean isAllNodesInThisClusterLineInList(ArrayList2d<WsnMsgResponse> tempCluster, int row, ArrayList<WsnMsgResponse> blkList) {
 		if (tempCluster == null) { // If there isn't a message group yet
@@ -477,8 +477,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Ele classifica os 'clusters de nós' pela 'energia residual' e pelos 'saltos para o sink' e imprime as configuração do cluster antes, durante e após nova ordem <p>
 	 * [Eng] It classify the 'clusters nodes' by 'residual energy' and by 'hops to sink' and prints cluster configuration before, during and after new order
-	 * @param cluster Grupo de mensagens (que representam agrupamentos) que serão classificados de acordo com parâmetros ("energia residual 'e'saltos para o sink')<b> cluster </b><p>
-	 * [Eng] @param Group of messages (representing clusters) which will be classified according with params ('residual energy' and 'hops to sink') <b> cluster </b>
+	 * @param cluster Grupo de mensagens (que representam clusters) que serão classificados de acordo com parâmetros ("energia residual 'e'saltos para o sink')<p>[Eng] Group of messages (representing clusters) which will be classified according with params ('residual energy' and 'hops to sink') 
 	 */
 	void classifyNodesByAllParams(ArrayList2d<WsnMsgResponse> cluster) {
 		Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
@@ -496,11 +495,8 @@ public class SinkNode extends SimpleNode
 	} // end classifyNodesByAllParams(ArrayList2d<WsnMsgResponse> cluster)
 	
 	/**
-	 * Ele define todos os clusters para cada WsnMsgResponse representando os nós de origem<p>
-	 * [Eng]It sets all clusters for each WsnMsgResponse representing the source nodes  
-	 * 
-	 * @param clusterGroup  Grupo de mensagens (representando agrupamentos) que têm os clusters configurados <b> clusterGroup</b><p>
-	 * [Eng] @param clusterGroup Group of messages (representing clusters) to have the clusters configurated <b> clusterGroup </b>
+	 * Ele define todos os clusters para cada WsnMsgResponse representando os nós de origem<p>[Eng] It sets all clusters for each WsnMsgResponse representing the source nodes  
+	 * @param clusterGroup  Grupo de mensagens (representando clusters) que têm os clusters configurados <p>[Eng] Group of messages (representing clusters) to have the clusters configurated 
 	 */
 	void setClustersFromNodes(ArrayList2d<WsnMsgResponse> clusterGroup) {
 		if (clusterGroup != null) // If there is a message group created
@@ -521,10 +517,8 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Ele recebe um ArrayList de WsnMsgResponse e retorna um ArrayList de nó com nós de origem destas mensagens<p>
 	 * [Eng] It receives an ArrayList of WsnMsgResponse and returns an ArrayList of Node with source nodes from that messages
-	 * @param lineMessages ArrayList de WsnMsgResponse <b>lineMessages</b><p>
-	 * [Eng] @param lineMessages ArrayList of WsnMsgResponse <b>lineMessages</b>
-	 * @return ArrayList de nós de origem <p>
-	 * [Eng] @return ArrayList of source nodes
+	 * @param lineMessages ArrayList de WsnMsgResponse <p>[Eng] ArrayList of WsnMsgResponse
+	 * @return ArrayList de nós de origem <p>[Eng] ArrayList of source nodes
 	 */
 	ArrayList<Node> convertArrayListMsgResponsesToArrayListNodes(ArrayList<WsnMsgResponse> lineMessages) {
 		ArrayList<Node> tempNodes = null;
@@ -540,14 +534,10 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Adiciona os clusters (linhas) de "tempClusterGiver" (em "rowIndexes" linhas) dentro do "tempClusterReceiver", retire os elementos de "lista negra" e remove estas linhas de "tempClusterGiver" no final <p>
 	 * [Eng] Adds the clusters (lines) from "tempClusterGiver" (in "rowIndexes" lines) inside the "tempClusterReceiver", remove the elements from "blackList" and removes this lines from "tempClusterGiver" at the end
-	 * @param tempClusterReceiver Estrutura do cluster que receberá os sensores / cluster a partir da estrutura tempClusterGiver <b>tempClusterReceiver</b><p>
-	 * [Eng] @param tempClusterReceiver Cluster structure that will receive the sensors/clusters from the tempClusterGiver structure <b>tempClusterReceiver</b>
-	 * @param tempClusterGiver Estrutura do cluster que vai dar os sensores / cluster à estrutura tempClusterReceiver <b> tempClusterGiver </b><p>
-	 * [Eng] @param tempClusterGiver Cluster structure that will give the sensors/clusters to the tempClusterReceiver structure <b> tempClusterGiver </b>
-	 * @param rowIndexes Índices de linha de "tempClusterGiver" para ser movido para "tempClusterReceiver" <b> rowIndexes </b><p>
-	 * [Eng] @param rowIndexes Line indexes from "tempClusterGiver" to be moved to "tempClusterReceiver" <b> rowIndexes </b>
-	 * @param blackList Lista que os elementos serão removidos da <b>lista negra</b><p>
-	 * [Eng] @param blackList List which the elements will be removed from <b> blackList </b>
+	 * @param tempClusterReceiver Estrutura do cluster que receberá os sensores / cluster a partir da estrutura tempClusterGiver <p>[Eng] Cluster structure that will receive the sensors/clusters from the tempClusterGiver structure 
+	 * @param tempClusterGiver Estrutura do cluster que vai dar os sensores / cluster à estrutura tempClusterReceiver <p>[Eng] Cluster structure that will give the sensors/clusters to the tempClusterReceiver structure 
+	 * @param rowIndexes Índices de linha de "tempClusterGiver" para ser movido para "tempClusterReceiver" <p>[Eng] Line indexes from "tempClusterGiver" to be moved to "tempClusterReceiver" 
+	 * @param blackList Lista que os elementos serão removidos <p>[Eng] List which the elements will be removed
 	 */
 	private void unifyClusters(ArrayList2d<WsnMsgResponse> tempClusterReceiver, ArrayList2d<WsnMsgResponse> tempClusterGiver, ArrayList<Integer> rowIndexes, ArrayList<WsnMsgResponse> blackList)
 	{
@@ -574,10 +564,8 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Ele remove o "msgToRemoveFromList" da lista "list" (lista negra) que passou por parâmetro <p>
 	 * [Eng] It removes the "msgToRemoveFromList" from the list "list" (blackList) passed by param
-	 * @param list Um objeto ArrayList (WsnMsgResponse) <b> list </b><p>
-	 * [Eng] @param list An ArrayList(WsnMsgResponse) object <b> list </b>
-	 * @param msgToRemoveFromList Um objeto WsnMsgResponse <b> msgToRemoveFromList </b><p>
-	 * [Eng] @param msgToRemoveFromList A WsnMsgResponse object <b> msgToRemoveFromList </b>
+	 * @param list Um objeto ArrayList (WsnMsgResponse) <p>[Eng] An ArrayList(WsnMsgResponse) object 
+	 * @param msgToRemoveFromList Um objeto WsnMsgResponse <p>[Eng] A WsnMsgResponse object 
 	 */
 	private void removeFromList(ArrayList<WsnMsgResponse> list, WsnMsgResponse msgToRemoveFromList) {
 		if (list == null) { // 
@@ -601,8 +589,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Ele aciona o processo de dividir um cluster, através da exclusão (retirar) a partir da linha do antigo cluster - para ser separado <p>
 	 * [Eng] It triggers the process to split a cluster, through the exclusion (remove) from the line from old cluster - to be splitted
-	 * @param lineFromCluster Número da linha do cluster para ser dividido <b> lineFromCluster </b><p>
-	 * [Eng] @param lineFromCluster Line number from cluster to be divided <b> lineFromCluster </b>
+	 * @param lineFromCluster Número da linha do cluster para ser dividido <p>[Eng] Line number from cluster to be divided 
 	 */
 	private void triggerSplitFromCluster(int lineFromCluster)
 	{
@@ -641,12 +628,9 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Quando um nó sensor envia uma mensagem para sink indicando uma novidade, o sink deve atirar / enviar mensagens para todos os sensores desse cluster exigem novas leituras de sensores para verificar a similaridade atual das leituras dos cluster de sensores <p>
 	 * [Eng] When a sensor node sends a message to sink indicating a novelty, the sink must shoot/send messages to all sensors in that cluster requiring new readings from sensors to verify the current similarity of the readings from cluster`s sensors 
-	 * @param tempCluster Cluster (acertamento de cluster) para ser utilizado como base - A estrutura é realmente um acertamento de cluster, em que cada cluster é representado por uma linha diferente <b> tempCluster </b><p>
-	 * [Eng] @param tempCluster Cluster (set of clusters) to be used as base - The structure actually is a set of clusters, where each cluster is represented by a different line <b> tempCluster </b>
-	 * @param lineFromCluster Número da linha do cluster atual <b> lineFromCluster </b><p>
-	 * [Eng] @param lineFromCluster Line number from current cluster <b> lineFromCluster </b>
-	 * @return Número de sensores (#colunas) no cluster / linha de lineFromCluster <p>
-	 * [Eng] @return Number of sensors (#columns) in the cluster/line from lineFromCluster
+	 * @param tempCluster Cluster (acertamento de cluster) para ser utilizado como base - A estrutura é realmente um acertamento de cluster, em que cada cluster é representado por uma linha diferente <p>[Eng] Cluster (set of clusters) to be used as base - The structure actually is a set of clusters, where each cluster is represented by a different line 
+	 * @param lineFromCluster Número da linha do cluster atual <p>[Eng] Line number from current cluster 
+	 * @return Número de sensores (#colunas) no cluster / linha de lineFromCluster <p>[Eng] Number of sensors (#columns) in the cluster/line from lineFromCluster
 	 */
 	private int sendSenseRequestMessageToAllSensorsInCluster(ArrayList2d<WsnMsgResponse> tempCluster, int lineFromCluster)
 	{
@@ -685,10 +669,8 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Ele identifica qual cluster (número da linha), onde o "newWsnMsgResp" está<p>
 	 * [Eng] It identifies which cluster (line number) where the "newWsnMsgResp" is 
-	 * @param newWsnMsgResp MessageResponse representando o nó sensorial para ser localizado na messageGroups <b> newWsnMsgResp </b><p>
-	 * [Eng] @param newWsnMsgResp MessageResponse representing the sensor node to be localized in messageGroups <b> newWsnMsgResp </b>
-	 * @return Número da linha (cluster) de mensagem passada, caso contrário, retorna -1 indicando que não existe essa mensagem ("newWsnMsgResp") em qualquer cluster <p>
-	 * [Eng] @return Line number (cluster) from message passed by; otherwise, returns -1 indicating that there is no such message("newWsnMsgResp") in any cluster
+	 * @param newWsnMsgResp MessageResponse representando o nó sensorial para ser localizado na messageGroups <p>[Eng]MessageResponse representing the sensor node to be localized in messageGroups 
+	 * @return Número da linha (cluster) de mensagem passada, caso contrário, retorna -1 indicando que não existe essa mensagem ("newWsnMsgResp") em qualquer cluster <p>[Eng] Line number (cluster) from message passed by; otherwise, returns -1 indicating that there is no such message("newWsnMsgResp") in any cluster
 	 */
 	private int identifyCluster(WsnMsgResponse newWsnMsgResp)
 	{ 
@@ -732,10 +714,8 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Ele identifica qual cluster(número da linha), onde o "representativeNode" está <p>
 	 * [Eng] It identifies which cluster (line number) where the "representativeNode" is 
-	 * @param representativeNode Nó representando o nó sensor representante a ser localizado no messageGroups <b> representativeNode </b><p>
-	 * [Eng] @param representativeNode Node representing the representative sensor node to be localized in messageGroups <b> representativeNode </b>
-	 * @return Número da linha (cluster) do nó passado, caso contrário, retorna -1 indicando que não existe tal nó ("representativeNode") em qualquer cluster<p>
-	 * [Eng] @return Line number (cluster) from node passed by; otherwise, returns -1 indicating that there is no such node("representativeNode") in any cluster
+	 * @param representativeNode Nó representando o nó sensor representante a ser localizado no messageGroups <p>[Eng] Node representing the representative sensor node to be localized in messageGroups 
+	 * @return Número da linha (cluster) do nó passado, caso contrário, retorna -1 indicando que não existe tal nó ("representativeNode") em qualquer cluster<p>[Eng] Line number (cluster) from node passed by; otherwise, returns -1 indicating that there is no such node("representativeNode") in any cluster
 	 */ 
 	private static int identifyCluster(Node representativeNode)
 	{
@@ -779,12 +759,9 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Ele remove o nó (newWsnMsgResp.source passado por parâmetro ) do grupo/cluster indicado por "tempCluster" e indicar se o grupo tornou-se vazio <p>
 	 * [Eng] It removes the node (newWsnMsgResp.source passed by param) from the group/cluster indicated by "tempCluster" and indicate if the cluster became empty
-	 * @param tempCluster Grupo de aglomerados que o nó (newWsnMsgResp.source) que serão removidos <b> tempCluster </b><p>
-	 * [Eng] @param tempCluster Group of clusters which the node (newWsnMsgResp.source) will be removed <b> tempCluster </b>
-	 * @param newWsnMsgResp  Mensagem que contém o nó (newWsnMsgResp.source), que será removido do grupo de aglomerado <b> newWsnMsgResp </b><p>
-	 * [Eng] @param newWsnMsgResp Message that contains the node (newWsnMsgResp.source) which will be removed from group of cluster <b> newWsnMsgResp </b>
-	 * @return Se o cluster desta mensagem / nó ficou vazio após a remoção do nó "newWsnMsgResp.source" <p>
-	 * [Eng] @return If the cluster of this message / node became empty after removal of the node in "newWsnMsgResp.source"
+	 * @param tempCluster Grupo de aglomerados que o nó (newWsnMsgResp.source) que serão removidos <p>[Eng] Group of clusters which the node (newWsnMsgResp.source) will be removed 
+	 * @param newWsnMsgResp  Mensagem que contém o nó (newWsnMsgResp.source), que será removido do grupo de aglomerado <p>[Eng] Message that contains the node (newWsnMsgResp.source) which will be removed from group of cluster 
+	 * @return Se o cluster desta mensagem / nó ficou vazio após a remoção do nó "newWsnMsgResp.source" <p>[Eng] If the cluster of this message / node became empty after removal of the node in "newWsnMsgResp.source"
 	 */
 	private boolean removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
 	{
@@ -843,8 +820,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Ele seleciona o nó representante para cada linha (cluster) dos sensores pela energia residual máxima e coloca-lo na primeira posição (em linha) <p>
 	 * [Eng] It selects the Representative Node for each line (cluster) from sensors by the max residual energy and puts him in the first position (in line)
-	 * @param tempCluster cluster(ArrayList), que terá os sensores ordenados (linha por linha) pela energia residual máxima <b> tempCluster </b><p>
-	 * [Eng] @param tempCluster Cluster (ArrayList) which will have the sensors ordered (line by line) by the max residual energy <b> tempCluster </b>
+	 * @param tempCluster cluster(ArrayList), que terá os sensores ordenados (linha por linha) pela energia residual máxima <p>[Eng] Cluster (ArrayList) which will have the sensors ordered (line by line) by the max residual energy 
 	 */
 	private void classifyRepresentativeNodesByResidualEnergy(ArrayList2d<WsnMsgResponse> tempCluster)
 	{
@@ -883,8 +859,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Ele classifica os nós para cada linha (cluster) dos sensores pela mínima distância (em número de saltos) para o sink entre eles que têm a mesma energia residual máximo e coloca-lo na primeira posição (em linha) <p>
 	 * [Eng] It classifies the Nodes for each line (cluster) from sensors by the min distance (in number of hops) to sink among them who have the same max residual energy and puts him in the first position (in line)
-	 * @param tempCluster Cluster(ArrayList), que terá os sensores ordenados (linha por linha - como um segundo critério) pelo número mínimo de saltos para o sink <b> tempCluster </b><p>
-	 * [Eng] Cluster (ArrayList) which will have the sensors ordered (line by line - as a second criterion) by the min number of hops to sink <b> tempCluster </b>
+	 * @param tempCluster Cluster(ArrayList), que terá os sensores ordenados (linha por linha - como um segundo critério) pelo número mínimo de saltos para o sink <p>[Eng] Cluster (ArrayList) which will have the sensors ordered (line by line - as a second criterion) by the min number of hops to sink 
 	 */
 	private void classifyRepresentativeNodesByHopsToSink(ArrayList2d<WsnMsgResponse> tempCluster)
 	{
@@ -1016,10 +991,10 @@ public class SinkNode extends SimpleNode
 	 * PS:. Each line in tempCluster (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.origem), 
 	 * classified by Dissimilarity Measure from yours data sensed, stored on WsnMsgResponse.dataRecordItens
 	 *  
-	 * @param tempCluster ArrayList2d de sensores, organizados em clusters (linha por linha) <b> tempCluster </b><p>
-	 * [Eng] ArrayList2d from sensors, organized as clusters (line by line) <b> tempCluster </b>
-	 * @param newWsnMsgResp Mensagem a ser utilizada para classificar o nó sensor <b> newWsnMsgResp </b><p>
-	 * [Eng] Message to be used for classify the sensor node <b> newWsnMsgResp </b>
+	 * @param tempCluster ArrayList2d de sensores, organizados em clusters (linha por linha) <p>
+	 * [Eng] ArrayList2d from sensors, organized as clusters (line by line) 
+	 * @param newWsnMsgResp Mensagem a ser utilizada para classificar o nó sensor <p>
+	 * [Eng] Message to be used for classify the sensor node 
 	 */
 	private void addNodeInClusterClassifiedByMessage(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
 	{
@@ -1075,8 +1050,7 @@ public class SinkNode extends SimpleNode
 	 * PS.: Each line in "messageGroups" (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.source), 
 	 * classified by Dissimilarity Measure from yours data sensed, stored on WsnMsgResponse.dataRecordItens
 	 *  
-	 * @param newWsnMsgResp Mensagem a ser utilizada para classificar o nó sensor <b> newWsnMsgResp </b><p>
-	 * [Eng] @param newWsnMsgResp Message to be used for classify the sensor node <b> newWsnMsgResp </b>
+	 * @param newWsnMsgResp Mensagem a ser utilizada para classificar o nó sensor <p>[Eng] Message to be used for classify the sensor node 
 	 */
 	private int searchAndReplaceNodeInClusterByMessage(WsnMsgResponse newWsnMsgResp)
 	{
@@ -1124,12 +1098,9 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Testa se a distância entre os nós sensores que enviaram tais mensagens (currentWsnMsg e newWsnMsg) é menor ou igual a máxima distância possível (maxDistance) para os dois nós estarem no mesmo cluster <p>
 	 * [Eng] Tests if the distance between the sensor nodes send those messages (currentWsnMsg e newWsnMsg) is less than or equal to the maximum possible distance (maxDistance) to the two nodes are in the same cluster
-	 * @param currentWsnMsg Mensagem atual já classificada no cluster <b> currentWsnMsg </b><p>
-	 * [Eng] Current message already classified in cluster <b> currentWsnMsg </b>
-	 * @param newWsnMsg Nova mensagem a ser classificada no cluster <b> newWsnMsg </b><p>
-	 * [Eng] @param newWsnMsg New message to be classified in the cluster<b> newWsnMsg </b>
-	 * @return Retorna "true" caso a distância entre os nós sensores que enviaram as mensagens não ultrapassa o limite máximo, "false" caso contrário <p>
-	 * [Eng] @return Returns "true" if the distance between the sensor nodes that have sent messages does not exceed the maximum limit, "false" otherwise
+	 * @param currentWsnMsg Mensagem atual já classificada no cluster <p>[Eng] Current message already classified in cluster 
+	 * @param newWsnMsg Nova mensagem a ser classificada no cluster <p>[Eng] New message to be classified in the cluster
+	 * @return Retorna "true" caso a distância entre os nós sensores que enviaram as mensagens não ultrapassa o limite máximo, "false" caso contrário <p>[Eng] Returns "true" if the distance between the sensor nodes that have sent messages does not exceed the maximum limit, "false" otherwise
 	 */
 	private boolean testDistanceBetweenSensorPositions(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 	{
@@ -1168,12 +1139,9 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Ele testa se há divergência (falta de similaridade) entre os dois conjunto de medida de 2 Sensores trazidos por 2 mensagens <p>
 	 * [Eng] It tests if there is dissimilarity (lack of similarity) between the 2 set of measure from 2 sensor brought by the 2 messages
-	 * @param currentWsnMsg Representa a mensagem atual do grupo de mensagens (messageGroups) em um "<WsnMsgResponse> ArrayList2d" estrutura <p>
-	 * [Eng] @param currentWsnMsg Represents the current message from the group of messages (messageGroups) in a "ArrayList2d<WsnMsgResponse>" structure <b> currentWsnMsg </b>
-	 * @param newWsnMsg Representa a mensagem chegou recentemente no nó sorvedouro, enviado a partir do nó sensor fonte <b> newWsnMsg </b><p>
-	 * [Eng] @param newWsnMsg Represents the recently arrived message in the sink node, sent from the source sensor node <b> newWsnMsg </b>
-	 * @return Verdadeiro caso as duas mensagens são diferentes, ou seja, de clusters diferentes (ou "grupos"); falsos, caso contrário <p>
-	 * [Eng] @return True case the two messages are DISsimilar, i.e., from different clusters (or "groups"); False, otherwise
+	 * @param currentWsnMsg Representa a mensagem atual do grupo de mensagens (messageGroups) em um "<WsnMsgResponse> ArrayList2d" estrutura <p>[Eng] Represents the current message from the group of messages (messageGroups) in a "ArrayList2d<WsnMsgResponse>" structure 
+	 * @param newWsnMsg Representa a mensagem chegou recentemente no nó sorvedouro, enviado a partir do nó sensor fonte <p>[Eng] Represents the recently arrived message in the sink node, sent from the source sensor node 
+	 * @return Verdadeiro caso as duas mensagens são diferentes, ou seja, de clusters diferentes (ou "grupos"); falsos, caso contrário <p>[Eng] True case the two messages are DISsimilar, i.e., from different clusters (or "groups"); False, otherwise
 	 */
 	
 	private boolean testSimilarityMeasureWithPairRounds(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
@@ -1340,10 +1308,8 @@ public class SinkNode extends SimpleNode
 	 * dataRecordItens, calculates the coefficients A and B according to these
 	 * parameters and sends these coefficients for the sensor node of origin
 	 * 
-	 * @param wsnMsgResp Mensagem recebida com os parâmetros a serem lidos <b> wsnMsgResp </b><p>
-	 * [Eng] @param wsnMsgResp Received message with the parameters to be read <b> wsnMsgResp </b>
-	 * @param clusterHeadNode Indica(seta) o ClusterHead daquele cluster <b> clusterHeadNode </b><p>
-	 * [Eng] @param clusterHeadNode Indicates(sets) that the cluster clusterhead  <b> clusterHeadNode </b>
+	 * @param wsnMsgResp Mensagem recebida com os parâmetros a serem lidos <p>[Eng] Received message with the parameters to be read 
+	 * @param clusterHeadNode Indica(seta) o ClusterHead daquele cluster <p>[Eng] Indicates(sets) that the cluster clusterhead  
 	 */
 	private void receiveMessage(WsnMsgResponse wsnMsgResp, Node clusterHeadNode)
 	{
@@ -1373,10 +1339,8 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Calcula e retorna a média aritmética dos valores reais passados <p>
 	 * [Eng] Computes and returns the arithmetic mean of the actual values ??passed
-	 * @param values Array de valores reais de entrada <b> values </b><p>
-	 * [Eng] @param values Array of real values ??input <b> values </b>
-	 * @return Média dos valores reais de entrada <p>
-	 * [Eng] @return Mean of the actual values ??of input
+	 * @param values Array de valores reais de entrada <p>[Eng] Array of real values ??input
+	 * @return Média dos valores reais de entrada <p>[Eng] Mean of the actual values ??of input
 	 */
 	private double calculaMedia(double[] values)
 	{
@@ -1395,16 +1359,11 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Calcula o coeficiente B da equação de regressão <p>
 	 * [Eng] Calculates the coefficient B of the regression equation
-	 * @param valores Array de valores (grandezas) das medições dos sensores <p>
-	 * [Eng] @param Array of values ??(magnitudes) of the measurements of the sensors
-	 * @param tempos Array de tempos das medições dos sensores <p>
-	 * [Eng] @param Array times of the measurements of the sensors
-	 * @param mediaValores Média dos valores lidos pelos sensores <b> mediaValores </b><p>
-	 * [Eng] @param mediaValores Mean of values ??read by the sensors <b> mediaValores </b>
-	 * @param mediaTempos Média dos tempos de leitura dos valores pelos sensores <b> mediaTempos </b><p>
-	 * [Eng] @param mediaTempos Mean time reading the values ??from sensors <b> mediaTempos </b>
-	 * @return Valor do coeficiente B da equação de regressão <p>
-	 * [Eng] @return Value of the coefficient B of the regression equation
+	 * @param valores Array de valores (grandezas) das medições dos sensores <p>[Eng] Array of values ??(magnitudes) of the measurements of the sensors
+	 * @param tempos Array de tempos das medições dos sensores <p>[Eng] Array times of the measurements of the sensors
+	 * @param mediaValores Média dos valores lidos pelos sensores <p>[Eng] Mean of values ??read by the sensors 
+	 * @param mediaTempos Média dos tempos de leitura dos valores pelos sensores <p>[Eng] Mean time reading the values ??from sensors <b> mediaTempos </b>
+	 * @return Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation
 	 */
 	private double calculaB(double[] valores, double[] tempos, double mediaValores, double mediaTempos)
 	{
@@ -1425,14 +1384,10 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Calcula o coeficiente A da equação de regressão <p>
 	 * [Eng] Calculate coefficient A of the regression equation
-	 * @param mediaValores Média dos valores lidos pelos sensores <b> mediaValores </b><p>
-	 * [Eng] @param mediaValores Mean of values ??read by the sensors <b> mediaValores </b>
-	 * @param mediaTempos Média dos tempos de leitura dos valores pelos sensores <b> mediaTempos </b><p>
-	 * [Eng] @param mediaTempos Mean time reading the values ??from sensors <b> mediaTempos </b>
-	 * @param B Valor do coeficiente B da equação de regressão <b> B </b><p>
-	 * [Eng] @param Value of the coefficient B of the regression equation <b> B </b>
-	 * @return Valor do coeficiente A <p>
-	 * [Eng] @return Value of the coefficient A
+	 * @param mediaValores Média dos valores lidos pelos sensores <p>[Eng] Mean of values ??read by the sensors 
+	 * @param mediaTempos Média dos tempos de leitura dos valores pelos sensores <p>[Eng] Mean time reading the values ??from sensors 
+	 * @param B Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation 
+	 * @return Valor do coeficiente A <p>[Eng] Value of the coefficient A
 	 */
 	private double calculaA(double mediaValores, double mediaTempos, double B)
 	{
@@ -1442,12 +1397,9 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Cria uma nova mensagem (WsnMsg) para envio dos coeficientes recebidos através dos parâmetros, e a envia para o próximo nó no caminho até o nó de origem da mensagem (wsnMsgResp.origem) <p>
 	 * [Eng] Creates a new message (WsnMsg) for sending coefficients received through the parameters, and sends it to the next node on the path until the source node of the message (wsnMsgResp.origem)
-	 * @param wsnMsgResp Mensagem de resposta enviada do nó de origem para o nó sink, que agora enviará os (novos) coeficientes calculados para o nó de origem <b> wsnMsgResp </b><p>
-	 * [Eng] Response message sent from the source node to the sink node, which now sends the (new) coefficients calculated for the source node <b> wsnMsgResp </b>
-	 * @param coeficienteA Valor do coeficiente A da equação de regressão <b> coeficienteA </b><p>
-	 * [Eng] Value of the coefficient A of the regression equation <b> coeficienteA </b>
-	 * @param coeficienteB Valor do coeficiente B da equação de regressão <b> coeficienteB </b><p>
-	 * [Eng] Value of the coefficient B of the regression equation <b> coeficienteB </b>
+	 * @param wsnMsgResp Mensagem de resposta enviada do nó de origem para o nó sink, que agora enviará os (novos) coeficientes calculados para o nó de origem <p>[Eng] Response message sent from the source node to the sink node, which now sends the (new) coefficients calculated for the source node 
+	 * @param coeficienteA Valor do coeficiente A da equação de regressão <p>[Eng] Value of the coefficient A of the regression equation 
+	 * @param coeficienteB Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation 
 	 */
 	private void sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB, Node clusterHeadNode)
 	{
@@ -1462,10 +1414,8 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Retorna todos os nós sensores no mesmo cluster do nó representante <p>
 	 * [Eng] Returns all sensor nodes in the same cluster from representative node
-	 * @param rn Nó representante <b> rn </b><p> 
-	 * [Eng] @param rn Representative Node <b> rn </b>
-	 * @return Todos nós sensores no mesmo cluster <p>
-	 * [Eng] @return All sensor nodes in the same cluster
+	 * @param rn Nó representante <p> [Eng] Representative Node 
+	 * @return Todos nós sensores no mesmo cluster <p>[Eng] All sensor nodes in the same cluster
 	 */
 	public static Node[] getNodesFromThisCluster(Node rn) {
 		Node[] nodes = null;
