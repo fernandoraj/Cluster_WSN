@@ -11,9 +11,8 @@ import sinalgo.nodes.Position;
 import sinalgo.nodes.messages.Message;
 
 /**
- * Class that represents a response message sent, usually to the sink (or
- * another sensor) in response to a request
- * 
+ * Class that represents a response message sent, usually to the sink (or another sensor) in response to a request <p>
+ * [Eng] Classe que representa uma mensagem de resposta enviada, normalmente para o sink (ou um outro sensor) em resposta a uma requisição
  * @author Fernando Rodrigues
  * 
  */
@@ -31,7 +30,7 @@ public class WsnMsgResponse extends Message {
 	public Integer ttl;
 	/**
 	 * Nó de destino <p>
-	 * [Eng] Destination node
+	 * [Eng] Target node
 	 */
 	public Node target;
 	/**
@@ -48,7 +47,7 @@ public class WsnMsgResponse extends Message {
 	
 	/**
 	 * Número de saltos até o destino <p>
-	 * [Eng] Number of hops to the destination
+	 * [Eng] Number of hops to the target
 	 */
 	public Integer hopsToTarget;
 	
@@ -71,13 +70,14 @@ public class WsnMsgResponse extends Message {
 	public String dataSensedType = null;
 	
 	/**
-	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro)
+	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro) <p>
+	 * [Eng] Percentage threshold of error to the readings of sensor nodes, which can be between 0.0 (no errors accepted) and 1.0 (accepts all and any errors)
 	 */
 	public double thresholdError = 0.0;
 
 	/**
-	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro) <p>
-	 * [Eng] Percentage threshold of error to the readings of sensor nodes, which can be between 0.0 (no errors accepted) and 1.0 (accepts all and any errors)
+	 * Percentual do limiar de erro espacial aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro) <p>
+	 * [Eng] Percentage spacial threshold of error to the readings of sensor nodes, which can be between 0.0 (no errors accepted) and 1.0 (accepts all and any errors)
 	 */
 	public double spacialThresholdError = 0.0;
 	
@@ -94,8 +94,8 @@ public class WsnMsgResponse extends Message {
 	public double batLevel;
 	
 	/**
-	 * Caminho de nós do nó que envia a mensagem de resposta até o sink node, em forma de pilha <p>
-	 * [Eng] Path nodes of the node that sends the reply message until the sink node in the form of stack
+	 * Caminho do nó que envia a mensagem de resposta até o sink node, em forma de pilha <p>
+	 * [Eng] Path from the message sender node until the sink node as a stack
 	 */
 	private Stack<Integer> pathToSenderNode;
 	
@@ -252,7 +252,7 @@ public class WsnMsgResponse extends Message {
 	/**
 	 * O sizeTimeSlot do Representante Node será inversamente proporcional ao número de sensores no mesmo cluster -> número 'L' na documentação <p>
 	 * [Eng] The sizeTimeSlot of Representative Node will be inversely proportional to the number of sensors in the same cluster -> number 'L' in documentation
-	 * @param globalTimeSlot Tamanho inicial do Time slot do sink nó <p>[Eng] Initial Size of Time Slot from the sink node <b> globalTimeSlot </b>
+	 * @param globalTimeSlot Tamanho inicial do Time slot do sink nó <p>[Eng] Initial Size of Time Slot from the sink node 
 	 * @param numSensorsInThisCLuster Número de nós (sensores) no cluster (grupo) <p>[Eng] Number of nodes (sensors) in that cluster (group)
 	 */
 	public void calculatesTheSizeTimeSlotFromRepresentativeNode(int globalTimeSlot, int numSensorsInThisCLuster)
@@ -276,11 +276,11 @@ public class WsnMsgResponse extends Message {
 	/**
 	 * Construtor básico da Classe <p>
 	 * [Eng] Basic constructor class
-	 * @param seqID Identificador da mensagem <P>[Eng] Message identifier <b> seqID </b>
-	 * @param origem Nó de origem <p>[Eng] Node the source <b> origem </b>
-	 * @param destino Nó de destino <p>[Eng] Node of destination <b> destino </b>
-	 * @param forwardingHop Nó que vai reencaminhar a mensagem <p>[Eng] Node that will forward the message <b> forwardingHop </b>
-	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets <b> tipo </b>
+	 * @param seqID Identificador da mensagem <p>[Eng] Message identifier 
+	 * @param source Nó de origem <p>[Eng] Source node 
+	 * @param target Nó de destino <p>[Eng] Target node 
+	 * @param forwardingHop Nó que vai reencaminhar a mensagem <p>[Eng] Node that will forward the message 
+	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets 
 	 */
 	public WsnMsgResponse(Integer seqID, Node source, Node target, Node forwardingHop, Integer type) {
 		this.sequenceID = seqID;
@@ -291,15 +291,15 @@ public class WsnMsgResponse extends Message {
 	}
 
 	/**
-	 * Construtor mediano da Classe //Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS <p>
+	 * Construtor mediano da Classe //Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS <p>
 	 * [Eng] Median Class Constructor // Integer seqID, Node origem, Node destino, Node forwardingHop, Integer tipo, Integer sizeTS
-	 * @param seqID Identificador da mensagem <p>[Eng] Message identifier <b> seqID </b>
-	 * @param origem Nó de origem <p>[Eng] Node the source <b> origem </b>
-	 * @param destino Nó de destino <p>[Eng] Node of destination <b> destino </b>
-	 * @param forwardingHop Nó que vai reencaminhar a mensagem <p>[Eng] Node that will forward the message <b> forwardingHop </b>
-	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets <b> tipo </b>
-	 * @param sizeTS Número de dados sensoreados por time slot (Tamanho do time slot) <p>[Eng] Number of sensed data per time slot (time slot Size) <b> sizeTS </b>
-	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage <b> dataSensedType </b>
+	 * @param seqID Identificador da mensagem <p>[Eng] Message identifier 
+	 * @param source Nó de origem <p>[Eng] Source node 
+	 * @param target Nó de destino <p>[Eng] Target node
+	 * @param forwardingHop Nó que vai reencaminhar a mensagem <p>[Eng] Node that will forward the message 
+	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets 
+	 * @param sizeTS Número de dados sensoreados por time slot (Tamanho do time slot) <p>[Eng] Number of sensed data per time slot (time slot Size) 
+	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage 
 	 */
 	public WsnMsgResponse(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, String dataSensedType) {
 		this.sequenceID = seqID;
@@ -314,13 +314,13 @@ public class WsnMsgResponse extends Message {
 	/**
 	 * Construtor estendido da Classe <p>
 	 * [Eng] Extended Constructor Class
-	 * @param seqID Identificador da mensagem <p>[Eng] Message identifier <b> seqID </b>
-	 * @param origem No de origem <p>[Eng] Node the source <b> origem </b>
-	 * @param destino No de destino <p>[Eng] Node of destination <b> destino </b>
-	 * @param forwardingHop No que vai reencaminhar a mensagem <p>[Eng] Node that will forward the message <b> forwardingHop </b>
-	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets <b> tipo </b>
-	 * @param sizeTS Numero de dados sensoreados por time slot (Tamanho do time slot) <p>[Eng] Number of sensed data per time slot (time slot Size) <b> sizeTS </b>
-	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage <b> dataSensedType </b>
+	 * @param seqID Identificador da mensagem <p>[Eng] Message identifier 
+	 * @param source Nó de origem <p>[Eng] Source node 
+	 * @param target Nó de destino <p>[Eng] Target node
+	 * @param forwardingHop Nó que vai reencaminhar a mensagem <p>[Eng] Node that will forward the message 
+	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets 
+	 * @param sizeTS Número de dados sensoreados por time slot (Tamanho do time slot) <p>[Eng] Number of sensed data per time slot (time slot Size) 
+	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage 
 	 * @param thresholdEr Limiar de erro aceitavel <p>[Eng] Threshold of acceptable error <b> thresholdEr </b>
 	 */
 	public WsnMsgResponse(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, String dataSensedType, double thresholdEr) {
@@ -335,16 +335,18 @@ public class WsnMsgResponse extends Message {
 	}
 
 	/**
-	 * Construtor estendido da Classe
-	 * @param seqID Identificador da mensagem <p>[Eng] Message identifier <b> seqID </b>
-	 * @param origem No de origem <p>[Eng] Node the source <b> origem </b>
-	 * @param destino No de destino <p>[Eng] Node of destination <b> destino </b>
-	 * @param forwardingHop No que vai reencaminhar a mensagem <p>[Eng] Node that will forward the message <b> forwardingHop </b>
-	 * @param tipo Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets <b> tipo </b>
-	 * @param sizeTS Numero de dados sensoreados por time slot (Tamanho do time slot) <p>[Eng] Number of sensed data per time slot (time slot Size) <b> sizeTS </b>
-	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage <b> dataSensedType </b>
-	 * @param thresholdEr Limiar de erro aceitavel <p>[Eng] Threshold of acceptable error <b> thresholdEr </b>
-	 * @param spatialThresholdEr Limiar de erro espacial aceitável <p>[Eng] Threshold of acceptable spatial error <b>  spatialThresholdEr </b>
+	 * Construtor estendido da Classe <p>
+	 * [Eng] Extended Constructor Class
+	 * @param seqID Identificador da mensagem <p>[Eng] Message identifier 
+	 * @param source Nó de origem <p>[Eng] Source node 
+	 * @param target Nó de destino <p>[Eng] Target node
+	 * @param forwardingHop Nó que vai reencaminhar a mensagem <p>[Eng] Node that will forward the message 
+	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets 
+	 * @param sizeTS Número de dados sensoreados por time slot (Tamanho do time slot) <p>[Eng] Number of sensed data per time slot (time slot Size) 
+	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage 
+	 * @param thresholdEr Limiar de erro aceitavel <p>[Eng] Threshold of acceptable error 
+	 * @param spatialThresholdEr Limiar de erro espacial aceitável <p>[Eng] Threshold of acceptable spatial error
+	 * @param batLevel Caminho do nó que envia a mensagem de resposta até o sink node, em forma de pilha <p>[Eng] Path from the message sender node until the sink node as a stack
 	 */
 	 
 	 
@@ -360,7 +362,10 @@ public class WsnMsgResponse extends Message {
 		this.spacialThresholdError = spatialThresholdEr;
 		this.batLevel = batLevel;
 	}
-
+	/**
+	 * Cria ums cópia da mensagem <p>
+	 * [Eng] Create a copy of the message
+	 */
 	@Override
 	public Message clone() {
 		WsnMsgResponse msg = new WsnMsgResponse(this.sequenceID, this.source, this.target, this.forwardingHop, this.typeMsg);
