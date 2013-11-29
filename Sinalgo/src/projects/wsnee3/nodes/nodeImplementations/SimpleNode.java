@@ -42,7 +42,7 @@ public class SimpleNode extends Node
 	 * Indicates the default size of Sliding Window from sensor readings to be send to sink node 
 	 * when there is a "novelty".
 	 */
-	protected static int slidingWindowSize = 10;
+	protected static int slidingWindowSize = 15; // According ADAGA-P* = 7
 	
 	/**
 	 * Indicates the current size of Sliding Window from sensor readings to be send to sink node 
@@ -344,17 +344,16 @@ public class SimpleNode extends Node
 			
 			else if (message instanceof WsnMsgResponse) // Mensagem de resposta dos nós sensores, ou para o sink, que deve ser repassada para o "proximoNoAteEstacaoBase", ou para o cluster head, que deve ser recebida/retida pelo mesmo
 			{
-			
-				
-				
 				
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
 				
-				
 				// TRATAR AQUI DO CASO EM QUE OS CLUSTER HEADS DEVEM ASSUMIR O CONTROLE DA SITUAÇÃO!!!
-				
-				
-				
+/*
+				if (wsnMsgResp.source.ID == 39 || this.ID == 39 || wsnMsgResp.source.ID == 15 || this.ID == 15)
+				{
+					System.out.println("* * * ID = 39 OR ID = 15 ! ! !");
+				}
+*/				
 				if (wsnMsgResp.target != null && wsnMsgResp.target.ID == this.ID) // ou (wsnMsgResp.target == this) ou (this.clusterHead == this) // This is the cluster head sensor which is receiving a message from another sensor of this same clsuter
 				{ 
 
@@ -580,6 +579,9 @@ public class SimpleNode extends Node
 	{
 		Global.sensorReadingsCount++; // Increments the global count of sensor readings
 		numTotalSensorReadings++; // Increments the local count of sensor readings
+		if (Global.currentTime > 100 && numTotalSensorReadings > Global.currentTime + 1) { // TODO
+			System.out.println(" * * * Sensor ID = "+this.ID+": numTotalSensorReadings (performSensorReading) = "+numTotalSensorReadings+" and Global.currentTime = "+Global.currentTime);
+		}
 		if (sensorReadingsQueue != null && sensorReadingsQueue.isEmpty())
 		{
 			loadSensorReadings();
@@ -1057,6 +1059,8 @@ public class SimpleNode extends Node
 							if (nodes[i].ID != this.ID) { // Caso não seja o próprio Nó Representativo
 							
 								DataRecord nodeData = getData((SimpleNode)nodes[i], dataSensedType); // Calcular o RMSE
+
+								((SimpleNode)nodes[i]).addDataRecordItens(nodeData);
 								
 								double sensorValue = nodeData.value;
 								
@@ -1067,13 +1071,16 @@ public class SimpleNode extends Node
 								Global.squaredError += Math.pow((predictionValue - sensorValue), 2);
 								((SimpleNode)nodes[i]).squaredError += Math.pow((predictionValue - sensorValue), 2);
 								// End of Code inserted		
-								
-								
-								
+/*
+								System.out.print("\t");
+								((SimpleNode)nodes[i]).printNodeRMSE();
+*/
 								// DEVE PEGAR OS VALORES LIDOS DE/POR CADA NÓ E CALCULAR O RMSE EM RELAÇÃO AO VALOR PREDITO PARA O NÓ REPRESENTATIVO !!! 
 							}
 
 						} // end for (int i=0; i < nodes.length ;i++)
+						
+						//System.out.println("");
 						
 					} // end if (nodes != null)
 					
@@ -1187,23 +1194,20 @@ public class SimpleNode extends Node
 						addThisNodeToPath(wsnMsgResp);
 						
 						wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
-						
+
+/*						// REMOVER DAQUI...						
+
 						Node[] nodes = SinkNode.getNodesFromThisCluster(this); // Se é um Nó Representativo, ler os valores de todos os outros nós naquele mesmo cluster naquele momento 
 						
 						if (nodes != null && nodes.length > 1) {
 							for (int i=0; i < nodes.length ;i++) { // For each sensor in same cluster from representative node - Para cada um dos nós no mesmo cluster deste Nó Representativo
-/*
-								if (nodes[i].ID == 11 || this.ID == 11 || nodes[i].ID == 12 || this.ID == 12)
-								{
-									System.out.println("* * * ID = 11 OR ID = 12 ! ! !");
-								}
-*/
 								if (nodes[i].ID != this.ID) { // Caso não seja o próprio Nó Representativo
 									updateDataRecordItens((SimpleNode)nodes[i], dataSensedType);
 								} // end if (nodes[i].ID != this.ID)
 							} // end for (int i=0; i < nodes.length ;i++)
 						} // end if (nodes != null && nodes.length > 1)
-							
+*/
+				// ... ATÉ AQUI!
 						
 						if (this.clusterHead == null) // It means that there isn't a cluster head, so the response message must be send to sink node (base station)
 						{
@@ -1283,6 +1287,8 @@ public class SimpleNode extends Node
 			this.squaredError += Math.pow((predictionValue - value), 2);
 			// End of Code inserted
 			
+			//printNodeRMSE();
+			
 			hit = true;
 		}
 		else
@@ -1328,11 +1334,10 @@ public class SimpleNode extends Node
 	 * @param dataType Type of data to be read by sensor
 	 */
 	private void updateDataRecordItens(SimpleNode currentNode, String dataType) {
-		for (int i=0; i < windowSize; i++) {
+		for (int i=0; i < windowSize; i++) { // TODO: check and change windowSize to slidingWindowSize
 			currentNode.dataRecordItens.add(getData(currentNode, dataType));
 		}
-		while (currentNode.dataRecordItens.size() > windowSize)
-		{
+		while (currentNode.dataRecordItens.size() > windowSize) { // TODO: change windowSize to slidingWindowSize
 			currentNode.dataRecordItens.removeElementAt(0);
 		}
 	}
@@ -1387,6 +1392,30 @@ public class SimpleNode extends Node
 		}
 		nonRead = true;
 	} // end addDataRecordItens(char typ, double val, double tim, double bat, int rnd)
+
+	/**
+	 * Adds the respective values to dataRecordItens attribute from this sensor (SimpleNode) and checks (ensures) that the size is not larger than "slidingWindowSize"
+	 * @param dataRecord Data record with the data to be add to "dataRecordItens" vector from the current sensor
+	 */
+	public void addDataRecordItens(DataRecord dataRecord)
+	{
+		if (dataRecord == null) {
+			return;
+		}
+
+		if (this.dataRecordItens == null)
+		{
+			this.dataRecordItens = new Vector<DataRecord>();
+		}
+		dataRecordItens.add(dataRecord);
+		//Implements a FIFO structure with the vector 'dataRecordItens' with at most 'slidingWindowSize' elements
+		while (dataRecordItens.size() > slidingWindowSize)
+		{
+			dataRecordItens.removeElementAt(0);
+		}
+		nonRead = true;
+	} // end addDataRecordItens(char typ, double val, double tim, double bat, int rnd)
+	
 	
 	private boolean nonRead = true;
 	
