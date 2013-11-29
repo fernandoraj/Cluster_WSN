@@ -84,7 +84,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = true; // ACS: false = Representative Nodes; true = Cluster Heads
+	private boolean allSensorsMustContinuoslySense = false; // ACS: false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Flag to indicate that the sink still not clustered all nodes for the first time
@@ -139,12 +139,19 @@ public class SinkNode extends SimpleNode
 	{
 		super();
 		this.setColor(Color.RED);
-		Utils.printForDebug("The size of time slot is "+sizeTimeSlot);
-		Utils.printForDebug("The type of data sensed is "+dataSensedType);
-		Utils.printForDebug("The threshold of error (max error) is "+thresholdError);
-		Utils.printForDebug("The size of sliding window is "+SimpleNode.slidingWindowSize);
-		Utils.printForDebug("The maximum distance between sensors in the same cluster is "+maxDistance);
-		Utils.printForDebug("The status for continuos sense is "+allSensorsMustContinuoslySense);
+		System.out.println("The size of time slot is "+sizeTimeSlot);
+		System.out.println("The type of data sensed is "+dataSensedType);
+		System.out.println("The threshold of error (max error) is "+thresholdError);
+		System.out.println("The size of sliding window is "+SimpleNode.slidingWindowSize);
+		System.out.println("The maximum distance between sensors in the same cluster is "+maxDistance);
+		System.out.println("The status for continuos sense is "+allSensorsMustContinuoslySense);
+		if (allSensorsMustContinuoslySense) {
+			System.out.println("Using Cluster Head approach... ACS = true");
+		}
+		else {
+			System.out.println("Using Representative Nodes approach...  ACS = false");
+		}
+
 		
 //		if(LogL.ROUND_DETAIL){
 			Global.log.logln("\nThe size of time slot is "+sizeTimeSlot);
