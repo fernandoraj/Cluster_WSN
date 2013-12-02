@@ -1,12 +1,32 @@
 /*
 Run and Debug configurations:
 
+Run wsnee
+
+Project: Sinalgo
+Main class: sinalgo.Run
+Arguments:
+-project wsnee -gen 54 wsnee:SimpleNode PositionFile (<trocar por caminho para arquivo>/data/mote_locs_formatado.txt) 
+             -gen 1 wsnee:SinkNode Line2D  
+              -overwrite  SimulationName=WsnEEClusterWithIntelLabsDataset
+
+Debug wsnee
+
+Project: Sinalgo
+Main class: sinalgo.runtime.Main
+Arguments:
+-project wsnee -gen 54 wsnee:SimpleNode PositionFile (<trocar por caminho para arquivo>/data/mote_locs_formatado.txt) 
+             -gen 1 wsnee:SinkNode Line2D  
+              -overwrite  SimulationName=WsnEEClusterWithIntelLabsDataset
+
+ - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x - x -
+
 Run wsnee3
 
 Project: Sinalgo
 Main class: sinalgo.Run
 Arguments:
--project wsnee3 -gen 54 wsnee3:SimpleNode PositionFile (/Users/fernando1/Documents/My Classes/UFC/Doutorado/Doutorado - PPGIA/Artigos/Redes de Sensores/Ferramentas/data/mote_locs_formatado.txt) 
+-project wsnee3 -gen 54 wsnee3:SimpleNode PositionFile (<trocar por caminho para arquivo>/data/mote_locs_formatado.txt) 
              -gen 1 wsnee3:SinkNode Line2D  
               -overwrite  SimulationName=WsnEEClusterWithIntelLabsDataset
 
@@ -15,7 +35,7 @@ Debug wsnee3
 Project: Sinalgo
 Main class: sinalgo.runtime.Main
 Arguments:
--project wsnee3 -gen 54 wsnee3:SimpleNode PositionFile (/Users/fernando1/Documents/My Classes/UFC/Doutorado/Doutorado - PPGIA/Artigos/Redes de Sensores/Ferramentas/data/mote_locs_formatado.txt) 
+-project wsnee3 -gen 54 wsnee3:SimpleNode PositionFile (<trocar por caminho para arquivo>/data/mote_locs_formatado.txt) 
              -gen 1 wsnee3:SinkNode Line2D  
               -overwrite  SimulationName=WsnEEClusterWithIntelLabsDataset
 
