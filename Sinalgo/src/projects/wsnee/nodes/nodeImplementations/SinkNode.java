@@ -1327,11 +1327,11 @@ public class SinkNode extends SimpleNode
 			double coeficienteA, coeficienteB;
 			double mediaTempos, mediaValores;
 			//Médias dos valores de leitura e tempos
-			mediaTempos = calculaMedia(tempos);
-			mediaValores = calculaMedia(valores);
+			mediaTempos = calculatesMean(tempos);
+			mediaValores = calculatesMean(valores);
 			//Cálculos dos coeficientes de regressão linear com os vetores acima
-			coeficienteB = calculaB(valores, tempos, mediaValores, mediaTempos);
-			coeficienteA = calculaA(mediaValores, mediaTempos, coeficienteB);
+			coeficienteB = calculatesB(valores, tempos, mediaValores, mediaTempos);
+			coeficienteA = calculatesA(mediaValores, mediaTempos, coeficienteB);
 			sendCoefficients(wsnMsgResp, coeficienteA, coeficienteB, clusterHeadNode);
 		}
 	} // end receiveMessage(WsnMsgResponse wsnMsgResp, Node clusterHeadNode)
@@ -1342,7 +1342,7 @@ public class SinkNode extends SimpleNode
 	 * @param values Array de valores reais de entrada <p>[Eng] Array of real values ??input
 	 * @return Média dos valores reais de entrada <p>[Eng] Mean of the actual values ??of input
 	 */
-	private double calculaMedia(double[] values)
+	private double calculatesMean(double[] values)
 	{
 		double mean = 0, sum = 0;
 		for (int i=0; i<values.length; i++)
@@ -1365,7 +1365,7 @@ public class SinkNode extends SimpleNode
 	 * @param avarageTimes Média dos tempos de leitura dos valores pelos sensores <p>[Eng] Mean time reading the values ??from sensors <b> mediaTempos </b>
 	 * @return Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation
 	 */
-	private double calculaB(double[] values, double[] times, double averageValues, double avarageTimes)
+	private double calculatesB(double[] values, double[] times, double averageValues, double avarageTimes)
 	{
 		double numerador = 0.0, denominador = 0.0, x;
 		for (int i = 0; i < times.length; i++)
@@ -1389,7 +1389,7 @@ public class SinkNode extends SimpleNode
 	 * @param B Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation 
 	 * @return Valor do coeficiente A <p>[Eng] Value of the coefficient A
 	 */
-	private double calculaA(double averageValues, double avarageTimes, double B)
+	private double calculatesA(double averageValues, double avarageTimes, double B)
 	{
 		return (averageValues - B*avarageTimes);
 	} // end calculaA(double mediaValores, double mediaTempos, double B)
