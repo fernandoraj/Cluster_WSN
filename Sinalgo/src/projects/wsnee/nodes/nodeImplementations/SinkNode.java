@@ -975,8 +975,8 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Muda a mensagem de posição "index" para a primeira posição [0] nesta linha do array<p>
 	 * [Eng] Change the message from "index" position for the first position [0] in that line from array
-	 * @param line
-	 * @param index
+	 * @param line 
+	 * @param index 
 	 */
 	private void changeMessagePositionInLine(int line, int index)
 	{
@@ -1359,19 +1359,19 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Calcula o coeficiente B da equação de regressão <p>
 	 * [Eng] Calculates the coefficient B of the regression equation
-	 * @param valores Array de valores (grandezas) das medições dos sensores <p>[Eng] Array of values ??(magnitudes) of the measurements of the sensors
-	 * @param tempos Array de tempos das medições dos sensores <p>[Eng] Array times of the measurements of the sensors
-	 * @param mediaValores Média dos valores lidos pelos sensores <p>[Eng] Mean of values ??read by the sensors 
-	 * @param mediaTempos Média dos tempos de leitura dos valores pelos sensores <p>[Eng] Mean time reading the values ??from sensors <b> mediaTempos </b>
+	 * @param values Array de valores (grandezas) das medições dos sensores <p>[Eng] Array of values ??(magnitudes) of the measurements of the sensors
+	 * @param times Array de tempos das medições dos sensores <p>[Eng] Array times of the measurements of the sensors
+	 * @param averageValues Média dos valores lidos pelos sensores <p>[Eng] Mean of values ??read by the sensors 
+	 * @param avarageTimes Média dos tempos de leitura dos valores pelos sensores <p>[Eng] Mean time reading the values ??from sensors <b> mediaTempos </b>
 	 * @return Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation
 	 */
-	private double calculaB(double[] valores, double[] tempos, double mediaValores, double mediaTempos)
+	private double calculaB(double[] values, double[] times, double averageValues, double avarageTimes)
 	{
 		double numerador = 0.0, denominador = 0.0, x;
-		for (int i = 0; i < tempos.length; i++)
+		for (int i = 0; i < times.length; i++)
 		{
-			x = tempos[i] - mediaTempos;
-			numerador += x*(valores[i] - mediaValores);
+			x = times[i] - avarageTimes;
+			numerador += x*(values[i] - averageValues);
 			denominador += x*x;
 		}
 		if (denominador != 0)
@@ -1384,28 +1384,28 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Calcula o coeficiente A da equação de regressão <p>
 	 * [Eng] Calculate coefficient A of the regression equation
-	 * @param mediaValores Média dos valores lidos pelos sensores <p>[Eng] Mean of values ??read by the sensors 
-	 * @param mediaTempos Média dos tempos de leitura dos valores pelos sensores <p>[Eng] Mean time reading the values ??from sensors 
+	 * @param averageValues Média dos valores lidos pelos sensores <p>[Eng] Mean of values ??read by the sensors 
+	 * @param avarageTimes Média dos tempos de leitura dos valores pelos sensores <p>[Eng] Mean time reading the values ??from sensors 
 	 * @param B Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation 
 	 * @return Valor do coeficiente A <p>[Eng] Value of the coefficient A
 	 */
-	private double calculaA(double mediaValores, double mediaTempos, double B)
+	private double calculaA(double averageValues, double avarageTimes, double B)
 	{
-		return (mediaValores - B*mediaTempos);
+		return (averageValues - B*avarageTimes);
 	} // end calculaA(double mediaValores, double mediaTempos, double B)
 	
 	/**
 	 * Cria uma nova mensagem (WsnMsg) para envio dos coeficientes recebidos através dos parâmetros, e a envia para o próximo nó no caminho até o nó de origem da mensagem (wsnMsgResp.origem) <p>
 	 * [Eng] Creates a new message (WsnMsg) for sending coefficients received through the parameters, and sends it to the next node on the path until the source node of the message (wsnMsgResp.origem)
 	 * @param wsnMsgResp Mensagem de resposta enviada do nó de origem para o nó sink, que agora enviará os (novos) coeficientes calculados para o nó de origem <p>[Eng] Response message sent from the source node to the sink node, which now sends the (new) coefficients calculated for the source node 
-	 * @param coeficienteA Valor do coeficiente A da equação de regressão <p>[Eng] Value of the coefficient A of the regression equation 
-	 * @param coeficienteB Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation 
+	 * @param coefficientA Valor do coeficiente A da equação de regressão <p>[Eng] Value of the coefficient A of the regression equation 
+	 * @param coefficientB Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation 
 	 */
-	private void sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB, Node clusterHeadNode)
+	private void sendCoefficients(WsnMsgResponse wsnMsgResp, double coefficientA, double coefficientB, Node clusterHeadNode)
 	{
 		WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.source , this, 1, wsnMsgResp.sizeTimeSlot, dataSensedType, thresholdError, clusterHeadNode);
 		// WsnMsg wsnMessage = new WsnMsg(1, this, wsnMsgResp.source , this, 1, wsnMsgResp.sizeTimeSlot, dataSensedType, thresholdError);
-		wsnMessage.setCoefs(coeficienteA, coeficienteB);
+		wsnMessage.setCoefs(coefficientA, coefficientB);
 		wsnMessage.setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
 		wsnMessage.hopsToTarget--;
 		sendToNextNodeInPath(wsnMessage);

@@ -784,14 +784,14 @@ public class SimpleNode extends Node
 	
 	/**
 	 * Transforma os valores de data (AnoMesDia) e hora (hora) passados em uma grandeza inteira com a quantidade de milisegundos total<p>[Eng] Turns the values of the date(YearMonthDay) and hour(hour) passed in a entire grandeur with a total milliseconds quantity
-	 * @param AnoMesDia String no formato AAAA-MM-DD representando a data da leitura do valor pelo sensor (A-Ano, M-Mes, D-Dia)<p>[Eng] String in YYYY-MM-DD format representing the date of reading the value from the sensor (Y-Year, M-month, D-Day)
-	 * @param hora String no formato HH:MM:SS.LLLLL representando a hora da leitura do valor pelo sensor (H-Hora, M-Minuto, S-Segundo, L-Milisegundo)<p>[Eng] String to format HH:MM:SS.LLLLL representing a hour by reading of the value from sensor(H-Hour, M-Minutes, S-Seconds, L-Milliseconds)
+	 * @param yearMonthDay String no formato AAAA-MM-DD representando a data da leitura do valor pelo sensor (A-Ano, M-Mes, D-Dia)<p>[Eng] String in YYYY-MM-DD format representing the date of reading the value from the sensor (Y-Year, M-month, D-Day)
+	 * @param hour String no formato HH:MM:SS.LLLLL representando a hora da leitura do valor pelo sensor (H-Hora, M-Minuto, S-Segundo, L-Milisegundo)<p>[Eng] String to format HH:MM:SS.LLLLL representing a hour by reading of the value from sensor(H-Hour, M-Minutes, S-Seconds, L-Milliseconds)
 	 * @return Quantidade de milisegundos total representando aquele instante de tempo (Data + Hora) segundo o padrão do Java<p>[Eng] Total quantity of milliseconds representing that instant of time( date + Hour) according to the Java. 
 	 */
-	private long parseCalendarHoras(String AnoMesDia, String hora)
+	private long parseCalendarHoras(String yearMonthDay, String hour)
 	{
-		String[] datas = AnoMesDia.split("-");
-		String[] horas = hora.split(":");
+		String[] datas = yearMonthDay.split("-");
+		String[] horas = hour.split(":");
 		String certo = "";
 		String millesegundos = "";
 		for (String mille : horas){
@@ -812,15 +812,15 @@ public class SimpleNode extends Node
 	 * [Eng]It calculates the prediction sensed value according to coefficients (A and B) informed and time parameter; it increments the prediction count (numTotalPredictions)
 	 * @param A Coeficiente A (interceptor) da equação de regressão, dada por S(t) = A + B.t <p>[Eng] Coefficient A(interceptor) of regression equation, given by S(t) = A + B.t
 	 * @param B Coeficiente B (slope, inclinação) da equação de regressão, dada por S(t) = A + B.t<p>[Eng] Coefficient B (slope, inclination) of regression equation, given by S(t) = A + B.t
-	 * @param tempo Parâmetro de tempo a ter o valor da grandeza predito<p>[Eng]Parameter of time to has the value by predicted grandeur.
+	 * @param time Parâmetro de tempo a ter o valor da grandeza predito<p>[Eng]Parameter of time to has the value by predicted grandeur.
 	 * @return Valor predito para o parâmetro sensoreado no tempo dado<p>[Eng]Predicted value to sensored parameter in a determined time.
 	 */
-	private double makePrediction(double A, double B, double tempo)
+	private double makePrediction(double A, double B, double time)
 	{
-		double time;
-		time = A + B*tempo;
+		double localTime;
+		localTime = A + B*time;
 		this.numTotalPredictions++;
-		return time;
+		return localTime;
 	} // end makePrediction(double A, double B, double tempo)
 	
 	/**
