@@ -960,6 +960,9 @@ public class SimpleNode extends Node
 		{
 			medida = identifyNumberSequenceByType(dataSensedType);
 		}
+		if (this.ID == 1 && Global.currentTime > 175) {
+			System.out.println("this.ID = "+this.ID+" ; Round = "+Global.currentTime+" this.numTotalSensorReadings = "+this.numTotalSensorReadings+" Diferença = "+(Global.currentTime - this.numTotalSensorReadings) );
+		}
 		String sensorReading = performSensorReading();
 		
 		if (sensorReading != null && medida != 0)
