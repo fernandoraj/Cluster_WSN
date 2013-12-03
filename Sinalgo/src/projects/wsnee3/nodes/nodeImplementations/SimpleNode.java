@@ -863,8 +863,8 @@ public class SimpleNode extends Node
 		if (dataType != null) {
 			numSequenceValueData = identifyNumberSequenceByType(dataType);
 		}
-		
-		String sensorReading = currentNode.performSensorReading();
+		// TODO:
+		String sensorReading = currentNode.performSensorReading(); 
 		
 		if (sensorReading != null && numSequenceValueData != 0)
 		{
@@ -960,8 +960,9 @@ public class SimpleNode extends Node
 		{
 			medida = identifyNumberSequenceByType(dataSensedType);
 		}
+		// TODO:
 		if (this.ID == 1 && Global.currentTime > 175) {
-			System.out.println("this.ID = "+this.ID+" ; Round = "+Global.currentTime+" this.numTotalSensorReadings = "+this.numTotalSensorReadings+" Diferença = "+(Global.currentTime - this.numTotalSensorReadings) );
+			System.out.println("this.ID = "+this.ID+" ; Round = "+Global.currentTime+" ; this.numTotalSensorReadings = "+this.numTotalSensorReadings+" ; Difference = "+(Global.currentTime - this.numTotalSensorReadings) );
 		}
 		String sensorReading = performSensorReading();
 		
@@ -1144,7 +1145,7 @@ public class SimpleNode extends Node
 							addThisNodeToPath(wsnMsgResp);
 							
 							wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
-							
+							// TODO:
 							DirectMessageTimer timer = new DirectMessageTimer(wsnMsgResp, clusterHead); // Envia uma mensagem diretamente para o 
 																										// ClusterHead deste nó sensor
 							timer.startRelative(1, this);
