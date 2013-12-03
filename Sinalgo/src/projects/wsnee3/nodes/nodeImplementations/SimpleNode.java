@@ -353,7 +353,11 @@ public class SimpleNode extends Node
 				{
 					System.out.println("* * * ID = 39 OR ID = 15 ! ! !");
 				}
-*/				
+*/				// TODO:
+				if (wsnMsgResp.typeMsg == 5) {
+					//System.out.println("MESSAGE FROM DIRECT!");
+				}
+				
 				if (wsnMsgResp.target != null && wsnMsgResp.target.ID == this.ID) // ou (wsnMsgResp.target == this) ou (this.clusterHead == this) // This is the cluster head sensor which is receiving a message from another sensor of this same clsuter
 				{ 
 
@@ -1135,6 +1139,7 @@ public class SimpleNode extends Node
 							WsnMsgResponse wsnMsgResp;
 							
 							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, this.ownTimeSlot, dataSensedType);
+							//wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 5, this.ownTimeSlot, dataSensedType);
 							
 							Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+limitPredictionError+")! NoID = "+this.ID+"\n");
 							Utils.printForDebug("* * * * The predicted value NO is within the margin of error of the value read! NoID = "+this.ID);
