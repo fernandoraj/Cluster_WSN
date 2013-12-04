@@ -190,6 +190,8 @@ public class SimpleNode extends Node
 	private double initialErrorRound;
 	
 	private boolean validPredictions = true;
+	
+	private boolean canMakePredictions = false; // variavel para saber se o node pode fazer predições;
 
 	@Override
 	public void preStep() {}
@@ -226,6 +228,8 @@ public class SimpleNode extends Node
 				else if (wsnMessage.typeMsg == 0)// Mensagem que vai do sink para os nós sensores e é um flood. Devemos atualizar a rota
 				{ 
 					this.setColor(Color.BLUE);
+					
+					canMakePredictions = Boolean.FALSE;
 
 //					Utils.printForDebug("*** Entrou em else if (wsnMessage.tipoMsg == 0) *** NoID = "+this.ID);
 					
@@ -259,7 +263,11 @@ public class SimpleNode extends Node
 					
 //					Utils.printForDebug("@ Entrou em else if (wsnMessage.tipoMsg == 1) @ NoID = "+this.ID+" nextNodeId = "+nextNodeId);
 
+					canMakePredictions = Boolean.TRUE;
+					
 					encaminhar = Boolean.FALSE;
+					
+					
 					
 					//Definir roteamento de mensagem
 					if (wsnMessage.target != this)
@@ -1273,9 +1281,12 @@ public class SimpleNode extends Node
 	 */
 	public final void triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
 	{
+		
+	if (canMakePredictions) {
 		if (validPredictions) {
 			triggerPredictions(dataSensedType, coefA, coefB, maxError);
 		}
+	}
 /*
 		else {
 			System.out.println("nodeID = "+this.ID+": validPredictions FALSE in Round = "+Global.currentTime);
