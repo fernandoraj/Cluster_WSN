@@ -189,6 +189,7 @@ public class SimpleNode extends Node
 	 */
 	private double initialErrorRound;
 	
+	private boolean validPredictions = true;
 
 	@Override
 	public void preStep() {}
@@ -353,12 +354,13 @@ public class SimpleNode extends Node
 				{
 					System.out.println("* * * ID = 39 OR ID = 15 ! ! !");
 				}
-*/				// TODO:
+*/				
+				// TODO:
 				if (wsnMsgResp.typeMsg == 5) {
-					//System.out.println("MESSAGE FROM DIRECT!");
+					//System.out.println("DirectMessageTimer(); received by the node "+this.ID+" from node "+wsnMsgResp.source.ID+" in Round = "+Global.currentTime);
+					validPredictions = false;
 				}
-				
-				if (wsnMsgResp.target != null && wsnMsgResp.target.ID == this.ID) // ou (wsnMsgResp.target == this) ou (this.clusterHead == this) // This is the cluster head sensor which is receiving a message from another sensor of this same clsuter
+				else if (wsnMsgResp.target != null && wsnMsgResp.target.ID == this.ID) // ou (wsnMsgResp.target == this) ou (this.clusterHead == this) // This is the cluster head sensor which is receiving a message from another sensor of this same clsuter
 				{ 
 
 /*
@@ -410,8 +412,10 @@ public class SimpleNode extends Node
 				break;
 			case 3:
 				break;
-			case 4: //Nível mínimo de bateria atingido (pelo ClusterHead) - Minimum battery level reached (by ClusterHead)
+			case 4: // Nível mínimo de bateria atingido (pelo ClusterHead) - Minimum battery level reached (by ClusterHead)
 				break;
+			case 5: // Aviso de parada de sensoriamento
+				break;				
 		}
 /*		
 		if (Global.currentTime > (initialErrorRound + maxErrorsPerCluster)) { // Se o tempo (round/ciclo/ticket) atual for maior do que o inicial mais o número máximo de erros por cluster
@@ -428,10 +432,23 @@ public class SimpleNode extends Node
 
 			wsnMsgResp.target = null; // wsnMsgResp.target = SinkNode; || wsnMsgResp.target = null; || wsnMsgResp.target = Tools.getNodeByID(55);
 			
+			// TODO: Disparar uma mensagem para todos os nós do mesmo cluster para que o atributo "validPredictions" torne-se falso até que o sink envie nova
+			// mensagem com novos coeficientes e torne o atr. "validPredictions" igual a true.
+			validPredictions = false;
 			
+			//Node.timers.clear(); // Limpar todos os timers deste nó (ClusterHead) e dos outros nós do mesmo cluster
 			
-			
-			
+			// Envia uma mensagem para cada um dos nós do cluster atual para que os mesmos parem de sensoriar (cessem as predições)
+			for (int i = 0; i < this.myCluster.members.size(); i++) {
+				
+				SimpleNode targetNode = this.myCluster.members.get(i);
+				
+				WsnMsgResponse wsnMsgRespStopPredictions = new WsnMsgResponse(1, this, targetNode, this, 5);
+												
+				DirectMessageTimer timer = new DirectMessageTimer(wsnMsgRespStopPredictions, targetNode); // Envia uma mensagem diretamente para o 
+																										  // nó "targetNode" deste cluster
+				timer.startRelative(1, this);
+			}			
 			
 			
 			WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
@@ -822,7 +839,8 @@ public class SimpleNode extends Node
 			this.ownTimeSlot = wsnMessage.sizeTimeSlot;
 			
 			windowSize = slidingWindowSize;
-			
+			validPredictions = true; // TODO:
+			//System.out.println("nodeID = "+this.ID+": validPredictions TRUE in Round = "+Global.currentTime);
 			triggerPredictions(wsnMessage.dataSensedType, coefA, coefB, maxError);
 		}
 	} // end receiveCoefficients(WsnMsg wsnMessage)
@@ -965,9 +983,11 @@ public class SimpleNode extends Node
 			medida = identifyNumberSequenceByType(dataSensedType);
 		}
 		// TODO:
+/*
 		if (this.ID == 1 && Global.currentTime > 175) {
 			System.out.println("this.ID = "+this.ID+" ; Round = "+Global.currentTime+" ; this.numTotalSensorReadings = "+this.numTotalSensorReadings+" ; Difference = "+(Global.currentTime - this.numTotalSensorReadings) );
 		}
+*/
 		String sensorReading = performSensorReading();
 		
 		if (sensorReading != null && medida != 0)
@@ -1154,6 +1174,7 @@ public class SimpleNode extends Node
 							DirectMessageTimer timer = new DirectMessageTimer(wsnMsgResp, clusterHead); // Envia uma mensagem diretamente para o 
 																										// ClusterHead deste nó sensor
 							timer.startRelative(1, this);
+							//System.out.println("new DirectMessageTimer(wsnMsgResp, clusterHead); from node "+this.ID+" to node "+clusterHead.ID+" in Round = "+Global.currentTime);
 							
 							numPredictionErrors = 0; // Reinicia a contagem dos erros de predição, depois de ter enviado uma mensagem inicial para o 
 													// ClusterHead
@@ -1252,7 +1273,14 @@ public class SimpleNode extends Node
 	 */
 	public final void triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
 	{
-		triggerPredictions(dataSensedType, coefA, coefB, maxError);
+		if (validPredictions) {
+			triggerPredictions(dataSensedType, coefA, coefB, maxError);
+		}
+/*
+		else {
+			System.out.println("nodeID = "+this.ID+": validPredictions FALSE in Round = "+Global.currentTime);
+		}
+*/
 	} // end triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
 	
 	/**
