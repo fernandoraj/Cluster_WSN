@@ -135,6 +135,11 @@ public class SinkNode extends SimpleNode
 	private int expectedNumberOfSensors = 0;
 	private int numMessagesExpectedReceived = 0;
 	
+	private boolean canReceiveMsgResponseError = false;
+	
+	// TODO: 
+	private double minimumOccupancyRatePerCluster = 1.35; // #TotalSensors = 54 / #CLusters = 40 => 54/40 = 1.35
+	
 	public SinkNode()
 	{
 		super();
@@ -198,147 +203,112 @@ public class SinkNode extends SimpleNode
 				
 				Utils.printForDebug("@ @ @ Message Received by SINK from the NodeID = "+wsnMsgResp.source.ID +" with MsgType = "+wsnMsgResp.typeMsg+"\n");
 				
-				if (wsnMsgResp.typeMsg == 2 || wsnMsgResp.typeMsg == 3) // Se é uma mensagem de um Nó Representativo / Cluster Head que excedeu o #máximo de erros de predição
-				{
-					if (wsnMsgResp.typeMsg == 2) {
-						numMessagesOfErrorPredictionReceived++;
-					}
-					if (wsnMsgResp.typeMsg == 3) {
-						numMessagesOfTimeSlotFinishedReceived++;
-					}
-// CASO O CLUSTER PRECISE SOFRER UM SPLIT, UMA MENSAGEM SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK DEVE SER ENVIADA PARA CADA UM DOS NÓS DO CLUSTER 
-					
-					//numMessagesExpectedReceived++;
-					
-					int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source);
-					if (lineFromCluster >= 0)
+				if (canReceiveMsgResponseError) { // If the other sensor nodes still getting data to send to sink calculates the Equation Regression Coeffs. - e.g.: During the Merge Process Operation
+
+					if (wsnMsgResp.typeMsg == 2 || wsnMsgResp.typeMsg == 3) // Se é uma mensagem de um Nó Representativo / Cluster Head que excedeu o #máximo de erros de predição
 					{
-//						expectedNumberOfSensors += sendSenseRequestMessageToAllSensorsInCluster(nodeGroups, lineFromCluster);
-						triggerSplitFromCluster(lineFromCluster);
-					}
-
-//					System.out.println("CHEGOU O NODE ID "+wsnMsgResp.source.ID+" NO SINK!");
-
-					newCluster = ensuresArrayList2d(newCluster);
-					
-					addNodesInNewCluster(nodesToReceiveDataReading, newCluster);
-					classifyNodesByAllParams(newCluster);
-					setClustersFromNodes(newCluster);
-					nodesToReceiveDataReading = new ArrayList2d<SimpleNode>();
-
-/*
-					if (newCluster == null) // If a new cluster (temp) has not yet been created (instanciated)
-					{
-						newCluster = new ArrayList2d<SimpleNode>(); // Instanciate him
-						newCluster.ensureCapacity(expectedNumberOfSensors);
-						newCluster.add((SimpleNode)wsnMsgResp.source, 0); // Adds the new response message sensor to new cluster
-
-					} // end if (newCluster == null)
-					else // If already there is a new cluster (created)
-					{
-						addNodesInNewCluster(nodesToReceiveDataReading, newCluster);
-					} // end else if (newCluster == null)
-*/
-/*
-					if (blackList == null) { // If BlackList is not created / instanciate yet...
-						blackList = new ArrayList<WsnMsgResponse>(); // Instanciate him
-					}
-					blackList.add(wsnMsgResp); // ... até aqui
-*/					
-					//expectedNumberOfSensors--;
-					
-					
-					for (int line = 0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from newCluster
-					{
-						int numSensors = newCluster.getNumCols(line);
-						Utils.printForDebug("Cluster / Line number = "+line);
-
-						if (!allSensorsMustContinuoslySense) { // If only the representative nodes must sensing (Representative nodes approach)
-							SimpleNode representativeNode = newCluster.get(line, 0); // Get the Representative Node (or Cluster Head)
-							representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-							receiveMessage(representativeNode, null);
-						} // end if (!allSensorsMustContinuoslySense)
+						if (wsnMsgResp.typeMsg == 2) {
+							numMessagesOfErrorPredictionReceived++;
+						}
+						if (wsnMsgResp.typeMsg == 3) {
+							numMessagesOfTimeSlotFinishedReceived++;
+						}
+	// CASO O CLUSTER PRECISE SOFRER UM SPLIT, UMA MENSAGEM SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK DEVE SER ENVIADA PARA CADA UM DOS NÓS DO CLUSTER 
 						
-						else { // If all nodes in cluters must sensing, and not only the representative nodes (Cluster heads approach)
-							Node chNode = newCluster.get(line, 0); // Cluster Head from the current cluster/line
-							for (int col=0; col < numSensors; col++) // For each colunm from that line in newCluster
-							{
-								SimpleNode currentNode = newCluster.get(line, col); // Get the current node
-								currentNode.myCluster.sizeTimeSlot = sensorTimeSlot; // If all sensor nodes in each cluster must continuosly sense, so the sizeTimeSlot doesn't matter
-								receiveMessage(currentNode, chNode);
-							} // end for (int col=0; col < numSensors; col++)
-						} // end else if (!allSensorsMustContinuoslySense)
-							
-					} // end for (int line=0; line < newCluster.getNumRows(); line++)
-					
-					unifyClusters(nodeGroups, newCluster); // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
-					Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
-
-				
-					
-					
-					
-// CASO O NÓ QUE TENHA ENVIADO A MsgResp SEJA UM CLUSTER HEAD???
-					if (wsnMsgResp.target != null)
-					{
-						Utils.printForDebug("Inside the code => if (wsnMsgResp.target != null)");						
-					}
-					//receiveMessage(wsnMsgResp, null); // Recebe a mensagem, para recálculo dos coeficientes e reenvio dos mesmos àquele nó sensor (Nó Representativo), mantendo o número de predições a serem executadas como complemento do total calculado inicialmente, ou seja, NÃO reinicia o ciclo de time slot daquele cluster
-				}
-				
-				else if (wsnMsgResp.typeMsg == 3) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
-				{
-/*					
-					numMessagesOfTimeSlotFinishedReceived++;
-					
-					int lineFromClusterNode = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
-					
-					if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
-					{
-						classifyNodesByAllParams(nodeGroups);
+						//numMessagesExpectedReceived++;
 						
-						SimpleNode representativeNode = nodeGroups.get(lineFromClusterNode, 0); // Get the (new) Representative Node (or Cluster Head)
-						int numSensors = nodeGroups.getNumCols(lineFromClusterNode);
-						Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
-						representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-						
-						receiveMessage(representativeNode, null);
-					}
-					// PAREI AQUI!!! - Fazer testes para verificar se os clusters estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
-*/				
-				} // else if (wsnMsgResp.typeMsg == 3)
-				
-				else if (wsnMsgResp.typeMsg == 4) // Se é uma mensagem de um Nó Representativo/Cluster Head cujo nível da bateria está abaixo do mínimo (SimpleNode.minBatLevelInClusterHead)
-				{
-					numMessagesOfLowBatteryReceived++;
-					
-					if (allSensorsMustContinuoslySense) { // Se é uma mensagem de um Cluster Head // Se for um ClusterHead (ClusterHead != null)
-						
-						int lineFromClusterNode = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
-						
-						if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
+						int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source);
+						if (lineFromCluster >= 0)
 						{
-							classifyNodesByAllParams(nodeGroups); // Reclassifica todos os nós do cluster atual - cujo Cluster Head teve decaimento do nível de bateria
+	//						expectedNumberOfSensors += sendSenseRequestMessageToAllSensorsInCluster(nodeGroups, lineFromCluster);
+							triggerSplitFromCluster(lineFromCluster);
+						}
+	
+	//					System.out.println("CHEGOU O NODE ID "+wsnMsgResp.source.ID+" NO SINK!");
+	
+						newCluster = ensuresArrayList2d(newCluster);
+						
+						addNodesInNewCluster(nodesToReceiveDataReading, newCluster);
+						classifyNodesByAllParams(newCluster);
+						setClustersFromNodes(newCluster);
+						nodesToReceiveDataReading = new ArrayList2d<SimpleNode>();
+	
+	/*
+						if (newCluster == null) // If a new cluster (temp) has not yet been created (instanciated)
+						{
+							newCluster = new ArrayList2d<SimpleNode>(); // Instanciate him
+							newCluster.ensureCapacity(expectedNumberOfSensors);
+							newCluster.add((SimpleNode)wsnMsgResp.source, 0); // Adds the new response message sensor to new cluster
+	
+						} // end if (newCluster == null)
+						else // If already there is a new cluster (created)
+						{
+							addNodesInNewCluster(nodesToReceiveDataReading, newCluster);
+						} // end else if (newCluster == null)
+	*/
+	/*
+						if (blackList == null) { // If BlackList is not created / instanciate yet...
+							blackList = new ArrayList<WsnMsgResponse>(); // Instanciate him
+						}
+						blackList.add(wsnMsgResp); // ... até aqui
+	*/					
+						//expectedNumberOfSensors--;
+						
+						
+						for (int line = 0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from newCluster
+						{
+							int numSensors = newCluster.getNumCols(line);
+							Utils.printForDebug("Cluster / Line number = "+line);
+	
+							if (!allSensorsMustContinuoslySense) { // If only the representative nodes must sensing (Representative nodes approach)
+								SimpleNode representativeNode = newCluster.get(line, 0); // Get the Representative Node (or Cluster Head)
+								representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+								receiveMessage(representativeNode, null);
+							} // end if (!allSensorsMustContinuoslySense)
 							
-							int numSensors = nodeGroups.getNumCols(lineFromClusterNode);
-							Node chNode = (nodeGroups.get(lineFromClusterNode, 0)); // Get the (new) Cluster Head from the current cluster/line
+							else { // If all nodes in cluters must sensing, and not only the representative nodes (Cluster heads approach)
+								Node chNode = newCluster.get(line, 0); // Cluster Head from the current cluster/line
+								for (int col=0; col < numSensors; col++) // For each colunm from that line in newCluster
+								{
+									SimpleNode currentNode = newCluster.get(line, col); // Get the current node
+									currentNode.myCluster.sizeTimeSlot = sensorTimeSlot; // If all sensor nodes in each cluster must continuosly sense, so the sizeTimeSlot doesn't matter
+									receiveMessage(currentNode, chNode);
+								} // end for (int col=0; col < numSensors; col++)
+							} // end else if (!allSensorsMustContinuoslySense)
+								
+						} // end for (int line=0; line < newCluster.getNumRows(); line++)
+						
+						unifyClusters(nodeGroups, newCluster); // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
+						Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
+						
+						// TODO: Test if it must br done currentNumberOfActiveSensors = (numTotalOfSensors - numMessagesOfLowBatteryReceived)
+						if (((double)numTotalOfSensors / (double)Global.clustersCount) <= minimumOccupancyRatePerCluster) { // Begin MERGE operation
+							canReceiveMsgResponseError = false;
+							// TODO: To be tested!
+							//nodeGroups = null;
+							
+							this.nextNodeToBaseStation = this;
+							WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 2, sizeTimeSlot, dataSensedType);
+							
+							WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
+							timer.startRelative(1, this);
+						}
 
-							Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"; ClusterHead / IDnumber = "+chNode.ID+"; #Sensors = "+numSensors);
-							for (int col=0; col < numSensors; col++) // For each node from that cluster (in messageGroups), it must communicate who is the new ClusterHead
-							{
-								SimpleNode nodeCurrent = nodeGroups.get(lineFromClusterNode, col); // Get the Node
-								
-								nodeCurrent.myCluster.sizeTimeSlot = sensorTimeSlot; // If all sensor nodes in Cluster must continuosly sense, so the sizeTimeSlot will be the sensorTimeSlot
-								
-								receiveMessage(nodeCurrent, chNode);
-							} // end for (int col=0; col < numSensors; col++)
-						} // end if (lineFromClusterNode >= 0)
+
+						
+	// CASO O NÓ QUE TENHA ENVIADO A MsgResp SEJA UM CLUSTER HEAD???
+						if (wsnMsgResp.target != null)
+						{
+							Utils.printForDebug("Inside the code => if (wsnMsgResp.target != null)");						
+						}
+						//receiveMessage(wsnMsgResp, null); // Recebe a mensagem, para recálculo dos coeficientes e reenvio dos mesmos àquele nó sensor (Nó Representativo), mantendo o número de predições a serem executadas como complemento do total calculado inicialmente, ou seja, NÃO reinicia o ciclo de time slot daquele cluster
+					}
 					
-					
-					} // end if (allSensorsMustContinuoslySense)
-					
-					// Se for um Nó Representativo (ClusterHead == null) - VERIFICAR ESTE CÓDIGO!!!
-					else { //if (!allSensorsMustContinuoslySense) { // Se é uma mensagem de um Nó Representativo
+					else if (wsnMsgResp.typeMsg == 3) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
+					{
+	/*					
+						numMessagesOfTimeSlotFinishedReceived++;
+						
 						int lineFromClusterNode = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
 						
 						if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
@@ -348,13 +318,62 @@ public class SinkNode extends SimpleNode
 							SimpleNode representativeNode = nodeGroups.get(lineFromClusterNode, 0); // Get the (new) Representative Node (or Cluster Head)
 							int numSensors = nodeGroups.getNumCols(lineFromClusterNode);
 							Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
-							representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);						
+							representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+							
 							receiveMessage(representativeNode, null);
-						} // end if (lineFromClusterNode >= 0)
-					}  // end else
-				} // end else if (wsnMsgResp.typeMsg == 4)
+						}
+						// PAREI AQUI!!! - Fazer testes para verificar se os clusters estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
+	*/				
+					} // else if (wsnMsgResp.typeMsg == 3)
+					
+					else if (wsnMsgResp.typeMsg == 4) // Se é uma mensagem de um Nó Representativo/Cluster Head cujo nível da bateria está abaixo do mínimo (SimpleNode.minBatLevelInClusterHead)
+					{
+						numMessagesOfLowBatteryReceived++;
+						
+						if (allSensorsMustContinuoslySense) { // Se é uma mensagem de um Cluster Head // Se for um ClusterHead (ClusterHead != null)
+							
+							int lineFromClusterNode = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
+							
+							if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
+							{
+								classifyNodesByAllParams(nodeGroups); // Reclassifica todos os nós do cluster atual - cujo Cluster Head teve decaimento do nível de bateria
+								
+								int numSensors = nodeGroups.getNumCols(lineFromClusterNode);
+								Node chNode = (nodeGroups.get(lineFromClusterNode, 0)); // Get the (new) Cluster Head from the current cluster/line
+	
+								Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"; ClusterHead / IDnumber = "+chNode.ID+"; #Sensors = "+numSensors);
+								for (int col=0; col < numSensors; col++) // For each node from that cluster (in messageGroups), it must communicate who is the new ClusterHead
+								{
+									SimpleNode nodeCurrent = nodeGroups.get(lineFromClusterNode, col); // Get the Node
+									
+									nodeCurrent.myCluster.sizeTimeSlot = sensorTimeSlot; // If all sensor nodes in Cluster must continuosly sense, so the sizeTimeSlot will be the sensorTimeSlot
+									
+									receiveMessage(nodeCurrent, chNode);
+								} // end for (int col=0; col < numSensors; col++)
+							} // end if (lineFromClusterNode >= 0)
+						
+						
+						} // end if (allSensorsMustContinuoslySense)
+						
+						// Se for um Nó Representativo (ClusterHead == null) - VERIFICAR ESTE CÓDIGO!!!
+						else { //if (!allSensorsMustContinuoslySense) { // Se é uma mensagem de um Nó Representativo
+							int lineFromClusterNode = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
+							
+							if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
+							{
+								classifyNodesByAllParams(nodeGroups);
+								
+								SimpleNode representativeNode = nodeGroups.get(lineFromClusterNode, 0); // Get the (new) Representative Node (or Cluster Head)
+								int numSensors = nodeGroups.getNumCols(lineFromClusterNode);
+								Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
+								representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);						
+								receiveMessage(representativeNode, null);
+							} // end if (lineFromClusterNode >= 0)
+						}  // end else
+					} // end else if (wsnMsgResp.typeMsg == 4)
+				} // end if (canReceiveMsgResponseError)
 				
-				else // If it is a message from a (Representative) node containing reading (sense) data
+				else if (wsnMsgResp.typeMsg != 2 && wsnMsgResp.typeMsg != 3 && wsnMsgResp.typeMsg != 4) // If it is a message from a (Representative) node containing reading (sense) data
 				{
 					
 // ALTERAR NESTE PONTO PARA VERIFICAR QUANDO UMA MENSAGEM DE RESPOSTA A UMA REQUISIÇÃO FOR RECEBIDA PARA REALIZAR POSSÍVEL SPLIT DE CLUSTER 
@@ -385,6 +404,7 @@ public class SinkNode extends SimpleNode
 							setClustersFromNodes(nodeGroups);
 							
 							stillNonclustered = false;
+							canReceiveMsgResponseError = true;
 						 	
 							if (nodeGroups != null) // If there is a message group created
 							{
@@ -427,76 +447,13 @@ public class SinkNode extends SimpleNode
 					{
 
 						numMessagesExpectedReceived++;
-/*						
-//						System.out.println("CHEGOU O NODE ID "+wsnMsgResp.source.ID+" NO SINK!");
-						
-						if (newCluster == null) // If a new cluster (temp) has not yet been created (instanciated)
-						{
-							newCluster = new ArrayList2d<SimpleNode>(); // Instanciate him
-							newCluster.ensureCapacity(expectedNumberOfSensors);
-							newCluster.add((SimpleNode)wsnMsgResp.source, 0); // Adds the new response message sensor to new cluster
 
-						} // end if (newCluster == null)
-						else // If already there is a new cluster (created)
-						{
-//							addNodeInClusterClassifiedByMessage(newCluster, wsnMsgResp);
-						} // end else if (newCluster == null)
-						if (blackList == null) { // If BlackList is not created / instanciate yet...
-							blackList = new ArrayList<WsnMsgResponse>(); // Instanciate him
-						}
-						blackList.add(wsnMsgResp); // ... até aqui
-*/						
-						//expectedNumberOfSensors--;
-/*
-						if (removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(nodesToReceiveDataReading, wsnMsgResp))
-//							if (numMessagesExpectedReceived >= expectedNumberOfSensors) // If all messagesResponse (from all nodes in Cluster to be splited) already done received
-						{
-							classifyNodesByAllParams(newCluster);
-							
-							setClustersFromNodes(newCluster);
-
-							//NESTE PONTO, É PRECISO MANDAR MENSAGEM PARA OS NOVOS NÓS REPRESENTATIVOS PARA QUE OS MESMOS INICIEM UMA NOVA FASE (Novo ciclo de sensoriamento)
-							
-							// (CICLO) DE SENSORIAMENTO
-							ArrayList<Integer> linesToBeUnified = new ArrayList<Integer>();
-							for (int line = 0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from newCluster
-							{
-								if (isAllNodesInThisClusterLineInList(newCluster, line, blackList)) {
-
-									linesToBeUnified.add(line);
-
-									int numSensors = newCluster.getNumCols(line);
-									Utils.printForDebug("Cluster / Line number = "+line);
-
-									if (!allSensorsMustContinuoslySense) { // If only the representative nodes must sensing (Representative nodes approach)
-										WsnMsgResponse wsnMsgResponseRepresentative = newCluster.get(line, 0); // Get the Representative Node (or Cluster Head)
-										wsnMsgResponseRepresentative.calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-										receiveMessage(wsnMsgResponseRepresentative, null);
-									} // end if (!allSensorsMustContinuoslySense)
-									
-									else { // If all nodes in cluters must sensing, and not only the representative nodes (Cluster heads approach)
-										Node chNode = (newCluster.get(line, 0)).source; // Cluster Head from the current cluster/line
-										for (int col=0; col < numSensors; col++) // For each colunm from that line in newCluster
-										{
-											WsnMsgResponse wsnMsgResponseCurrent = newCluster.get(line, col); // Get the current node
-											wsnMsgResponseCurrent.sizeTimeSlot = sensorTimeSlot; // If all sensor nodes in each cluster must continuosly sense, so the sizeTimeSlot doesn't matter
-											receiveMessage(wsnMsgResponseCurrent, chNode);
-										} // end for (int col=0; col < numSensors; col++)
-									} // end else if (!allSensorsMustContinuoslySense)
-									
-									
-								}
-							} // end for (int line=0; line < newCluster.getNumRows(); line++)
-							
-							unifyClusters(nodeGroups, newCluster, linesToBeUnified, blackList); // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
-							Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
-
-						} // end if (removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(nodesToReceiveDataReading, wsnMsgResp))
-						// end if (numMessagesExpectedReceived >= expectedNumberOfSensors)
-*/
 					} // end else if (stillNonclustered)
 					
 				} // end else
+				else {
+					System.out.println("MENSAGEM DESCARTADA: wsnMsgResp.typeMsg = "+wsnMsgResp.typeMsg);
+				}
 			} // end if (message instanceof WsnMsg)
 		} //end while (inbox.hasNext())
 	} //end handleMessages()
@@ -1563,19 +1520,19 @@ public class SinkNode extends SimpleNode
 	 */
 	public Integer calculatesTheSizeTimeSlotFromRepresentativeNode(int globalTimeSlot, int numSensorsInThisCLuster)
 	{
-		Integer sizeTimeSlot = 0;
+		Integer newSizeTimeSlot = 0;
 		
 		if (numSensorsInThisCLuster == 0) {
 			numSensorsInThisCLuster = 1;
 		}
 			
-		sizeTimeSlot = (int)(globalTimeSlot / numSensorsInThisCLuster);
-		//this.sizeTimeSlot = SimpleNode.maxErrorsPerCluster; // O NR realizará os testes de novidades de tal forma que, apenas quando o número máximo de ciclos (rounds) for atingido (maxErrorsPerCluster) um novo NR será calculado;
+		newSizeTimeSlot = (int)(globalTimeSlot / numSensorsInThisCLuster);
+		//this.newSizeTimeSlot = SimpleNode.maxErrorsPerCluster; // O NR realizará os testes de novidades de tal forma que, apenas quando o número máximo de ciclos (rounds) for atingido (maxErrorsPerCluster) um novo NR será calculado;
 		
-		if (sizeTimeSlot < 1) { // sizeTimeSlot shouldn't be equal to 0 (or less than one)
-			sizeTimeSlot = 1;
+		if (newSizeTimeSlot < 1) { // newSizeTimeSlot shouldn't be equal to 0 (or less than one)
+			newSizeTimeSlot = 1;
 		}
-		return sizeTimeSlot;
+		return newSizeTimeSlot;
 	}
 
 }
