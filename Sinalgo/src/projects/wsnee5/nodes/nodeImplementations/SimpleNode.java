@@ -216,8 +216,15 @@ public class SimpleNode extends Node
 			{
 				Boolean encaminhar = Boolean.TRUE;
 				WsnMsg wsnMessage = (WsnMsg) message;
+				boolean typeIs2 = false;
 				
 //				Utils.printForDebug("* Entrou em if (message instanceof WsnMsg) * NoID = "+this.ID);
+				
+				if (wsnMessage.typeMsg == 2) {
+					nextNodeToBaseStation = null;
+					typeIs2 = true;
+					wsnMessage.typeMsg = 0;
+				}
 				
 				if (wsnMessage.forwardingHop.equals(this)) // A mensagem voltou. O nó deve descarta-la
 				{ 
@@ -230,6 +237,8 @@ public class SimpleNode extends Node
 					this.setColor(Color.BLUE);
 					
 					canMakePredictions = Boolean.FALSE;
+					System.out.println("0 0 0  SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions = "+canMakePredictions);
+					//nextNodeToBaseStation = null;
 
 //					Utils.printForDebug("*** Entrou em else if (wsnMessage.tipoMsg == 0) *** NoID = "+this.ID);
 					
@@ -264,6 +273,7 @@ public class SimpleNode extends Node
 //					Utils.printForDebug("@ Entrou em else if (wsnMessage.tipoMsg == 1) @ NoID = "+this.ID+" nextNodeId = "+nextNodeId);
 
 					canMakePredictions = Boolean.TRUE;
+					System.out.println("1 1 1 SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions = "+canMakePredictions);
 					
 					encaminhar = Boolean.FALSE;
 					
@@ -343,6 +353,10 @@ public class SimpleNode extends Node
 					
 					//Devemos alterar o campo forwardingHop(da mensagem) para armazenar o noh que vai encaminhar a mensagem.
 					wsnMessage.forwardingHop = this; 
+
+					if (typeIs2) {
+						wsnMessage.typeMsg = 2;
+					}
 					//...além de repassar a wsnMessage para os próximos nós
 					broadcast(wsnMessage);
 					
@@ -608,9 +622,11 @@ public class SimpleNode extends Node
 	{
 		Global.sensorReadingsCount++; // Increments the global count of sensor readings
 		numTotalSensorReadings++; // Increments the local count of sensor readings
+/*
 		if (Global.currentTime > 100 && numTotalSensorReadings > Global.currentTime + 1) { // TODO
 			System.out.println(" * * * Sensor ID = "+this.ID+": numTotalSensorReadings (performSensorReading) = "+numTotalSensorReadings+" and Global.currentTime = "+Global.currentTime);
 		}
+*/
 		if (sensorReadingsQueue != null && sensorReadingsQueue.isEmpty())
 		{
 			loadSensorReadings();
@@ -1282,11 +1298,13 @@ public class SimpleNode extends Node
 	public final void triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
 	{
 		
-	if (canMakePredictions) {
-		if (validPredictions) {
-			triggerPredictions(dataSensedType, coefA, coefB, maxError);
+		if (canMakePredictions) {
+			// TODO:
+			System.out.println("    SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions ="+canMakePredictions);
+			if (validPredictions) {
+				triggerPredictions(dataSensedType, coefA, coefB, maxError);
+			}
 		}
-	}
 /*
 		else {
 			System.out.println("nodeID = "+this.ID+": validPredictions FALSE in Round = "+Global.currentTime);
