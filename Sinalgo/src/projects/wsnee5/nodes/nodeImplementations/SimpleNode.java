@@ -240,7 +240,7 @@ public class SimpleNode extends Node
 					this.setColor(Color.BLUE);
 					
 					//canMakePredictions = Boolean.FALSE;
-					System.out.println("0 0 0  SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions = "+canMakePredictions);
+					//System.out.println("0 0 0  SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions = "+canMakePredictions);
 					//nextNodeToBaseStation = null;
 
 //					Utils.printForDebug("*** Entrou em else if (wsnMessage.tipoMsg == 0) *** NoID = "+this.ID);
@@ -276,7 +276,7 @@ public class SimpleNode extends Node
 //					Utils.printForDebug("@ Entrou em else if (wsnMessage.tipoMsg == 1) @ NoID = "+this.ID+" nextNodeId = "+nextNodeId);
 
 					canMakePredictions = Boolean.TRUE;
-					System.out.println("1 1 1 SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions = "+canMakePredictions);
+					//System.out.println("1 1 1 SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions = "+canMakePredictions);
 					
 					encaminhar = Boolean.FALSE;
 					
@@ -1331,7 +1331,7 @@ public class SimpleNode extends Node
 		
 		if (canMakePredictions) {
 			// TODO:
-			System.out.println("    SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions ="+canMakePredictions);
+			//System.out.println("    SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions ="+canMakePredictions);
 			if (validPredictions) {
 				triggerPredictions(dataSensedType, coefA, coefB, maxError);
 			}
