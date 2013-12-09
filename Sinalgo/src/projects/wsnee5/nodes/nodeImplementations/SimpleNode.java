@@ -23,6 +23,7 @@ import sinalgo.configuration.Configuration;
 import sinalgo.configuration.CorruptConfigurationEntryException;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.nodes.Node;
+import sinalgo.nodes.TimerCollection;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 import sinalgo.runtime.Global;
@@ -216,16 +217,18 @@ public class SimpleNode extends Node
 			{
 				Boolean encaminhar = Boolean.TRUE;
 				WsnMsg wsnMessage = (WsnMsg) message;
-				boolean typeIs2 = false;
+//				boolean typeIs2 = false;
 				
 //				Utils.printForDebug("* Entrou em if (message instanceof WsnMsg) * NoID = "+this.ID);
-				
+/*			
 				if (wsnMessage.typeMsg == 2) {
 					nextNodeToBaseStation = null;
 					typeIs2 = true;
 					wsnMessage.typeMsg = 0;
+					TimerCollection tc = this.getTimers();
+					tc.clear();
 				}
-				
+*/
 				if (wsnMessage.forwardingHop.equals(this)) // A mensagem voltou. O nó deve descarta-la
 				{ 
 					encaminhar = Boolean.FALSE;
@@ -236,7 +239,7 @@ public class SimpleNode extends Node
 				{ 
 					this.setColor(Color.BLUE);
 					
-					canMakePredictions = Boolean.FALSE;
+					//canMakePredictions = Boolean.FALSE;
 					System.out.println("0 0 0  SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions = "+canMakePredictions);
 					//nextNodeToBaseStation = null;
 
@@ -346,17 +349,18 @@ public class SimpleNode extends Node
 					}
 					addThisNodeToPath(wsnMsgResp);
 					
-					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
-					
-					timer.startRelative(wsnMessage.sizeTimeSlot, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
-					
+					if (nextNodeToBaseStation != null) {
+						WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
+						timer.startRelative(wsnMessage.sizeTimeSlot, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+					}
 					
 					//Devemos alterar o campo forwardingHop(da mensagem) para armazenar o noh que vai encaminhar a mensagem.
 					wsnMessage.forwardingHop = this; 
-
+/*
 					if (typeIs2) {
 						wsnMessage.typeMsg = 2;
 					}
+*/
 					//...além de repassar a wsnMessage para os próximos nós
 					broadcast(wsnMessage);
 					
@@ -400,10 +404,11 @@ public class SimpleNode extends Node
 //					this.setColor(Color.YELLOW);
 					
 					addThisNodeToPath(wsnMsgResp);
-					
-					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
-					
-					timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (0) : Antes -> timer.startRelative(1, this);
+
+					if (nextNodeToBaseStation != null) {
+						WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
+						timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (0) : Antes -> timer.startRelative(1, this);
+					}
 				} // end else if (wsnMsgResp.target != null && wsnMsgResp.target.ID == this.ID)
 				
 			} // end else if (message instanceof WsnMsgResponse)
@@ -472,10 +477,10 @@ public class SimpleNode extends Node
 				timer.startRelative(1, this);
 			}			
 			
-			
-			WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
-			
-			timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
+			if (nextNodeToBaseStation != null) {
+				WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
+				timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
+			}
 			
 			errorsInThisCluster = 0; // Depois de enviar a mensagem para o Sink, reseta (reinicia) o contador de erros deste cluster
 			
@@ -495,6 +500,21 @@ public class SimpleNode extends Node
 		//hopsToTarget++;
 //		wsnMsgResp.saltosAteDestino++; // Transferido para o método pushToPath() da classe WsnMsgResponse
 	} // end addThisNodeToPath(WsnMsgResponse wsnMsgResp)
+	
+	/**
+	 * Starts the merge process in SimpleNode
+	 */
+	public void startMerge()
+	{
+		TimerCollection tc = this.getTimers();
+		tc.clear();
+		canMakePredictions = false;
+	}
+	
+	public void freeNextNode()
+	{
+		nextNodeToBaseStation = null;
+	}
 	
 	/**
 	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual
@@ -800,8 +820,16 @@ public class SimpleNode extends Node
 			}
 		}
 		horas[2] = certo;
-		GregorianCalendar gc = new GregorianCalendar(Integer.parseInt(datas[0]), Integer.parseInt(datas[1]) -1, Integer.parseInt(datas[2]),Integer.parseInt(horas[0]),Integer.parseInt(horas[1]), Integer.parseInt(horas[2]));
-		long quantTime = (gc.getTimeInMillis() + Long.parseLong(millesegundos)/1000);
+		long quantTime = 0;
+
+		try {
+			GregorianCalendar gc = new GregorianCalendar(Integer.parseInt(datas[0]), Integer.parseInt(datas[1]) -1, Integer.parseInt(datas[2]),Integer.parseInt(horas[0]),Integer.parseInt(horas[1]), Integer.parseInt(horas[2]));
+			quantTime = (gc.getTimeInMillis() + Long.parseLong(millesegundos)/1000);
+		}
+		catch (NumberFormatException ex) {
+			System.out.println("Erro! SensorID = "+this.ID+" Mensagem: "+ex.getMessage()+" StackTrace: "+ex.getStackTrace());
+		}
+		
 		return quantTime;
 	} // end parseCalendarHoras(String AnoMesDia, String hora)
 	
@@ -1165,10 +1193,11 @@ public class SimpleNode extends Node
 							addThisNodeToPath(wsnMsgResp);
 													
 							wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
-							
-							WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
-							
-							timer.startRelative(1, this); // Envia a mensagem para o nó sink (próximo nó no caminho do sink)
+
+							if (nextNodeToBaseStation != null) {
+								WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
+								timer.startRelative(1, this); // Envia a mensagem para o nó sink (próximo nó no caminho do sink)
+							}
 							
 							exit = true; // Caso este seja o ClusterHead e esteja com a bateria fraca, então não deve continuar sensoreando 
 						} // end if ((batLevel != 0.0) && (batLevel <= minBatLevelInClusterHead))
@@ -1265,8 +1294,10 @@ public class SimpleNode extends Node
 						
 						if (this.clusterHead == null) // It means that there isn't a cluster head, so the response message must be send to sink node (base station)
 						{
-							WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
-							timer.startRelative(1, this); // Espera por 1 round e envia a mensagem para o nó sink (próximo nó no caminho do sink) : Antes -> timer.startRelative(1, this);
+							if (nextNodeToBaseStation != null) {
+								WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
+								timer.startRelative(1, this); // Espera por 1 round e envia a mensagem para o nó sink (próximo nó no caminho do sink) : Antes -> timer.startRelative(1, this);
+							}
 							// ERA: Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
 						} // end if (this.clusterHead == null)
 
