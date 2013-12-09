@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Set;
 
 import projects.wsnee5.nodes.messages.WsnMsg;
@@ -16,7 +17,11 @@ import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
+import sinalgo.nodes.timers.Timer;
 import sinalgo.runtime.Global;
+import sinalgo.runtime.Runtime;
+import sinalgo.nodes.TimerCollection;
+import projects.wsnee5.nodes.timers.FreeTimer;
 
 public class SinkNode extends SimpleNode 
 {
@@ -285,13 +290,23 @@ public class SinkNode extends SimpleNode
 						if (((double)numTotalOfSensors / (double)Global.clustersCount) <= minimumOccupancyRatePerCluster) { // Begin MERGE operation
 							canReceiveMsgResponseError = false;
 							// TODO: To be tested!
-							//nodeGroups = null;
+							nodeGroups = null;
+							System.out.println("    ***  ENTROU no MERGE ! Round = "+Global.currentTime);
 							
-							this.nextNodeToBaseStation = this;
-							WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 2, sizeTimeSlot, dataSensedType);
+							for(Node n : Runtime.nodes) {
+								((SimpleNode)n).startMerge();
+							}
+
+//							this.nextNodeToBaseStation = this;
 							
+							FreeTimer ft = new FreeTimer();
+							ft.startRelative(1, this);
+							
+							WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedType);
+
 							WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
-							timer.startRelative(1, this);
+							timer.startRelative(2, this);
+							numMessagesReceived = 0;
 						}
 
 
@@ -457,6 +472,14 @@ public class SinkNode extends SimpleNode
 			} // end if (message instanceof WsnMsg)
 		} //end while (inbox.hasNext())
 	} //end handleMessages()
+	
+	public void setNextNodesToNull()
+	{
+		for(Node n : Runtime.nodes) {
+			((SimpleNode)n).freeNextNode();
+		}
+		this.nextNodeToBaseStation = this;
+	}
 	
 	/**
 	 * Test if all nodes in line number "row" of "tempCluster" are in "blkList", ie, if the sink have already received message responses from all nodes in the respective Cluster  
