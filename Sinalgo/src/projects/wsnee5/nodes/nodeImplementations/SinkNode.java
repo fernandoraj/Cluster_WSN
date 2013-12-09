@@ -291,6 +291,8 @@ public class SinkNode extends SimpleNode
 							canReceiveMsgResponseError = false;
 							// TODO: To be tested!
 							nodeGroups = null;
+							Global.clustersCount = 0;
+							stillNonclustered = true;
 							System.out.println("    ***  ENTROU no MERGE ! Round = "+Global.currentTime);
 							
 							for(Node n : Runtime.nodes) {
