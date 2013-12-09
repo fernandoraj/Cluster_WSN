@@ -98,6 +98,14 @@ public class TimerCollection implements Iterable<Timer>{
 	}
 	
 	/**
+	 * Removes all timers from this TimerCollection
+	 */
+	public void clear() {
+		timers = new Vector<Timer>(0);
+		iterator();
+	}
+	
+	/**
 	 * This method returns an iterator for the collection. Note that this method doesn't generate
 	 * a new instance but resets the ReusableIterator and returns it.
 	 * 
