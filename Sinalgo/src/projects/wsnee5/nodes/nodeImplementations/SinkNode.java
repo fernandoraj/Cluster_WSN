@@ -218,8 +218,6 @@ public class SinkNode extends SimpleNode
 						if (wsnMsgResp.typeMsg == 3) {
 							numMessagesOfTimeSlotFinishedReceived++;
 						}
-	// CASO O CLUSTER PRECISE SOFRER UM SPLIT, UMA MENSAGEM SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK DEVE SER ENVIADA PARA CADA UM DOS NÓS DO CLUSTER 
-						
 						//numMessagesExpectedReceived++;
 						
 						int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source);
@@ -228,38 +226,14 @@ public class SinkNode extends SimpleNode
 	//						expectedNumberOfSensors += sendSenseRequestMessageToAllSensorsInCluster(nodeGroups, lineFromCluster);
 							triggerSplitFromCluster(lineFromCluster);
 						}
-	
-	//					System.out.println("CHEGOU O NODE ID "+wsnMsgResp.source.ID+" NO SINK!");
-	
+		
 						newCluster = ensuresArrayList2d(newCluster);
 						
 						addNodesInNewCluster(nodesToReceiveDataReading, newCluster);
 						classifyNodesByAllParams(newCluster);
 						setClustersFromNodes(newCluster);
 						nodesToReceiveDataReading = new ArrayList2d<SimpleNode>();
-	
-	/*
-						if (newCluster == null) // If a new cluster (temp) has not yet been created (instanciated)
-						{
-							newCluster = new ArrayList2d<SimpleNode>(); // Instanciate him
-							newCluster.ensureCapacity(expectedNumberOfSensors);
-							newCluster.add((SimpleNode)wsnMsgResp.source, 0); // Adds the new response message sensor to new cluster
-	
-						} // end if (newCluster == null)
-						else // If already there is a new cluster (created)
-						{
-							addNodesInNewCluster(nodesToReceiveDataReading, newCluster);
-						} // end else if (newCluster == null)
-	*/
-	/*
-						if (blackList == null) { // If BlackList is not created / instanciate yet...
-							blackList = new ArrayList<WsnMsgResponse>(); // Instanciate him
-						}
-						blackList.add(wsnMsgResp); // ... até aqui
-	*/					
-						//expectedNumberOfSensors--;
-						
-						
+							
 						for (int line = 0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from newCluster
 						{
 							int numSensors = newCluster.getNumCols(line);
@@ -299,8 +273,6 @@ public class SinkNode extends SimpleNode
 								((SimpleNode)n).startMerge();
 							}
 
-//							this.nextNodeToBaseStation = this;
-							
 							FreeTimer ft = new FreeTimer();
 							ft.startRelative(1, this);
 							
@@ -310,37 +282,12 @@ public class SinkNode extends SimpleNode
 							timer.startRelative(2, this);
 							numMessagesReceived = 0;
 						}
-
-
 						
-	// CASO O NÓ QUE TENHA ENVIADO A MsgResp SEJA UM CLUSTER HEAD???
-						if (wsnMsgResp.target != null)
-						{
-							Utils.printForDebug("Inside the code => if (wsnMsgResp.target != null)");						
-						}
-						//receiveMessage(wsnMsgResp, null); // Recebe a mensagem, para recálculo dos coeficientes e reenvio dos mesmos àquele nó sensor (Nó Representativo), mantendo o número de predições a serem executadas como complemento do total calculado inicialmente, ou seja, NÃO reinicia o ciclo de time slot daquele cluster
 					}
 					
 					else if (wsnMsgResp.typeMsg == 3) // Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
 					{
-	/*					
-						numMessagesOfTimeSlotFinishedReceived++;
-						
-						int lineFromClusterNode = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
-						
-						if (lineFromClusterNode >= 0) // Se a linha da mensagem recebida for encontrada
-						{
-							classifyNodesByAllParams(nodeGroups);
-							
-							SimpleNode representativeNode = nodeGroups.get(lineFromClusterNode, 0); // Get the (new) Representative Node (or Cluster Head)
-							int numSensors = nodeGroups.getNumCols(lineFromClusterNode);
-							Utils.printForDebug("Cluster / Line number = "+lineFromClusterNode+"\n");
-							representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-							
-							receiveMessage(representativeNode, null);
-						}
-						// PAREI AQUI!!! - Fazer testes para verificar se os clusters estão sendo reconfigurados quando um No Repres. finaliza seu time slot e atualiza o status de sua bateria!
-	*/				
+
 					} // else if (wsnMsgResp.typeMsg == 3)
 					
 					else if (wsnMsgResp.typeMsg == 4) // Se é uma mensagem de um Nó Representativo/Cluster Head cujo nível da bateria está abaixo do mínimo (SimpleNode.minBatLevelInClusterHead)
@@ -368,8 +315,6 @@ public class SinkNode extends SimpleNode
 									receiveMessage(nodeCurrent, chNode);
 								} // end for (int col=0; col < numSensors; col++)
 							} // end if (lineFromClusterNode >= 0)
-						
-						
 						} // end if (allSensorsMustContinuoslySense)
 						
 						// Se for um Nó Representativo (ClusterHead == null) - VERIFICAR ESTE CÓDIGO!!!
@@ -392,8 +337,6 @@ public class SinkNode extends SimpleNode
 				
 				else if (wsnMsgResp.typeMsg != 2 && wsnMsgResp.typeMsg != 3 && wsnMsgResp.typeMsg != 4) // If it is a message from a (Representative) node containing reading (sense) data
 				{
-					
-// ALTERAR NESTE PONTO PARA VERIFICAR QUANDO UMA MENSAGEM DE RESPOSTA A UMA REQUISIÇÃO FOR RECEBIDA PARA REALIZAR POSSÍVEL SPLIT DE CLUSTER 
 					numMessagesReceived++;
 					
 					if (stillNonclustered) // If the sink still not clustered all nodes for the first time
@@ -462,26 +405,30 @@ public class SinkNode extends SimpleNode
 					
 					else // otherwise, if the sink have already been clustered all nodes for the first time
 					{
-
 						numMessagesExpectedReceived++;
-
 					} // end else if (stillNonclustered)
 					
 				} // end else
+/*
 				else {
 					System.out.println("MENSAGEM DESCARTADA: wsnMsgResp.typeMsg = "+wsnMsgResp.typeMsg);
 				}
+*/
 			} // end if (message instanceof WsnMsg)
 		} //end while (inbox.hasNext())
 	} //end handleMessages()
 	
+	/**
+	 * Calls the "freeNextNode()" method for each sensor node in the network for clear (set as null) the "nextNodeToBaseStation" attribute and
+	 * set the "nextNodeToBaseStation" from sink node (this) to itself (this)
+	 */
 	public void setNextNodesToNull()
 	{
 		for(Node n : Runtime.nodes) {
 			((SimpleNode)n).freeNextNode();
-		}
+		} // end for(Node n : Runtime.nodes)
 		this.nextNodeToBaseStation = this;
-	}
+	} // end setNextNodesToNull()
 	
 	/**
 	 * Test if all nodes in line number "row" of "tempCluster" are in "blkList", ie, if the sink have already received message responses from all nodes in the respective Cluster  
