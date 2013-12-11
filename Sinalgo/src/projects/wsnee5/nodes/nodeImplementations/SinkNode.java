@@ -89,7 +89,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = true; // ACS: false = Representative Nodes; true = Cluster Heads
+	private boolean allSensorsMustContinuoslySense = false; // ACS: false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Flag to indicate that the sink still not clustered all nodes for the first time
@@ -143,17 +143,13 @@ public class SinkNode extends SimpleNode
 	private boolean canReceiveMsgResponseError = false;
 	
 	// TODO: 
-	private double minimumOccupancyRatePerCluster = 1.35; // #TotalSensors = 54 / #CLusters = 40 => 54/40 = 1.35
+	private double minimumOccupancyRatePerCluster = 1.0; // #TotalSensors = 54 / #CLusters = 40 => 54/40 = 1.35
 	
 	public SinkNode()
 	{
 		super();
 		this.setColor(Color.RED);
-		System.out.println("The size of time slot is "+sizeTimeSlot);
-		System.out.println("The type of data sensed is "+dataSensedType);
-		System.out.println("The threshold of error (max error) is "+thresholdError);
-		System.out.println("The size of sliding window is "+SimpleNode.slidingWindowSize);
-		System.out.println("The maximum distance between sensors in the same cluster is "+maxDistance);
+		System.out.println("The number of sensors is "+numTotalOfSensors);
 		System.out.println("The status for continuos sense is "+allSensorsMustContinuoslySense);
 		if (allSensorsMustContinuoslySense) {
 			System.out.println("Using Cluster Head approach... ACS = true");
@@ -161,6 +157,15 @@ public class SinkNode extends SimpleNode
 		else {
 			System.out.println("Using Representative Nodes approach...  ACS = false");
 		}
+		System.out.println("The sensor delay is "+SimpleNode.limitPredictionError);
+		System.out.println("The cluster delay is "+SimpleNode.maxErrorsPerCluster);
+		System.out.println("The threshold of error (max error) is "+thresholdError);
+		System.out.println("The size of time slot is "+sizeTimeSlot);
+		System.out.println("The spacial threshold of error (spacialThresholdError) is "+spacialThresholdError);
+		System.out.println("The size of sliding window is "+SimpleNode.slidingWindowSize);
+		System.out.println("The maximum distance between sensors in the same cluster is "+maxDistance);
+		System.out.println("The minimum occupancy rate per cluster (for Merge) is "+minimumOccupancyRatePerCluster);
+		System.out.println("The type of data sensed is "+dataSensedType);
 
 		
 //		if(LogL.ROUND_DETAIL){
