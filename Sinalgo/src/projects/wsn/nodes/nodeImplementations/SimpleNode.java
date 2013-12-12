@@ -141,6 +141,10 @@ public class SimpleNode extends Node
 	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
 	protected static final int limitPredictionError = 5; // delay (abbrev.)
+	
+	protected boolean newCoefsReceived = false;
+	
+	protected int currentCoefsVersion = 0;
 
 	@Override
 	public void preStep() {}
@@ -210,11 +214,9 @@ public class SimpleNode extends Node
 					else if (encaminhar) {//Nó sensor recebe uma mensagem de flooding (com wsnMessage) e deve responder ao sink com uma WsnMsgResponse... (continua em "...além de") 
 						WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, "");
 
-						if (wsnMessage != null) {
-
+						if (wsnMessage.typeMsg == 1 && wsnMessage != null) {
 							wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType); 
 							prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
-
 						}
 
 						addThisNodeToPath(wsnMsgResp);
@@ -222,7 +224,7 @@ public class SimpleNode extends Node
 						timer.startRelative(wsnMessage.sizeTimeSlot, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
 
 						if (wsnMessage.typeMsg == 2 && wsnMessage != null){ // approachType = 2 = Naive
-							makeSensorReadingAndSendind (wsnMessage.dataSensedType); // Chama o método de sensoriamento / envio de dados da abordagem naive
+							makeSensorReadingAndSendind(wsnMessage.dataSensedType); // Chama o método de sensoriamento / envio de dados da abordagem naive
 						}
 						else if (wsnMessage == null){
 						
@@ -236,11 +238,10 @@ public class SimpleNode extends Node
 			}//if (message instanceof WsnMsg)
 
 			else if (message instanceof WsnMsgResponse ) {
-					WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
-					addThisNodeToPath(wsnMsgResp);
-					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
-					timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
-
+				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
+				addThisNodeToPath(wsnMsgResp);
+				WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
+				timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
 			}//else if (message instanceof WsnMsgResponse )
 		}//while (inbox.hasnext())
 	}//public void handleMessages
@@ -581,7 +582,8 @@ public class SimpleNode extends Node
 		double coefA = wsnMessage.getCoefA();
 		double coefB = wsnMessage.getCoefB();
 		double maxError = wsnMessage.getThresholdError();
-		triggerPredictions(wsnMessage.dataSensedType, coefA, coefB, maxError);
+		currentCoefsVersion++;
+		triggerPredictions(wsnMessage.dataSensedType, coefA, coefB, maxError, currentCoefsVersion);
 	}
 	
 	/**
@@ -592,7 +594,7 @@ public class SimpleNode extends Node
 	 * @param coefB Coeficiente B da equação de regressão para esse sensor <p> [eng] <b>coefB</b> Coefficient B from the Regression Equation for this sensor
 	 * @param maxError Limiar de erro para o calculo da predição desse sensor <p> [Eng] <b>maxError</b> Threshold error to the calculation of prediction for this sensor
 	 */
-	protected void triggerPredictions (String dataSensedType, double coefA, double coefB, double maxError)
+	protected void triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError, int coefsVersion)
 	{
 		int medida = 0;
 		if (dataSensedType != null)
@@ -644,7 +646,7 @@ public class SimpleNode extends Node
 //					lastValueRead = value;
 //					lastTimeRead = quantTime;
 					
-					PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError);
+					PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError, coefsVersion);
 					newPredictionTimer.startRelative(1, this);
 /*					
 					Utils.printForDebug(" @ @ O valor predito ESTA dentro da margem de erro do valor lido! NoID = "+this.ID);
@@ -654,15 +656,7 @@ public class SimpleNode extends Node
 				else
 				{
 					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 1, 2, dataSensedType);
-/*					
-					//Adiciona os últimos valores lidos anteriormente a mensagem que vai para o sink
-					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), lastValueRead, lastTimeRead);
-					//Adiciona os valores lidos (NOVIDADE) na mensagem que vai para o sink
-					ultimoRoundLido = Integer.parseInt(linhas[2]);
-					lastValueRead = value;
-					lastTimeRead = quantTime;
-					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), lastValueRead, lastTimeRead);
-*/					
+
 					//Adds the last values ​​previously read to the message that goes to the sink
 					for (int cont=0; cont<dataRecordItens.size(); cont++) //for(int cont=0; cont<slidingWindowSize; cont++)
 					{
@@ -674,11 +668,16 @@ public class SimpleNode extends Node
 					WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
 					
 					timer.startRelative(1, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
-					
+
+					ultimoRoundLido = Integer.parseInt(linhas[2]);
+
 					Utils.printForDebug("\n\n * * * * O valor predito NAO esta dentro da margem de erro do valor lido! NoID = "+this.ID);
 					Utils.printForDebug("\nRound = "+ultimoRoundLido+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError);
 					
 					numPredictionErrors = 0;
+					
+					PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError, coefsVersion);
+					newPredictionTimer.startRelative(1, this);
 				} // end else if (numPredictionErrors < limitPredictionError)
 				
 			} // end if (linhas.length > 4)
@@ -694,9 +693,11 @@ public class SimpleNode extends Node
 	 * @param coefB Coeficiente B da equação de regressão para esse sensor <p> [Eng] <b>coefB</b> Coefficient B from the Regression Equation for this sensor
 	 * @param maxError Limiar de erro para o calculo da predição desse sensor <p> [Eng] <b>maxError</b> Threshold error to the calculation of prediction for this sensor
 	 */
-	public final void triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
+	public final void triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError, int version)
 	{
-		triggerPredictions(dataSensedType, coefA, coefB, maxError);
+		if (version >= currentCoefsVersion) {
+			triggerPredictions(dataSensedType, coefA, coefB, maxError, version);
+		}
 	}
 	
 	/**
@@ -746,7 +747,7 @@ public class SimpleNode extends Node
 	 * [Eng] Read the next value from present sensor, send to sink and trigger the next reading 
 	 * @param dataSensedType Tipo de dado a ser lido pelo sensor <p> [Eng] <b>dataSensedType</b> Type of data to be read from sensor: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem
 	 */
-	protected void makeSensorReadingAndSendind (String dataSensedType)
+	protected void makeSensorReadingAndSendind(String dataSensedType)
 	{
 		int medida = 0;
 		if (dataSensedType != null)
