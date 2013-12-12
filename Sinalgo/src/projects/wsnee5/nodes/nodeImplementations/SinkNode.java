@@ -54,7 +54,7 @@ public class SinkNode extends SimpleNode
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
 	 * Percentage of temporal acceptable error threshold for the readings of sensor nodes, which may be between 0.0 (accepts no errors) and 1.0 (accepts any error)
 	 */
-	private double thresholdError = 0.05; // te
+	private double thresholdError = 0.05; // thresholdErr: 0.05 = 5%
 	
 	/**
 	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
@@ -143,7 +143,7 @@ public class SinkNode extends SimpleNode
 	private boolean canReceiveMsgResponseError = false;
 	
 	// TODO: 
-	private double minimumOccupancyRatePerCluster = 1.0; // #TotalSensors = 54 / #CLusters = 40 => 54/40 = 1.35
+	private double minimumOccupancyRatePerCluster = 1.35; // MORPC: #TotalSensors = 54 / #CLusters = 40 => 54/40 = 1.35
 	
 	public SinkNode()
 	{
@@ -272,7 +272,7 @@ public class SinkNode extends SimpleNode
 							nodeGroups = null;
 							Global.clustersCount = 0;
 							stillNonclustered = true;
-							System.out.println("    ***  ENTROU no MERGE ! Round = "+Global.currentTime);
+//							System.out.println("    ***  ENTROU no MERGE ! Round = "+Global.currentTime);
 							
 							for(Node n : Runtime.nodes) {
 								((SimpleNode)n).startMerge();
