@@ -937,6 +937,23 @@ public abstract class Node implements DoublyLinkedListEntry{
 			neighborhoodChange(); 
 		}
 		
+		// Handle dropped messages (messages that were sent by this node, but that do not arrive.
+		if(Configuration.generateNAckMessages) {
+			PacketCollection pc = Global.isEvenRound ? nAckBufferEvenRound : nAckBufferOddRound;
+			if(nackBox == null) {
+				nackBox = new NackBox(pc);
+			} else {
+				nackBox.resetForList(pc);
+			}
+			handleNAckMessages(nackBox);
+		}
+		
+		//call the 'handleMessages' ALWAYS, and pass the appropriate Inbox. This Inbox
+		//can also be a an Iterator over an empty list.
+		inbox = packetBuffer.getInbox();
+		handleMessages(inbox);
+
+		
 		timersToHandle.clear();
 		// Fire all timers which are going off in this round
 		if(timers.size() > 0){
@@ -959,7 +976,7 @@ public abstract class Node implements DoublyLinkedListEntry{
 				t.fire();
 			}
 		}
-
+/*
 		// Handle dropped messages (messages that were sent by this node, but that do not arrive.
 		if(Configuration.generateNAckMessages) {
 			PacketCollection pc = Global.isEvenRound ? nAckBufferEvenRound : nAckBufferOddRound;
@@ -975,7 +992,7 @@ public abstract class Node implements DoublyLinkedListEntry{
 		//can also be a an Iterator over an empty list.
 		inbox = packetBuffer.getInbox();
 		handleMessages(inbox);
-		
+*/		
 		// a custom method that may do something at the end of the step
 		postStep();
 		
