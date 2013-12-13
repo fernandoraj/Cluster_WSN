@@ -36,7 +36,7 @@ public class SinkNode extends SimpleNode  {
 	 * Indica que tipo de aproximação o sink node deve sinalizar que todos os outros nós devem seguir (Adaga-P*, continuamente sensorando-e-enviando (naive sabendo ou não os tempos iniciais) <p>
 	 * [Eng] Indicates what type of approach the sink node should signal to all other nodes must follow (Adaga-P*, continuously sensing-and-send (naive with or without learning initial time))
 	 */
-	private Integer approachType = 2; // 0(default) = temporal correlation (Adaga-P*); 2 = Naive
+	private Integer approachType = 0; // 0(default) = temporal correlation (Adaga-P*); 2 = Naive
 	
 	public SinkNode()
 	{
