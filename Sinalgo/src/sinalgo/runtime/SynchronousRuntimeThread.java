@@ -40,13 +40,14 @@ package sinalgo.runtime;
 import java.util.Date;
 import java.text.NumberFormat;
 
+//import projects.wsnee4.utils.Utils;
 import projects.wsnee3.utils.Utils;
 //import projects.wsn.utils.Utils;
 import sinalgo.configuration.Configuration;
 import sinalgo.configuration.WrongConfigurationException;
 import sinalgo.nodes.Node;
 import sinalgo.tools.logging.LogL;
-import projects.wsn.nodes.nodeImplementations.SimpleNode;
+//import projects.wsn.nodes.nodeImplementations.SimpleNode;
 
 
 /**
