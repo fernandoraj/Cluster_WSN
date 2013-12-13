@@ -214,7 +214,7 @@ public class SimpleNode extends Node
 					else if (encaminhar) {//Nó sensor recebe uma mensagem de flooding (com wsnMessage) e deve responder ao sink com uma WsnMsgResponse... (continua em "...além de") 
 						WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, "");
 
-						if (wsnMessage.typeMsg == 1 && wsnMessage != null) {
+						if (wsnMessage.typeMsg == 0 && wsnMessage != null) {
 							wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType); 
 							prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
 						}
