@@ -89,7 +89,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = false; // ACS: false = Representative Nodes; true = Cluster Heads
+	private boolean allSensorsMustContinuoslySense = true; // ACS: false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Flag to indicate that the sink still not clustered all nodes for the first time
@@ -272,7 +272,7 @@ public class SinkNode extends SimpleNode
 							nodeGroups = null;
 							Global.clustersCount = 0;
 							stillNonclustered = true;
-//							System.out.println("    ***  ENTROU no MERGE ! Round = "+Global.currentTime);
+							System.out.println("    ***  ENTROU no MERGE ! Round = "+Global.currentTime);
 							
 							for(Node n : Runtime.nodes) {
 								((SimpleNode)n).startMerge();
@@ -280,6 +280,8 @@ public class SinkNode extends SimpleNode
 
 							FreeTimer ft = new FreeTimer();
 							ft.startRelative(1, this);
+							
+							sizeTimeSlot = 2; // Sugestão do Prof. Everardo em reunião no dia 12/12/2013
 							
 							WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedType);
 
