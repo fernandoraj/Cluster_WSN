@@ -43,7 +43,7 @@ public class SimpleNode extends Node
 	 * Indicates the default size of Sliding Window from sensor readings to be send to sink node 
 	 * when there is a "novelty".
 	 */
-	protected static int slidingWindowSize = 15; // According ADAGA-P* = 7
+	protected static int slidingWindowSize = 7; // According ADAGA-P* = 7
 	
 	/**
 	 * Indicates the current size of Sliding Window from sensor readings to be send to sink node 
