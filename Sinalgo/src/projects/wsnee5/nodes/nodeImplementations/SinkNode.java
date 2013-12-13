@@ -30,7 +30,13 @@ public class SinkNode extends SimpleNode
 	 * Número de dados sensoriados por time slot (Tamanho do time slot inicial) <br>
 	 * Number of sensed data per time slot (initial time slot size)
 	 */
-	private Integer sizeTimeSlot = 100;
+	private Integer sizeTimeSlot = 70;
+	
+	/**
+	 * Número de dados sensoriados por time slot (Tamanho do time slot inicial) <br>
+	 * Number of sensed data per time slot (initial time slot size)
+	 */
+	private Integer sizeTimeSlotForMerge = 25;
 	
 	/**
 	 * Quantidade de rounds (ciclos) a ser saltado para cada leitura sequencial dos sensores, no caso de uso da abordagem de ClusterHeads (ACS=True) <br>
@@ -78,7 +84,7 @@ public class SinkNode extends SimpleNode
 	 * Distância máxima aceitável para a formação de clusters. Se for igual a zero (0,0), não considerar tal limite (distância) <br>
 	 * Maximum distance acceptable to the formation of clusters. If it is equal to zero (0.0), ignoring
 	 */
-	private double maxDistance = 8.0; //8.0;
+	private double maxDistance = 0.0; //8.0;
 	
 	/**
 	 * Número total de nós sensores presentes na rede <br>
@@ -89,10 +95,10 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = true; // ACS: false = Representative Nodes; true = Cluster Heads
+	private boolean allSensorsMustContinuoslySense = false; // ACS: false = Representative Nodes; true = Cluster Heads
 	
 	/**
-	 * Flag to indicate that the sink still not clustered all nodes for the first time
+	 * Flag to indicate that the sink still not clustered all nodes for the first time or after start a Merge process
 	 */
 	private boolean stillNonclustered = true;
 	
@@ -108,7 +114,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * "BlackList" is the list of messages (source nodes) already received by sink (and removed from nodesToReceiveDataReading)
 	 */
-	private ArrayList<SimpleNode> blackList;
+//	private ArrayList<SimpleNode> blackList;
 	
 	/**
 	 * Número de mensagens recebidas pelo nó sink de todos os outros nós sensores <br> 
@@ -121,7 +127,12 @@ public class SinkNode extends SimpleNode
 	 * Number of rounds (cycles) for reclustering of the sensors in use cases of Representatives Nodes
 	 */
 //	private int numRoundsForReclustering = 30;
-	
+
+	/**
+	 * Number of messages response expected already received until the moment
+	 */
+	private int numMessagesExpectedReceived = 0;
+
 	/**
 	 * Number of messages of error prediction received by sink node from all other sensors nodes
 	 */
@@ -137,8 +148,8 @@ public class SinkNode extends SimpleNode
 	 */
 	private int numMessagesOfLowBatteryReceived = 0;
 	
-	private int expectedNumberOfSensors = 0;
-	private int numMessagesExpectedReceived = 0;
+//	private int expectedNumberOfSensors = 0;
+	
 	
 	private boolean canReceiveMsgResponseError = false;
 	
@@ -161,6 +172,7 @@ public class SinkNode extends SimpleNode
 		System.out.println("The cluster delay is "+SimpleNode.maxErrorsPerCluster);
 		System.out.println("The threshold of error (max error) is "+thresholdError);
 		System.out.println("The size of time slot is "+sizeTimeSlot);
+		System.out.println("The size of time slot for merge is "+sizeTimeSlotForMerge);
 		System.out.println("The spacial threshold of error (spacialThresholdError) is "+spacialThresholdError);
 		System.out.println("The size of sliding window is "+SimpleNode.slidingWindowSize);
 		System.out.println("The maximum distance between sensors in the same cluster is "+maxDistance);
@@ -272,7 +284,7 @@ public class SinkNode extends SimpleNode
 							nodeGroups = null;
 							Global.clustersCount = 0;
 							stillNonclustered = true;
-							System.out.println("    ***  ENTROU no MERGE ! Round = "+Global.currentTime);
+//							System.out.println("    ***  ENTROU no MERGE ! Round = "+Global.currentTime);
 							
 							for(Node n : Runtime.nodes) {
 								((SimpleNode)n).startMerge();
@@ -281,7 +293,7 @@ public class SinkNode extends SimpleNode
 							FreeTimer ft = new FreeTimer();
 							ft.startRelative(1, this);
 							
-							sizeTimeSlot = 2; // Sugestão do Prof. Everardo em reunião no dia 12/12/2013
+							sizeTimeSlot = sizeTimeSlotForMerge; // Sugestão do Prof. Everardo em reunião no dia 12/12/2013 : sizeTimeSlotForMerge = 2
 							
 							WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedType);
 
