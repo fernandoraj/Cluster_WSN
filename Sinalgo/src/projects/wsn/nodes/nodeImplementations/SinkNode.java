@@ -98,7 +98,7 @@ public class SinkNode extends SimpleNode  {
 	 * @param dataSensedType Tipo de dados (da série temporal) da mensagem <p> [Eng] <b>dataSensedType</b> Data type (of the time serie) of the message
 	 */
 	private void receiveMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType) {
-		if (approachType == 2) { // Abordagem Naive
+		if (approachType == 2 || (wsnMsgResp != null && wsnMsgResp.typeMsg == 1)) { // Abordagem Naive ou dados de sensoreamento espúrio
 			// Tratar mensagem recebida com dados do sensor
 		} // end if (approachType == 2)
 		else if (wsnMsgResp != null && wsnMsgResp.dataRecordItens != null) {

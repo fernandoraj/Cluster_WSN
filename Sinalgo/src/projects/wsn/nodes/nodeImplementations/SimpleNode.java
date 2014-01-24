@@ -202,6 +202,7 @@ public class SimpleNode extends Node
 							} else if (wsnMessage.target == this)  {//Se este for o nó de destino da mensagem...
 								this.setColor(Color.RED);
 								//...então o nó deve receber os coeficientes enviados pelo sink e...
+								newCoefsReceived = true; // Makes the sensors stop sensing without coefficients
 								receiveCoefficients(wsnMessage);
 								//...não deve mais encaminhar esta mensagem
 							}
@@ -223,13 +224,18 @@ public class SimpleNode extends Node
 						WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
 						timer.startRelative(wsnMessage.sizeTimeSlot, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
 
+						// TODO: Altera o método Adaga-P* (wsnMessage.typeMsg == 0) para que os sensores continuem sensoriando após terminarem de ler os dados iniciais até receberem os coeficientes calculados e enviados pelo sink
+						// Change the Adaga-P* approach (wsnMessage.typeMsg == 0) to the sensors nodes continue sensing after reading initial data until receiving the coefficients calculated and sended by sink
+						if (wsnMessage.typeMsg == 0 && wsnMessage != null) {
+							ReadingSendingTimer newReadingSendingTimer = new ReadingSendingTimer(wsnMessage.dataSensedType);
+							newReadingSendingTimer.startRelative(wsnMessage.sizeTimeSlot, this);
+						}
+
 						if (wsnMessage.typeMsg == 2 && wsnMessage != null){ // approachType = 2 = Naive
 							makeSensorReadingAndSendind(wsnMessage.dataSensedType); // Chama o método de sensoriamento / envio de dados da abordagem naive
 						}
 						else if (wsnMessage == null){
-						
-						Utils.printForDebug("wsnMessage é NULL!");
-
+							Utils.printForDebug("wsnMessage é NULL!");
 						}
 
 						wsnMessage.forwardingHop = this; //Devemos alterar o campo forwardingHop(da mensagem) para armazenar o noh que vai encaminhar a mensagem.
@@ -819,7 +825,10 @@ public class SimpleNode extends Node
 	 */
 	public final void makeSensorReadingAndSendingLoop(String dataSensedType)
 	{
-		makeSensorReadingAndSendind(dataSensedType);
+		// TODO: Implementar um flag booleano (newCoefsReceived) para indicar que, no Adaga-P*, os nós sensores não podem continuar sensoriando em loop pois já receberam os coeficientes para predição
+		if (!newCoefsReceived) {
+			makeSensorReadingAndSendind(dataSensedType);
+		}
 	}
 	
 	/**
