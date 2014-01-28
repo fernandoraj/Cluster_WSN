@@ -42,12 +42,17 @@ public class SinkNode extends SimpleNode  {
 	{
 		super();
 		this.setColor(Color.RED);
-		Utils.printForDebug("The size of time slot is "+sizeTimeSlot);
-		Utils.printForDebug("The type of data sensed is "+dataSensedType);
-		Utils.printForDebug("The threshold of error (max error) is "+thresholdError);
-		Utils.printForDebug("The size of sliding window is "+SimpleNode.slidingWindowSize);
-		Utils.printForDebug("The size of delay to send novelties is "+SimpleNode.limitPredictionError);
-		Utils.printForDebug("The approach type is "+approachType+" (0 = temporal correlation (Adaga-P*); 2 = Naive)");
+		System.out.println();
+		System.out.println("The size of time slot is "+sizeTimeSlot);
+		System.out.println("The type of data sensed is "+dataSensedType);
+		System.out.println("The threshold of error (max error) is "+thresholdError);
+		System.out.println("The size of sliding window is "+SimpleNode.slidingWindowSize);
+		System.out.println("The size of delay to send novelties is "+SimpleNode.limitPredictionError);
+		if (approachType == 0) {
+			System.out.println("The approach type is Adaga-P*");
+		} else if (approachType == 2) {
+			System.out.println("The approach type is Naive)");
+		}
 		
 			Global.log.logln("\nThe size of time slot is "+sizeTimeSlot);
 			Global.log.logln("The type of data sensed is "+dataSensedType);
