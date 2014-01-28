@@ -220,13 +220,17 @@ public class SimpleNode extends Node
 							prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
 						}
 
-						addThisNodeToPath(wsnMsgResp);
-						WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
-						timer.startRelative(wsnMessage.sizeTimeSlot, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+//						addThisNodeToPath(wsnMsgResp);
+//						WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
+//						timer.startRelative(wsnMessage.sizeTimeSlot, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
 
 						// TODO: Altera o método Adaga-P* (wsnMessage.typeMsg == 0) para que os sensores continuem sensoriando após terminarem de ler os dados iniciais até receberem os coeficientes calculados e enviados pelo sink
 						// Change the Adaga-P* approach (wsnMessage.typeMsg == 0) to the sensors nodes continue sensing after reading initial data until receiving the coefficients calculated and sended by sink
 						if (wsnMessage.typeMsg == 0 && wsnMessage != null) {
+							addThisNodeToPath(wsnMsgResp);
+							WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, proximoNoAteEstacaoBase);
+							timer.startRelative(wsnMessage.sizeTimeSlot, this); // Espera por "wsnMessage.sizeTimeSlot" rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+
 							ReadingSendingTimer newReadingSendingTimer = new ReadingSendingTimer(wsnMessage.dataSensedType);
 							newReadingSendingTimer.startRelative(wsnMessage.sizeTimeSlot, this);
 						}
