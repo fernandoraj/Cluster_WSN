@@ -50,8 +50,13 @@ public class SinkNode extends SimpleNode  {
 		System.out.println("The size of delay to send novelties is "+SimpleNode.limitPredictionError);
 		if (approachType == 0) {
 			System.out.println("The approach type is Adaga-P*");
+			if (SimpleNode.newContinuousSensingModeEnable) {
+				System.out.println("The sensing mode is Continuous in Adaga-P*");
+			} else {
+				System.out.println("The sensing mode is NON-Continuous in Adaga-P*");
+			}
 		} else if (approachType == 2) {
-			System.out.println("The approach type is Naive)");
+			System.out.println("The approach type is Naive");
 		}
 		
 			Global.log.logln("\nThe size of time slot is "+sizeTimeSlot);
@@ -103,7 +108,7 @@ public class SinkNode extends SimpleNode  {
 	 * @param dataSensedType Tipo de dados (da série temporal) da mensagem <p> [Eng] <b>dataSensedType</b> Data type (of the time serie) of the message
 	 */
 	private void receiveMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType) {
-		if (approachType == 2 || (wsnMsgResp != null && wsnMsgResp.typeMsg == 1)) { // Abordagem Naive ou dados de sensoreamento espúrio
+		if (approachType == 2 || (SimpleNode.newContinuousSensingModeEnable && (wsnMsgResp != null && wsnMsgResp.typeMsg == 1))) { // Abordagem Naive ou dados de sensoreamento espúrio
 			// Tratar mensagem recebida com dados do sensor
 		} // end if (approachType == 2)
 		else if (wsnMsgResp != null && wsnMsgResp.dataRecordItens != null) {
