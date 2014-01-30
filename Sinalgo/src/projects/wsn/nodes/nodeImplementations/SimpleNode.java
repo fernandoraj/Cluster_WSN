@@ -43,7 +43,7 @@ public class SimpleNode extends Node
 	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"<p>
 	 * [Eng] Indicates the size of Sliding Window from sensor readings to be send to sink node when there is a "novelty".
 	 */
-	protected static int slidingWindowSize = 4;
+	protected static int slidingWindowSize = 7;
 	
 	/**
 	 * Armazenar o nó que será usado para alcançar a Estação-Base<p>
