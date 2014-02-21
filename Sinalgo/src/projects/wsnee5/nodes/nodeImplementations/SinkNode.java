@@ -96,7 +96,7 @@ public class SinkNode extends SimpleNode
 	 * Indica que o sink node sinaliza para todos os outros nós que deve ficar continuamente com sensoriamento (usando Cluster Heads) <p>
 	 * [Eng] Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = false; // ACS: false = Representative Nodes; true = Cluster Heads
+	private boolean allSensorsMustContinuoslySense = true; // ACS: false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Emblema para indicar que o sink ainda não agrupou todos nós para a primeira vez <p>
