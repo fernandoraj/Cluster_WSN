@@ -230,6 +230,8 @@ public class SimpleNode extends Node
 	private boolean validPredictions = true;
 	
 	private boolean canMakePredictions = false; // variavel para saber se o node pode fazer predições;
+	
+	private boolean minusOne = false; // Flag to set that the ClusterHead from this node will send "news" to sink in the next error (miss), so hereafter the nodes must don't compute the RMSE to error case
 
 	@Override
 	public void preStep() {}
@@ -422,6 +424,10 @@ public class SimpleNode extends Node
 				if (wsnMsgResp.typeMsg == 5) {
 					//System.out.println("DirectMessageTimer(); received by the node "+this.ID+" from node "+wsnMsgResp.source.ID+" in Round = "+Global.currentTime);
 					validPredictions = false;
+					this.minusOne = false;
+				}
+				else if (wsnMsgResp.typeMsg == 6) {
+					this.minusOne = true;
 				}
 				else if (wsnMsgResp.target != null && wsnMsgResp.target.ID == this.ID) // ou (wsnMsgResp.target == this) ou (this.clusterHead == this) // This is the cluster head sensor which is receiving a message from another sensor of this same clsuter
 				{ 
@@ -485,6 +491,23 @@ public class SimpleNode extends Node
 			errorsInThisCluster = 0; // Então zera a quantidade de erros deste cluster
 		}
 */		
+		//TODO:
+		if (errorsInThisCluster == maxErrorsPerCluster) // Send "toPorUmaMessage" to all sensors in this cluster
+		{
+			// Envia uma mensagem para cada um dos nós do cluster atual para que os mesmos saibam que falta um erro (miss) para atingir o limite de erros deste cluster (sensores devem descartar acúmulo de RMSE)
+			for (int i = 0; i < this.myCluster.members.size(); i++) {
+				
+				SimpleNode targetNode = this.myCluster.members.get(i);
+				
+				WsnMsgResponse wsnMsgRespStopAddRMSE = new WsnMsgResponse(1, this, targetNode, this, 6);
+												
+				DirectMessageTimer timer = new DirectMessageTimer(wsnMsgRespStopAddRMSE, targetNode); // Envia uma mensagem diretamente para o 
+																										  // nó "targetNode" deste cluster
+				timer.startRelative(1, this);
+			}			
+		
+		}
+		
 		if (errorsInThisCluster > maxErrorsPerCluster)
 		{
 			// Deve informar ao Sink tal problema, para que o mesmo providencie o tratamento correto (Qual seja!???)
@@ -961,6 +984,7 @@ public class SimpleNode extends Node
 	
 			this.numTotalPredictions = 0;
 			this.numPredictionErrors = 0;
+			this.minusOne = false;
 			this.ownTimeSlot = wsnMessage.sizeTimeSlot;
 			
 			windowSize = slidingWindowSize;
@@ -1190,6 +1214,7 @@ public class SimpleNode extends Node
 					System.out.println("* * * ID = 11 ! ! !");
 				}
 */
+				//TODO: TriggerPredictions -> isValuePredictInValueReading
 				if (!isValuePredictInValueReading(value, predictionValue, maxError)) {
 					numPredictionErrors++; // Contador do número de erros de predição
 				} // end if (!isValuePredictInValueReading(value, predictionValue, maxError))
@@ -1238,12 +1263,15 @@ public class SimpleNode extends Node
 
 						} // end for (int i=0; i < nodes.length ;i++)
 						
-						//System.out.println("");
 						
 					} // end if (nodes != null)
 					
 					else { // if (nodes == null)
 //						System.out.println("Node with NULL CLuster = "+this.ID);
+					}
+					if (numPredictionErrors == (limitPredictionError - 1)) // Send "toPorUmaMessage" to all sensors in this cluster
+					{
+						this.minusOne = true;
 					}
 					
 				} // end if (this.clusterHead == null)
@@ -1444,24 +1472,27 @@ public class SimpleNode extends Node
 	 */
 	protected boolean isValuePredictInValueReading(double value, double predictionValue, double maxError)
 	{
-/*		// Code moved to else block below - according to Prof. Everardo request in 25/09/2013: RMSE should only be computed when data are not sent to the sink
+		// Code moved to else block below - according to Prof. Everardo request in 25/09/2013: RMSE should only be computed when data are not sent to the sink
+/*
 		Global.predictionsCount++;
 		this.predictionsCount++;
 
 		Global.squaredError += Math.pow((predictionValue - value), 2);
 		this.squaredError += Math.pow((predictionValue - value), 2);
-*/		
+*/
 		boolean hit;
 		if (value >= (predictionValue - value*maxError) && value <= (predictionValue + value*maxError))
 		{
 			Global.numberOfHitsInThisRound++;
 
 			// Code inserted in else block according to Prof. Everardo request in 25/09/2013
+
 			Global.predictionsCount++;
 			this.predictionsCount++;
 
 			Global.squaredError += Math.pow((predictionValue - value), 2);
 			this.squaredError += Math.pow((predictionValue - value), 2);
+
 			// End of Code inserted
 			
 			//printNodeRMSE();
@@ -1472,6 +1503,17 @@ public class SimpleNode extends Node
 		{
 			Global.numberOfMissesInThisRound++;
 			hit = false;
+			//TODO: isValuePredictInValueReading
+			if (!minusOne) {
+	
+				Global.predictionsCount++;
+				this.predictionsCount++;
+	
+				Global.squaredError += Math.pow((predictionValue - value), 2);
+				this.squaredError += Math.pow((predictionValue - value), 2);
+			}
+
+		
 		}
 		return hit;
 	} // end isValuePredictInValueReading(double value, double predictionValue, double maxError)
