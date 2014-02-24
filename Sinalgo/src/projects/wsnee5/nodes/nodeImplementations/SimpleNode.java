@@ -424,7 +424,7 @@ public class SimpleNode extends Node
 				if (wsnMsgResp.typeMsg == 5) {
 					//System.out.println("DirectMessageTimer(); received by the node "+this.ID+" from node "+wsnMsgResp.source.ID+" in Round = "+Global.currentTime);
 					validPredictions = false;
-					this.minusOne = false;
+					//this.minusOne = false;
 				}
 				else if (wsnMsgResp.typeMsg == 6) {
 					this.minusOne = true;
@@ -494,6 +494,7 @@ public class SimpleNode extends Node
 		//TODO:
 		if (errorsInThisCluster == maxErrorsPerCluster) // Send "toPorUmaMessage" to all sensors in this cluster
 		{
+			this.minusOne = true; // Set the flag "minusOne" from this sensor (ClusterHead) to true, indicates that the next prediction error should not consider the RMSE.
 			// Envia uma mensagem para cada um dos nós do cluster atual para que os mesmos saibam que falta um erro (miss) para atingir o limite de erros deste cluster (sensores devem descartar acúmulo de RMSE)
 			for (int i = 0; i < this.myCluster.members.size(); i++) {
 				
@@ -1269,7 +1270,7 @@ public class SimpleNode extends Node
 					else { // if (nodes == null)
 //						System.out.println("Node with NULL CLuster = "+this.ID);
 					}
-					if (numPredictionErrors == (limitPredictionError - 1)) // Send "toPorUmaMessage" to all sensors in this cluster
+					if (numPredictionErrors == (limitPredictionError)) // Send "toPorUmaMessage" to all sensors in this cluster
 					{
 						this.minusOne = true;
 					}
@@ -1312,7 +1313,7 @@ public class SimpleNode extends Node
 
 					if (!exit) {
 
-						if (numPredictionErrors >= limitPredictionError) { // Se o número máximo de erros de predição por sensor foi atingido para este 
+						if (numPredictionErrors > limitPredictionError) { // Se o número máximo de erros de predição por sensor foi atingido para este 
 							// sensor e o mesmo tem um ClusterHead (!=null), então este último deve ser reportado (avisado)
 
 							WsnMsgResponse wsnMsgResp;
@@ -1353,7 +1354,7 @@ public class SimpleNode extends Node
 				else // if (this.clusterHead == null) - Se não existe ClusterHead, mas sim apenas Nó Representativo
 				{
 				
-					if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Se o número de erros de predição é menor do que o limite aceitável de erros (limitPredictionError) e o número de predições executadas é menor do que o máximo de predições para o cluster deste nó sensor
+					if ((numPredictionErrors <= limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Se o número de erros de predição é menor do que o limite aceitável de erros (limitPredictionError) e o número de predições executadas é menor do que o máximo de predições para o cluster deste nó sensor
 					{
 						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
 						newPredictionTimer.startRelative(1, this); 
@@ -1363,7 +1364,7 @@ public class SimpleNode extends Node
 					{
 						WsnMsgResponse wsnMsgResp;
 						
-						if (!(numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Caso tenha saído do laço de predição por ter excedido o número máximo de erros de predição e não pelo limite do seu time slot (número máximo de predições a serem feitas por este Nó Representativo - ou Cluster Head - deste cluster)
+						if (!(numPredictionErrors <= limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Caso tenha saído do laço de predição por ter excedido o número máximo de erros de predição e não pelo limite do seu time slot (número máximo de predições a serem feitas por este Nó Representativo - ou Cluster Head - deste cluster)
 						{
 							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, (this.myCluster.sizeTimeSlot - numTotalPredictions), dataSensedType);
 							
