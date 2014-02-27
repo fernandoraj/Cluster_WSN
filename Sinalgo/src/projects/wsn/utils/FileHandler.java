@@ -618,7 +618,7 @@ public class FileHandler {
 			//TypeData.DATE, TypeData.TIME, TypeData.EPOCH, TypeData.SENSORID, TypeData.TEMP, TypeData.HUM, TypeData.LUM, TypeData.VOLT
 			//Remember of configuring "quantLearning" attribute value
 			//FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_10000.txt", TypeData.TEMP, 10.0);
-			FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_20000.txt", TypeData.TEMP, 10.0);
+			FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_20000.txt", TypeData.DATE, 2.0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
