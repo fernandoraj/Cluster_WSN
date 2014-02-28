@@ -86,7 +86,7 @@ public class SimpleNode extends Node
 	 * Valor (grandeza/magnitude) da última leitura do sensor.<p>
 	 * [Eng] Value(grandeur/magnitude) of the last sensor read.
 	 */
-	protected double lastValueRead;
+	protected double[] lastValuesRead;
 	
 	/**
 	 * Tempo (data/hora em milisegundos) da última leitura do sensor.<p> 
@@ -348,8 +348,8 @@ public class SimpleNode extends Node
 							
 							if (wsnMessage != null)
 							{
-								wsnMsgResp = new WsnMsgResponse(1, this, null, this, 1, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType); // wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType); 
-								prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
+								wsnMsgResp = new WsnMsgResponse(1, this, null, this, 1, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedTypes); // wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedTypes); 
+								prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedTypes);
 							}
 							addThisNodeToPath(wsnMsgResp);
 							
@@ -370,7 +370,7 @@ public class SimpleNode extends Node
 				{
 					
 					
-					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, "");
+					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, null);
 					
 					if (wsnMessage != null)
 					{
@@ -379,11 +379,11 @@ public class SimpleNode extends Node
 //	CASO O CLUSTER PRECISE SOFRER UM SPLIT, CADA UM DOS NÓS DO CLUSTER DEVE RECEBER UMA MENS. SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK
 						
 						
-						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType); 
+						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedTypes); 
 
 						windowSize = wsnMessage.sizeTimeSlot;
 
-						prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedType);
+						prepararMensagem(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedTypes);
 					
 					}
 					addThisNodeToPath(wsnMsgResp);
@@ -571,6 +571,9 @@ public class SimpleNode extends Node
 		canMakePredictions = false;
 	}
 	
+	/**
+	 * 
+	 */
 	public void freeNextNode()
 	{
 		nextNodeToBaseStation = null;
@@ -580,12 +583,10 @@ public class SimpleNode extends Node
 	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual<p>[Eng] Prepare the message "wsnMsgResp" to be sended for the sink increasing the data read by the actual node.
 	 * @param wsnMsgResp Mensagem a ser preparada para envio<p>[Eng] Message to be prepared for sending.
 	 * @param sizeTimeSlot Tamanho do slot de tempo (intervalo) a ser lido pelo nó sensor, ou tamanho da quantidade de dados a ser enviado para o sink<p>[Eng] Size of time slot(interval) to be read by sensor node, or size of data quantity to be sended to the sink.
-	 * @param dataSensedType Tipo de dado (temperatura, umidade, luminosidade, etc) a ser sensoreado (lido) pelo nó sensor.<p>[Eng] Type of data( temperature, humidity, luminosity, etc) to ber sensored(read) by the sensor node.
+	 * @param dataSensedTypes Tipos de dados (temperatura, umidade, luminosidade, etc) a serem sensoreados (lidos) pelo nó sensor.<p>[Eng] Types of data( temperature, humidity, luminosity, etc) to ber sensored(read) by the sensor node.
 	 */
-	private void prepararMensagem(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
+	private void prepararMensagem(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
 	{
-		
-		int measure = 0;
 		int numSequenceVoltageData = 7; //Position of voltage data according the data structure in "data*.txt" file
 		int numSequenceRound = 2;
 /*
@@ -594,22 +595,18 @@ public class SimpleNode extends Node
  * Position         [0]         [1]         [2] [3]  [4]    [5]    [6]   [7]
  * Data type       Data         Hora       Round ID  Temp   Hum    Lum   Volt
  */
-		if (dataSensedType != null)
-		{
-			measure = identifyNumberSequenceByType(dataSensedType);
-		}
+
 		String dataLine = performSensorReading();
 		int i=0; //cont = 0 
-		
-//		windowSize = sizeTimeSlot;
 		
 		while (i<sizeTimeSlot && dataLine != null)
 		{
 			i++;
-			if (dataLine != null && dataSensedType != null && measure != 0)
+			if (dataLine != null && dataSensedTypes != null && dataSensedTypes.length > 0)
 			{
 				String lines[] = dataLine.split(" ");
-				double value;
+				
+				double[] values = new double[dataSensedTypes.length];
 				double quantTime;
 				double batLevel;
 				int round;
@@ -621,48 +618,43 @@ public class SimpleNode extends Node
 					
 					round = Integer.parseInt(lines[numSequenceRound]); //Número do round
 					
-					if (lines[measure] == null || lines[measure].equals(""))
-					{
-						value = 0.0;
-					}
-					else
-					{
-						try
-						{
-							value = Double.parseDouble(lines[measure]);
-						}//try
-						catch (NumberFormatException e)
-						{
-							value = 0.0;
-						}//catch
-					}//else
+					for (int nTypes = 0; nTypes < dataSensedTypes.length; nTypes++) {
+						if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals("")) {
+							values[nTypes] = 0.0;
+						}  // end if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals(""))
+						else {
+							try {
+								values[nTypes] = Double.parseDouble(lines[dataSensedTypes[nTypes]]);
+							}//try
+							catch (NumberFormatException e) {
+								values[nTypes] = 0.0;
+							}//catch
+						} // end else if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals(""))
+					} // end for (int nTypes = 0; nTypes < dataSensedTypes.length; nTypes++)
 					
-					if (lines[numSequenceVoltageData] == null || lines[numSequenceVoltageData].equals(""))
-					{
+					
+					if (lines[numSequenceVoltageData] == null || lines[numSequenceVoltageData].equals("")) {
 						batLevel = 0.0;
 					}
-					else
-					{
-						try
-						{
+					else {
+						try {
 							batLevel = Double.parseDouble(lines[numSequenceVoltageData]);
 						}//try
-						catch (NumberFormatException e)
-						{
+						catch (NumberFormatException e) {
 							batLevel = 0.0;
 						}//catch
 					}//else
 					
 					quantTime = parseCalendarHours(lines[0], lines[1]);
 					
-					lastValueRead = value;
+					lastValuesRead = values;
 					lastTimeRead = quantTime;
 					lastBatLevel = batLevel;
 					lastRoundRead = round;
 
-					addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
+					addDataRecordItens(dataSensedTypes, values, quantTime, batLevel, round);
 
-					wsnMsgResp.addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
+					wsnMsgResp.addDataRecordItens(dataSensedTypes, values, quantTime, batLevel, round);
 					
 				}//if (linhas.length > 4)
 			}//if (dataLine != null && dataSensedType != null && medida != 0)
@@ -884,6 +876,10 @@ public class SimpleNode extends Node
 	 * @return Posição correspondente do tipo de dado a ser aferido na string lida do arquivo de dados (data.txt)<p>        
 	 * Position corresponding from data type to be measured in the string read by data file (data.txt)
 	 */
+
+	
+/*	THIS IS NO LONGER NECESSARY!!!
+
 	private int identifyNumberSequenceByType(String type) 
 	{
 		if (type.equals("t"))
@@ -896,6 +892,7 @@ public class SimpleNode extends Node
 			return 7;	
 		return 0;
 	} // end identificarTipo(String tipo)
+*/
 	
 	/**
 	 * Transforma os valores de data (AnoMesDia) e hora (hora) passados em uma grandeza inteira com a quantidade de milisegundos total<p>[Eng] Turns the values of the date(YearMonthDay) and hour(hour) passed in a entire grandeur with a total milliseconds quantity
@@ -991,7 +988,7 @@ public class SimpleNode extends Node
 			windowSize = slidingWindowSize;
 			validPredictions = true; // TODO:
 			//System.out.println("nodeID = "+this.ID+": validPredictions TRUE in Round = "+Global.currentTime);
-			triggerPredictions(wsnMessage.dataSensedType, coefA, coefB, maxError);
+			triggerPredictions(wsnMessage.dataSensedTypes, coefA, coefB, maxError);
 		}
 	} // end receiveCoefficients(WsnMsg wsnMessage)
 	
@@ -1005,7 +1002,7 @@ public class SimpleNode extends Node
 		{
 			for (int cont=0; cont < dataRecordItens.size(); cont++) //for(int cont=0; cont<slidingWindowSize; cont++)
 			{
-				wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).type, dataRecordItens.get(cont).value, dataRecordItens.get(cont).time, dataRecordItens.get(cont).batLevel, dataRecordItens.get(cont).round); 
+				wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).typs, dataRecordItens.get(cont).values, dataRecordItens.get(cont).time, dataRecordItens.get(cont).batLevel, dataRecordItens.get(cont).round); 
 			}
 		}
 	} // end addDataRecordItensInWsnMsgResponse(WsnMsgResponse wsnMsgResp)
@@ -1015,14 +1012,13 @@ public class SimpleNode extends Node
 	 * [Eng]Returns the sensor (currentNode) data (in DataRecord) according to the data type (dataType) indicated
 	 * @param currentNode Nó sensor que deve ler dados<p>
 	 * [Eng] currentNode sensor node that must read data.
-	 * @param dataType Tipo de dados a ser lido<p>
-	 * [Eng] dataType Type of data to be read.
+	 * @param dataSensedTypes Tipos de dados a serem lidos<p>
+	 * [Eng] dataTypes Types of data to be read.
 	 * @return Dado do sensor (currentNode)<p>
 	 * [Eng] Data from sensor (currentNode)
 	 */
-	private DataRecord getData(SimpleNode currentNode, String dataType) {
+	private DataRecord getData(SimpleNode currentNode, int[] dataSensedTypes) {
 		DataRecord temp = new DataRecord();
-		int numSequenceValueData = 0; //Temporary value
 		int numSequenceVoltageData = 7; //According the data structure in "data*.txt" file
 		int numSequenceRound = 2; //According the data structure in "data*.txt" file
 /*
@@ -1032,16 +1028,12 @@ public class SimpleNode extends Node
  * Data type       Data         Hora       Round ID  Temp   Hum    Lum   Volt
  */
 		
-		
-		if (dataType != null) {
-			numSequenceValueData = identifyNumberSequenceByType(dataType);
-		}
 		// TODO:
 		String sensorReading = currentNode.performSensorReading(); 
 		
-		if (sensorReading != null && numSequenceValueData != 0)
+		if (sensorReading != null && dataSensedTypes != null && dataSensedTypes.length > 0)
 		{
-			double value;
+			double[] values = new double[dataSensedTypes.length];
 			double quantTime;
 			double batLevel;
 
@@ -1049,34 +1041,28 @@ public class SimpleNode extends Node
 
 			if (lines.length > 4)
 			{
-				if (lines[numSequenceValueData] == null || lines[numSequenceValueData].equals(""))
-				{
-					value = 0.0;
-				}
-				else
-				{
-					try
-					{
-						value = Double.parseDouble(lines[numSequenceValueData]);
-					}//try
-					catch (NumberFormatException e)
-					{
-						value = 0.0;
-					}//catch
-				}//else
+				for (int nTypes = 0; nTypes < dataSensedTypes.length; nTypes++) {
+					if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals("")) {
+						values[nTypes] = 0.0;
+					}  // end if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals(""))
+					else {
+						try {
+							values[nTypes] = Double.parseDouble(lines[dataSensedTypes[nTypes]]);
+						}//try
+						catch (NumberFormatException e) {
+							values[nTypes] = 0.0;
+						}//catch
+					} // end else if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals(""))
+				} // end for (int nTypes = 0; nTypes < dataSensedTypes.length; nTypes++)
 				
-				if (lines[numSequenceVoltageData] == null || lines[numSequenceVoltageData].equals(""))
-				{
+				if (lines[numSequenceVoltageData] == null || lines[numSequenceVoltageData].equals("")) {
 					batLevel = 0.0;
 				}
-				else
-				{
-					try
-					{
+				else {
+					try {
 						batLevel = Double.parseDouble(lines[numSequenceVoltageData]);
 					}//try
-					catch (NumberFormatException e)
-					{
+					catch (NumberFormatException e) {
 						batLevel = 0.0;
 					}//catch
 				}//else
@@ -1086,8 +1072,8 @@ public class SimpleNode extends Node
 				quantTime = parseCalendarHours(lines[0], lines[1]);
 				
 //				temp = new DataRecord();
-				temp.type = dataType.charAt(0);
-				temp.value = value;
+				temp.typs = dataSensedTypes;
+				temp.values = values;
 				temp.time = quantTime;
 				temp.batLevel = batLevel;
 				temp.round = round;
@@ -1098,14 +1084,13 @@ public class SimpleNode extends Node
 		else {
 			temp = null;
 		}
-		
 		return temp;
-	}
+	} // end getData(SimpleNode currentNode, int[] dataSensedTypes)
 	
 	/**
 	 * Lê o próximo valor do sensor atual, executa a predição e, de acordo com a predição (acerto ou erro), dispara a próxima ação<p>
 	 * [Eng]Read the next value from present sensor, make the prediction and, according with the predition (hit or miss), trigges the next action 
-	 * @param dataSensedType Tipo de data para ser lido pelo sensor: "t"=temperatura, "h"=umidade, "l"=luminosidade ou "v"=voltagem<p>
+	 * @param dataSensedTypes Tipo de data para ser lido pelo sensor: "t"=temperatura, "h"=umidade, "l"=luminosidade ou "v"=voltagem<p>
 	 * [Eng] Type of data to be read from sensor: "t"=temperature, "h"=humidity, "l"=luminosity or "v"=voltage
 	 * @param coefA Coeficiente A da equação de regressão para este sensor<p>
 	 * [Eng] Coefficient A from the Regression Equation for this sensor
@@ -1114,112 +1099,32 @@ public class SimpleNode extends Node
 	 * @param maxError threshold Erro para o cálculo de previsão para este sensor<p>
 	 * [Eng] Threshold error to the calculation of prediction for this sensor
 	 */
-	protected void triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError)
+	protected void triggerPredictions(int[] dataSensedTypes, double coefA, double coefB, double maxError)
 	{
 
-		// USAR O MÉTODO getData(SimpleNode currentNode, String dataType) CRIADO !!!
+		DataRecord dataRecord = getData(this, dataSensedTypes);
 		
-		
-		// SUBSTITUIR DAQUI ... 
-		
-		
-		int measure = 0;
-		int numSequenceVoltageData = 7; //According the data structure in "data*.txt" file
-		int numSequenceRound = 2; //According the data structure in "data*.txt" file
-/*
- * Example:
- * 				2004-03-21 19:02:26.792489 65528 4 87.383 45.4402 5.52 2.31097
- * Position         [0]         [1]         [2] [3]  [4]    [5]    [6]   [7]
- * Data type       Data         Hora       Round ID  Temp   Hum    Lum   Volt
- */
-
-		if (dataSensedType != null)
-		{
-			measure = identifyNumberSequenceByType(dataSensedType);
-		}
-		// TODO:
-/*
-		if (this.ID == 1 && Global.currentTime > 175) {
-			System.out.println("this.ID = "+this.ID+" ; Round = "+Global.currentTime+" ; this.numTotalSensorReadings = "+this.numTotalSensorReadings+" ; Difference = "+(Global.currentTime - this.numTotalSensorReadings) );
-		}
-*/
-		String sensorReading = performSensorReading();
-		
-		if (sensorReading != null && measure != 0)
-		{
-			String lines[] = sensorReading.split(" ");
-			double value;
-			double quantTime;
-			double batLevel;
-			if (lines.length > 4)
-			{
-				if (lines[measure] == null || lines[measure].equals(""))
-				{
-					value = 0.0;
-				}
-				else
-				{
-					try
-					{
-						value = Double.parseDouble(lines[measure]);
-					}//try
-					catch (NumberFormatException e)
-					{
-						value = 0.0;
-					}//catch
-				}//else
-				
-				if (lines[numSequenceVoltageData] == null || lines[numSequenceVoltageData].equals(""))
-				{
-					batLevel = 0.0;
-				}
-				else
-				{
-					try
-					{
-						batLevel = Double.parseDouble(lines[numSequenceVoltageData]);
-					}//try
-					catch (NumberFormatException e)
-					{
-						batLevel = 0.0;
-					}//catch
-				}//else
-
-				int round = Integer.parseInt(lines[numSequenceRound]); // Número do round
-				
-				quantTime = parseCalendarHours(lines[0], lines[1]);
-
-				
-				
-				
-				// ATÉ AQUI !!!
-				
-				
-				
-				
+		if (dataRecord != null) {
+			
+				double[] values = dataRecord.values;
+				double quantTime = dataRecord.time;
+				double batLevel = dataRecord.batLevel;
+				int round = dataRecord.round;
 				
 				double predictionValue = makePrediction(coefA, coefB, quantTime); // Incrementa o contador numTotalPredictions (numTotalPredictions++)
 				
-//				addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round);
-
 				lastRoundRead = round;
-//				lastValueRead = value;
-//				lastTimeRead = quantTime;
 
 /*
  *  HERE IS THE POINT OF TEST FROM PREDICT VALUE FOR CHOICE WHAT TO DO !!!
  */
-/*
-				if (this.ID == 11)
-				{
-					System.out.println("* * * ID = 11 ! ! !");
-				}
-*/
+
 				//TODO: TriggerPredictions -> isValuePredictInValueReading
-				if (!isValuePredictInValueReading(value, predictionValue, maxError)) {
+				if (!isValuePredictInValueReading(values, predictionValue, maxError)) {
 					numPredictionErrors++; // Contador do número de erros de predição
 				} // end if (!isValuePredictInValueReading(value, predictionValue, maxError))
-				addDataRecordItens(dataSensedType.charAt(0), value, quantTime, batLevel, round); // Removido (comentado) da linha 987
+
+				addDataRecordItens(dataSensedTypes, values, quantTime, batLevel, round); // Removido (comentado) da linha 987
 				
 				if (this.clusterHead == null) { // Se NÃO existe um CH, ou seja, se o modo de sensoriamento NÃO é contínuo (SinkNode.allSensorsMustContinuoslySense = false)
 					Utils.printForDebug("* * The total number of predictions is "+numTotalPredictions+"! NoID = "+this.ID+" Maximum of predictions = "+this.ownTimeSlot);					
@@ -1242,11 +1147,11 @@ public class SimpleNode extends Node
 						for (int i=0; i < nodes.length ;i++) { // Para cada um dos nós no mesmo cluste deste Nó Representativo
 							if (nodes[i].ID != this.ID) { // Caso não seja o próprio Nó Representativo
 							
-								DataRecord nodeData = getData((SimpleNode)nodes[i], dataSensedType); // Calcular o RMSE
+								DataRecord nodeData = getData((SimpleNode)nodes[i], dataSensedTypes); // Calcular o RMSE
 
 								((SimpleNode)nodes[i]).addDataRecordItens(nodeData);
 								
-								double sensorValue = nodeData.value;
+								double sensorValue = nodeData.values;
 								
 								// Code inserted in else block according to Prof. Everardo request in 25/09/2013
 								Global.predictionsCount++;
@@ -1293,7 +1198,7 @@ public class SimpleNode extends Node
 					
 							Integer messageType = 4; // CÓDIGO PARA INFORMAR AO SINK QUE ESTE CLUSTER HEAD ATINGIU O MIN. DE BATERIA
 
-							wsnMsgResp = new WsnMsgResponse(1, this, null, this, messageType, 0, dataSensedType);
+							wsnMsgResp = new WsnMsgResponse(1, this, null, this, messageType, 0, dataSensedTypes);
 							
 							addDataRecordItensInWsnMsgResponse(wsnMsgResp);
 
@@ -1318,7 +1223,7 @@ public class SimpleNode extends Node
 
 							WsnMsgResponse wsnMsgResp;
 							
-							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, this.ownTimeSlot, dataSensedType);
+							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, this.ownTimeSlot, dataSensedTypes);
 							//wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 5, this.ownTimeSlot, dataSensedType);
 							
 							Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+limitPredictionError+")! NoID = "+this.ID+"\n");
@@ -1343,7 +1248,7 @@ public class SimpleNode extends Node
 //						else {
 						
 						// Se o modo de sensoriamento é contínuo, continua fazendo predição
-						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
+						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedTypes, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
 						//newPredictionTimer.startRelative(1, this); 
 						newPredictionTimer.startRelative(SinkNode.sensorTimeSlot, this);
 //						}
@@ -1356,7 +1261,7 @@ public class SimpleNode extends Node
 				
 					if ((numPredictionErrors <= limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Se o número de erros de predição é menor do que o limite aceitável de erros (limitPredictionError) e o número de predições executadas é menor do que o máximo de predições para o cluster deste nó sensor
 					{
-						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedType, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
+						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedTypes, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
 						newPredictionTimer.startRelative(1, this); 
 					} // end if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot))
 					
@@ -1366,7 +1271,7 @@ public class SimpleNode extends Node
 						
 						if (!(numPredictionErrors <= limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Caso tenha saído do laço de predição por ter excedido o número máximo de erros de predição e não pelo limite do seu time slot (número máximo de predições a serem feitas por este Nó Representativo - ou Cluster Head - deste cluster)
 						{
-							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, (this.myCluster.sizeTimeSlot - numTotalPredictions), dataSensedType);
+							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, (this.myCluster.sizeTimeSlot - numTotalPredictions), dataSensedTypes);
 							
 							Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+limitPredictionError+")! NoID = "+this.ID+"\n");
 							Utils.printForDebug("* * * * The predicted value NO is within the margin of error of the value read! NoID = "+this.ID);
@@ -1374,7 +1279,7 @@ public class SimpleNode extends Node
 						}
 						else // if (numTotalPredictions >= this.ownTimeSlot) // Caso tenha saído do laço de predições por ter excedido o limite do seu time slot próprio(número máximo de predições a serem feitas por este Nó Representativo)
 						{
-							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 3, 0, dataSensedType);
+							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 3, 0, dataSensedTypes);
 							
 							Utils.printForDebug("* * The total loops predictions ("+numTotalPredictions+") REACHED the maximum of loops predictions (TimeSlot proprio = "+this.ownTimeSlot+") of this representative node / cluster! NoID = "+this.ID+"\n");						
 						}					
@@ -1385,20 +1290,6 @@ public class SimpleNode extends Node
 						
 						wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
 
-/*						// REMOVER DAQUI...						
-
-						Node[] nodes = SinkNode.getNodesFromThisCluster(this); // Se é um Nó Representativo, ler os valores de todos os outros nós naquele mesmo cluster naquele momento 
-						
-						if (nodes != null && nodes.length > 1) {
-							for (int i=0; i < nodes.length ;i++) { // For each sensor in same cluster from representative node - Para cada um dos nós no mesmo cluster deste Nó Representativo
-								if (nodes[i].ID != this.ID) { // Caso não seja o próprio Nó Representativo
-									updateDataRecordItens((SimpleNode)nodes[i], dataSensedType);
-								} // end if (nodes[i].ID != this.ID)
-							} // end for (int i=0; i < nodes.length ;i++)
-						} // end if (nodes != null && nodes.length > 1)
-*/
-				// ... ATÉ AQUI!
-						
 						if (this.clusterHead == null) // It means that there isn't a cluster head, so the response message must be send to sink node (base station)
 						{
 							if (nextNodeToBaseStation != null) {
@@ -1420,10 +1311,8 @@ public class SimpleNode extends Node
 					
 				} // end else from if (this.clusterHead != null)
 				
-			}// end if (linhas.length > 4)
+			}// end if (dataRecord != null)
 			
-		}// end if (sensorReading != null && medida != 0)
-		
 	}// end triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError)
 	
 	/**
@@ -1513,11 +1402,70 @@ public class SimpleNode extends Node
 				Global.squaredError += Math.pow((predictionValue - value), 2);
 				this.squaredError += Math.pow((predictionValue - value), 2);
 			}
-
-		
 		}
 		return hit;
 	} // end isValuePredictInValueReading(double value, double predictionValue, double maxError)
+
+	/**
+	 * Ele compara os valores de leituras ('values') com os valores preditos ('predictionValues') usando 'maxError' como limiar de erro<p>
+	 * [Eng] It compares the read values ('values') to the predict values ('predictionValues') using 'maxError' as threshold error
+	 * @param values Valores lidos pelo sensor<p>[Eng] Values read from the sensor
+	 * @param predictionValues Valores preditos para serem comparados<p>[Eng] Values predict to be compared
+	 * @param maxError Limiar de erro para o calculo da predição para o sensor<p>[Eng] Threshold error to the calculation of prediction for this sensor
+	 * @return Verdadeiro se os valores sensoriados (lidos) estão dentro da margem de erro dos valores de predição(mais ou menos o limiar de erro) ou Falso, caso contrário<p>[Eng] True if the sensed (read) value is in the predicted value (more or less the threshold error) ou False, otherwise
+	 */
+	protected boolean areValuesPredictInValuesReading(double[] values, double[] predictionValues, double maxError)
+	{
+		// Code moved to else block below - according to Prof. Everardo request in 25/09/2013: RMSE should only be computed when data are not sent to the sink
+/*
+		Global.predictionsCount++;
+		this.predictionsCount++;
+
+		Global.squaredError += Math.pow((predictionValue - value), 2);
+		this.squaredError += Math.pow((predictionValue - value), 2);
+*/
+		// Implementar os testes de acerto de predição múltiplos em modo AND e modo OR, ou seja, no modo AND só é acerto quando 
+		// TODOS os valores dos diversos tipos estiverem dentro do erro esperado; e no modo OR, quando algum dos tipos sensoriados 
+		// estiverem dentro do esperado, considera-se acerto.
+		
+		// TODO: PAREI AQUI - Para implementar o cálculo dos diversos coeficientes no sink node!
+		
+		boolean hit;
+		if (values >= (predictionValues - values*maxError) && values <= (predictionValues + values*maxError))
+		{
+			Global.numberOfHitsInThisRound++;
+
+			// Code inserted in else block according to Prof. Everardo request in 25/09/2013
+
+			Global.predictionsCount++;
+			this.predictionsCount++;
+
+			Global.squaredError += Math.pow((predictionValues - values), 2);
+			this.squaredError += Math.pow((predictionValues - values), 2);
+
+			// End of Code inserted
+			
+			//printNodeRMSE();
+			
+			hit = true;
+		}
+		else
+		{
+			Global.numberOfMissesInThisRound++;
+			hit = false;
+			//TODO: isValuePredictInValueReading
+			if (!minusOne) {
+	
+				Global.predictionsCount++;
+				this.predictionsCount++;
+	
+				Global.squaredError += Math.pow((predictionValues - values), 2);
+				this.squaredError += Math.pow((predictionValues - values), 2);
+			}
+		}
+		return hit;
+	} // end isValuePredictInValueReading(double value, double predictionValue, double maxError)
+	
 	
 	/**
 	 * Desempilha um nó do caminho de nós <p>
@@ -1553,11 +1501,11 @@ public class SimpleNode extends Node
 	 * Atualiza o "dataRecordItens" estrutura do "currentNode" pela leitura de "windowSize" quantidade de dados do tipo "dataType" <p>
 	 * [Eng] Updates the "dataRecordItens" structure from the "currentNode" by the reading of "windowSize" quantity of data from type "dataType"
 	 * @param currentNode Sensor node to have the dataRecordItens updated
-	 * @param dataType Type of data to be read by sensor
+	 * @param dataTypes Types of data to be read by sensor
 	 */
-	private void updateDataRecordItens(SimpleNode currentNode, String dataType) {
+	private void updateDataRecordItens(SimpleNode currentNode, int[] dataTypes) {
 		for (int i=0; i < windowSize; i++) { // TODO: check and change windowSize to slidingWindowSize
-			currentNode.dataRecordItens.add(getData(currentNode, dataType));
+			currentNode.dataRecordItens.add(getData(currentNode, dataTypes));
 		}
 		while (currentNode.dataRecordItens.size() > windowSize) { // TODO: change windowSize to slidingWindowSize
 			currentNode.dataRecordItens.removeElementAt(0);
@@ -1581,8 +1529,8 @@ public class SimpleNode extends Node
 	 */
 	public class DataRecord
 	{
-		char type;
-		double value;
+		int[] typs;
+		double[] values;
 		double time;
 		double batLevel;
 		int round;
@@ -1598,7 +1546,7 @@ public class SimpleNode extends Node
 	 * @param bat Nível de Potência da bateria no sensor<p>[Eng] Battery power level sensor
 	 * @param rnd Número do round<p>[Eng] Round number
 	 */
-	public void addDataRecordItens(char typ, double val, double tim, double bat, int rnd)
+	public void addDataRecordItens(int[] typs, double[] vals, double tim, double bat, int rnd)
 	{
 		if (this.dataRecordItens == null)
 		{
@@ -1606,8 +1554,8 @@ public class SimpleNode extends Node
 		}
 		DataRecord dr = new DataRecord();
 		
-		dr.type = typ;
-		dr.value = val;
+		dr.typs = typs;
+		dr.values = vals;
 		dr.time = tim;
 		dr.batLevel = bat;
 		dr.round = rnd;
@@ -1648,11 +1596,11 @@ public class SimpleNode extends Node
 	
 	private boolean nonRead = true;
 	
-	private double[] values;
+	private int[][] types2;
+	
+	private double[][] values2;
 	
 	private double[] times;
-	
-	private char[] types;
 	
 	private double[] batLevels;
 	
@@ -1667,9 +1615,9 @@ public class SimpleNode extends Node
 			{
 				tam = dataRecordItens.size();
 			}
-			values = new double[tam];
+			types2 = new int[tam][];
+			values2 = new double[tam][];
 			times = new double[tam];
-			types = new char[tam];
 			batLevels = new double[tam];
 			rounds = new int[tam];
 			
@@ -1677,17 +1625,17 @@ public class SimpleNode extends Node
 			{
 				if (dataRecordItens.get(i) != null)
 				{
-					values[i] = ((DataRecord)dataRecordItens.get(i)).value;
+					types2[i] = ((DataRecord)dataRecordItens.get(i)).typs;
+					values2[i] = ((DataRecord)dataRecordItens.get(i)).values;
 					times[i] = ((DataRecord)dataRecordItens.get(i)).time;
-					types[i] = ((DataRecord)dataRecordItens.get(i)).type;
 					batLevels[i] = ((DataRecord)dataRecordItens.get(i)).batLevel;
 					rounds[i] = ((DataRecord)dataRecordItens.get(i)).round;
 				}
 				else
 				{
-					values[i] = 0.0;
+					types2[i] = null;
+					values2[i] = null;
 					times[i] = 0.0;
-					types[i] = ' ';
 					batLevels[i] = 0.0;
 					rounds[i] = 0;
 				}
@@ -1697,10 +1645,16 @@ public class SimpleNode extends Node
 		}
 	}
 	
-	public double[] getDataRecordValues()
+	public int[][] getDataRecordTypes()
 	{
 		readData();
-		return values;
+		return types2;
+	}
+	
+	public double[][] getDataRecordValues()
+	{
+		readData();
+		return values2;
 	}
 
 	public double[] getDataRecordTimes()
@@ -1709,12 +1663,6 @@ public class SimpleNode extends Node
 		return times;
 	}
 
-	public char[] getDataRecordTypes()
-	{
-		readData();
-		return types;
-	}
-	
 	public double[] getDataRecordBatLevels()
 	{
 		readData();

@@ -51,10 +51,12 @@ public class SinkNode extends SimpleNode
 	private Integer sizeTimeUpdate = 5;
 	
 	/**
-	 * Tipo de dado a ser sensoriado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <br>
-	 * [Eng] Type of data to be sensed (read in the sensor nodes), which can be: "t" = temperature, "h" = humidity, "l" = brightness or "v" = voltage
+	 * Tipos de dados a serem sensoriados (lidos nos nós sensores), que, para os dados do "Intel Lab Data", podem ser: temperatura = 4, 
+	 * umidade = 5, luminosidade = 6 ou voltagem = 7. <br>
+	 * [Eng] Types of data to be sensed (read in the sensor nodes), which, for Intel Lab Data, can be: 
+	 * temperature = 4; humidity = 5; brightness("lum") = 6 or voltage = 7;
 	 */
-	private String dataSensedType = "t";
+	private int[] dataSensedTypes = {4,5,6};
 	
 	/**
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
@@ -185,12 +187,12 @@ public class SinkNode extends SimpleNode
 		System.out.println("The size of sliding window is "+SimpleNode.slidingWindowSize);
 		System.out.println("The maximum distance between sensors in the same cluster is "+maxDistance);
 		System.out.println("The minimum occupancy rate per cluster (for Merge) is "+minimumOccupancyRatePerCluster);
-		System.out.println("The type of data sensed is "+dataSensedType);
+//		System.out.println("The type of data sensed is "+dataSensedType);
 
 		
 //		if(LogL.ROUND_DETAIL){
 			Global.log.logln("\nThe size of time slot is "+sizeTimeSlot);
-			Global.log.logln("The type of data sensed is "+dataSensedType);
+//			Global.log.logln("The type of data sensed is "+dataSensedType);
 			Global.log.logln("The threshold of error (max error) is "+thresholdError);
 			Global.log.logln("The size of sliding window is "+SimpleNode.slidingWindowSize+"\n");
 //		}
@@ -206,7 +208,7 @@ public class SinkNode extends SimpleNode
 	public void construirRoteamento()
 	{
 		this.nextNodeToBaseStation = this;
-		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedType);
+		WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedTypes);
 		
 		// The numberOfMessagesOverAll and sensorReadingsCount attribs are used to define a param from energy consumption of the overall network
 		Utils.printForDebug("Global.numberOfMessagesOverAll = "+Global.numberOfMessagesOverAll);
@@ -303,7 +305,7 @@ public class SinkNode extends SimpleNode
 							
 							sizeTimeSlot = sizeTimeSlotForMerge; // Sugestão do Prof. Everardo em reunião no dia 12/12/2013 : sizeTimeSlotForMerge = 2
 							
-							WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedType);
+							WsnMsg wsnMessage = new WsnMsg(1, this, null, this, 0, sizeTimeSlot, dataSensedTypes);
 
 							WsnMessageTimer timer = new WsnMessageTimer(wsnMessage);
 							timer.startRelative(2, this);
@@ -675,7 +677,7 @@ public class SinkNode extends SimpleNode
 				WsnMsgResponse currentWsnMsgResp = tempCluster.get(lineFromCluster, col);
 				//currentWsnMsgResp.hopsToTarget--;
 
-				WsnMsg wsnMessage = new WsnMsg(1, this, currentWsnMsgResp.source, this, 1, sizeTimeUpdate, dataSensedType);
+				WsnMsg wsnMessage = new WsnMsg(1, this, currentWsnMsgResp.source, this, 1, sizeTimeUpdate, dataSensedTypes);
 								
 				wsnMessage.removeCoefs(); // Identifies this message as requesting sensing and not sending coefficients
 				wsnMessage.setPathToSenderNode(currentWsnMsgResp.clonePath(), currentWsnMsgResp.hopsToTarget); // Sets the path (route) to destination node (source) - same "currentWsnMsgResp.origem"
@@ -1368,7 +1370,7 @@ public class SinkNode extends SimpleNode
 		if (receivedNode != null && receivedNode.dataRecordItens != null)
 		{
 			int size = receivedNode.dataRecordItens.size();
-			double[] valores = new double[size];
+			double[][] valores = new double[size][];
 			double[] tempos = new double[size];
 
 			//Dados lidos do sensor correspondente
@@ -1376,18 +1378,18 @@ public class SinkNode extends SimpleNode
 			tempos = receivedNode.getDataRecordTimes();
 
 			//Coeficientes de regressão linear com os vetores acima
-			double coeficienteA, coeficienteB;
-			double mediaTempos, mediaValores;
+			double[] coeficientesA, coeficientesB;
+			double mediaTempos, mediaValores[];
 
 			//Médias dos valores de leitura e tempos
-			mediaTempos = calculaMedia(tempos);
-			mediaValores = calculaMedia(valores);
+			mediaTempos = calculatesAverage(tempos);
+			mediaValores = calculatesAverage(valores);
 
 			//Cálculos dos coeficientes de regressão linear com os vetores acima
-			coeficienteB = calculaB(valores, tempos, mediaValores, mediaTempos);
-			coeficienteA = calculaA(mediaValores, mediaTempos, coeficienteB);
+			coeficientesB = calculatesBs(valores, tempos, mediaValores, mediaTempos);
+			coeficientesA = calculatesAs(mediaValores, mediaTempos, coeficientesB);
 			
-			sendCoefficients(receivedNode, coeficienteA, coeficienteB, clusterHeadNode);
+			sendCoefficients(receivedNode, coeficientesA, coeficientesB, clusterHeadNode);
 		}
 	} // end receiveMessage(WsnMsgResponse wsnMsgResp, Node clusterHeadNode)
 	
@@ -1397,7 +1399,7 @@ public class SinkNode extends SimpleNode
 	 * @param values Array de valores reais de entrada <p>[Eng] Array of real values ??input
 	 * @return Média dos valores reais de entrada <p>[Eng] Mean of the actual values ??of input
 	 */
-	private double calculaMedia(double[] values)
+	private double calculatesAverage(double[] values)
 	{
 		double mean = 0, sum = 0;
 		for (int i=0; i<values.length; i++)
@@ -1410,7 +1412,32 @@ public class SinkNode extends SimpleNode
 		}
 		return mean;
 	} // end calculaMedia(double[] values)
-			
+
+	/**
+	 * Calcula e retorna a média aritmética dos valores reais passados <p>
+	 * [Eng] Computes and returns the arithmetic mean of the actual values passed
+	 * @param values Array de valores reais de entrada <p>[Eng] Array of real input values
+	 * @return Média dos valores reais de entrada <p>[Eng] Mean of the actual input values 
+	 */
+	private double[] calculatesAverage(double[][] values)
+	{
+		double means[] = new double[values.length];
+		for (int firstDim = 0; firstDim < values.length; firstDim++) {
+			double mean = 0, sum = 0;
+			for (int i = 0; i < values[firstDim].length; i++)
+			{
+				sum += values[firstDim][i];
+			}
+			if (values[firstDim].length > 0)
+			{
+				mean = sum/values[firstDim].length;
+			}
+			means[firstDim] = mean;
+		}
+		return means;
+	} // end calculaMedia(double[] values)
+
+	
 	/**
 	 * Calcula o coeficiente B da equação de regressão <p>
 	 * [Eng] Calculates the coefficient B of the regression equation
@@ -1420,20 +1447,24 @@ public class SinkNode extends SimpleNode
 	 * @param avarageTimes Média dos tempos de leitura dos valores pelos sensores <p>[Eng] Mean time reading the values ??from sensors <b> mediaTempos </b>
 	 * @return Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation
 	 */
-	private double calculaB(double[] values, double[] times, double averageValues, double avarageTimes)
+	private double[] calculatesBs(double[][] values, double[] times, double[] averageValues, double avarageTimes)
 	{
-		double numerador = 0.0, denominador = 0.0, x;
-		for (int i = 0; i < times.length; i++)
-		{
-			x = times[i] - avarageTimes;
-			numerador += x*(values[i] - averageValues);
-			denominador += x*x;
+		double Bs[] = new double[values.length];
+		for (int firstDim = 0; firstDim < values.length; firstDim++) {
+			double numerador = 0.0, denominador = 0.0, x = 0.0;
+			for (int i = 0; i < times.length; i++) {
+				x = times[i] - avarageTimes;
+				numerador += x*(values[firstDim][i] - averageValues[firstDim]);
+				denominador += x*x;
+			}
+			if (denominador != 0) {
+				Bs[firstDim] = (numerador/denominador);
+			}
+			else {
+				Bs[firstDim] = 0.0;
+			}
 		}
-		if (denominador != 0)
-		{
-			return (numerador/denominador);
-		}
-		return 0.0;
+		return Bs;
 	} // end calculaB(double[] valores, double[] tempos, double mediaValores, double mediaTempos)
 	
 	/**
@@ -1444,23 +1475,27 @@ public class SinkNode extends SimpleNode
 	 * @param B Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation 
 	 * @return Valor do coeficiente A <p>[Eng] Value of the coefficient A
 	 */
-	private double calculaA(double averageValues, double avarageTimes, double B)
+	private double[] calculatesAs(double[] averageValues, double avarageTimes, double[] Bs)
 	{
-		return (averageValues - B*avarageTimes);
+		double As[] = new double[averageValues.length];
+		for (int firstDim = 0; firstDim < averageValues.length; firstDim++) {
+			As[firstDim] = (averageValues[firstDim] - Bs[firstDim]*avarageTimes);
+		}
+		return As;
 	} // end calculaA(double mediaValores, double mediaTempos, double B)
 	
 	/**
 	 * Cria uma nova mensagem (WsnMsg) para envio dos coeficientes recebidos através dos parâmetros, e a envia para o próximo nó no caminho até o nó de origem da mensagem (wsnMsgResp.origem) <p>
 	 * [Eng] Creates a new message (WsnMsg) for sending coefficients received through the parameters, and sends it to the next node on the path until the source node of the message (wsnMsgResp.origem)
 	 * @param sourceNode Mensagem de resposta enviada do nó de origem para o nó sink, que agora enviará os (novos) coeficientes calculados para o nó de origem <p>[Eng] Response message sent from the source node to the sink node, which now sends the (new) coefficients calculated for the source node 
-	 * @param coefficientA Valor do coeficiente A da equação de regressão <p>[Eng] Value of the coefficient A of the regression equation 
-	 * @param coefficientB Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation 
+	 * @param coefficientsA Valor do coeficiente A da equação de regressão <p>[Eng] Value of the coefficient A of the regression equation 
+	 * @param coefficientsB Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation 
 	 */
 
-	private void sendCoefficients(SimpleNode sourceNode, double coefficientA, double coefficientB, Node clusterHeadNode)
+	private void sendCoefficients(SimpleNode sourceNode, double[] coefficientsA, double[] coefficientsB, Node clusterHeadNode)
 	{
-		WsnMsg wsnMessage = new WsnMsg(1, this, sourceNode, this, 1, sourceNode.myCluster.sizeTimeSlot, dataSensedType, thresholdError, clusterHeadNode);
-		wsnMessage.setCoefs(coefficientA, coefficientB);
+		WsnMsg wsnMessage = new WsnMsg(1, this, sourceNode, this, 1, sourceNode.myCluster.sizeTimeSlot, dataSensedTypes, thresholdError, clusterHeadNode);
+		wsnMessage.setCoefs(coefficientsA, coefficientsB);
 		wsnMessage.setPathToSenderNode(sourceNode.getPathToSenderNode(), sourceNode.hopsToTarget);
 		sendToNextNodeInPath(wsnMessage);
 	} // end sendCoefficients(WsnMsgResponse wsnMsgResp, double coeficienteA, double coeficienteB, Node clusterHeadNode)
