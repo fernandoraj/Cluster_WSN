@@ -65,7 +65,7 @@ public class WsnMsg extends Message {
 	 * Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>
 	 * [Eng] Type of data to be sensed (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage
 	 */
-	public String dataSensedType = null;
+	public int[] dataSensedTypes = null;
 	
 	/**
 	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro) <p>
@@ -107,8 +107,8 @@ public class WsnMsg extends Message {
 	 */
 	public class coefEquation
 	{
-		Double coefA;
-		Double coefB;
+		double[] coefA;
+		double[] coefB;
 	}
 	
 	/**
@@ -138,7 +138,7 @@ public class WsnMsg extends Message {
 	 * [Eng] Reads the coefficient A in the equation
 	 * @return valor do coeficiente A <p>[Eng] value of the coefficient A
 	 */ 
-	public Double getCoefA()
+	public double[] getCoefA()
 	{
 		if (coefs != null)
 		{
@@ -152,7 +152,7 @@ public class WsnMsg extends Message {
 	 * [Eng] Reads the coefficient B in the equation
 	 * @return valor do coeficiente B <p>[Eng] value of the coefficient B
 	 */
-	public Double getCoefB()
+	public double[] getCoefB()
 	{
 		if (coefs != null)
 		{
@@ -167,7 +167,7 @@ public class WsnMsg extends Message {
 	 * @param A valor do coeficiente A <p>[Eng] value of the coefficient A
 	 * @param B valor do coeficiente B <p>[Eng] value of the coefficient B
 	 */
-	public void setCoefs(Double A, Double B)
+	public void setCoefs(double[] A, double[] B)
 	{
 		if (coefs == null)
 		{
@@ -249,16 +249,16 @@ public class WsnMsg extends Message {
 	 * @param forwardingHop Nó que vai reencaminhar a mensagem <p>[Eng] Node that will forward the message 
 	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets 
 	 * @param sizeTS Número de dados sensoreados por time slot (Tamanho do time slot) <p>[Eng] Number of sensed data per time slot (time slot Size) 
-	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage 
+	 * @param dataSensedTypes Tipos de dados a serem sensoreados (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage 
 	 */
-	public WsnMsg(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, String dataSensedType) {
+	public WsnMsg(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, int[] dataSensedTypes) {
 		this.sequenceID = seqID;
 		this.source = source;
 		this.target = target;
 		this.forwardingHop = forwardingHop;
 		this.typeMsg = type;
 		this.sizeTimeSlot = sizeTS;
-		this.dataSensedType = dataSensedType;
+		this.dataSensedTypes = dataSensedTypes;
 	}
 
 	/**
@@ -270,17 +270,17 @@ public class WsnMsg extends Message {
 	 * @param forwardingHop Nó que vai reencaminhar a mensagem <p>[Eng] Node that will forward the message 
 	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets 
 	 * @param sizeTS Número de dados sensoreados por time slot (Tamanho do time slot) <p>[Eng] Number of sensed data per time slot (time slot Size) 
-	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage 
+	 * @param dataSensedTypes Tipos de dados a serem sensoreados (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage 
 	 * @param thresholdEr Limiar de erro aceitavel <p>[Eng] Threshold of acceptable error <b> thresholdEr </b>
 	 */
-	public WsnMsg(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, String dataSensedType, double thresholdEr) {
+	public WsnMsg(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, int[] dataSensedTypes, double thresholdEr) {
 		this.sequenceID = seqID;
 		this.source = source;
 		this.target = target;
 		this.forwardingHop = forwardingHop;
 		this.typeMsg = type;
 		this.sizeTimeSlot = sizeTS;
-		this.dataSensedType = dataSensedType;
+		this.dataSensedTypes = dataSensedTypes;
 		this.thresholdError = thresholdEr;
 	}
 	
@@ -293,18 +293,18 @@ public class WsnMsg extends Message {
 	 * @param forwardingHop Nó que vai reencaminhar a mensagem <p>[Eng] Node that will forward the message 
 	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets 
 	 * @param sizeTS Número de dados sensoreados por time slot (Tamanho do time slot) <p>[Eng] Number of sensed data per time slot (time slot Size) 
-	 * @param dataSensedType Tipo de dado a ser sensoreado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage 
+	 * @param dataSensedTypes Tipos de dados a serem sensoreados (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage 
 	 * @param thresholdEr Limiar de erro aceitavel <p>[Eng] Threshold of acceptable error 
 	 * @param clusterHeadNode Cluster Head do cluster do nó que receberá a mensagem <p> [Eng] Cluster Head cluster node to receive the message 
 	 */
-	public WsnMsg(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, String dataSensedType, double thresholdEr, Node clusterHeadNode) {
+	public WsnMsg(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, int[] dataSensedTypes, double thresholdEr, Node clusterHeadNode) {
 		this.sequenceID = seqID;
 		this.source = source;
 		this.target = target;
 		this.forwardingHop = forwardingHop;
 		this.typeMsg = type;
 		this.sizeTimeSlot = sizeTS;
-		this.dataSensedType = dataSensedType;
+		this.dataSensedTypes = dataSensedTypes;
 		this.thresholdError = thresholdEr;
 		this.clusterHead = clusterHeadNode;
 	}
@@ -318,7 +318,7 @@ public class WsnMsg extends Message {
 		msg.ttl = this.ttl;
 		msg.hopsToTarget = this.hopsToTarget;
 		msg.sizeTimeSlot = this.sizeTimeSlot;
-		msg.dataSensedType = this.dataSensedType;
+		msg.dataSensedTypes = this.dataSensedTypes;
 		msg.thresholdError = this.thresholdError;
 		msg.coefs = this.coefs;
 		msg.hasCoefs = this.hasCoefs;
