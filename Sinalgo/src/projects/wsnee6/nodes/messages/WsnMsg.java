@@ -71,11 +71,11 @@ public class WsnMsg extends Message {
 	 * Percentual do limiar de erro aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0(aceita todo e qualquer erro) <p>
 	 * [Eng] Percentage threshold of error to the readings of sensor nodes, which can be between 0.0 (no errors accepted) and 1.0 (accepts all and any errors)
 	 */
-	private double thresholdError = 0.0;
+	private double[] thresholdErrors = null;
 	
-	public double getThresholdError()
+	public double[] getThresholdErrors()
 	{
-		return thresholdError;
+		return thresholdErrors;
 	}
 	
 	/**
@@ -107,8 +107,8 @@ public class WsnMsg extends Message {
 	 */
 	public class coefEquation
 	{
-		double[] coefA;
-		double[] coefB;
+		double[] coefsA;
+		double[] coefsB;
 	}
 	
 	/**
@@ -138,11 +138,11 @@ public class WsnMsg extends Message {
 	 * [Eng] Reads the coefficient A in the equation
 	 * @return valor do coeficiente A <p>[Eng] value of the coefficient A
 	 */ 
-	public double[] getCoefA()
+	public double[] getCoefsA()
 	{
 		if (coefs != null)
 		{
-			return coefs.coefA;
+			return coefs.coefsA;
 		}
 		return null;
 	}
@@ -152,11 +152,11 @@ public class WsnMsg extends Message {
 	 * [Eng] Reads the coefficient B in the equation
 	 * @return valor do coeficiente B <p>[Eng] value of the coefficient B
 	 */
-	public double[] getCoefB()
+	public double[] getCoefsB()
 	{
 		if (coefs != null)
 		{
-			return coefs.coefB;
+			return coefs.coefsB;
 		}
 		return null;
 	}
@@ -174,8 +174,8 @@ public class WsnMsg extends Message {
 			coefs = new coefEquation();
 		}
 		hasCoefs = true;
-		coefs.coefA = A;
-		coefs.coefB = B;
+		coefs.coefsA = A;
+		coefs.coefsB = B;
 	}
 
 	/**
@@ -271,9 +271,9 @@ public class WsnMsg extends Message {
 	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets 
 	 * @param sizeTS Número de dados sensoreados por time slot (Tamanho do time slot) <p>[Eng] Number of sensed data per time slot (time slot Size) 
 	 * @param dataSensedTypes Tipos de dados a serem sensoreados (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage 
-	 * @param thresholdEr Limiar de erro aceitavel <p>[Eng] Threshold of acceptable error <b> thresholdEr </b>
+	 * @param thresholdErs Limiares de erros aceitaveis <p>[Eng] Thresholds of acceptable errors
 	 */
-	public WsnMsg(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, int[] dataSensedTypes, double thresholdEr) {
+	public WsnMsg(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, int[] dataSensedTypes, double[] thresholdErs) {
 		this.sequenceID = seqID;
 		this.source = source;
 		this.target = target;
@@ -281,7 +281,7 @@ public class WsnMsg extends Message {
 		this.typeMsg = type;
 		this.sizeTimeSlot = sizeTS;
 		this.dataSensedTypes = dataSensedTypes;
-		this.thresholdError = thresholdEr;
+		this.thresholdErrors = thresholdErs;
 	}
 	
 	/**
@@ -294,10 +294,10 @@ public class WsnMsg extends Message {
 	 * @param type Tipo do Pacote: 0 para Estabelecimento de Rotas e 1 para pacotes de dados <p>[Eng] Package type: 0 for Establishment of Routes 1 and for data packets 
 	 * @param sizeTS Número de dados sensoreados por time slot (Tamanho do time slot) <p>[Eng] Number of sensed data per time slot (time slot Size) 
 	 * @param dataSensedTypes Tipos de dados a serem sensoreados (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <p>[Eng] Type of data to be sensoreado (read the sensor nodes), which can be: "T" = temperature, "h" = humidity, "l" = light or "v" = voltage 
-	 * @param thresholdEr Limiar de erro aceitavel <p>[Eng] Threshold of acceptable error 
+	 * @param thresholdErs Limiares de erros aceitaveis <p>[Eng] Thresholds of acceptable error 
 	 * @param clusterHeadNode Cluster Head do cluster do nó que receberá a mensagem <p> [Eng] Cluster Head cluster node to receive the message 
 	 */
-	public WsnMsg(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, int[] dataSensedTypes, double thresholdEr, Node clusterHeadNode) {
+	public WsnMsg(Integer seqID, Node source, Node target, Node forwardingHop, Integer type, Integer sizeTS, int[] dataSensedTypes, double[] thresholdErs, Node clusterHeadNode) {
 		this.sequenceID = seqID;
 		this.source = source;
 		this.target = target;
@@ -305,7 +305,7 @@ public class WsnMsg extends Message {
 		this.typeMsg = type;
 		this.sizeTimeSlot = sizeTS;
 		this.dataSensedTypes = dataSensedTypes;
-		this.thresholdError = thresholdEr;
+		this.thresholdErrors = thresholdErs;
 		this.clusterHead = clusterHeadNode;
 	}
 	/**
@@ -319,7 +319,7 @@ public class WsnMsg extends Message {
 		msg.hopsToTarget = this.hopsToTarget;
 		msg.sizeTimeSlot = this.sizeTimeSlot;
 		msg.dataSensedTypes = this.dataSensedTypes;
-		msg.thresholdError = this.thresholdError;
+		msg.thresholdErrors = this.thresholdErrors;
 		msg.coefs = this.coefs;
 		msg.hasCoefs = this.hasCoefs;
 		msg.pathToSenderNode = this.pathToSenderNode;
