@@ -44,6 +44,18 @@ public class SimpleNode extends Node
 	 * [Eng] Indicates the size of Sliding Window from sensor readings to be send to sink node when there is a "novelty".
 	 */
 	protected static int slidingWindowSize = 4; // According ADAGA-P* = 7
+
+	/**
+	 * Número máximo(limite) de predições dos erros de qualquer nó de sensor - Isso também pode ser expressado em percentual(double) do total de timeslot.<p> 
+	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
+	 */
+	protected static final double limitPredictionError = 5; // SensorDelay
+	
+	/**
+	 *  Número máximo(limite) de erro dos nós dos sensores por cluster -  Sobre o limite, o cluster head comunica-se com o sink.<p>
+	 * [Eng] Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink.
+	 */
+	public static final int maxErrorsPerCluster = 5; // ClusterDelay
 	
 	/**
 	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"<p>
@@ -106,7 +118,6 @@ public class SimpleNode extends Node
 	 */
 	protected int numTotalPredictions;
 	
-
 	/**
 	 * Número de predições de erros do nó do sensor nesse timeslot.<p>
 	 * [Eng] Number of prediction errors of the sensor node in this timeslot.
@@ -114,10 +125,10 @@ public class SimpleNode extends Node
 	protected int numPredictionErrors;
 	
 	/**
-	 * Número máximo(limite) de predições dos erros de qualquer nó de sensor - Isso também pode ser expressado em percentual(double) do total de timeslot.<p> 
-	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
+	 * Número de predições de erros do nó do sensor por tipo de dados.<p>
+	 * [Eng] Number of prediction errors of the sensor node per data type sensed.
 	 */
-	protected static final double limitPredictionError = 5; // SensorDelay
+	protected int[] numPredictionErrorsPerType;
 	
 	/**
 	 * Cluster que esse nó pertence.<p>
@@ -142,12 +153,6 @@ public class SimpleNode extends Node
 	 * [Eng] Counter of message errors received by ClusterHead in this cluster.
 	 */
 	private int errorsInThisCluster;
-	
-	/**
-	 *  Número máximo(limite) de erro dos nós dos sensores por cluster -  Sobre o limite, o cluster head comunica-se com o sink.<p>
-	 * [Eng] Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink.
-	 */
-	public static final int maxErrorsPerCluster = 5; // ClusterDelay
 	
 	/**
 	 * Nível mínimo(limite) da bateria dos cluster head's - Abaixo do limite, o cluster head comunica-se com o sink.<p>
@@ -233,6 +238,11 @@ public class SimpleNode extends Node
 	
 	private boolean minusOne = false; // Flag to set that the ClusterHead from this node will send "news" to sink in the next error (miss), so hereafter the nodes must don't compute the RMSE to error case
 
+	public SimpleNode() {
+		super();
+		numPredictionErrorsPerType = new int[SinkNode.dataSensedTypes.length];
+	}
+	
 	@Override
 	public void preStep() {}
 
@@ -281,15 +291,11 @@ public class SimpleNode extends Node
 					//canMakePredictions = Boolean.FALSE;
 					//System.out.println("0 0 0  SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions = "+canMakePredictions);
 					//nextNodeToBaseStation = null;
-
-//					Utils.printForDebug("*** Entrou em else if (wsnMessage.tipoMsg == 0) *** NoID = "+this.ID);
 					
 					if (nextNodeToBaseStation == null)
 					{
 						nextNodeToBaseStation = inbox.getSender();
 						sequenceNumber = wsnMessage.sequenceID;
-						
-//						Utils.printForDebug("**** Entrou em if (proximoNoAteEstacaoBase == null) **** NoID = "+this.ID);
 					}
 					else if (sequenceNumber < wsnMessage.sequenceID)
 					{ 
@@ -297,29 +303,20 @@ public class SimpleNode extends Node
 					//Exemplo: Nó A transmite em brodcast. Nó B recebe a msg e retransmite em broadcast.
 					//Consequentemente, nó A irá receber a msg. Sem esse condicional, nó A iria retransmitir novamente, gerando um loop.
 						sequenceNumber = wsnMessage.sequenceID;
-						
-//						Utils.printForDebug("***** Entrou em else if (sequenceNumber < wsnMessage.sequenceID) ***** NoID = "+this.ID);
 					}
 					else
 					{
 						forward = Boolean.FALSE;
-						
-//						Utils.printForDebug("****** Entrou em encaminhar = Boolean.FALSE; ****** NoID = "+this.ID);
 					}
 				} //if (wsnMessage.tipoMsg == 0)
-				else if (wsnMessage.typeMsg == 1)// Mensagem que vai do sink para os nós sensores e é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
+				// Mensagem que vai do sink para os nós sensores e é um pacote transmissor de dados (coeficientes). Devemos atualizar a rota
+				else if (wsnMessage.typeMsg == 1)
 				{ 
 //					this.setColor(Color.YELLOW);
 //					Integer nextNodeId = wsnMessage.popFromPath();
-					
-//					Utils.printForDebug("@ Entrou em else if (wsnMessage.tipoMsg == 1) @ NoID = "+this.ID+" nextNodeId = "+nextNodeId);
 
 					canMakePredictions = Boolean.TRUE;
-					//System.out.println("1 1 1 SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions = "+canMakePredictions);
-					
 					forward = Boolean.FALSE;
-					
-					
 					
 					//Definir roteamento de mensagem
 					if (wsnMessage.target != this)
@@ -374,10 +371,7 @@ public class SimpleNode extends Node
 					
 					if (wsnMessage != null)
 					{
-						
-						
 //	CASO O CLUSTER PRECISE SOFRER UM SPLIT, CADA UM DOS NÓS DO CLUSTER DEVE RECEBER UMA MENS. SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK
-						
 						
 						wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedTypes); 
 
@@ -406,7 +400,6 @@ public class SimpleNode extends Node
 				} //if (encaminhar)
 			} //if (message instanceof WsnMsg)
 
-			
 			
 			else if (message instanceof WsnMsgResponse) // Mensagem de resposta dos nós sensores, ou para o sink, que deve ser repassada para o "proximoNoAteEstacaoBase", ou para o cluster head, que deve ser recebida/retida pelo mesmo
 			{
@@ -778,8 +771,8 @@ public class SimpleNode extends Node
 			bufferedReader.close();
 		if (sensorReadingsQueue.size() < sensorReadingsLoadBlockSize && !(loadAllSensorReadingsFromFile)) {
 			loadAllSensorReadingsFromFile = true;
-			System.err.println("NodeID: " + this.ID + " has already read all the sensor readings of the file. " +
-					"\n It has only " + sensorReadingsQueue.size() + " readings in its memory (sensorReadingsLoadedFromFile list)");
+//			System.err.println("NodeID: " + this.ID + " has already read all the sensor readings of the file. " +
+//					"\n It has only " + sensorReadingsQueue.size() + " readings in its memory (sensorReadingsLoadedFromFile list)");
 		}
 
 		lastLineLoadedFromSensorReadingsFile = lastLineLoadedFromSensorReadingsFile + lineCounter; //updates the last line read from the file
@@ -928,20 +921,22 @@ public class SimpleNode extends Node
 	} // end parseCalendarHoras(String AnoMesDia, String hora)
 	
 	/**
-	 * Faz o calculo da predição do valor sensoreado de acordo com os coeficientes (A e B) informados e o parâmetro de tempo; incrementa o contador de predições (numTotalPredictions) <p>
+	 * Faz o calculo das predições dos valores sensoreados de acordo com os coeficientes (A e B) informados e o parâmetro de tempo; incrementa o contador de predições (numTotalPredictions) <p>
 	 * [Eng]It calculates the prediction sensed value according to coefficients (A and B) informed and time parameter; it increments the prediction count (numTotalPredictions)
-	 * @param A Coeficiente A (interceptor) da equação de regressão, dada por S(t) = A + B.t <p>[Eng] Coefficient A(interceptor) of regression equation, given by S(t) = A + B.t
-	 * @param B Coeficiente B (slope, inclinação) da equação de regressão, dada por S(t) = A + B.t<p>[Eng] Coefficient B (slope, inclination) of regression equation, given by S(t) = A + B.t
+	 * @param A Coeficientes A (interceptor) da equação de regressão, dada por S(t) = A + B.t <p>[Eng] Coefficient A(interceptor) of regression equation, given by S(t) = A + B.t
+	 * @param B Coeficientes B (slope, inclinação) da equação de regressão, dada por S(t) = A + B.t<p>[Eng] Coefficient B (slope, inclination) of regression equation, given by S(t) = A + B.t
 	 * @param time Parâmetro de tempo a ter o valor da grandeza predito<p>[Eng]Parameter of time to has the value by predicted grandeur.
 	 * @return Valor predito para o parâmetro sensoreado no tempo dado<p>[Eng]Predicted value to sensored parameter in a determined time.
 	 */
-	private double makePrediction(double A, double B, double time)
+	private double[] makePredictions(double[] A, double[] B, double time)
 	{
-		double time2;
-		time2 = A + B*time;
-		this.numTotalPredictions++;
-		return time2;
-	} // end makePrediction(double A, double B, double tempo)
+		double[] predictions = new double[A.length];
+		for (int numTypes = 0; numTypes < A.length; numTypes++) {
+			predictions[numTypes] = A[numTypes] + B[numTypes]*time;
+			this.numTotalPredictions++;
+		}
+		return predictions;
+	} // end makePrediction(double[] A, double[] B, double time)
 	
 	/**
 	 * Inicia um temporizador para enviar a mensagem passada para o próximo nó no caminho até o nó destino.<p>
@@ -976,9 +971,9 @@ public class SimpleNode extends Node
 		this.clusterHead = wsnMessage.getClusterHead();
 		if (wsnMessage.hasCoefs())
 		{
-			double coefA = wsnMessage.getCoefA();
-			double coefB = wsnMessage.getCoefB();
-			double maxError = wsnMessage.getThresholdError();
+			double[] coefsA = wsnMessage.getCoefsA();
+			double[] coefsB = wsnMessage.getCoefsB();
+			double[] maxErrors = wsnMessage.getThresholdErrors();
 	
 			this.numTotalPredictions = 0;
 			this.numPredictionErrors = 0;
@@ -988,7 +983,7 @@ public class SimpleNode extends Node
 			windowSize = slidingWindowSize;
 			validPredictions = true; // TODO:
 			//System.out.println("nodeID = "+this.ID+": validPredictions TRUE in Round = "+Global.currentTime);
-			triggerPredictions(wsnMessage.dataSensedTypes, coefA, coefB, maxError);
+			triggerPredictions(wsnMessage.dataSensedTypes, coefsA, coefsB, maxErrors);
 		}
 	} // end receiveCoefficients(WsnMsg wsnMessage)
 	
@@ -1088,18 +1083,18 @@ public class SimpleNode extends Node
 	} // end getData(SimpleNode currentNode, int[] dataSensedTypes)
 	
 	/**
-	 * Lê o próximo valor do sensor atual, executa a predição e, de acordo com a predição (acerto ou erro), dispara a próxima ação<p>
-	 * [Eng]Read the next value from present sensor, make the prediction and, according with the predition (hit or miss), trigges the next action 
-	 * @param dataSensedTypes Tipo de data para ser lido pelo sensor: "t"=temperatura, "h"=umidade, "l"=luminosidade ou "v"=voltagem<p>
-	 * [Eng] Type of data to be read from sensor: "t"=temperature, "h"=humidity, "l"=luminosity or "v"=voltage
-	 * @param coefA Coeficiente A da equação de regressão para este sensor<p>
-	 * [Eng] Coefficient A from the Regression Equation for this sensor
-	 * @param coefB Coeficiente B da equação de regressão para este sensor<p>
-	 * [Eng] Coefficient B from the Regression Equation for this sensor
-	 * @param maxError threshold Erro para o cálculo de previsão para este sensor<p>
-	 * [Eng] Threshold error to the calculation of prediction for this sensor
+	 * Lê os próximos valores (para cada tipo sensoriado) do sensor atual, executa a predição e, de acordo com a predição (acerto ou erro), dispara a próxima ação<p>
+	 * [Eng] Read next values (from each sensed type) from present sensor, make the prediction and, according with the predition (hit or miss), trigges the next action 
+	 * @param dataSensedTypes Tipos de dados para serem lidos pelo sensor: "t"=temperatura, "h"=umidade, "l"=luminosidade ou "v"=voltagem<p>
+	 * [Eng] Types of data to be read from sensor: "t"=temperature, "h"=humidity, "l"=luminosity or "v"=voltage
+	 * @param coefsA Coeficientes A da equação de regressão para este sensor<p>
+	 * [Eng] Coefficients A from the Regression Equation for this sensor
+	 * @param coefsB Coeficientes B da equação de regressão para este sensor<p>
+	 * [Eng] Coefficients B from the Regression Equation for this sensor
+	 * @param maxErrors Limiares de erro para o cálculo de predições para este sensor<p>
+	 * [Eng] Threshold errors to the calculation of predictions for this sensor
 	 */
-	protected void triggerPredictions(int[] dataSensedTypes, double coefA, double coefB, double maxError)
+	protected void triggerPredictions(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors)
 	{
 
 		DataRecord dataRecord = getData(this, dataSensedTypes);
@@ -1111,28 +1106,21 @@ public class SimpleNode extends Node
 				double batLevel = dataRecord.batLevel;
 				int round = dataRecord.round;
 				
-				double predictionValue = makePrediction(coefA, coefB, quantTime); // Incrementa o contador numTotalPredictions (numTotalPredictions++)
+				double[] predictionValues = makePredictions(coefsA, coefsB, quantTime); // Incrementa o contador numTotalPredictions (numTotalPredictions++)
 				
-				lastRoundRead = round;
-
-/*
- *  HERE IS THE POINT OF TEST FROM PREDICT VALUE FOR CHOICE WHAT TO DO !!!
- */
+				lastRoundRead = dataRecord.round;
 
 				//TODO: TriggerPredictions -> isValuePredictInValueReading
-				if (!isValuePredictInValueReading(values, predictionValue, maxError)) {
-					numPredictionErrors++; // Contador do número de erros de predição
+				//for
+				boolean[] hitsInThisReading = arePredictValuesInReadingValues(values, predictionValues, maxErrors);
+				for (int cont = 0; cont < hitsInThisReading.length; cont++) {
+					if (!hitsInThisReading[cont]) {
+						numPredictionErrorsPerType[cont]++;
+						numPredictionErrors++; // Contador do número de erros de predição
+					}
 				} // end if (!isValuePredictInValueReading(value, predictionValue, maxError))
 
 				addDataRecordItens(dataSensedTypes, values, quantTime, batLevel, round); // Removido (comentado) da linha 987
-				
-				if (this.clusterHead == null) { // Se NÃO existe um CH, ou seja, se o modo de sensoriamento NÃO é contínuo (SinkNode.allSensorsMustContinuoslySense = false)
-					Utils.printForDebug("* * The total number of predictions is "+numTotalPredictions+"! NoID = "+this.ID+" Maximum of predictions = "+this.ownTimeSlot);					
-				} // end if (this.clusterHead != null)
-				else { // if (this.clusterHead != null)
-					Utils.printForDebug("* * The total number of predictions is "+numTotalPredictions+"! NoID = "+this.ID);
-				} // end else
-
 				
 				if (numPredictionErrors > 0) { // Se há erros de predição, então exibe uma mensagem
 					Utils.printForDebug("* * * * The number of prediction errors is "+numPredictionErrors+"! NoID = "+this.ID+"\n");
@@ -1142,7 +1130,8 @@ public class SimpleNode extends Node
 				if (this.clusterHead == null) { // Se é um Nó Representativo, ler os valores de todos os outros nós naquele mesmo cluster naquele momento e calcular 
 					// o RMSE de cada valor em relação ao predictionValue do Nó Representativo
 					Node[] nodes = SinkNode.getNodesFromThisCluster(this);
-					
+
+					// DEVE PEGAR OS VALORES LIDOS DE/POR CADA NÓ E CALCULAR O RMSE EM RELAÇÃO AO VALOR PREDITO PARA O NÓ REPRESENTATIVO !!! 
 					if (nodes != null && nodes.length > 1) {
 						for (int i=0; i < nodes.length ;i++) { // Para cada um dos nós no mesmo cluste deste Nó Representativo
 							if (nodes[i].ID != this.ID) { // Caso não seja o próprio Nó Representativo
@@ -1151,20 +1140,21 @@ public class SimpleNode extends Node
 
 								((SimpleNode)nodes[i]).addDataRecordItens(nodeData);
 								
-								double sensorValue = nodeData.values;
+								double[] sensorValues = nodeData.values;
 								
-								// Code inserted in else block according to Prof. Everardo request in 25/09/2013
-								Global.predictionsCount++;
-								((SimpleNode)nodes[i]).predictionsCount++;
-	
-								Global.squaredError += Math.pow((predictionValue - sensorValue), 2);
-								((SimpleNode)nodes[i]).squaredError += Math.pow((predictionValue - sensorValue), 2);
-								// End of Code inserted		
+								for (int cont = 0; cont < sensorValues.length; cont++) {
+									// Code inserted in else block according to Prof. Everardo request in 25/09/2013
+									Global.predictionsCount++;
+									((SimpleNode)nodes[i]).predictionsCount++;
+		
+									Global.squaredError += Math.pow((predictionValues[cont] - sensorValues[cont]), 2); // Used for RMSE calculation
+									((SimpleNode)nodes[i]).squaredError += Math.pow((predictionValues[cont] - sensorValues[cont]), 2);
+									// End of Code inserted		
+								}
 /*
 								System.out.print("\t");
 								((SimpleNode)nodes[i]).printNodeRMSE();
 */
-								// DEVE PEGAR OS VALORES LIDOS DE/POR CADA NÓ E CALCULAR O RMSE EM RELAÇÃO AO VALOR PREDITO PARA O NÓ REPRESENTATIVO !!! 
 							}
 
 						} // end for (int i=0; i < nodes.length ;i++)
@@ -1175,7 +1165,7 @@ public class SimpleNode extends Node
 					else { // if (nodes == null)
 //						System.out.println("Node with NULL CLuster = "+this.ID);
 					}
-					if (numPredictionErrors == (limitPredictionError)) // Send "toPorUmaMessage" to all sensors in this cluster
+					if (numPredictionErrors == (limitPredictionError)) // Send "toPorUmaMessage" (minusOne) to all sensors in this cluster
 					{
 						this.minusOne = true;
 					}
@@ -1228,7 +1218,7 @@ public class SimpleNode extends Node
 							
 							Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+limitPredictionError+")! NoID = "+this.ID+"\n");
 							Utils.printForDebug("* * * * The predicted value NO is within the margin of error of the value read! NoID = "+this.ID);
-							Utils.printForDebug("Round = "+lastRoundRead+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError+"\n");
+							Utils.printForDebug("Round = "+lastRoundRead+": Vpredito[0] = "+predictionValues[0]+", Vlido[0] = "+values[0]+", Limiar[0] = "+maxErrors[0]+"\n");
 							
 							addDataRecordItensInWsnMsgResponse(wsnMsgResp);
 							
@@ -1248,7 +1238,7 @@ public class SimpleNode extends Node
 //						else {
 						
 						// Se o modo de sensoriamento é contínuo, continua fazendo predição
-						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedTypes, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
+						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedTypes, coefsA, coefsB, maxErrors); // Então dispara uma nova predição - laço de predições
 						//newPredictionTimer.startRelative(1, this); 
 						newPredictionTimer.startRelative(SinkNode.sensorTimeSlot, this);
 //						}
@@ -1261,7 +1251,7 @@ public class SimpleNode extends Node
 				
 					if ((numPredictionErrors <= limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Se o número de erros de predição é menor do que o limite aceitável de erros (limitPredictionError) e o número de predições executadas é menor do que o máximo de predições para o cluster deste nó sensor
 					{
-						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedTypes, coefA, coefB, maxError); // Então dispara uma nova predição - laço de predições
+						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedTypes, coefsA, coefsB, maxErrors); // Então dispara uma nova predição - laço de predições
 						newPredictionTimer.startRelative(1, this); 
 					} // end if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot))
 					
@@ -1275,7 +1265,7 @@ public class SimpleNode extends Node
 							
 							Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+limitPredictionError+")! NoID = "+this.ID+"\n");
 							Utils.printForDebug("* * * * The predicted value NO is within the margin of error of the value read! NoID = "+this.ID);
-							Utils.printForDebug("Round = "+lastRoundRead+": Vpredito = "+predictionValue+", Vlido = "+value+", Limiar = "+maxError+"\n");
+							Utils.printForDebug("Round = "+lastRoundRead+": Vpredito[0] = "+predictionValues[0]+", Vlido[0] = "+values[0]+", Limiar[0] = "+maxErrors[0]+"\n");
 						}
 						else // if (numTotalPredictions >= this.ownTimeSlot) // Caso tenha saído do laço de predições por ter excedido o limite do seu time slot próprio(número máximo de predições a serem feitas por este Nó Representativo)
 						{
@@ -1318,19 +1308,19 @@ public class SimpleNode extends Node
 	/**
 	 * Isso chama o método triggerPredictions
 	 * [Eng]It calls the method triggerPredictions
-	 * @param dataSensedType Tipo de dado a ser lido pelo sensor: "t"=temperatura, "h"=umidade, "l"=luminosidade ou "v"=voltagem<p>[Eng] Type of data to be read from sensor: "t"=temperature, "h"=humidity, "l"=luminosity or "v"=voltage
-	 * @param coefA Coeficiente A da equação de regressão para esse sensor<p>[Eng] Coefficient A from the Regression Equation for this sensor
-	 * @param coefB Coeficiente B da equação de regressão para esse sensor<p>[Eng] Coefficient B from the Regression Equation for this sensor
-	 * @param maxError Erro limiar para calculação da predição para esse sensor.<p>[Eng] Threshold error to the calculation of prediction for this sensor
+	 * @param dataSensedTypes Tipo de dado a ser lido pelo sensor: "t"=temperatura, "h"=umidade, "l"=luminosidade ou "v"=voltagem<p>[Eng] Type of data to be read from sensor: "t"=temperature, "h"=humidity, "l"=luminosity or "v"=voltage
+	 * @param coefsA Coeficiente A da equação de regressão para esse sensor<p>[Eng] Coefficient A from the Regression Equation for this sensor
+	 * @param coefsB Coeficiente B da equação de regressão para esse sensor<p>[Eng] Coefficient B from the Regression Equation for this sensor
+	 * @param maxErrors Erro limiar para calculação da predição para esse sensor.<p>[Eng] Threshold error to the calculation of prediction for this sensor
 	 */
-	public final void triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
+	public final void triggerPrediction(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors)
 	{
 		
 		if (canMakePredictions) {
 			// TODO:
 			//System.out.println("    SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions ="+canMakePredictions);
 			if (validPredictions) {
-				triggerPredictions(dataSensedType, coefA, coefB, maxError);
+				triggerPredictions(dataSensedTypes, coefsA, coefsB, maxErrors);
 			}
 		}
 /*
@@ -1355,117 +1345,60 @@ public class SimpleNode extends Node
 	
 	/**
 	 * Ele compara o valor de leitura ('value') para o valor predito ('predictionValue') usando 'maxError' como erro limiar<p>[Eng] It compares the read value('value') to the predict value('predictionValue') using 'maxError' as threshold error
-	 * @param value Valor lido pelo sensor<p>[Eng] Value read from the sensor
-	 * @param predictionValue Valor predito para ser comparado<p>[Eng] Value predict to be compared
-	 * @param maxError Limiar de erro para o calculo da predição para o sensor<p>[Eng] Threshold error to the calculation of prediction for this sensor
-	 * @return Verdadeiro se o valor sensoriado(lido) é dentro do valor de predição(mais ou menos a limiar de erro) ou falso, caso contrário<p>[Eng] True if the sensed (read) value is in the predicted value (more or less the threshold error) ou False, otherwise
-	 */
-	protected boolean isValuePredictInValueReading(double value, double predictionValue, double maxError)
-	{
-		// Code moved to else block below - according to Prof. Everardo request in 25/09/2013: RMSE should only be computed when data are not sent to the sink
-/*
-		Global.predictionsCount++;
-		this.predictionsCount++;
-
-		Global.squaredError += Math.pow((predictionValue - value), 2);
-		this.squaredError += Math.pow((predictionValue - value), 2);
-*/
-		boolean hit;
-		if (value >= (predictionValue - value*maxError) && value <= (predictionValue + value*maxError))
-		{
-			Global.numberOfHitsInThisRound++;
-
-			// Code inserted in else block according to Prof. Everardo request in 25/09/2013
-
-			Global.predictionsCount++;
-			this.predictionsCount++;
-
-			Global.squaredError += Math.pow((predictionValue - value), 2);
-			this.squaredError += Math.pow((predictionValue - value), 2);
-
-			// End of Code inserted
-			
-			//printNodeRMSE();
-			
-			hit = true;
-		}
-		else
-		{
-			Global.numberOfMissesInThisRound++;
-			hit = false;
-			//TODO: isValuePredictInValueReading
-			if (!minusOne) {
-	
-				Global.predictionsCount++;
-				this.predictionsCount++;
-	
-				Global.squaredError += Math.pow((predictionValue - value), 2);
-				this.squaredError += Math.pow((predictionValue - value), 2);
-			}
-		}
-		return hit;
-	} // end isValuePredictInValueReading(double value, double predictionValue, double maxError)
-
-	/**
-	 * Ele compara os valores de leituras ('values') com os valores preditos ('predictionValues') usando 'maxError' como limiar de erro<p>
-	 * [Eng] It compares the read values ('values') to the predict values ('predictionValues') using 'maxError' as threshold error
 	 * @param values Valores lidos pelo sensor<p>[Eng] Values read from the sensor
 	 * @param predictionValues Valores preditos para serem comparados<p>[Eng] Values predict to be compared
-	 * @param maxError Limiar de erro para o calculo da predição para o sensor<p>[Eng] Threshold error to the calculation of prediction for this sensor
-	 * @return Verdadeiro se os valores sensoriados (lidos) estão dentro da margem de erro dos valores de predição(mais ou menos o limiar de erro) ou Falso, caso contrário<p>[Eng] True if the sensed (read) value is in the predicted value (more or less the threshold error) ou False, otherwise
+	 * @param maxErrors Limiar de erro para o calculo da predição para o sensor<p>[Eng] Threshold error to the calculation of prediction for this sensor
+	 * @return Verdadeiro se o valor sensoriado(lido) está dentro do valor de predição (mais ou menos no limiar de erro) ou falso, caso contrário<p>[Eng] True if the sensed (read) value is in the predicted value (more or less the threshold error) ou False, otherwise
 	 */
-	protected boolean areValuesPredictInValuesReading(double[] values, double[] predictionValues, double maxError)
+	protected boolean[] arePredictValuesInReadingValues(double[] values, double[] predictionValues, double[] maxErrors)
 	{
 		// Code moved to else block below - according to Prof. Everardo request in 25/09/2013: RMSE should only be computed when data are not sent to the sink
 /*
 		Global.predictionsCount++;
 		this.predictionsCount++;
 
-		Global.squaredError += Math.pow((predictionValue - value), 2);
+		Global.squaredError += Math.pow((predictionValue - value), 2); // RMSE
 		this.squaredError += Math.pow((predictionValue - value), 2);
 */
-		// Implementar os testes de acerto de predição múltiplos em modo AND e modo OR, ou seja, no modo AND só é acerto quando 
-		// TODOS os valores dos diversos tipos estiverem dentro do erro esperado; e no modo OR, quando algum dos tipos sensoriados 
-		// estiverem dentro do esperado, considera-se acerto.
+		boolean[] hits = new boolean[values.length];
 		
-		// TODO: PAREI AQUI - Para implementar o cálculo dos diversos coeficientes no sink node!
-		
-		boolean hit;
-		if (values >= (predictionValues - values*maxError) && values <= (predictionValues + values*maxError))
-		{
-			Global.numberOfHitsInThisRound++;
+		for (int numTypes = 0; numTypes < values.length; numTypes++) {
+			if (values[numTypes] >= (predictionValues[numTypes] - values[numTypes] * maxErrors[numTypes]) && values[numTypes] <= (predictionValues[numTypes] + values[numTypes] * maxErrors[numTypes]))
+			{
+				Global.numberOfHitsInThisRound++;
 
-			// Code inserted in else block according to Prof. Everardo request in 25/09/2013
+				// Code inserted in else block according to Prof. Everardo request in 25/09/2013
 
-			Global.predictionsCount++;
-			this.predictionsCount++;
-
-			Global.squaredError += Math.pow((predictionValues - values), 2);
-			this.squaredError += Math.pow((predictionValues - values), 2);
-
-			// End of Code inserted
-			
-			//printNodeRMSE();
-			
-			hit = true;
-		}
-		else
-		{
-			Global.numberOfMissesInThisRound++;
-			hit = false;
-			//TODO: isValuePredictInValueReading
-			if (!minusOne) {
-	
 				Global.predictionsCount++;
 				this.predictionsCount++;
-	
-				Global.squaredError += Math.pow((predictionValues - values), 2);
-				this.squaredError += Math.pow((predictionValues - values), 2);
+
+				Global.squaredError += Math.pow((predictionValues[numTypes] - values[numTypes]), 2); // RMSE
+				this.squaredError += Math.pow((predictionValues[numTypes] - values[numTypes]), 2);
+
+				// End of Code inserted
+				
+				//printNodeRMSE();
+				
+				hits[numTypes] = true;
 			}
+			else
+			{
+				Global.numberOfMissesInThisRound++;
+				hits[numTypes] = false;
+				//TODO: isValuePredictInValueReading
+				if (!minusOne) {
+		
+					Global.predictionsCount++;
+					this.predictionsCount++;
+		
+					Global.squaredError += Math.pow((predictionValues[numTypes] - values[numTypes]), 2); // RMSE
+					this.squaredError += Math.pow((predictionValues[numTypes] - values[numTypes]), 2);
+				}
+			}
+			
 		}
-		return hit;
-	} // end isValuePredictInValueReading(double value, double predictionValue, double maxError)
-	
+		return hits;
+	} // end arePredictValuesInReadingValues(double[] values, double[] predictionValues, double maxError)
 	
 	/**
 	 * Desempilha um nó do caminho de nós <p>
@@ -1645,16 +1578,16 @@ public class SimpleNode extends Node
 		}
 	}
 	
-	public int[][] getDataRecordTypes()
+	public int[] getDataRecordTypes(int ind)
 	{
 		readData();
-		return types2;
+		return types2[ind];
 	}
 	
-	public double[][] getDataRecordValues()
+	public double[] getDataRecordValues(int ind)
 	{
 		readData();
-		return values2;
+		return values2[ind];
 	}
 
 	public double[] getDataRecordTimes()
