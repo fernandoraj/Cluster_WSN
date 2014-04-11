@@ -56,19 +56,19 @@ public class SinkNode extends SimpleNode
 	 * [Eng] Types of data to be sensed (read in the sensor nodes), which, for Intel Lab Data, can be: 
 	 * temperature = 4; humidity = 5; brightness("lum") = 6 or voltage = 7;
 	 */
-	private int[] dataSensedTypes = {4,5,6};
+	public static int[] dataSensedTypes = {4}; //{4}; //{4,5}; //{4,5,6};
 	
 	/**
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
 	 * [Eng] Percentage of temporal acceptable error threshold for the readings of sensor nodes, which may be between 0.0 (accepts no errors) and 1.0 (accepts any error)
 	 */
-	private double thresholdError = 0.05; // thresholdErr: 0.05 = 5%
+	private double[] thresholdErrors = {0.05}; //{0.05}; //{0.05,0.05}; //{0.05,0.05,0.05}; // thresholdErr: 0.05 = 5%
 	
 	/**
 	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
 	 * [Eng] Limit of acceptable magnitude difference (spatial error) for the readings of sensor nodes / - which can be between 0.0 (no errors accepted) and 1.0 (accepts any error)
 	 */
-	private double spacialThresholdError = 1.5;
+	private double[] spacialThresholdErrors = {1.5}; //{1.5}; //{1.5, 1.5}; //{2.0, 2.5, 70.0};
 	
 	/**
 	 * Percentual mínimo do número de rounds iguais das medições de 2 sensores para que os mesmos sejam classificados no mesmo cluster <br>
@@ -180,10 +180,12 @@ public class SinkNode extends SimpleNode
 		}
 		System.out.println("The sensor delay is "+SimpleNode.limitPredictionError);
 		System.out.println("The cluster delay is "+SimpleNode.maxErrorsPerCluster);
-		System.out.println("The threshold of error (max error) is "+thresholdError);
+		for (int numTypes = 0; numTypes < thresholdErrors.length; numTypes++) {
+			System.out.println("The threshold of error (max error) is "+thresholdErrors[numTypes]+" for data type (SensedType) in position "+dataSensedTypes[numTypes]);
+		}
 		System.out.println("The size of time slot is "+sizeTimeSlot);
 		System.out.println("The size of time slot for merge is "+sizeTimeSlotForMerge);
-		System.out.println("The spacial threshold of error (spacialThresholdError) is "+spacialThresholdError);
+		System.out.println("The spacial threshold of error (spacialThresholdError) is "+spacialThresholdErrors);
 		System.out.println("The size of sliding window is "+SimpleNode.slidingWindowSize);
 		System.out.println("The maximum distance between sensors in the same cluster is "+maxDistance);
 		System.out.println("The minimum occupancy rate per cluster (for Merge) is "+minimumOccupancyRatePerCluster);
@@ -193,7 +195,9 @@ public class SinkNode extends SimpleNode
 //		if(LogL.ROUND_DETAIL){
 			Global.log.logln("\nThe size of time slot is "+sizeTimeSlot);
 //			Global.log.logln("The type of data sensed is "+dataSensedType);
-			Global.log.logln("The threshold of error (max error) is "+thresholdError);
+			for (int numTypes = 0; numTypes < thresholdErrors.length; numTypes++) {
+				Global.log.logln("The threshold of error (max error) is "+thresholdErrors[numTypes]+" for data type (SensedType) in position "+dataSensedTypes[numTypes]);
+			}
 			Global.log.logln("The size of sliding window is "+SimpleNode.slidingWindowSize+"\n");
 //		}
 	} // end SinkNode()
@@ -379,7 +383,7 @@ public class SinkNode extends SimpleNode
 							
 							nodeGroups.ensureCapacity(numTotalOfSensors); // Ensure the capacity as the total number of sensors (nodes) in the data set
 							
-							nodeGroups.add((SimpleNode)wsnMsgResp.source, 0); // Add the initial message to the group (ArrayList2d of WsnMsgResponse)
+							nodeGroups.add((SimpleNode)wsnMsgResp.source, 0); // Add the initial sensor node(SimpleNode) to the group 0 - line 0 (ArrayList2d of SimpleNode)
 						}
 						else // If there is a message group (SensorCluster), then adds the wsnMsgResp representing a sensor to group, classifing this message/sensor in correct cluster/line
 						{
@@ -1253,10 +1257,10 @@ public class SinkNode extends SimpleNode
 		boolean tSimilarityTrend = false;
 		
 		int currentSize;
-		double[] currentValues;
+		double[][] currentValues;
 		if (currentNode.dataRecordItens != null) {
 			currentSize = currentNode.dataRecordItens.size();
-			currentValues = new double[currentSize];
+			currentValues = new double[currentSize][];
 		}
 		else {
 			return (mSimilarityMagnitude && tSimilarityTrend);
@@ -1265,15 +1269,18 @@ public class SinkNode extends SimpleNode
 		int[] currentRound = new int[currentSize];
 		
 		//Data read from current sensor (from ArrayList2d)
-		currentValues = currentNode.getDataRecordValues();
+		//TODO: Analizar a corretude!!!
+		for (int cont = 0; cont < currentSize; cont++) {
+			currentValues[cont] = currentNode.getDataRecordValues(cont);
+		}
 
 		currentRound = currentNode.getDataRecordRounds();
 
 		int newSize;
-		double[] newValues;
+		double[][] newValues;
 		if (newNode.dataRecordItens != null) {
 			newSize = newNode.dataRecordItens.size();
-			newValues = new double[newSize];
+			newValues = new double[newSize][];
 		}
 		else {
 			return (mSimilarityMagnitude && tSimilarityTrend);
@@ -1282,14 +1289,17 @@ public class SinkNode extends SimpleNode
 		int[] newRound = new int[newSize];
 		
 		//Data read from new sensor (from message received)
-		newValues = newNode.getDataRecordValues();
+		//TODO: Analizar a corretude2!!!
+		for (int cont = 0; cont < newSize; cont++) {
+			newValues[cont] = newNode.getDataRecordValues(cont);
+		}
 
 		newRound = newNode.getDataRecordRounds();
 
-		HashMap<Integer, Double> hashCurrentMsg, hashNewMsg;
+		HashMap<Integer, double[]> hashCurrentMsg, hashNewMsg;
 		
-		hashCurrentMsg = new HashMap<Integer, Double>();
-		hashNewMsg = new HashMap<Integer, Double>();
+		hashCurrentMsg = new HashMap<Integer, double[]>();
+		hashNewMsg = new HashMap<Integer, double[]>();
 		
 		// Populates 2 HashMaps with the values from currentWsnMsg and newWsnMsg
 		for (int i=0,j=0; (i < currentSize || j < newSize); i++, j++)
@@ -1309,7 +1319,7 @@ public class SinkNode extends SimpleNode
 		
 		int numEqualKeys = 0;
 		
-		double sumDifs = 0.0;
+		double[] sumDifs = new double[dataSensedTypes.length];
 		
 		Set<Integer> keys = hashCurrentMsg.keySet();
 		for (Integer key : keys)
@@ -1317,36 +1327,50 @@ public class SinkNode extends SimpleNode
 			if (hashNewMsg.containsKey(key))
 			{
 				numEqualKeys++;
-				double curValue = hashCurrentMsg.get(key);
-				double newValue = hashNewMsg.get(key);
-				sumDifs += Math.abs(curValue - newValue);
+				double[] curValue = hashCurrentMsg.get(key);
+				double[] newValue = hashNewMsg.get(key);
+				for (int numTypes = 0; numTypes < dataSensedTypes.length; numTypes++) {
+					sumDifs[numTypes] += Math.abs(curValue[numTypes] - newValue[numTypes]);
+				}
 			}
 		}
 
-		if ((numEqualKeys > 0) && (sumDifs/numEqualKeys <= spacialThresholdError))
+		if (numEqualKeys > 0)
 		{
-			mSimilarityMagnitude = true;
+			int cont = 0;
+			while ((cont < dataSensedTypes.length) && (sumDifs[cont]/numEqualKeys <= spacialThresholdErrors[cont])) { // It tests if all attributes (dimensions) are in mSimilarityMagnitude
+				cont++;
+			}
+			if (cont == dataSensedTypes.length) {
+				mSimilarityMagnitude = true;
+			}
 
 		}
 
-		double contN1 = 0.0;
+		double contN1[] = new double[dataSensedTypes.length];
 		double contN = currentSize; // = newSize; // Total size of sensed values from node
 		for (int i=1,j=1; (i < currentSize && j < newSize); i++, j++)
 		{
-			double difX, difY;			
-			difX = (currentValues[i] - currentValues[i-1]);
-			difY = (newValues[j] - newValues[j-1]);
-			if ((difX * difY) >= 0)
-			{
-				contN1++;
+			double[] difX = new double[dataSensedTypes.length];
+			double[] difY = new double[dataSensedTypes.length];
+			for (int numTypes = 0; numTypes < dataSensedTypes.length; numTypes++) {
+				difX[numTypes] = (currentValues[i][numTypes] - currentValues[i-1][numTypes]);
+				difY[numTypes] = (newValues[j][numTypes] - newValues[j-1][numTypes]);
+				if ((difX[numTypes] * difY[numTypes]) >= 0)
+				{
+					contN1[numTypes]++;
+				}
 			}
 		}
-		if ((contN > 0.0) && (contN1/contN >= thresholdError))
-		{
-			tSimilarityTrend = true;
-
+		if (contN > 0.0) {
+			int cont = 0;
+			while ((cont < dataSensedTypes.length) && (contN1[cont]/contN >= thresholdErrors[cont])) { // It tests if all attributes (dimensions) are in tSimilarityTrend
+				cont++;
+			}
+			if (cont == dataSensedTypes.length) {
+				tSimilarityTrend = true;
+			}	
 		}
-		
 
 		return (mSimilarityMagnitude && tSimilarityTrend);
 	} // end testSimilarityMeasureWithPairRounds(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
@@ -1374,7 +1398,9 @@ public class SinkNode extends SimpleNode
 			double[] tempos = new double[size];
 
 			//Dados lidos do sensor correspondente
-			valores = receivedNode.getDataRecordValues();
+			for (int cont=0; cont < size; cont++) {
+				valores[cont] = receivedNode.getDataRecordValues(cont);
+			}
 			tempos = receivedNode.getDataRecordTimes();
 
 			//Coeficientes de regressão linear com os vetores acima
@@ -1421,18 +1447,19 @@ public class SinkNode extends SimpleNode
 	 */
 	private double[] calculatesAverage(double[][] values)
 	{
-		double means[] = new double[values.length];
-		for (int firstDim = 0; firstDim < values.length; firstDim++) {
+		//TODO: Verificar cálculo!
+		double means[] = new double[values[0].length];
+		for (int secondDim = 0; secondDim < values[0].length; secondDim++)
+		{
 			double mean = 0, sum = 0;
-			for (int i = 0; i < values[firstDim].length; i++)
-			{
-				sum += values[firstDim][i];
+			for (int firstDim = 0; firstDim < values.length; firstDim++) {
+				sum += values[firstDim][secondDim];
 			}
-			if (values[firstDim].length > 0)
+			if (values.length > 0)
 			{
-				mean = sum/values[firstDim].length;
+				mean = sum/values.length;
 			}
-			means[firstDim] = mean;
+			means[secondDim] = mean;
 		}
 		return means;
 	} // end calculaMedia(double[] values)
@@ -1441,31 +1468,37 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Calcula o coeficiente B da equação de regressão <p>
 	 * [Eng] Calculates the coefficient B of the regression equation
-	 * @param values Array de valores (grandezas) das medições dos sensores <p>[Eng] Array of values ??(magnitudes) of the measurements of the sensors
+	 * @param values Array de valores (grandezas) das medições dos sensores <p>[Eng] Array of values (magnitudes) of the measurements of the sensors
 	 * @param times Array de tempos das medições dos sensores <p>[Eng] Array times of the measurements of the sensors
-	 * @param averageValues Média dos valores lidos pelos sensores <p>[Eng] Mean of values ??read by the sensors 
-	 * @param avarageTimes Média dos tempos de leitura dos valores pelos sensores <p>[Eng] Mean time reading the values ??from sensors <b> mediaTempos </b>
+	 * @param averageValues Média dos valores lidos pelos sensores <p>[Eng] Mean of values read by the sensors 
+	 * @param avarageTimes Média dos tempos de leitura dos valores pelos sensores <p>[Eng] Mean time reading the values from sensors <b> mediaTempos </b>
 	 * @return Valor do coeficiente B da equação de regressão <p>[Eng] Value of the coefficient B of the regression equation
 	 */
 	private double[] calculatesBs(double[][] values, double[] times, double[] averageValues, double avarageTimes)
 	{
-		double Bs[] = new double[values.length];
-		for (int firstDim = 0; firstDim < values.length; firstDim++) {
+		double Bs[] = new double[values[0].length];
+//		System.out.println("@ @ @ # # # values.length = "+values.length+" AND times.length = "+times.length);
+		for (int secondDim = 0; secondDim < dataSensedTypes.length; secondDim++) {
+//			System.out.println("@ @ @ firstDim = "+firstDim);
 			double numerador = 0.0, denominador = 0.0, x = 0.0;
-			for (int i = 0; i < times.length; i++) {
-				x = times[i] - avarageTimes;
-				numerador += x*(values[firstDim][i] - averageValues[firstDim]);
+//				System.out.println("@ @ @ i = "+i);
+//				System.out.println("@ @ @ # # # values[firstDim][i] = "+values[firstDim][i]+" AND averageValues[firstDim] = "+averageValues[firstDim]);
+			//TODO:
+			for (int firstDim = 0; firstDim < values.length; firstDim++) {
+
+				x = times[firstDim] - avarageTimes;
+				numerador += x*(values[firstDim][secondDim] - averageValues[secondDim]);
 				denominador += x*x;
 			}
 			if (denominador != 0) {
-				Bs[firstDim] = (numerador/denominador);
+				Bs[secondDim] = (numerador/denominador);
 			}
 			else {
-				Bs[firstDim] = 0.0;
+				Bs[secondDim] = 0.0;
 			}
 		}
 		return Bs;
-	} // end calculaB(double[] valores, double[] tempos, double mediaValores, double mediaTempos)
+	} // end calculatesBs(double[][] values, double[] times, double[] averageValues, double avarageTimes)
 	
 	/**
 	 * Calcula o coeficiente A da equação de regressão <p>
@@ -1478,8 +1511,8 @@ public class SinkNode extends SimpleNode
 	private double[] calculatesAs(double[] averageValues, double avarageTimes, double[] Bs)
 	{
 		double As[] = new double[averageValues.length];
-		for (int firstDim = 0; firstDim < averageValues.length; firstDim++) {
-			As[firstDim] = (averageValues[firstDim] - Bs[firstDim]*avarageTimes);
+		for (int secondDim = 0; secondDim < averageValues.length; secondDim++) {
+			As[secondDim] = (averageValues[secondDim] - Bs[secondDim]*avarageTimes);
 		}
 		return As;
 	} // end calculaA(double mediaValores, double mediaTempos, double B)
@@ -1494,7 +1527,7 @@ public class SinkNode extends SimpleNode
 
 	private void sendCoefficients(SimpleNode sourceNode, double[] coefficientsA, double[] coefficientsB, Node clusterHeadNode)
 	{
-		WsnMsg wsnMessage = new WsnMsg(1, this, sourceNode, this, 1, sourceNode.myCluster.sizeTimeSlot, dataSensedTypes, thresholdError, clusterHeadNode);
+		WsnMsg wsnMessage = new WsnMsg(1, this, sourceNode, this, 1, sourceNode.myCluster.sizeTimeSlot, dataSensedTypes, thresholdErrors, clusterHeadNode);
 		wsnMessage.setCoefs(coefficientsA, coefficientsB);
 		wsnMessage.setPathToSenderNode(sourceNode.getPathToSenderNode(), sourceNode.hopsToTarget);
 		sendToNextNodeInPath(wsnMessage);
