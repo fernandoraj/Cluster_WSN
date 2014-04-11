@@ -54,7 +54,7 @@ public class SinkNode extends SimpleNode
 	 * Tipo de dado a ser sensoriado (lido nos nós sensores), que pode ser: "t"=temperatura, "h"=humidade, "l"=luminosidade ou "v"=voltagem <br>
 	 * [Eng] Type of data to be sensed (read in the sensor nodes), which can be: "t" = temperature, "h" = humidity, "l" = brightness or "v" = voltage
 	 */
-	private String dataSensedType = "t";
+	private String dataSensedType = "h";
 	
 	/**
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
@@ -99,7 +99,7 @@ public class SinkNode extends SimpleNode
 	private boolean allSensorsMustContinuoslySense = true; // ACS: false = Representative Nodes; true = Cluster Heads
 	
 	/**
-	 * Emblema para indicar que o sink ainda não agrupou todos nós para a primeira vez <p>
+	 * Flag para indicar que o sink ainda não agrupou todos nós para a primeira vez <p>
 	 * [Eng] Flag to indicate that the sink still not clustered all nodes for the first time
 	 */
 	private boolean stillNonclustered = true;
