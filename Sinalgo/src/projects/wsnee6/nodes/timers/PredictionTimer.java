@@ -5,22 +5,22 @@ import sinalgo.nodes.timers.Timer;
 
 public class PredictionTimer extends Timer {
 
-	private String dataType;
-	private double A;
-	private double B;
-	private double error;
+	private int[] dataTypes;
+	private double[] As;
+	private double[] Bs;
+	private double[] errors;
 	
-	public PredictionTimer(String dataSensedType, double coefA, double coefB, double maxError)
+	public PredictionTimer(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors)
 	{
-		this.dataType = dataSensedType;
-		this.A = coefA;
-		this.B = coefB;
-		this.error = maxError;
+		this.dataTypes = dataSensedTypes;
+		this.As = coefsA;
+		this.Bs = coefsB;
+		this.errors = maxErrors;
 	}
 	
 	@Override
 	public void fire() {
-		((SimpleNode)node).triggerPrediction(dataType, A, B, error);
+		((SimpleNode)node).triggerPrediction(dataTypes, As, Bs, errors);
 	}
 
 }
