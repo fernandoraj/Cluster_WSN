@@ -1100,7 +1100,7 @@ public class SimpleNode extends Node
 		}
 		
 		return temp;
-	}
+	} // end getData(SimpleNode currentNode, String dataType)
 	
 	/**
 	 * Lê o próximo valor do sensor atual, executa a predição e, de acordo com a predição (acerto ou erro), dispara a próxima ação<p>
@@ -1252,7 +1252,7 @@ public class SimpleNode extends Node
 								Global.predictionsCount++;
 								((SimpleNode)nodes[i]).predictionsCount++;
 	
-								Global.squaredError += Math.pow((predictionValue - sensorValue), 2);
+								Global.squaredError += Math.pow((predictionValue - sensorValue), 2); // RMSE
 								((SimpleNode)nodes[i]).squaredError += Math.pow((predictionValue - sensorValue), 2);
 								// End of Code inserted		
 /*
@@ -1491,7 +1491,7 @@ public class SimpleNode extends Node
 			Global.predictionsCount++;
 			this.predictionsCount++;
 
-			Global.squaredError += Math.pow((predictionValue - value), 2);
+			Global.squaredError += Math.pow((predictionValue - value), 2); // RMSE
 			this.squaredError += Math.pow((predictionValue - value), 2);
 
 			// End of Code inserted
