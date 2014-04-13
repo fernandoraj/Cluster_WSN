@@ -30,7 +30,9 @@ public class SinkNode extends SimpleNode
 	 * Número de dados sensoriados por time slot (Tamanho do time slot inicial) <br>
 	 * [Eng] Number of sensed data per time slot (initial time slot size)
 	 */
-	private Integer sizeTimeSlot = 70;
+	private Integer sizeTimeSlot = 70; 	// This value would be, at least, 10 ^ N, N = quantity of dimensions from data, 
+										// i.e., number of dimensions from "dataSensedTypes", e.g., if dataSensedTypes
+										// = {4,5} => N = 2 => sizeTimeSlot >= 10^2 = 100.
 	
 	/**
 	 * Número de dados sensoriados por time slot (Tamanho do time slot inicial) <br>
@@ -477,6 +479,7 @@ public class SinkNode extends SimpleNode
 	 * @return Verdadeiro se todos os nós em linha "linha" de "tempCluster" estão na "blkList" <p>
 	 * [Eng] True if all nodes in line number "row" of "tempCluster" are in "blkList"
 	 */
+/*
 	private boolean isAllNodesInThisClusterLineInList(ArrayList2d<WsnMsgResponse> tempCluster, int row, ArrayList<WsnMsgResponse> blkList) {
 		if (tempCluster == null) { // If there isn't a message group yet
 			System.out.println("ERROR in isAllNodesInThisClusterLineInList method: There isn't tempCluster object instanciated yet!");
@@ -505,6 +508,7 @@ public class SinkNode extends SimpleNode
 		}
 		return true;
 	}
+*/
 	
 	/**
 	 * Ele classifica os 'clusters de nós' pela 'energia residual' e pelos 'saltos para o sink' e imprime as configuração do cluster antes, durante e após nova ordem <p>
@@ -596,6 +600,7 @@ public class SinkNode extends SimpleNode
 	 * @param list Um objeto ArrayList (WsnMsgResponse) <p>[Eng] An ArrayList(WsnMsgResponse) object 
 	 * @param msgToRemoveFromList Um objeto WsnMsgResponse <p>[Eng] A WsnMsgResponse object 
 	 */
+/*
 	private void removeFromList(ArrayList<WsnMsgResponse> list, WsnMsgResponse msgToRemoveFromList) {
 		if (list == null) { // 
 			System.out.println("ERROR in removeFromList method: There isn't listToRemove object instanciated!");
@@ -614,6 +619,7 @@ public class SinkNode extends SimpleNode
 			} // end while (cont < listToRemove.size())
 		} // end else
 	} // end removeFromList(ArrayList<WsnMsgResponse> listToRemove, WsnMsgResponse msgToRemove)
+*/
 	
 	/**
 	 * Ele aciona o processo de dividir um cluster, através da exclusão (retirar) a partir da linha do antigo cluster - para ser separado <p>
@@ -702,17 +708,17 @@ public class SinkNode extends SimpleNode
 	} // end sendSenseRequestMessageToAllSensorsInCluster(ArrayList2d<WsnMsgResponse> tempCluster, int lineFromCluster)
 	
 	/**
-	 * Ele identifica qual cluster (número da linha), onde o "newWsnMsgResp" está<p>
-	 * [Eng] It identifies which cluster (line number) where the "newWsnMsgResp" is 
-	 * @param newNode MessageResponse representando o nó sensorial para ser localizado na messageGroups <p>[Eng]MessageResponse representing the sensor node to be localized in messageGroups 
-	 * @return Número da linha (cluster) de mensagem passada, caso contrário, retorna -1 indicando que não existe essa mensagem ("newWsnMsgResp") em qualquer cluster <p>[Eng] Line number (cluster) from message passed by; otherwise, returns -1 indicating that there is no such message("newWsnMsgResp") in any cluster
+	 * Identifica qual cluster (número da linha), onde o "newNode" está<p>
+	 * [Eng] It identifies which cluster (line number) where the "newNode" is 
+	 * @param newNode SimpleNode representando o nó sensor para ser localizado no nodeGroups <p>[Eng]SimpleNode representing the sensor node to be localized in nodeGroups 
+	 * @return Número da linha (cluster) do sensor passado como parâmetro, caso contrário, retorna -1 indicando que não existe esse nó sesnor ("newNode") em nenhum cluster <p>[Eng] Line number (cluster) from node passed by; otherwise, returns -1 indicating that there is no such node("newNode") in any cluster
 	 */
 	private static int identifyCluster(SimpleNode newNode)
 	{
 		int lineCLuster = -1;
 		if (nodeGroups == null) // If there isn't a message group yet
 		{
-			Utils.printForDebug("ERROR in identifyCluster(Node) method: There isn't messageGroups object instanciated yet!");
+			Utils.printForDebug("ERROR in identifyCluster(SimpleNode) method: There isn't nodeGroups object instanciated yet!");
 		}
 		else
 		{
@@ -753,6 +759,7 @@ public class SinkNode extends SimpleNode
 	 * @param newWsnMsgResp  Mensagem que contém o nó (newWsnMsgResp.source), que será removido do grupo de aglomerado <p>[Eng] Message that contains the node (newWsnMsgResp.source) which will be removed from group of cluster 
 	 * @return Se o cluster desta mensagem / nó ficou vazio após a remoção do nó "newWsnMsgResp.source" <p>[Eng] If the cluster of this message / node became empty after removal of the node in "newWsnMsgResp.source"
 	 */
+/*
 	private boolean removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
 	{
 		boolean receivedAll = false;
@@ -792,11 +799,6 @@ public class SinkNode extends SimpleNode
 				if (tempCluster.getNumCols(line) == 1) { // It means that this is the last node in this line (cluster), and it will be removed so the cluster will be empty
 					tempCluster.remove(line);
 					receivedAll = true; // Then the sink have received all data node message from the current cluster
-/*					
-					if (tempCluster.getNumRows() == 0) { // If the group (total cluster) became empty
-						receivedAll = true; // Then the sink have received all data node message 
-					}
-*/
 				}
 				else {
 					tempCluster.remove(line,col);
@@ -805,6 +807,7 @@ public class SinkNode extends SimpleNode
 		}
 		return receivedAll;
 	} // end removeNodeAndChecksIfDataReceivedFromAllNodesInCluster(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
+*/
 	
 	/**
 	 * Ele seleciona o nó representante para cada linha (cluster) dos sensores pela energia residual máxima e coloca-lo na primeira posição (em linha) <p>
@@ -970,16 +973,17 @@ public class SinkNode extends SimpleNode
 	} // end changeMessagePositionInLine(int line, int index)
 	
 	/**
-	 * Adiciona o objeto WsnMsgResponse (newWsnMsgResp), passado pelo parâmetro, na linha correta ("Cluster") a partir do tempCluster (ArrayList2d), de acordo com a Medida dissimilaridade
-	 * PS:. Cada linha tempCluster (ArrayList2d de objetos WsnMsgResponse) representa um cluster de sensores (WsnMsgResponse.origem)
-	 * classificada pela dissimilaridade Medida a partir de dados sensoriados, armazenado em WsnMsgResponse.dataRecordItens <p>
+	 * Adiciona o objeto SimpleNode (newNode), passado como parâmetro, na linha correta ("Cluster") a partir do tempCluster (ArrayList2d), 
+	 * de acordo com a Medida de Dissimilaridade
+	 * PS:. Cada linha tempCluster (ArrayList2d de objetos SimpleNode) representa um cluster de sensores
+	 * classificada pela Medida de Dissimilaridade a partir de dados sensoriados, armazenado em WsnMsgResponse.dataRecordItens <p>
 	 * [Eng] Adds the WsnMsgResponse object (newWsnMsgResp), passed by parameter, in the correct line ("Cluster") from the tempCluster (ArrayList2d) according with the Dissimilarity Measure 
-	 * PS:. Each line in tempCluster (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.origem), 
+	 * PS:. Each line in tempCluster (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors, 
 	 * classified by Dissimilarity Measure from yours data sensed, stored on WsnMsgResponse.dataRecordItens
 	 *  
 	 * @param tempCluster ArrayList2d de sensores, organizados em clusters (linha por linha) <p>
 	 * [Eng] ArrayList2d from sensors, organized as clusters (line by line) 
-	 * @param newNode Mensagem a ser utilizada para classificar o nó sensor <p>
+	 * @param newNode Nó sensor utilizado para classificação  <p>
 	 * [Eng] Message to be used for classify the sensor node 
 	 */
 	private void addNodeInClusterClassifiedByMessage(ArrayList2d<SimpleNode> tempCluster, SimpleNode newNode)
