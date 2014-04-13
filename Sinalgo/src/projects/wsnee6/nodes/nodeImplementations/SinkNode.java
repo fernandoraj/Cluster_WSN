@@ -109,8 +109,8 @@ public class SinkNode extends SimpleNode
 	private boolean stillNonclustered = true;
 	
 	/**
-	 * Array 2D (clusters) a partir de sensores (Mensagens de sensores = WsnMsgResponse) <p>
-	 * [Eng] Array 2D (clusters) from sensors (Messages from sensors = WsnMsgResponse)
+	 * Array 2D (clusters) de sensores (Sensores = SimpleNode) <p>
+	 * [Eng] Array 2D (clusters) from sensors (Sensors = SimpleNode)
 	 */
 	private static ArrayList2d<SimpleNode> nodeGroups;
 	
@@ -397,6 +397,7 @@ public class SinkNode extends SimpleNode
 							classifyNodesByAllParams(nodeGroups);
 							Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
 							setClustersFromNodes(nodeGroups);
+							//TODO: Definir e calcular um array de Dimensões Fractais (double[] clustersFD)
 							
 							stillNonclustered = false;
 							canReceiveMsgResponseError = true;
