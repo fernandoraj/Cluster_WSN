@@ -13,7 +13,6 @@ import java.util.Vector;
 import projects.defaultProject.nodes.timers.DirectMessageTimer;
 import projects.wsnee6.nodes.messages.WsnMsg;
 import projects.wsnee6.nodes.messages.WsnMsgResponse;
-//import projects.wsnee6.nodes.messages.WsnMsgResponse.DataRecord;
 import projects.wsnee6.nodes.timers.PredictionTimer;
 import projects.wsnee6.nodes.timers.WsnMessageResponseTimer;
 import projects.wsnee6.nodes.timers.WsnMessageTimer;
