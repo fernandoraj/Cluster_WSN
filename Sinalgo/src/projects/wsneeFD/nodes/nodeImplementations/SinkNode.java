@@ -11,6 +11,7 @@ import projects.wsneeFD.nodes.messages.WsnMsg;
 import projects.wsneeFD.nodes.messages.WsnMsgResponse;
 import projects.wsneeFD.nodes.timers.WsnMessageTimer;
 import projects.wsneeFD.utils.ArrayList2d;
+import projects.wsneeFD.utils.FD3BigInt;
 import projects.wsneeFD.utils.Utils;
 import projects.wsneeFD.nodes.nodeImplementations.Cluster;
 import sinalgo.gui.transformation.PositionTransformation;
@@ -385,7 +386,9 @@ public class SinkNode extends SimpleNode
 							setClustersFromNodes(nodeGroups);
 							
 							//TODO: Definir e calcular um array de Dimensões Fractais (double[] clustersFD)
-							calculatesFractalDimensions(nodeGroups);
+							for (int i = 0; i < nodeGroups.getNumRows(); i++) {
+							    nodeGroups.setKey(i, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(i)));
+							}
 							
 							stillNonclustered = false;
 							canReceiveMsgResponseError = true;
@@ -1524,8 +1527,6 @@ public class SinkNode extends SimpleNode
 		return newSizeTimeSlot;
 	}
 
-	public void calculatesFractalDimensions(ArrayList2d nodeGroups){
-		
-	}
+	
 	
 }
