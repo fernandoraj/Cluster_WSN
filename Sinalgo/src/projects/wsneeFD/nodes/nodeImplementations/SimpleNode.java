@@ -1461,11 +1461,11 @@ public class SimpleNode extends Node
 	 */
 	public class DataRecord
 	{
-		int[] typs;
-		double[] values;
-		double time;
-		double batLevel;
-		int round;
+		public int[] typs;
+		public double[] values;
+		public double time;
+		public double batLevel;
+		public int round;
 	} // end DataRecord
 	
 	public Vector<DataRecord> dataRecordItens;
