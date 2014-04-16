@@ -1,11 +1,8 @@
 package projects.wsneeFD.utils;
 
-//import java.lang.reflect.Constructor;
-//import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-//import java.util.TreeSet;
+
+import projects.wsneeFD.nodes.nodeImplementations.SimpleNode;
 
 public class ArrayList2d<T, E>
 {
@@ -27,6 +24,27 @@ public class ArrayList2d<T, E>
 	class MyStructure<K, V> {
 		K fracDim;
 		ArrayList<V> cluster;
+		@Override
+		public String toString() {
+			return "MyStructure [fracDim=" + fracDim + ", cluster=" + cluster + "]";
+		}
+	}
+	
+	public MyStructure<T, E> getMyStructure(int row)
+	{
+		return array.get(row);
+	}
+
+	
+	
+	@Override
+	public String toString() {
+		String output = "";
+		for (int i = 0; i < array.size(); i++) {
+			MyStructure<T, E> arrayList = array.get(i);
+			output = output+arrayList+"\n";
+		}
+		return output;
 	}
 
 	/**
@@ -58,33 +76,34 @@ public class ArrayList2d<T, E>
  
 	/**
 	 * Adds an item at the end of the specified row. This will guarantee that at least row rows exist.
+	 * @deprecated
 	 */
-/*
-	public void add(T data, int row)
-	{
-		ensureCapacity(row);
-		while(row >= getNumRows())
-		{
-			MyStructure<E, T> doubleNodesMap = new MyStructure<E, T>();
-			try {
-				Constructor<E> constructor = eClass.getConstructor();
-				E newInstance = constructor.newInstance();
-				
-				doubleNodesMap.put(newInstance, new ArrayList<T>());
-				array.add(doubleNodesMap);
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		if (array.get(row).get(0.0) != null) {
-			array.get(row).get(0.0).add(data);
-		}
-	}
-*/
+
+//	public void add(T data, int row, double qq)
+//	{
+//		ensureCapacity(row);
+//		while(row >= getNumRows())
+//		{
+//			MyStructure<E, T> doubleNodesMap = new MyStructure<E, T>();
+//			try {
+//				Constructor<E> constructor = eClass.getConstructor();
+//				E newInstance = constructor.newInstance();
+//				
+//				doubleNodesMap.put(newInstance, new ArrayList<T>());
+//				array.add(doubleNodesMap);
+//				
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		if (array.get(row).get(0.0) != null) {
+//			array.get(row).get(0.0).add(data);
+//		}
+//	}
+
 	
 	/**
-	 * Adds an item at the end of the specified row. This will guarantee that at least row rows exist.
+	 * Adds an item at the end of the specified row. This will guarantee that at least row rows exist.<code> ArrayList2d.add</code>
 	 */
 	public void add(E data, int row, T key)
 	{
