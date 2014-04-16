@@ -21,9 +21,6 @@ END NOTICE */
 
 package projects.wsneeFD.utils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -34,7 +31,7 @@ import projects.wsneeFD.nodes.nodeImplementations.SimpleNode;
 
 public class FD3BigInt {
 
-	static int embed_dim; /* How many coordinates (columns) points have. */
+	static int embedDim; /* How many coordinates (columns) points have. */
 	static int dataLines; /*
 						 * Number of data points in input file (Total number of
 						 * lines).
@@ -51,10 +48,8 @@ public class FD3BigInt {
 	static int mark; /* Marks smallest usable box count */
 
 	static int boxCount[] = new int[numbits + 1]; /*
-												 * Array to keep track of the
-												 * box counts of each size. Each
-												 * index is the base-2 log of
-												 * the corresponding box size.
+												 * Array to keep track of the box counts of each size. Each
+												 * index is the base-2 log of the corresponding box size.
 												 */
 
 	static double negLogBoxCount[] = new double[numbits + 1]; /*
@@ -107,83 +102,40 @@ public class FD3BigInt {
 	static double slope;
 	static double intercept;
 
-	/* ################################################################## */
-	/* ################################################################## */
-	public static int getEmbedDim(String userInputFile) {
-		int count = 0;
-		/*
-		 * if (debugging || checking)
-		 * System.out.print("Now inside get_e_dim.\n"); if (debugging ||
-		 * checking) System.out.print("About to open input file.\n");
-		 */
-
-		String filename = userInputFile;
-		String fCap = filename.toUpperCase();
-		if (fCap.endsWith("CSV")) {
-			try {
-				BufferedReader reader = new BufferedReader(new FileReader(
-						filename));
-				String text = reader.readLine(); // Jumps the first line (with
-													// the number of file lines)
-
-				if ((text = reader.readLine()) != null) {
-					String s[] = text.split("[,\t ]");
-					count = s.length;
-				}
-				reader.close();
-			} catch (IOException e) {
-				System.err
-						.println("Sorry! There was a problem reading your file: ["
-								+ filename + "] !");
-				return -1;
-			}
-		}
-		return (count);
-	} // end getEmbedDim(String userInputFile)
-
-	public static ArrayList<DataRecord> dataReadings(
-			ArrayList<SimpleNode> clusters) {
+	/**
+	 * Read the cluster of sensors (ArrayList of SimpleNode) and gets the DataRecordItens to the "data" attribute to be returned
+	 * @param cluster ArrayList of sensors (SimpleNodes)
+	 * @return DataRecord Itens from all sensors passed by
+	 */
+	public static ArrayList<DataRecord> dataReadings(ArrayList<SimpleNode> cluster) {
 		ArrayList<DataRecord> data = new ArrayList<DataRecord>();
 
-		for (int i = 1; i < clusters.size(); i++) {
-			for (int j = 0; j < clusters.get(i).dataRecordItens.size(); j++) {
-				data.add(clusters.get(i).dataRecordItens.get(j));
+		for (int i = 0; i < cluster.size(); i++) {
+			for (int j = 0; j < cluster.get(i).dataRecordItens.size(); j++) {
+				data.add(cluster.get(i).dataRecordItens.get(j));
 			}
-
 		}
 		return data;
-	}
+	} // end dataReadings(ArrayList<SimpleNode> cluster)
 
 	/* ################################################################## */
 	/* ################################################################## */
+	/**
+	 * Find maximum and minimum data values in the input file. These are
+	 * needed so that the data can be scaled to be a set of non-negative
+	 * integers between 0 and maxdiam, where maxdiam will be the largest
+	 * integer value expressible as an element of the data type
+	 * "unsigned long int".
+	 * @param clusters
+	 */
 	public static void maxMin(ArrayList<DataRecord> clusters) {
-
 		double temp;
-
-		/*
-		 * if (debugging || checking) {
-		 * System.out.print("Now control is in max_min.\n");
-		 * System.out.print("Number of data lines is "+dataLines+" ...\n");
-		 * System.out.print("Starting to read data.\n"); } // if (debugging ||
-		 * checking)
-		 */
-		/*
-		 * find maximum and minimum data values in the input file. These are
-		 * needed so that the data can be scaled to be a set of non-negative
-		 * integers between 0 and maxdiam, where maxdiam will be the largest
-		 * integer value expressible as an element of the data type
-		 * "unsigned long int".
-		 */
-
-		// numToRead = ((long) embed_dim) * dataLines;
 		boolean firstData = true;
 		for (int i = 0; i < clusters.size(); i++) {
 			for (int j = 0; j < clusters.get(i).values.length; j++) {
 				temp = clusters.get(i).values[j];
-
 				if (firstData) {
 					pmax = pmin = temp;
-
 					firstData = false;
 				} // if (firstData)
 				else {
@@ -195,57 +147,10 @@ public class FD3BigInt {
 							pmin = temp;
 						} // end if (temp < pmin)
 					} // end else from if (temp > pmax)
-				}
-			}
-
-		} // end else from if (firstData)
-		// end for (int j = 0; j < s.length; j++)
-		// end if ((text = reader.readLine()) != null)
-		// end for (int i = 1; i < dataLines; i++)
-
-		/*
-		 * check to see if the maximum equals the minimum -- this is a
-		 * degenerate case -- or it might mean that the input file is faulty.
-		 */
-		/*
-		 * if (pmax == pmin) { System.out.print
-		 * ("The input file, "+userInputFile+", is confusing!\n\n");
-		 * System.out.print
-		 * ("Either all the points in "+userInputFile+" have the same ");
-		 * System.out.print ("coordinates,\n"); System.out.print
-		 * ("(THE FRACTAL DIMENSION IS ZERO IN THIS CASE.)\n\n");
-		 * System.out.print
-		 * ("or "+userInputFile+" is simply of the wrong form for an\n");
-		 * System.out.print ("input file to this program -- please check.\n"); }
-		 * /* close the input file
-		 */
-
-	}
-
-	// end max_min(String userinputfile)
-	// end max_min(String userinputfile, double pmax, double pmin)
-
-	/* ################################################################## */
-	/* ################################################################## */
-	/*
-	 * This procedure performs one pass of the radix sort. It assumes that the
-	 * queues each have a marker in front at the time of the call, and this is
-	 * the condition the procedure LEAVES the queues in when it terminates.
-	 */
-	public void rad_pass() {
-	} // end rad_pass(int coord, int bitpos)
-
-	/* ################################################################## */
-	/* ################################################################## */
-	/*
-	 * THIS SORT IS TO BE USED DIRECTLY AFTER FDDRIVER DOES THE INITIAL LOADING
-	 * OF THE DATA INTO THE QUEUES. IT LEAVES THE DATA ESSENTIALLY SORTED, WITH
-	 * ALL THE DATA WHOSE X-COORD STARTS WITH 0 IN Q[0], IN ORDER, AND ALL THE
-	 * DATA WHOSE X-COORD STARTS WITH 1 IN Q[1], IN ORDER. THUS THE SWEEP THAT
-	 * COMES NEXT MUST TRAVERSE Q[0], AND THEN Q [1].
-	 */
-	public void radixsort() {
-	} // end radixsort()
+				} // end else from if (firstData)
+			} // end for (int j = 0; j < clusters.get(i).values.length; j++)
+		} // end for (int i = 0; i < clusters.size(); i++)
+	} // end maxMin(ArrayList<DataRecord> clusters)
 
 	/* ################################################################## */
 	/* ################################################################## */
@@ -256,10 +161,7 @@ public class FD3BigInt {
 	 * TRAVERSAL, AND THEN "MASSAGED". AFTER "SWEEP" RUNS, WE NEED ONLY FIT A
 	 * SLOPE TO THE DATA TO OBTAIN THE FRACTAL DIMENSIONS.
 	 */
-	public static void sweep() { // (long boxCountS[], double negLogBoxCountS[],
-									// double logSumSqrFreqS[], double
-									// informationS[]) {
-
+	public static void sweep() { 
 		/*
 		 * Here we allocate storage for a word that describes the bit changes
 		 * between two different unsigned long int's. We have one of these words
@@ -267,11 +169,7 @@ public class FD3BigInt {
 		 * the sweep is done that gets the box counts.
 		 */
 
-		BigInteger diff_test[] = new BigInteger[embed_dim]; /*
-															 * XOR'S OF PAIRS OF
-															 * COORDINATES
-															 */
-
+		BigInteger diff_test[] = new BigInteger[embedDim]; // XOR'S OF PAIRS OF COORDINATES
 		int bitpos, countpos, coord; // queue_num;
 		boolean found;
 		int pointCount[] = new int[numbits + 1];
@@ -289,29 +187,23 @@ public class FD3BigInt {
 		}
 
 		previous = 0;
-		// System.out.println("");
 		for (int cont = 0; cont < data.length; cont++) {
 			current = cont;
 			found = false;
 			/* START BY LOOKING AT THE BIGGEST BOX SIZE */
 			bitpos = numbits - 1;
-			for (int coord2 = (embed_dim - 1); coord2 >= 0; coord2--) {
-				diff_test[coord2] = data[previous][coord2]
-						.xor(data[current][coord2]); // data[previous][coord2] ^
-														// data[current][coord2];
+			for (int coord2 = (embedDim - 1); coord2 >= 0; coord2--) {
+				diff_test[coord2] = data[previous][coord2].xor(data[current][coord2]); // data[previous][coord2] ^ data[current][coord2];
 				// System.out.println("data["+previous+"]["+coord2+"] XOR data["+current+"]["+coord2+"] = "+diff_test[coord2]);
 			}
-			// System.out.println("");
 			do {
-				coord = (embed_dim - 1);
+				coord = (embedDim - 1);
 				do {
 					/*
 					 * IF THE CURRENT POINT AND PREVIOUS POINTS ARE IN DIFFERENT
 					 * BOXES OF THIS SIZE,
 					 */
-					if (FDRadixSort.queueNo(diff_test[coord], bitpos) == 1) { // (
-																				// IS_A_ONE(diff_test[coord],bitpos)
-																				// )
+					if (FDRadixSort.queueNo(diff_test[coord], bitpos) == 1) { // (IS_A_ONE(diff_test[coord],bitpos))
 
 						// System.out.println("cont = "+cont+", diff_test[coord] = "+diff_test[coord]+", bitpos = "+bitpos);
 
@@ -329,9 +221,7 @@ public class FD3BigInt {
 							 * THIS FUNCTION.
 							 */
 							if (debugging) {
-								System.out.println("pointCount[" + countpos
-										+ "] is " + pointCount[countpos]
-										+ "...\n");
+								System.out.println("pointCount[" + countpos+ "] is " + pointCount[countpos]+ "...\n");
 							}
 							freq = pointCount[countpos] / (double) dataLines;
 
@@ -382,12 +272,10 @@ public class FD3BigInt {
 		 */
 
 		for (countpos = numbits; countpos >= 0; countpos--) {
-			negLogBoxCount[countpos] = -Math.log((double) boxCount[countpos])
-					/ log2;
+			negLogBoxCount[countpos] = -Math.log((double) boxCount[countpos]) / log2;
 
 			if (debugging) {
-				System.out.println("pointCount[" + countpos + "] is "
-						+ pointCount[countpos] + "...\n");
+				System.out.println("pointCount[" + countpos + "] is "+ pointCount[countpos] + "...\n");
 			}
 			freq = pointCount[countpos] / (double) dataLines;
 
@@ -404,8 +292,7 @@ public class FD3BigInt {
 			logSumSqrFreq[countpos] = Math.log(sumSqrFreq[countpos]) / log2;
 			information[countpos] += (freq * Math.log(freq) / log2);
 			information[countpos] *= (dataLines / (double) boxCount[0]);
-			information[countpos] += (Math.log((double) dataLines) - Math
-					.log((double) boxCount[0])) / log2;
+			information[countpos] += (Math.log((double) dataLines) - Math.log((double) boxCount[0])) / log2;
 
 			/*
 			 * information[countpos] NOW CONTAINS THE INFORMATION SUM FOR ALL
@@ -443,13 +330,11 @@ public class FD3BigInt {
 	 * TO FIGURE OUT WHY. AFTERWARDS, WE STOPPED USING dataLines/cutOff_factor,
 	 * AND CHANGED TO boxCountF[0]/cutOff_factor.)
 	 */
-	public static void findMark() // (int markPtr, int boxCountM[])
-	// ulong *markPtr, boxCountM[numbits+1] ;
-	{
+	public static void findMark() {
 		int i, cutOff_factor = 1;
 
 		/* Calculate cutOff_factor = 2^(embed_dim) + 1 */
-		for (i = 1; i <= embed_dim; i++) {
+		for (i = 1; i <= embedDim; i++) {
 			cutOff_factor = cutOff_factor * 2;
 		} // end for (i = 1; i <= embed_dim; i++)
 		cutOff_factor++;
@@ -465,23 +350,16 @@ public class FD3BigInt {
 
 	/* ################################################################## */
 	/* ################################################################## */
-	public static void GetDims() /*
-								 * (double negLogBoxCountF[], double
-								 * logSumSqrFreqF[], double informationF[],
-								 * ulong markF, double *capDimPtr, double
-								 * *infDimPtr, double *corrDimPtr)
-								 */
-	// ulong markF ;
-	// double negLogBoxCountF[numbits+1], informationF[numbits+1],
-	// logSumSqrFreqF[numbits+1],
-	// *capDimPtr, *infDimPtr, *corrDimPtr;
-	{
+	/**
+	 * Gets the calculation of Fractal Dimensions
+	 */
+	public static void getDims() {
 		int i;
 		double logEps[] = new double[numbits + 1];
 		// double slope;
 		// double intercept;
 
-		/* GET LOG (BASE 2) OF THE DIAMETER OF THE I'TH SIZE OF BOX. */
+		// GET LOG (BASE 2) OF THE DIAMETER OF THE I'TH SIZE OF BOX.
 		for (i = numbits; i >= 0; i--) {
 			logEps[i] = i;
 		}
@@ -499,7 +377,7 @@ public class FD3BigInt {
 		fitLSqrLine(mark, numbits - 2, logEps, information);
 		infDim = slope;
 		/*
-		 * fitLSqrLine(markF,numbits-4, logEps, logSumSqrFreqF, &slope,
+		 * fitLSqrLine(markF, numbits-4, logEps, logSumSqrFreqF, &slope,
 		 * &intercept);
 		 */
 		fitLSqrLine(mark, numbits - 2, logEps, logSumSqrFreq);
@@ -508,7 +386,7 @@ public class FD3BigInt {
 
 	/* ################################################################## */
 	/* ################################################################## */
-	/*
+	/**
 	 * FIT LEAST SQUARE LINE TO DATA IN X,Y. NO PROTECTION AGAINST OVERFLOW
 	 * HERE. IT IS ASSUMED THAT LAST > FIRST AND THAT THE X'S ARE NOT ALL THE
 	 * SAME -- ELSE DIVISION BY ZERO WILL OCCUR.
@@ -531,10 +409,14 @@ public class FD3BigInt {
 		intercept = Ymean - slope * Xmean;
 	} // end fitLSqrLine (int first, int last, double X[], double Y[])
 
+	/**
+	 * Prints all elements from the bidimensional array of BigInteger type passed by parameter
+	 * @param dat Array of BigInteger[][] to be printed
+	 */
 	public static void printData(BigInteger[][] dat) {
 		System.out.println("Begin printing ...");
 		for (int i = 0; i < dataLines; i++) {
-			for (int j = 0; j < embed_dim; j++) {
+			for (int j = 0; j < embedDim; j++) {
 				System.out.print(data[i][j] + " ");
 			}
 			System.out.println();
@@ -545,61 +427,59 @@ public class FD3BigInt {
 	/* ################################################################## */
 	/* ################################################################## */
 
-	public static double calculatesFractalDimensions(ArrayList<SimpleNode> clusters) {
+	/**
+	 * Calculates the Fractal Dimension from the cluster of SimpleNodes passed by parameter
+	 * @param cluster ArrayList of SimpleNodes to calculates the fractal dimension
+	 * @return the value of fractal dimension of the cluster
+	 */
+	public static double calculatesFractalDimensions(ArrayList<SimpleNode> cluster) {
 
-		ArrayList<DataRecord> datum = dataReadings(clusters);
-		// Long maxdiam = new Long(0); /* 2^numbits - 1: determines the scaling.
-		// */
-		// BigInteger maxDiam = new BigInteger("18446744073709551614"); // For
-		// compatibility with C language
+		// Long maxdiam = new Long(0); // 2^numbits - 1: determines the scaling.
+		// BigInteger maxDiam = new BigInteger("18446744073709551614"); // For compatibility with C language
+
 		BigInteger maxDiam; /* 2^numbits - 1: determines the scaling. */
-		double max, min; /*
-						 * Maximum and minimum values in input file-- we need to
-						 * know these in order to scale the input points.
-						 */
-		double buf; /*
-					 * A buffer for inputs to stay in until they are scaled and
-					 * converted to integers.
-					 */
+		double max, min; // Maximum and minimum values in input file-- we need to know these in order to scale the input points.
+		double buf; // A buffer for inputs to stay in until they are scaled and converted to integers.
+
+		ArrayList<DataRecord> datum = dataReadings(cluster);
 
 		/* FIND OUT HOW MANY COORDINATES POINTS HAVE -- 1?, 2?, 3?, MORE? */
-		embed_dim = ((SimpleNode.DataRecord) clusters.get(0).dataRecordItens
-				.get(0)).values.length;
+		embedDim = ((SimpleNode.DataRecord) cluster.get(0).dataRecordItens.get(0)).values.length;
 
 		maxMin(datum);
 		max = pmax;
 		min = pmin;
-
+		
+		if (max == min) { // All the points have the same coordinates (THE FRACTAL DIMENSION IS ZERO IN THIS CASE.)
+			return 0.0;
+		}
+		
 		BigInteger big2 = new BigInteger("2");
 		BigInteger big1 = new BigInteger("1");
 		maxDiam = (big2.pow(numbits)).subtract(big1);
 
-		data = new BigInteger[datum.size()][embed_dim];
+		data = new BigInteger[datum.size()][embedDim];
 
 		for (int i = 0; i < datum.size(); i++) {
-
-			for (int j = 0; j < embed_dim; j++) { // for (j = 0; j < s.length;
-													// j++)
-
+			for (int j = 0; j < embedDim; j++) { // for (j = 0; j < s.length; j++)
+				
 				buf = datum.get(i).values[j];
+				
 				BigDecimal bigMax = new BigDecimal(max + "");
 				BigDecimal bigMin = new BigDecimal(min + "");
 				BigDecimal bigBuf = new BigDecimal(buf + "");
 				BigDecimal bigMaxDiam = new BigDecimal(maxDiam);
-				/*
-				 * String temp = ""+((int)(max-min)); String temp2 =
-				 * ""+((int)(buf-min));
-				 */
-				data[i][j] = (bigBuf.subtract(bigMin).multiply((bigMaxDiam
-						.divide(bigMax.subtract(bigMin), 2,
-								RoundingMode.HALF_UP)))).toBigInteger();
+
+				// ((buf-min)*(maxDiam/(max-min)));
+				
+				data[i][j] = (bigBuf.subtract(bigMin).multiply((bigMaxDiam.divide(bigMax.subtract(bigMin), 2, RoundingMode.HALF_UP)))).toBigInteger();
 
 				// BigInteger bigMaxDiamInt = bigMaxDiam.toBigInteger();
-				BigInteger lessBig = data[i][j].min(maxDiam);
+				BigInteger lessBig = data[i][j].min(maxDiam); 
 
-				if (lessBig.equals(maxDiam)) {
+				if (lessBig.equals(maxDiam)) { // Normalization of values from data (BigInteger) in relation of "maxDiam" value
 					data[i][j] = data[i][j].subtract(maxDiam);
-				}
+				} // end if (lessBig.equals(maxDiam))
 			}
 		}
 
@@ -608,29 +488,17 @@ public class FD3BigInt {
 		 * corresponding to the least significant bit of the last coordinate.
 		 */
 
-		/* radix sort queues */
-
+		// radix sort using queues
 		data = FDRadixSort.radixSort2(data);
 
 		/* sweep data */
-
-		// TODO: Convert / create sweep method to Java
-		// sweep(boxCount, negLogBoxCount, logSumSqrFreq, information);
 		sweep();
 
-		// TODO: Convert findMark method to Java
-		// findMark(&mark, boxCount) ;
 		findMark();
 
-		/* GET RID OF THIS LINE WHEN DONE WITH TEST!!! */
-		/* mark = 24; */
-
-		// GetDims(negLogBoxCount, logSumSqrFreq, information, mark, &capDim,
-		// &infDim, &corrDim);
-		GetDims();
+		getDims();
 
 		return capDim;
-	}
+	} // end calculatesFractalDimensions(ArrayList<SimpleNode> clusters)
 
-	
-} // end main(String args[])
+}
