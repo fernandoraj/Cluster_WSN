@@ -4,25 +4,24 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
-//import java.util.Iterator;
 import java.util.Set;
 
 import projects.wsneeFD.nodes.messages.WsnMsg;
 import projects.wsneeFD.nodes.messages.WsnMsgResponse;
+import projects.wsneeFD.nodes.timers.FreeTimer;
 import projects.wsneeFD.nodes.timers.WsnMessageTimer;
 import projects.wsneeFD.utils.ArrayList2d;
 import projects.wsneeFD.utils.FD3BigInt;
 import projects.wsneeFD.utils.Utils;
-import projects.wsneeFD.nodes.nodeImplementations.Cluster;
 import sinalgo.gui.transformation.PositionTransformation;
 import sinalgo.nodes.Node;
 import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
-//import sinalgo.nodes.timers.Timer;
 import sinalgo.runtime.Global;
 import sinalgo.runtime.Runtime;
+//import java.util.Iterator;
+//import sinalgo.nodes.timers.Timer;
 //import sinalgo.nodes.TimerCollection;
-import projects.wsneeFD.nodes.timers.FreeTimer;
 
 public class SinkNode extends SimpleNode 
 {
@@ -165,7 +164,6 @@ public class SinkNode extends SimpleNode
 	
 	private boolean canReceiveMsgResponseError = false;
 	
-	// TODO: 
 	private double minimumOccupancyRatePerCluster = 1.35; // MORPC: #TotalSensors = 54 / #CLusters = 40 => 54/40 = 1.35
 	
 	public SinkNode() {
@@ -203,6 +201,7 @@ public class SinkNode extends SimpleNode
 			}
 			Global.log.logln("The size of sliding window is "+SimpleNode.slidingWindowSize+"\n");
 //		}
+		construirRoteamento(); // Equivale ao clique com o botão direito sobre o SinkNode e a escolha da opção "Definir Sink como Raiz de Roteamento"
 	} // end SinkNode()
 
 	@Override
@@ -241,6 +240,31 @@ public class SinkNode extends SimpleNode
 				if (canReceiveMsgResponseError) { // If the other sensor nodes still getting data to send to sink calculates the Equation Regression Coeffs. - e.g.: During the Merge Process Operation
 
 					if (wsnMsgResp.typeMsg == 2 || wsnMsgResp.typeMsg == 3) { // Se é uma mensagem de um Nó Representativo / Cluster Head que excedeu o #máximo de erros de predição
+
+/*
+						 Neste caso (wsnMsgResp.typeMsg == 2 || wsnMsgResp.typeMsg == 3), os clusters atuais estão armazenados em "nodeGroups", só que ocorreu um erro de
+						 predição em algum nó (wsnMsgResp.typeMsg == 2) ou algum nó esgotou o seu tempo de predição (wsnMsgResp.typeMsg == 3). Desta forma, primeiramente 
+						 (1) o nó sensor que enviou novos dados junto com a mensagem de erro irá substituir o antigo nó que o representava em "nodeGroups" (linha: 
+						 int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source);
+						 ), então, a seguir (2), iremos remover de "nodeGroups" todo o cluster do nó que enviou novos dados (com mensagem de erro) e o transferir para 
+						 a estrutura "nodesToReceiveDataReading" (linha:
+						 triggerSplitFromCluster(lineFromCluster);
+						 ). No passo seguinte (3), iremos transferir todos os nós de "nodesToReceiveDataReading" para a estrutura "newCluster" (linha:
+						 addNodesInNewCluster(nodesToReceiveDataReading, newCluster);
+						 ), dividindo cada nó em clusters (linhas) de acordo com o cluster correto ao qual ele deveria pertencer, ou seja, pode acontecer um split (divisão) 
+						 dos nós que estavam em um mesmo cluster. Em seguida (4), classificamos os nós dentro da estrutura "newCluster" (linha:
+						 classifyNodesByAllParams(newCluster);
+						 ), para que os nós representativos / cluster heads ocupem a primeira posição (coluna) de cada cluster. O próximo passo (5) é fazer a auto-
+						 -configuração dos clusters dos nós em "newCluster", para que cada nó configure corretamente o atributo "myCluster" (linha:
+						 setClustersFromNodes(newCluster);
+						 ), indicando quais os sensores presentes em seu próprio cluster. O passo seguinte (6) é tratar a mensagem recebida propriamente "receiveMessage()"
+						 enviando os novos coeficientes para os devidos nós dentro do laço "for" (linha:
+						 for (int line = 0; line < newCluster.getNumRows(); line++)
+						 ). Finalmente (7), unir os novos clusters (newCluster) com os cluster já existentes (nodeGroups) através do método "unifyClusters()" (linha:
+						 unifyClusters(nodeGroups, newCluster);
+						 ), mas mantendo a separação (de linhas) entre tais clusters, ou seja, tal método faz somente uma espécie de 'Append' entre os dois grupos de 
+						 clusters.
+*/
 						if (wsnMsgResp.typeMsg == 2) {
 							numMessagesOfErrorPredictionReceived++;
 						}
@@ -249,21 +273,29 @@ public class SinkNode extends SimpleNode
 						}
 						//numMessagesExpectedReceived++;
 						
-						int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source);
-						if (lineFromCluster >= 0)
-						{
+						// TODO:
+						/*
+						 * Criar métodos AQUI para:
+						 * 1) Inserir os novos dados recebidos em todos os clusters;
+						 * 2) Recalcular as dimensões fractais de todos os "novos" clusters;
+						 * 3) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
+						 * 4) Adicionar o(s) novo(s) nó(s) para o cluster selecionado no passo anterior!
+						 * 5) Estudar demais alterações necessárias e possíveis efeitos colaterais...
+						 */
+						
+						int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // (1)
+						if (lineFromCluster >= 0) {
 	//						expectedNumberOfSensors += sendSenseRequestMessageToAllSensorsInCluster(nodeGroups, lineFromCluster);
-							triggerSplitFromCluster(lineFromCluster);
+							triggerSplitFromCluster(lineFromCluster); // (2)
 						}
-		
 						newCluster = ensuresArrayList2d(newCluster);
 						
-						addNodesInNewCluster(nodesToReceiveDataReading, newCluster);
-						classifyNodesByAllParams(newCluster);
-						setClustersFromNodes(newCluster);
+						addNodesInNewCluster(nodesToReceiveDataReading, newCluster); // (3)
+						classifyNodesByAllParams(newCluster); // (4)
+						setClustersFromNodes(newCluster); // (5)
 						nodesToReceiveDataReading = new ArrayList2d<Double, SimpleNode>();
 							
-						for (int line = 0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from newCluster
+						for (int line = 0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from newCluster // (6)
 						{
 							int numSensors = newCluster.getNumCols(line);
 							Utils.printForDebug("Cluster / Line number = "+line);
@@ -286,7 +318,8 @@ public class SinkNode extends SimpleNode
 								
 						} // end for (int line=0; line < newCluster.getNumRows(); line++)
 						
-						unifyClusters(nodeGroups, newCluster); // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
+						unifyClusters(nodeGroups, newCluster); // (7) // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
+
 						Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
 						
 						// TODO: Test if it must br done currentNumberOfActiveSensors = (numTotalOfSensors - numMessagesOfLowBatteryReceived)
@@ -315,11 +348,11 @@ public class SinkNode extends SimpleNode
 						}
 						
 					}
-					
-					else if (wsnMsgResp.typeMsg == 3) {// Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot)
+/*
+					else if (wsnMsgResp.typeMsg == 3) {// Se é uma mensagem de um Nó Representativo que excedeu o #máximo de predições (timeSlot) => Incorporado ao caso anterior
 
 					} // else if (wsnMsgResp.typeMsg == 3)
-					
+*/					
 					else if (wsnMsgResp.typeMsg == 4) { // Se é uma mensagem de um Nó Representativo/Cluster Head cujo nível da bateria está abaixo do mínimo (SimpleNode.minBatLevelInClusterHead)
 						numMessagesOfLowBatteryReceived++;
 						
@@ -377,7 +410,7 @@ public class SinkNode extends SimpleNode
 							nodeGroups.add((SimpleNode)wsnMsgResp.source, 0, initialFracDim); // Add the initial sensor node(SimpleNode) to the group 0 - line 0 (ArrayList2d of SimpleNode)
 						}
 						else { // If there is a message group (SensorCluster), then adds the wsnMsgResp representing a sensor to group, classifing this message/sensor in correct cluster/line
-							addNodeInClusterClassifiedByMessage(nodeGroups, (SimpleNode)wsnMsgResp.source);
+							addNodeInCluster(nodeGroups, (SimpleNode)wsnMsgResp.source);
 						}
 						
 						if (numMessagesReceived >= numTotalOfSensors) { // In this point, clusters should be "closed", and the sensors inside them being classified
@@ -385,10 +418,14 @@ public class SinkNode extends SimpleNode
 							Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
 							setClustersFromNodes(nodeGroups);
 							
-							//TODO: Definir e calcular um array de Dimensões Fractais (double[] clustersFD)
+							//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
 							for (int i = 0; i < nodeGroups.getNumRows(); i++) {
 							    nodeGroups.setKey(i, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(i)));
+							    System.out.println("Fractal Dimension of cluster "+i+" = "+nodeGroups.getKey(i));
 							}
+							System.out.println("Tehee");
+							System.out.println(nodeGroups);
+//							printClusterArray(nodeGroups);
 							
 							stillNonclustered = false;
 							canReceiveMsgResponseError = true;
@@ -508,7 +545,7 @@ public class SinkNode extends SimpleNode
 	} // end classifyNodesByAllParams(ArrayList2d<WsnMsgResponse> cluster)
 	
 	/**
-	 * Ele define todos os clusters para cada WsnMsgResponse representando os nós de origem<p>[Eng] It sets all clusters for each WsnMsgResponse representing the source nodes  
+	 * Ele define todos os clusters para cada SimpleNode representando os nós de origem<p>[Eng] It sets all clusters for each SimpleNode representing the source nodes  
 	 * @param clusterGroup  Grupo de mensagens (representando clusters) que têm os clusters configurados <p>[Eng] Group of messages (representing clusters) to have the clusters configurated 
 	 */
 	void setClustersFromNodes(ArrayList2d<Double, SimpleNode> clusterGroup) {
@@ -592,9 +629,9 @@ public class SinkNode extends SimpleNode
 */
 	
 	/**
-	 * Ele aciona o processo de dividir um cluster, através da exclusão (retirar) a partir da linha do antigo cluster - para ser separado <p>
-	 * [Eng] It triggers the process to split a cluster, through the exclusion (remove) from the line from old cluster - to be splitted
-	 * @param lineFromCluster Número da linha do cluster para ser dividido <p>[Eng] Line number from cluster to be divided 
+	 * Aciona o processo de divisão de cluster, através da retirada da linha do cluster em "nodeGroups", e transferência do mesmo para "nodesToReceiveDataReading"<p>
+	 * [Eng] It triggers the process to split a cluster, through the removal from the line from cluster in "nodeGroups" - and transfer to "nodesToReceiveDataReading"
+	 * @param lineFromCluster Número da linha do cluster para ser dividido <p>[Eng] Line number from cluster to be divided
 	 */
 	private void triggerSplitFromCluster(int lineFromCluster) {
 		// IDEIA: O nó representativo acabou de enviar seus últimos dados de leitura (sensoriamento), então ele não precisa enviar novamente
@@ -619,7 +656,7 @@ public class SinkNode extends SimpleNode
 		else {
 			System.out.print("Round = "+Global.currentTime+": ");
 			if (nodeGroups == null) {
-				System.out.println("messageGroup = NULL ! ");
+				System.out.println("nodeGroups = NULL ! ");
 			}
 			if (nodesToReceiveDataReading == null) {
 				System.out.println("nodesToReceiveDataReading = NULL !");
@@ -887,15 +924,20 @@ public class SinkNode extends SimpleNode
 		if (cluster != null) { // If there is a message group created
 			for (int line=0; line < cluster.getNumRows(); line++) {
 				Utils.printForDebug("Line = "+line+": ");
+				System.out.println("Line = "+line+": ");
 				for (int col=0; col < cluster.getNumCols(line); col++) {
 					SimpleNode currentNode = cluster.get(line, col);
 					Utils.printForDebug("NodeID = "+currentNode.ID+" ");
+					System.out.println("NodeID = "+currentNode.ID+" ");
 				}
 				Utils.printForDebug("");
+				System.out.println("");
 			}
 			Utils.printForDebug("Number of Lines / Clusters = "+cluster.getNumRows()+"\n");
+			System.out.println("Number of Lines / Clusters = "+cluster.getNumRows()+"\n");
 		}
 	} // end printClusterArray(ArrayList2d<WsnMsgResponse> cluster)
+	
 	
 	/**
 	 * Muda a mensagem de posição "index" para a primeira posição [0] nesta linha do array<p>
@@ -921,7 +963,7 @@ public class SinkNode extends SimpleNode
 	 * @param newNode Nó sensor utilizado para classificação  <p>
 	 * [Eng] Message to be used for classify the sensor node 
 	 */
-	private void addNodeInClusterClassifiedByMessage(ArrayList2d<Double, SimpleNode> tempCluster, SimpleNode newNode) {
+	private void addNodeInCluster(ArrayList2d<Double, SimpleNode> tempCluster, SimpleNode newNode) {
 		boolean found = false;
 		int line = 0;
 		while ((!found) && (line < tempCluster.getNumRows()))
@@ -967,130 +1009,107 @@ public class SinkNode extends SimpleNode
 	} // end addNodeInClusterClassifiedByMessage(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
 	
 	/**
-	 * Adiciona os nós nodesReceived, passados por parâmetro, na linha correta ("Cluster") a partir do newCluster (ArrayList2d), de acordo com a Medida dissimilaridade
-     * PS:. Cada linha tempCluster (ArrayList2d de objetos WsnMsgResponse) representa um conjunto de sensores (WsnMsgResponse.origem),
-     * Classificado pela dissimilaridade Medida a partir de dados de sensoriamento yours, armazenada em WsnMsgResponse.dataRecordItens <p>
-	 * [Eng] Adds the nodes in nodesReceived, passed by parameter, in the correct line ("Cluster") from the newCluster (ArrayList2d) according with the Dissimilarity Measure 
-	 * PS.: Each line in tempCluster (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.origem), 
-	 * classified by Dissimilarity Measure from yours data sensed, stored on WsnMsgResponse.dataRecordItens
+	 * Adiciona os nós contidos em "nodesReceived", passados por parâmetro, na linha correta ("Cluster") de newCluster (ArrayList2d), de acordo com a Medida de Similaridade
+     * PS:. Cada linha de "newCluster" (ArrayList2d de objetos SimpleNode) representa um conjunto de sensores (cluster),
+     * classificado pela Medida de Similaridade a partir de dados de sensoriamento, armazenados em SimpleNode.dataRecordItens <p>
+	 * [Eng] Adds the nodes in nodesReceived, passed by parameter, in the correct line ("Cluster") from the newCluster (ArrayList2d) according with the Similarity Measure 
+	 * PS.: Each line in newCluster (ArrayList2d of objects SimpleNode) represents a cluster of sensors, 
+	 * classified by Similarity Measure from yours data sensed, stored on SimpleNode.dataRecordItens
 	 *  
-	 * @param nodesReceived
-	 * @param newCluster
+	 * @param nodesReceived Cluster de nós sensores com dados recebidos pelo sink
+	 * @param newCluster Cluster de sensores que irá receber e agrupar corretamente os sensores com novos dados recebidos
 	 */
 	private void addNodesInNewCluster(ArrayList2d<Double, SimpleNode> nodesReceived, ArrayList2d<Double, SimpleNode> newCluster)
 	{
 		if (nodesReceived == null) {
 			Utils.printForDebug("ERROR in addNodesInCluster method: nodesReceived == null!");
-		}
+		} // end if (nodesReceived == null)
 		else {
-			
 			for (int row=0; row < nodesReceived.getNumRows(); row++) {
 				for (int colu=0; colu < nodesReceived.getNumCols(row); colu++) {
-					
 					boolean found = false;
 					int line = 0;
 					SimpleNode nodeReceived = nodesReceived.get(row, colu);
 //					SimpleNode nodeReceived = nodesReceived.remove(row, colu);
-					while ((!found) && (line < newCluster.getNumRows()))
-					{
+					while ((!found) && (line < newCluster.getNumRows())) {
 						int col = 0;
 						boolean continueThisLine = true;
-						while ((continueThisLine) && (col < newCluster.getNumCols(line)))
-						{
+						while ((continueThisLine) && (col < newCluster.getNumCols(line))) {
 							SimpleNode currentNewNode = newCluster.get(line, col);
-							if (testDistanceBetweenSensorPositions(currentNewNode, nodeReceived))
-							{
-								if (testSimilarityMeasureWithPairRounds(currentNewNode, nodeReceived)) // If this (new)message (with sensor readings) already is dissimilar to current message
-								{
+							if (testDistanceBetweenSensorPositions(currentNewNode, nodeReceived)) {
+								if (testSimilarityMeasureWithPairRounds(currentNewNode, nodeReceived)) { // If this (new)message (with sensor readings) already is dissimilar to current message
 									continueThisLine = true; // Then this (new)message doesn't belong to this cluster / line / group
-								}
-								else
-								{
+								} // end if (testSimilarityMeasureWithPairRounds(currentNewNode, nodeReceived))
+								else {
 									continueThisLine = false;
-								}
-							}
-							else
-							{
+								} // end else from if (testSimilarityMeasureWithPairRounds(currentNewNode, nodeReceived))
+							} // end if (testDistanceBetweenSensorPositions(currentNewNode, nodeReceived))
+							else {
 								continueThisLine = false;
-							}
+							} // end else from if (testDistanceBetweenSensorPositions(currentNewNode, nodeReceived))
 							col++;
-						}
-						if ((continueThisLine) && (col == newCluster.getNumCols(line)))
-						{
+						} // end while ((continueThisLine) && (col < newCluster.getNumCols(line)))
+						if ((continueThisLine) && (col == newCluster.getNumCols(line))) {
 							found = true;
 							newCluster.add(nodeReceived, line);
-						}
-						else
-						{
+						} // end if ((continueThisLine) && (col == newCluster.getNumCols(line)))
+						else {
 							line++;
-						}
-					}
-					if (!found)
-					{
+						} // end else from if ((continueThisLine) && (col == newCluster.getNumCols(line)))
+					} // end 
+					if (!found) {
 						newCluster.add(nodeReceived, newCluster.getNumRows()); // It adds the new message "wsnMsgResp" in a new line (cluster) of messageGroup 
-					}
-					
-				}
-				
-			}
+					} // end if (!found)
+				} // end for (int colu=0; colu < nodesReceived.getNumCols(row); colu++)
+			} // end for (int row=0; row < nodesReceived.getNumRows(); row++)
 			//nodesReceived.removeAll(); 
-
-		}
+		} // end else from if (nodesReceived == null)
 	} // end addNodeInClusterClassifiedByMessage(ArrayList2d<WsnMsgResponse> tempCluster, WsnMsgResponse newWsnMsgResp)
 
 	/**
-	 * Procura o objeto WsnMsgResponse com o mesmo nó de origem, na posição correta em "Cluster" das messageGroups (ArrayList2d)
-	 * e substituí-lo com o que é passado por parâmetro
-	 * PS:. Cada linha "messageGroups" (ArrayList2d de objetos WsnMsgResponse) representa um cluster de sensores (WsnMsgResponse.source) <p>
-	 * classificada pela dissimilaridade Medida a partir de dados sensoriados, armazenada em WsnMsgResponse.dataRecordItens <p>
-	 * [Eng] Search the WsnMsgResponse object with the same source node, in the correct position in "Cluster" from the messageGroups (ArrayList2d) 
+	 * Procura o objeto SimpleNode, na posição correta em "Cluster" de "nodeGroups" (ArrayList2d)
+	 * e substitui com o que é passado por parâmetro
+	 * PS:. Cada linha de "nodeGroups" (ArrayList2d de objetos SimpleNode) representa um cluster de sensores (SimpleNode) 
+	 * classificada pela Medida de Dissimilaridade a partir dos dados sensoriados, armazenados em SimpleNode.dataRecordItens <p>
+	 * [Eng] Search the SimpleNode object, in the correct position in "Cluster" from the "nodeGroups" (ArrayList2d) 
 	 * and replace him with the one passed by parameter
-	 * PS.: Each line in "messageGroups" (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.source), 
-	 * classified by Dissimilarity Measure from yours data sensed, stored on WsnMsgResponse.dataRecordItens
+	 * PS.: Each line in "nodeGroups" (ArrayList2d of objects SimpleNode) represents a cluster of sensors (SimpleNode), 
+	 * classified by Dissimilarity Measure from yours data sensed, stored on SimpleNode.dataRecordItens
 	 *  
-	 * @param newNode Mensagem a ser utilizada para classificar o nó sensor <p>[Eng] Message to be used for classify the sensor node 
+	 * @param newNode Nó sensor a ser classificado  <p>[Eng] Sensor node to be classified
 	 */
-	private int searchAndReplaceNodeInCluster(SimpleNode newNode)
-	{
+	private int searchAndReplaceNodeInCluster(SimpleNode newNode) {
 		int lineCLuster = -1;
-		if (nodeGroups == null) // If there isn't a message group yet
-		{
+		if (nodeGroups == null) { // If there isn't a message group yet
 			Utils.printForDebug("ERROR in searchAndReplaceNodeInCluster method: There isn't nodeGroups object instanciated yet!");
-		}
-		else
-		{
+		} // end if (nodeGroups == null)
+		else {
 			boolean found = false;
 			int line = 0, col = 0;
 			SimpleNode currentNode = null;
-			while ((!found) && (line < nodeGroups.getNumRows()))
-			{
+			while ((!found) && (line < nodeGroups.getNumRows())) {
 				col = 0;
-				while ((!found) && (col < nodeGroups.getNumCols(line)))
-				{
+				while ((!found) && (col < nodeGroups.getNumCols(line))) {
 					currentNode = nodeGroups.get(line, col);
-					if (isEqualNode(currentNode, newNode))
-					{
+					if (isEqualNode(currentNode, newNode)) {
 						found = true;
-					}
-					else
-					{
+					} // end if (isEqualNode(currentNode, newNode))
+					else {
 						col++;
-					}
+					} // end else from if (isEqualNode(currentNode, newNode))
 				}
-				if (!found)
-				{
+				if (!found) {
 					line++;
-				}
+				} // end if (!found)
 			}
-			if (found)
-			{
+			if (found) {
 				lineCLuster = line;
 				newNode.myCluster = currentNode.myCluster;
-				nodeGroups.set(line, col, newNode); // It sets the new message "wsnMsgResp" in the line and col (cluster) of messageGroup 
-			}
-		}
+				nodeGroups.set(line, col, newNode); // It sets the new node "newNode" in the line and col (cluster) of nodeGroups
+			} // end if (found)
+		} // end else from if (nodeGroups == null)
 		return lineCLuster;
-	} // end searchAndReplaceNodeInClusterByMessage(WsnMsgResponse newWsnMsgResp)
+	} // end searchAndReplaceNodeInCluster(SimpleNode newNode)
 
 	/**
 	 * Procura o objeto WsnMsgResponse com o mesmo nó de origem, na posição correta em "Cluster" das messageGroups (ArrayList2d)
@@ -1387,7 +1406,6 @@ public class SinkNode extends SimpleNode
 	 */
 	private double[] calculatesAverage(double[][] values)
 	{
-		//TODO: Verificar cálculo!
 		double means[] = new double[values[0].length];
 		for (int secondDim = 0; secondDim < values[0].length; secondDim++)
 		{
@@ -1423,7 +1441,6 @@ public class SinkNode extends SimpleNode
 			double numerador = 0.0, denominador = 0.0, x = 0.0;
 //				System.out.println("@ @ @ i = "+i);
 //				System.out.println("@ @ @ # # # values[firstDim][i] = "+values[firstDim][i]+" AND averageValues[firstDim] = "+averageValues[firstDim]);
-			//TODO:
 			for (int firstDim = 0; firstDim < values.length; firstDim++) {
 
 				x = times[firstDim] - avarageTimes;
