@@ -40,6 +40,18 @@ public class SinkNode extends SimpleNode
 	private Integer sizeTimeSlotForMerge = 25;
 	
 	/**
+	 * Indica que o sink node sinaliza para todos os outros nós que deve ficar continuamente com sensoriamento (usando Cluster Heads) <p>
+	 * [Eng] Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
+	 */
+	private boolean allSensorsMustContinuoslySense = true; // ACS: false = Representative Nodes; true = Cluster Heads
+	
+	/**
+	 * Indica quando o modo de clusterização usando Dimensão Fractal está ligado (ativo = true)
+	 * [Eng] Indicates whether the Fractal Dimension clustering is in ON mode (active = true)
+	 */
+	private final boolean FDmodeOn = true;
+
+	/**
 	 * Quantidade de rounds (ciclos) a ser saltado para cada leitura sequencial dos sensores, no caso de uso da abordagem de ClusterHeads (ACS=True) <br>
 	 * [Eng] Number of rounds (cycles) to be jumped for each sequential sensor reading in the case of using the approach of ClusterHeads (ACS=True)
 	 */
@@ -95,11 +107,6 @@ public class SinkNode extends SimpleNode
 	 */
 	private static int numTotalOfSensors = 54;
 
-	/**
-	 * Indica que o sink node sinaliza para todos os outros nós que deve ficar continuamente com sensoriamento (usando Cluster Heads) <p>
-	 * [Eng] Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
-	 */
-	private boolean allSensorsMustContinuoslySense = true; // ACS: false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Emblema para indicar que o sink ainda não agrupou todos nós para a primeira vez <p>
@@ -273,9 +280,9 @@ public class SinkNode extends SimpleNode
 						}
 						//numMessagesExpectedReceived++;
 						
-						// TODO:
 						/*
 						 * Criar métodos AQUI para:
+						 * 0) Clonar o cluster de sensores
 						 * 1) Inserir os novos dados recebidos em todos os clusters;
 						 * 2) Recalcular as dimensões fractais de todos os "novos" clusters;
 						 * 3) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
@@ -283,6 +290,39 @@ public class SinkNode extends SimpleNode
 						 * 5) Estudar demais alterações necessárias e possíveis efeitos colaterais...
 						 */
 						
+						//TODO: TO BE TESTED! (18/04/2014)
+						if (FDmodeOn) { // Se estiver no modo Dimensão Fractal!
+							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
+							ArrayList2d<Double, SimpleNode> cloneCluster = nodeGroups.clone2();
+							insertNewNodeInClusters(cloneCluster, currentNode);
+							classifyNodesByAllParams(cloneCluster); // Investigar se é necessário (1)
+							setClustersFromNodes(cloneCluster); // Investigar se é necessário (1)
+							
+							//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
+							for (int i = 0; i < cloneCluster.getNumRows(); i++) {
+								cloneCluster.setKey(i, FD3BigInt.calculatesFractalDimensions(cloneCluster.get(i)));
+							    System.out.println("Fractal Dimension of cluster "+i+" = "+cloneCluster.getKey(i));
+							}
+							System.out.println("Aqui");
+							System.out.println(cloneCluster);
+
+							
+							
+							//TODO: TEORICAMENTE, ESTÁ FALTANDO APENAS OS PASSOS 3) 4) E 5):
+							/* 3) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
+							 * 4) Adicionar o(s) novo(s) nó(s) para o cluster selecionado no passo anterior!
+							 * 5) Estudar demais alterações necessárias e possíveis efeitos colaterais...
+							 */
+							
+							
+							
+						}
+						else {
+							
+							// COLOCAR AS PRÓXIMAS LINHAS (MARCADAS*) PARA DENTRO DESTE ELSE!
+							
+						}
+// *DAQUI...
 						int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // (1)
 						if (lineFromCluster >= 0) {
 	//						expectedNumberOfSensors += sendSenseRequestMessageToAllSensorsInCluster(nodeGroups, lineFromCluster);
@@ -319,7 +359,7 @@ public class SinkNode extends SimpleNode
 						} // end for (int line=0; line < newCluster.getNumRows(); line++)
 						
 						unifyClusters(nodeGroups, newCluster); // (7) // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
-
+// *... ATÉ AQUI!
 						Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
 						
 						// TODO: Test if it must br done currentNumberOfActiveSensors = (numTotalOfSensors - numMessagesOfLowBatteryReceived)
@@ -418,13 +458,16 @@ public class SinkNode extends SimpleNode
 							Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
 							setClustersFromNodes(nodeGroups);
 							
-							//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
-							for (int i = 0; i < nodeGroups.getNumRows(); i++) {
-							    nodeGroups.setKey(i, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(i)));
-							    System.out.println("Fractal Dimension of cluster "+i+" = "+nodeGroups.getKey(i));
+							//TODO:FDmodeON to be checked
+							if (FDmodeOn) {
+								//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
+								for (int i = 0; i < nodeGroups.getNumRows(); i++) {
+								    nodeGroups.setKey(i, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(i)));
+								    System.out.println("Fractal Dimension of cluster "+i+" = "+nodeGroups.getKey(i));
+								}
+								System.out.println("Tehee");
+								System.out.println(nodeGroups);
 							}
-							System.out.println("Tehee");
-							System.out.println(nodeGroups);
 //							printClusterArray(nodeGroups);
 							
 							stillNonclustered = false;
@@ -1112,57 +1155,26 @@ public class SinkNode extends SimpleNode
 	} // end searchAndReplaceNodeInCluster(SimpleNode newNode)
 
 	/**
-	 * Procura o objeto WsnMsgResponse com o mesmo nó de origem, na posição correta em "Cluster" das messageGroups (ArrayList2d)
-	 * e substituí-lo com o que é passado por parâmetro
-	 * PS:. Cada linha "messageGroups" (ArrayList2d de objetos WsnMsgResponse) representa um cluster de sensores (WsnMsgResponse.source) <p>
-	 * classificada pela dissimilaridade Medida a partir de dados sensoriados, armazenada em WsnMsgResponse.dataRecordItens <p>
-	 * [Eng] Search the WsnMsgResponse object with the same source node, in the correct position in "Cluster" from the messageGroups (ArrayList2d) 
-	 * and replace him with the one passed by parameter
-	 * PS.: Each line in "messageGroups" (ArrayList2d of objects WsnMsgResponse) represents a cluster of sensors (WsnMsgResponse.source), 
-	 * classified by Dissimilarity Measure from yours data sensed, stored on WsnMsgResponse.dataRecordItens
+	 * Insere o objeto "SimpleNode" passado em todos os "clusters" de newCluster (ArrayList2d)
+	 * PS:. Cada linha "newCluster" (ArrayList2d de objetos SimpleNode) representa um cluster de sensores, <p>
+	 * classificada pela Medida de Similaridade a partir de dados sensoriados, armazenada em SimpleNode.dataRecordItens <p>
+	 * [Eng] Inserts the SimpleNode object in all "clusters" from newCluster (ArrayList2d) 
+	 * PS.: Each line in "newCluster" (ArrayList2d of SimpleNode objects) represents a cluster of sensors, 
+	 * classified by Dissimilarity Measure from yours data sensed, stored on SimpleNode.dataRecordItens
 	 *  
-	 * @param newNode Mensagem a ser utilizada para classificar o nó sensor <p>[Eng] Message to be used for classify the sensor node 
+	 * @param newNode Nó sensor a ser inserido <p>[Eng] Message to be used for classify the sensor node 
 	 */
-	private int searchAndReplaceNodesInCluster(SimpleNode newNode)
+	private void insertNewNodeInClusters(ArrayList2d<Double, SimpleNode> newCluster, SimpleNode newNode)
 	{
-		int lineCLuster = -1;
-		if (nodeGroups == null) // If there isn't a message group yet
-		{
-			Utils.printForDebug("ERROR in searchAndReplaceNodeInCluster method: There isn't nodeGroups object instanciated yet!");
-		}
-		else
-		{
-			boolean found = false;
-			int line = 0, col = 0;
-			SimpleNode currentNode = null;
-			while ((!found) && (line < nodeGroups.getNumRows()))
-			{
-				col = 0;
-				while ((!found) && (col < nodeGroups.getNumCols(line)))
-				{
-					currentNode = nodeGroups.get(line, col);
-					if (isEqualNode(currentNode, newNode))
-					{
-						found = true;
-					}
-					else
-					{
-						col++;
-					}
-				}
-				if (!found)
-				{
-					line++;
-				}
+		if (newCluster == null) { // If there isn't a valid node cluster
+			Utils.printForDebug("ERROR in insertNewNodeInClusters method: There isn't newCluster object instanciated yet!");
+		} // end if (newCluster == null)
+		else {
+			for (int line = 0; line < newCluster.getNumRows(); line++) {
+				newCluster.add(line, newNode);
 			}
-			if (found)
-			{
-				lineCLuster = line;
-				newNode.myCluster = currentNode.myCluster;
-				nodeGroups.set(line, col, newNode); // It sets the new message "wsnMsgResp" in the line and col (cluster) of messageGroup 
-			}
-		}
-		return lineCLuster;
+//				newNode.myCluster = currentNode.myCluster;
+		} // end else from if (newCluster == null)
 	} // end searchAndReplaceNodeInClusterByMessage(WsnMsgResponse newWsnMsgResp)
 
 	/**
