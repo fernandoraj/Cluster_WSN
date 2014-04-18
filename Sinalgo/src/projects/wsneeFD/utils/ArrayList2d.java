@@ -2,9 +2,9 @@ package projects.wsneeFD.utils;
 
 import java.util.ArrayList;
 
-import projects.wsneeFD.nodes.nodeImplementations.SimpleNode;
+//import projects.wsneeFD.nodes.nodeImplementations.SimpleNode;
 
-public class ArrayList2d<T, E>
+public class ArrayList2d<T, E> implements Cloneable
 {
 //	ArrayList<MyStructure<Type>> array;
 //	ArrayList<ArrayList<Type>> array;
@@ -21,12 +21,22 @@ public class ArrayList2d<T, E>
 		array = new ArrayList< MyStructure<T, E>>();
 	}
 
-	class MyStructure<K, V> {
+	class MyStructure<K, V> implements Cloneable {
 		K fracDim;
 		ArrayList<V> cluster;
 		@Override
 		public String toString() {
 			return "MyStructure [fracDim=" + fracDim + ", cluster=" + cluster + "]";
+		}
+		@Override
+		public MyStructure<K, V> clone() {
+			MyStructure<K, V> cloneObject = new MyStructure<>();
+			cloneObject.fracDim = this.fracDim;
+			for (int i = 0; i < this.cluster.size(); i++) {
+				cloneObject.cluster.add(this.cluster.get(i));
+			}
+//			cloneObject.cluster = (ArrayList<V>)this.cluster.clone(); // It could replace the loop "for" above!
+			return cloneObject;
 		}
 	}
 	
@@ -35,7 +45,22 @@ public class ArrayList2d<T, E>
 		return array.get(row);
 	}
 
+	@Override
+	public ArrayList< MyStructure<T, E>> clone() {
+		ArrayList< MyStructure<T, E>> cloneArray = new ArrayList< MyStructure<T, E>>();
+		for (int i = 0; i < this.array.size() ; i++) {
+			cloneArray.add(this.array.get(i).clone());
+		}
+		return cloneArray;
+	}
 	
+	public ArrayList2d<T, E> clone2() {
+		ArrayList2d<T, E> cloneArray = new ArrayList2d<T, E>();
+		for (int i = 0; i < this.array.size() ; i++) {
+			cloneArray.array.add(this.array.get(i).clone());
+		}
+		return cloneArray;
+	}
 	
 	@Override
 	public String toString() {
