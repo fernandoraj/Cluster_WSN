@@ -295,15 +295,19 @@ public class SinkNode extends SimpleNode
 							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
 							ArrayList2d<Double, SimpleNode> cloneCluster = nodeGroups.clone2();
 							insertNewNodeInClusters(cloneCluster, currentNode);
-							classifyNodesByAllParams(cloneCluster); // Investigar se é necessário (1)
-							setClustersFromNodes(cloneCluster); // Investigar se é necessário (1)
+							//classifyNodesByAllParams(cloneCluster); // Investigar se é necessário (1)
+							//setClustersFromNodes(cloneCluster); // Investigar se é necessário (1)
 							
+							System.out.println("\nAntes de calcular FD: cloneCluster:");
+							System.out.println(cloneCluster);
+
 							//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
+							System.out.println("");
 							for (int i = 0; i < cloneCluster.getNumRows(); i++) {
 								cloneCluster.setKey(i, FD3BigInt.calculatesFractalDimensions(cloneCluster.get(i)));
 							    System.out.println("Fractal Dimension of cluster "+i+" = "+cloneCluster.getKey(i));
 							}
-							System.out.println("Aqui: cloneCluster:");
+							System.out.println("\nDepois de calcular FD: cloneCluster:");
 							System.out.println(cloneCluster);
 
 							System.out.println("Aqui: nodeGroups:");
