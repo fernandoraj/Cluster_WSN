@@ -83,7 +83,7 @@ public class ArrayList2d<T, E> implements Cloneable
 		String output = "";
 		for (int i = 0; i < array.size(); i++) {
 			MyStructure<T, E> arrayList = array.get(i);
-			output = output+arrayList+"\n";
+			output = output+"Line "+i+" "+arrayList+"\n";
 		}
 		return output;
 	}
