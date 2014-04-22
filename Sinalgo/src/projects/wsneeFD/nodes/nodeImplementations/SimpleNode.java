@@ -42,7 +42,7 @@ public class SimpleNode extends Node
 	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"<p>
 	 * [Eng] Indicates the size of Sliding Window from sensor readings to be send to sink node when there is a "novelty".
 	 */
-	protected static int slidingWindowSize = 4; // According ADAGA-P* = 7
+	protected static int slidingWindowSize = 10; // According ADAGA-P* = 7
 
 	/**
 	 * Número máximo(limite) de predições dos erros de qualquer nó de sensor - Isso também pode ser expressado em percentual(double) do total de timeslot.<p> 
