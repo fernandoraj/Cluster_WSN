@@ -303,10 +303,11 @@ public class SinkNode extends SimpleNode
 								cloneCluster.setKey(i, FD3BigInt.calculatesFractalDimensions(cloneCluster.get(i)));
 							    System.out.println("Fractal Dimension of cluster "+i+" = "+cloneCluster.getKey(i));
 							}
-							System.out.println("Aqui");
+							System.out.println("Aqui: cloneCluster:");
 							System.out.println(cloneCluster);
 
-							
+							System.out.println("Aqui: nodeGroups:");
+							System.out.println(nodeGroups);
 							
 							//TODO: TEORICAMENTE, ESTÁ FALTANDO APENAS OS PASSOS 3) 4) E 5):
 							/* 3) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
