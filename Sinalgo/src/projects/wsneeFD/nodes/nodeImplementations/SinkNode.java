@@ -305,14 +305,14 @@ public class SinkNode extends SimpleNode
 							//classifyNodesByAllParams(cloneCluster); // Investigar se é necessário (1)
 							//setClustersFromNodes(cloneCluster); // Investigar se é necessário (1)
 							
-							System.out.println("\nAntes de calcular FD: cloneCluster:");
-							System.out.println(cloneCluster);
+//							System.out.println("\nAntes de calcular FD: cloneCluster:");
+//							System.out.println(cloneCluster);
 
 							//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
-							System.out.println("");
+//							System.out.println("");
 							for (int i = 0; i < cloneCluster.getNumRows(); i++) {
 								cloneCluster.setKey(i, FD3BigInt.calculatesFractalDimensions(cloneCluster.get(i)));
-							    System.out.println("Fractal Dimension of cluster "+i+" = "+cloneCluster.getKey(i));
+//							    System.out.println("Fractal Dimension of cluster "+i+" = "+cloneCluster.getKey(i));
 							}
 							System.out.println("\nDepois de calcular FD: cloneCluster:");
 							System.out.println(cloneCluster);
@@ -502,7 +502,7 @@ public class SinkNode extends SimpleNode
 								//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
 								for (int i = 0; i < nodeGroups.getNumRows(); i++) {
 								    nodeGroups.setKey(i, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(i)));
-								    System.out.println("Fractal Dimension of cluster "+i+" = "+nodeGroups.getKey(i));
+//								    System.out.println("Fractal Dimension of cluster "+i+" = "+nodeGroups.getKey(i));
 								}
 								System.out.println("Tehee");
 								System.out.println(nodeGroups);
@@ -560,6 +560,7 @@ public class SinkNode extends SimpleNode
 		minDiff = Math.abs(newCluster.getKey(0) - curCluster.getKey(0));
 		minLine = 0;
 		for (int line = 1; line < curCluster.getNumRows(); line++) {
+			System.out.println("|newCluster.fracDim("+line+")["+newCluster.getKey(line)+"] - curCluster.fracDim("+line+")["+curCluster.getKey(line)+"]| = "+Math.abs(newCluster.getKey(line) - curCluster.getKey(line)));
 			if (Math.abs(newCluster.getKey(line) - curCluster.getKey(line)) < minDiff) {
 				minLine = line;
 				minDiff = Math.abs(newCluster.getKey(line) - curCluster.getKey(line));
