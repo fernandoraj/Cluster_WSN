@@ -288,29 +288,30 @@ public class SinkNode extends SimpleNode
 						
 						/*
 						 * Criar métodos AQUI para:
-						 * 0) Clonar o cluster de sensores
-						 * 1) Inserir os novos dados recebidos em todos os clusters;
-						 * 2) Recalcular as dimensões fractais de todos os "novos" clusters;
-						 * 3) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
-						 * 4) Adicionar o(s) novo(s) nó(s) para o cluster selecionado no passo anterior!
-						 * 5) Estudar demais alterações necessárias e possíveis efeitos colaterais...
+						 * 1) Clonar o cluster de sensores
+						 * 2) Inserir os novos dados recebidos em todos os clusters;
+						 * 3) Recalcular as dimensões fractais de todos os "novos" clusters;
+						 * 4) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
+						 * 5) Adicionar o(s) novo(s) nó(s) para o cluster selecionado no passo anterior!
+						 * 6) Estudar demais alterações necessárias e possíveis efeitos colaterais...
 						 */
 						
 						//TODO: TO BE TESTED! (18/04/2014)
 						if (FDmodeOn) { // Se estiver no modo Dimensão Fractal!
 							
 							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
-							ArrayList2d<Double, SimpleNode> cloneCluster = nodeGroups.clone2();
-							insertNewNodeInClusters(cloneCluster, currentNode);
-							//classifyNodesByAllParams(cloneCluster); // Investigar se é necessário (1)
-							//setClustersFromNodes(cloneCluster); // Investigar se é necessário (1)
+							
+							System.out.println("Source Node from Message Received: NodeID = "+currentNode.ID);
+							
+							ArrayList2d<Double, SimpleNode> cloneCluster = nodeGroups.clone2(); // (1)
+							insertNewNodeInClusters(cloneCluster, currentNode); // (2)
 							
 //							System.out.println("\nAntes de calcular FD: cloneCluster:");
 //							System.out.println(cloneCluster);
 
 							//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
 //							System.out.println("");
-							for (int i = 0; i < cloneCluster.getNumRows(); i++) {
+							for (int i = 0; i < cloneCluster.getNumRows(); i++) { // (3)
 								cloneCluster.setKey(i, FD3BigInt.calculatesFractalDimensions(cloneCluster.get(i)));
 //							    System.out.println("Fractal Dimension of cluster "+i+" = "+cloneCluster.getKey(i));
 							}
@@ -321,36 +322,57 @@ public class SinkNode extends SimpleNode
 							System.out.println(nodeGroups);
 							
 							//TODO: TEORICAMENTE, ESTÁ FALTANDO APENAS OS PASSOS 3) 4) E 5):
-							/* 3) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
-							 * 4) Adicionar o(s) novo(s) nó(s) para o cluster selecionado no passo anterior!
-							 * 5) Estudar demais alterações necessárias e possíveis efeitos colaterais...
+							/* 4) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
+							 * 5) Remover o antigo nó sensor (que enviou a mensagem) do seu cluster anterior;
+							 * 6) Adicionar o(s) novo(s) nó(s) para o cluster selecionado no passo anterior;
+							 * 7) Recalcular a Dimensão Fractal do cluster que recebeu os novos dados do nó sensor;
+							 * 8) Estudar demais alterações necessárias e possíveis efeitos colaterais:
+							 * 		8.1) Reclassificar os nós dentro dos clusters para escolha dos Nós Representativos / Cluster Heads
+							 * 		8.2) Reconfigurar os clusters de cada nó sensor (myCluster) de acordo com a nova configuração
 							 */
 							
-							int codeMinFDDiff = minimumFractalDimensionDiff(nodeGroups, cloneCluster);
+							int codeMinFDDiff = minimumFractalDimensionDiff(nodeGroups, cloneCluster); // (4)
 							if (codeMinFDDiff < 0) {
 								System.out.println("Error in minimumFractalDimensionDiff: "+codeMinFDDiff);
 							} // end if (codeMinFDDiff < 0)
 							else {
-								System.out.println("Searching and removing node from old cluster...");
-								int oldCLuster = searchAndRemoveNodeFromCluster(nodeGroups, currentNode); // Remove the old node from the old cluster
+								System.out.println("\nSearching and removing node from old cluster...");
+								int oldCLuster = searchAndRemoveNodeFromCluster(nodeGroups, currentNode); // Remove the old node from the old cluster (5)
 								System.out.println("Done... Node removed from cluster number "+oldCLuster);
 								
-								System.out.println("Inserting new node in new cluster ...");
-								insertNewNodeInClusterLine(nodeGroups, currentNode, codeMinFDDiff); // Insert the new received node in the new correct line in cluster
+								System.out.println("\nInserting new node in new cluster ...");
+								insertNewNodeInClusterLine(nodeGroups, currentNode, codeMinFDDiff); // Insert the new received node in the new correct line in cluster (6)
 								System.out.println("New node inserted in cluster number "+codeMinFDDiff);
 								
-								nodeGroups.setKey(codeMinFDDiff, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(codeMinFDDiff)));
-								System.out.println("New Fractal Dimension of cluster "+codeMinFDDiff+" from nodeGroups is "+nodeGroups.getKey(codeMinFDDiff));
+								nodeGroups.setKey(codeMinFDDiff, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(codeMinFDDiff))); // (7)
+								System.out.println("\nNew Fractal Dimension of cluster "+codeMinFDDiff+" from nodeGroups is "+nodeGroups.getKey(codeMinFDDiff));
 							    System.out.println("Fractal Dimension of cluster Number = "+codeMinFDDiff+" CHOSEN from cloneCluster is "+cloneCluster.getKey(codeMinFDDiff));
 
 								System.out.println("\ncloneCluster:");
 								System.out.println(cloneCluster);
 
-								System.out.println("nodeGroups:");
+								System.out.println("nodeGroups 1:");
 								System.out.println(nodeGroups);
 
-								//Descartar cloneCluster!!! => cloneCluster = null;
+								//Descartar cloneCluster!!! => 
+								cloneCluster = new ArrayList2d<Double, SimpleNode>(); //null;
 // PAREI AQUI !!!
+
+								triggerSplitFromCluster(nodeGroups, cloneCluster, codeMinFDDiff); 
+
+								classifyNodesByAllParams(cloneCluster); // Investigar... (8.1)
+								setClustersFromNodes(cloneCluster); // Investigar... (8.2)
+								
+								receiveMessageToAllInvolvedSensors(cloneCluster);
+								
+								if (cloneCluster != null) {
+									cloneCluster.transferRowTo(0, nodeGroups); //unifyClusters(nodeGroups, cloneCluster);
+								}
+								
+								System.out.println("nodeGroups 2:");
+								System.out.println(nodeGroups);
+
+								cloneCluster = null;
 
 							} // end else from if (codeMinFDDiff < 0)
 							
@@ -362,7 +384,7 @@ public class SinkNode extends SimpleNode
 							int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // (1)
 							if (lineFromCluster >= 0) {
 //								expectedNumberOfSensors += sendSenseRequestMessageToAllSensorsInCluster(nodeGroups, lineFromCluster);
-								triggerSplitFromCluster(lineFromCluster); // (2)
+								triggerSplitFromCluster(nodeGroups, nodesToReceiveDataReading, lineFromCluster); // (2)
 							}
 							newCluster = ensuresArrayList2d(newCluster);
 							
@@ -370,7 +392,10 @@ public class SinkNode extends SimpleNode
 							classifyNodesByAllParams(newCluster); // (4)
 							setClustersFromNodes(newCluster); // (5)
 							nodesToReceiveDataReading = new ArrayList2d<Double, SimpleNode>();
-								
+							
+							receiveMessageToAllInvolvedSensors(newCluster);
+							
+/*
 							for (int line = 0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from newCluster // (6)
 							{
 								int numSensors = newCluster.getNumCols(line);
@@ -393,6 +418,8 @@ public class SinkNode extends SimpleNode
 								} // end else if (!allSensorsMustContinuoslySense)
 									
 							} // end for (int line=0; line < newCluster.getNumRows(); line++)
+*/
+							
 							
 							unifyClusters(nodeGroups, newCluster); // (7) // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
 							Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
@@ -550,7 +577,42 @@ public class SinkNode extends SimpleNode
 		} //end while (inbox.hasNext())
 	} //end handleMessages()
 	
+	/**
+	 * 
+	 * @param cluster
+	 */
+	private void receiveMessageToAllInvolvedSensors(ArrayList2d<Double, SimpleNode> cluster) {
+		for (int line = 0; line < cluster.getNumRows(); line++) // For each line (group/cluster) from cluster // (6)
+		{
+			int numSensors = cluster.getNumCols(line);
+			Utils.printForDebug("Cluster / Line number = "+line);
+
+			if (!allSensorsMustContinuoslySense) { // If only the representative nodes must sensing (Representative nodes approach)
+				SimpleNode representativeNode = cluster.get(line, 0); // Get the Representative Node (or Cluster Head)
+				representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
+				receiveMessage(representativeNode, null);
+			} // end if (!allSensorsMustContinuoslySense)
+			
+			else { // If all nodes in cluters must sensing, and not only the representative nodes (Cluster heads approach)
+				Node chNode = cluster.get(line, 0); // Cluster Head from the current cluster/line
+				for (int col=0; col < numSensors; col++) // For each colunm from that line in cluster
+				{
+					SimpleNode currentNode = cluster.get(line, col); // Get the current node
+					currentNode.myCluster.sizeTimeSlot = sensorTimeSlot; // If all sensor nodes in each cluster must continuosly sense, so the sizeTimeSlot doesn't matter
+					receiveMessage(currentNode, chNode);
+				} // end for (int col=0; col < numSensors; col++)
+			} // end else if (!allSensorsMustContinuoslySense)
+				
+		} // end for (int line=0; line < cluster.getNumRows(); line++)
+	} // end receiveMessageToAllInvolvedSensors(ArrayList2d<Double, SimpleNode> cluster)
 	
+	/**
+	 * Calcula a menor diferença (diferença mínima) entre as dimensões fractais de um mesmo cluster antes e depois da chegada de novos dados 
+	 * de um certo nó sensor e retorna o número da linha do cluster correspondente
+	 * @param curCluster Cluster atual
+	 * @param newCluster Novo Cluster
+	 * @return Número da linha do cluster com menor diferença absoluta entre as dimensões fractais
+	 */
 	public int minimumFractalDimensionDiff(ArrayList2d<Double, SimpleNode> curCluster, ArrayList2d<Double, SimpleNode> newCluster) {
 		int minLine;
 		Double minDiff;
@@ -684,8 +746,8 @@ public class SinkNode extends SimpleNode
 	} // end convertArrayListMsgResponsesToArrayListNodes(ArrayList<WsnMsgResponse> lineMessages)
 	
 	/**
-	 * Adiciona os clusters (linhas) de "tempClusterGiver" (em "rowIndexes" linhas) dentro do "tempClusterReceiver", retire os elementos de "lista negra" e remove estas linhas de "tempClusterGiver" no final <p>
-	 * [Eng] Adds the clusters (lines) from "tempClusterGiver" (in "rowIndexes" lines) inside the "tempClusterReceiver", remove the elements from "blackList" and removes this lines from "tempClusterGiver" at the end
+	 * Adiciona os clusters (linhas) de "tempClusterGiver" (em "rowIndexes" linhas) dentro do "tempClusterReceiver" e remove estas linhas de "tempClusterGiver" no final <p>
+	 * [Eng] Adds the clusters (lines) from "tempClusterGiver" (in "rowIndexes" lines) inside the "tempClusterReceiver" and removes this lines from "tempClusterGiver" at the end
 	 * @param tempClusterReceiver Estrutura do cluster que receberá os sensores / cluster a partir da estrutura tempClusterGiver <p>[Eng] Cluster structure that will receive the sensors/clusters from the tempClusterGiver structure 
 	 * @param tempClusterGiver Estrutura do cluster que vai dar os sensores / cluster à estrutura tempClusterReceiver <p>[Eng] Cluster structure that will give the sensors/clusters to the tempClusterReceiver structure 
 	 */
@@ -703,6 +765,29 @@ public class SinkNode extends SimpleNode
 		} // end while (rowGiver < rowIndexes.size())
 		for (int i = (tempClusterGiver.getNumRows()-1); i >= 0; i--) {
 			tempClusterGiver.remove(i);
+		} // end for (int i = (tempClusterGiver.getNumRows()-1); i >= 0; i--)
+	} // end unifyClusters(ArrayList2d<Double, SimpleNode> tempClusterReceiver, ArrayList2d<Double, SimpleNode> tempClusterGiver)
+	
+	/**
+	 * Adiciona os clusters (linhas) de "tempClusterGiver" (em "rowIndexes" linhas) dentro do "tempClusterReceiver" e remove estas linhas de "tempClusterGiver" no final <p>
+	 * [Eng] Adds the clusters (lines) from "tempClusterGiver" (in "rowIndexes" lines) inside the "tempClusterReceiver" and removes this lines from "tempClusterGiver" at the end
+	 * @param sourceClusters Estrutura do cluster que receberá os sensores / cluster a partir da estrutura tempClusterGiver <p>[Eng] Cluster structure that will receive the sensors/clusters from the tempClusterGiver structure 
+	 * @param targetClusters Estrutura do cluster que vai dar os sensores / cluster à estrutura tempClusterReceiver <p>[Eng] Cluster structure that will give the sensors/clusters to the tempClusterReceiver structure 
+	 */
+	private void transferClustersTo(ArrayList2d<Double, SimpleNode> sourceClusters, ArrayList2d<Double, SimpleNode> targetClusters) {
+		int rowReceiver, rowGiver = 0, col;
+		rowReceiver = sourceClusters.getNumRows();
+		while (rowGiver < targetClusters.getNumRows()) {
+			col = 0;
+			while (col < targetClusters.getNumCols(rowGiver)) {
+				sourceClusters.add(targetClusters.get(rowGiver, col), rowReceiver);
+				col++;
+			} // end while (col < tempClusterGiver.getNumCols(rowIndexes.get(rowGiver)))
+			rowGiver++;
+			rowReceiver++;
+		} // end while (rowGiver < rowIndexes.size())
+		for (int i = (targetClusters.getNumRows()-1); i >= 0; i--) {
+			targetClusters.remove(i);
 		} // end for (int i = (tempClusterGiver.getNumRows()-1); i >= 0; i--)
 	} // end unifyClusters(ArrayList2d<Double, SimpleNode> tempClusterReceiver, ArrayList2d<Double, SimpleNode> tempClusterGiver)
 	
@@ -734,43 +819,35 @@ public class SinkNode extends SimpleNode
 */
 	
 	/**
-	 * Aciona o processo de divisão de cluster, através da retirada da linha do cluster em "nodeGroups", e transferência do mesmo para "nodesToReceiveDataReading"<p>
-	 * [Eng] It triggers the process to split a cluster, through the removal from the line from cluster in "nodeGroups" - and transfer to "nodesToReceiveDataReading"
+	 * Aciona o processo de divisão de cluster, através da retirada da linha "lineFromCluster" do cluster "sourceClusters", e transferência da mesma para "targetClusters"<p>
+	 * [Eng] It triggers the process to split a cluster, through the removal from the line "lineFromCluster" from cluster "sourceClusters" and transfer to "targetClusters"
+	 * @param sourceClusters Cluster do qual a linha será removida <p>[Eng] Cluster which the line will be removed
+	 * @param targetClusters Cluster para o qual a linha será inserida <p>[Eng] Cluster to which the line will be inserted
 	 * @param lineFromCluster Número da linha do cluster para ser dividido <p>[Eng] Line number from cluster to be divided
 	 */
-	private void triggerSplitFromCluster(int lineFromCluster) {
+	private void triggerSplitFromCluster(ArrayList2d<Double, SimpleNode> sourceClusters, ArrayList2d<Double, SimpleNode> targetClusters, int lineFromCluster) {
 		// IDEIA: O nó representativo acabou de enviar seus últimos dados de leitura (sensoriamento), então ele não precisa enviar novamente
 		// Remover cluster (nós do cluster) de messageGroups
-		nodesToReceiveDataReading = ensuresArrayList2d(nodesToReceiveDataReading);
+		targetClusters = ensuresArrayList2d(targetClusters);
 		
-		if (nodeGroups != null && nodesToReceiveDataReading != null) {
+		if (sourceClusters != null && targetClusters != null) {
 /*			
-			Utils.printForDebug("Antes: messageGroups.numRows = "+nodeGroups.getNumRows()+" and nodesToReceiveDataReading.numRows = "+nodesToReceiveDataReading.getNumRows());
-			Utils.printForDebug("messageGroups");
 			printClusterArray(nodeGroups);
 */			
-			nodeGroups.transferRowTo(lineFromCluster, nodesToReceiveDataReading);
+			sourceClusters.transferRowTo(lineFromCluster, targetClusters);
 /*
-			Utils.printForDebug("Depois: messageGroups.numRows = "+nodeGroups.getNumRows()+" and nodesToReceiveDataReading.numRows = "+nodesToReceiveDataReading.getNumRows());
-			Utils.printForDebug("messageGroups");
 			printClusterArray(nodeGroups);
-			Utils.printForDebug("nodesToReceiveDataReading");
-			printClusterArray(nodesToReceiveDataReading);
 */
 		}
 		else {
 			System.out.print("Round = "+Global.currentTime+": ");
-			if (nodeGroups == null) {
-				System.out.println("nodeGroups = NULL ! ");
+			if (sourceClusters == null) {
+				System.out.println("sourceClusters = NULL! ");
 			}
-			if (nodesToReceiveDataReading == null) {
-				System.out.println("nodesToReceiveDataReading = NULL !");
+			if (targetClusters == null) {
+				System.out.println("targetClusters = NULL!");
 			}
 		}
-
-
-		//messageGroups.remove(lineFromCluster);
-		
 		// Armazenar quantos nós existiam neste cluster, para saber quando todos terminaram de responder
 		// Identificá-los pelo clusterHeadID
 	} // end triggerSplitFromCluster(int lineFromCluster)
@@ -1256,6 +1333,11 @@ public class SinkNode extends SimpleNode
 				lineCLuster = line;
 //				node.myCluster = currentNode.myCluster;
 				cluster.remove(line, col); // It removes the node "node" from the line and col of cluster
+				if (cluster.get(line) != null) {
+					if (cluster.get(line).size() == 0) {
+						cluster.remove(line);
+					}
+				}
 			} // end if (found)
 		} // end else from if (nodeGroups == null)
 		return lineCLuster;
@@ -1660,13 +1742,18 @@ public class SinkNode extends SimpleNode
 		return nodes;
 	}
 	
+	/**
+	 * Ensures that if there isn't a node group yet, then it does create one and adds the node to it
+	 * @param array2d Cluster of sensors to be created, if it doesn't exists yet
+	 * @return An instanciated of ArrayList2d<Double, SimpleNode>()
+	 */
 	public ArrayList2d<Double, SimpleNode> ensuresArrayList2d(ArrayList2d<Double, SimpleNode> array2d) {
 		if (array2d == null) {// If there isn't a node group yet, then it does create one and adds the node to it
 			array2d = new ArrayList2d<Double, SimpleNode>();
 	 		//NodesToReceiveDataReading.ensureCapacity(numTotalOfSensors); // Ensure the capacity as the total number of sensors (nodes) in the data set
-		}
+		} // end if (array2d == null)
 		return array2d;
-	}
+	} // end ensuresArrayList2d(ArrayList2d<Double, SimpleNode> array2d)
 
 	/**
 	 * O sizeTimeSlot do nó representativo que irá ser inversamente proporcional ao número de sensores no mesmo aglomerado -> número de "L" em documentationn <p>
