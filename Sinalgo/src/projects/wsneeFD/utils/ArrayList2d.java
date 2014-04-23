@@ -2,14 +2,16 @@ package projects.wsneeFD.utils;
 
 import java.util.ArrayList;
 
-//import projects.wsneeFD.nodes.nodeImplementations.SimpleNode;
-
+/**
+ * Class to represents an array (ArrayList) of "MyStructure" objects
+ * @author Fernando Rodrigues <a href="mailto:fernandorodrigues.ufc@gmail.com"> e-mail </a>
+ *
+ * @param <T> Type of the "Key" (fractal dimension - fracDim) of each "MyStructure" object
+ * @param <E> Type of the "Elements" from arrayList (cluster) of each "MyStructure" object
+ */
 public class ArrayList2d<T, E> implements Cloneable
 {
-//	ArrayList<MyStructure<Type>> array;
-//	ArrayList<ArrayList<Type>> array;
 	private ArrayList< MyStructure<T, E>> array;
-//	private ArrayList<Map<E, ArrayList<T>>> array;
 //	private Class<E> eClass;
  
 	public ArrayList2d(Class<E> eClass) {
@@ -21,6 +23,13 @@ public class ArrayList2d<T, E> implements Cloneable
 		array = new ArrayList< MyStructure<T, E>>();
 	}
 
+	/**
+	 * Class to represents a structure that stores a key (e.g.: Fractal Dimension as a Double) and an array list of elements (e.g.: a cluster of SimpleNode)
+	 * @author Fernando Rodrigues <a href="mailto:fernandorodrigues.ufc@gmail.com"> e-mail </a>
+	 *
+	 * @param <K> Type of the fractal dimension (fracDim or "Key") of object
+	 * @param <V> Type of the elements ("Values") from cluster (ArrayList)
+	 */
 	class MyStructure<K, V> implements Cloneable {
 		K fracDim;
 		ArrayList<V> cluster;
@@ -49,10 +58,15 @@ public class ArrayList2d<T, E> implements Cloneable
 		}
 	}
 	
+	/**
+	 * Returns the myStructure object of line "row"
+	 * @param row Line of myStructure required
+	 * @return myStructure object of line required (indicated in "row")
+	 */
 	public MyStructure<T, E> getMyStructure(int row)
 	{
 		return array.get(row);
-	}
+	} // end getMyStructure(int row)
 
 	@Override
 	public ArrayList< MyStructure<T, E>> clone() {
@@ -63,7 +77,7 @@ public class ArrayList2d<T, E> implements Cloneable
 			}
 		}
 		return cloneArray;
-	}
+	} // end clone()
 	
 	public ArrayList2d<T, E> clone2() {
 		if (this.array == null) {
@@ -76,7 +90,7 @@ public class ArrayList2d<T, E> implements Cloneable
 			}
 		}
 		return cloneArray;
-	}
+	} // end clone2()
 	
 	@Override
 	public String toString() {
@@ -86,17 +100,17 @@ public class ArrayList2d<T, E> implements Cloneable
 			output = output+"Line "+i+" "+arrayList+"\n";
 		}
 		return output;
-	}
+	} // end toString()
 
 	/**
-	 * ensures a minimum capacity of num rows. Note that this does not guarantee
+	 * Ensures a minimum capacity of num rows. Note that this does not guarantee
 	 * that there are that many rows.
 	 * 
 	 * @param num
 	 */
 	public void ensureCapacity(int num) {
 		array.ensureCapacity(num);
-	}
+	} // end ensureCapacity(int num)
  
 	/**
 	 * Ensures that the given row has at least the given capacity. Note that
@@ -113,7 +127,7 @@ public class ArrayList2d<T, E> implements Cloneable
 			array.add(new MyStructure<T, E>());
 		}
 //		array.get(row). ensureCapacity(num);
-	}
+	} // end ensureCapacity(int row, int num)
  
 	/**
 	 * Adds an item at the end of the specified row. This will guarantee that at least row rows exist.
@@ -145,6 +159,9 @@ public class ArrayList2d<T, E> implements Cloneable
 	
 	/**
 	 * Adds an item at the end of the specified row. This will guarantee that at least row rows exist.<code> ArrayList2d.add</code>
+	 * @param data Data item to be add at row indicated
+	 * @param row Line number to add the data passed by
+	 * @param key The value of "key" (fracDim) of line to be set
 	 */
 	public void add(E data, int row, T key)
 	{
@@ -176,15 +193,21 @@ public class ArrayList2d<T, E> implements Cloneable
 		}
 	} // end add(E data, int row, T key)
 
+	/**
+	 * Adds an item ("data") at the column ("col") of the specified row ("row"), without guarantee that this col (column number) exists.
+	 * @param row Line number to add the data
+	 * @param col Column number to add the data
+	 * @param data Data to be add
+	 */
 	public void add(int row, int col, E data)
 	{
 		if (array.get(row) != null) {
 			array.get(row).cluster.add(col, data);
 		}
-	}
+	} // end add(int row, int col, E data)
 
 	/**
-	 * Adds an item ("data") at the end of the specified row ("row"), with guarantee that at least row rows exist.
+	 * Adds an item ("data") at the end of the specified row ("row"), with guarantee that at least row rows exists.
 	 * @param data Data to be add
 	 * @param row Line number to add the data
 	 */
@@ -201,17 +224,17 @@ public class ArrayList2d<T, E> implements Cloneable
 			}
 			array.get(row).cluster.add(data);
 		}
-	}
+	} // end add(E data, int row)
 
 	/**
-	 * Adds an item ("data") at the end of the specified row ("row"), without guarantee that this row (line number) exist.
+	 * Adds an item ("data") at the end of the specified row ("row"), without any guarantee that this row (line number) exists.
 	 * @param row Line number to add the data
 	 * @param data Data to be add
 	 */
 	public void add(int row, E data)
 	{
 		array.get(row).cluster.add(data);
-	}
+	} // end add(int row, E data)
 
 	/**
 	 * Returns the element at the specified position (row, col) in this list2d, without removing it from list2d
@@ -305,6 +328,11 @@ public class ArrayList2d<T, E> implements Cloneable
 		}
 	}
  
+	/**
+	 * Remove the data from column ("col") and row ("row")
+	 * @param row Line number
+	 * @param col Column number
+	 */
 	public void remove(int row, int col)
 	{
 		if (array.get(row) != null && array.get(row).cluster.get(col) != null) {
@@ -312,6 +340,11 @@ public class ArrayList2d<T, E> implements Cloneable
 		}
 	}
 	
+	/**
+	 * Remove the array of data (all line / myStructure) from row ("row")
+	 * @param row Line number
+	 * @param col Column number
+	 */
 	public void remove(int row)
 	{
 		if (array.get(row) != null) {
@@ -319,6 +352,11 @@ public class ArrayList2d<T, E> implements Cloneable
 		}
 	}
 	
+	/**
+	 * Transfer the row indicated ("row") from this object to the "target" object
+	 * @param row Line number to be transfered
+	 * @param target Object to receive the line from "this" object
+	 */
 	public void transferRowTo(int row, ArrayList2d<T, E> target)
 	{
 		target.array.add(array.get(row));
@@ -365,5 +403,4 @@ public class ArrayList2d<T, E> implements Cloneable
 		}
 		return 0;
 	}
-	
 }
