@@ -17,11 +17,11 @@ public class ArrayList2d<T, E> implements Cloneable
 	public ArrayList2d(Class<E> eClass) {
 //		this.eClass = eClass;
 		array = new ArrayList< MyStructure<T, E>>();
-	}
+	} // end ArrayList2d(Class<E> eClass)
 	
 	public ArrayList2d() {
 		array = new ArrayList< MyStructure<T, E>>();
-	}
+	} // end ArrayList2d()
 
 	/**
 	 * Class to represents a structure that stores a key (e.g.: Fractal Dimension as a Double) and an array list of elements (e.g.: a cluster of SimpleNode)
@@ -36,11 +36,13 @@ public class ArrayList2d<T, E> implements Cloneable
 		public MyStructure() {
 			//fracDim = new K();
 			cluster = new ArrayList<V>();
-		}
+		} // end MyStructure()
+		
 		@Override
 		public String toString() {
 			return "MyStructure [fracDim=" + fracDim + ", cluster=" + cluster + "]";
-		}
+		} // end toString()
+		
 		@Override
 		public MyStructure<K, V> clone() {
 			MyStructure<K, V> cloneObject = new MyStructure<>();
@@ -55,16 +57,15 @@ public class ArrayList2d<T, E> implements Cloneable
 			}
 //			cloneObject.cluster = (ArrayList<V>)this.cluster.clone(); // It could replace the loop "for" above!
 			return cloneObject;
-		}
-	}
+		} // end clone()
+	} // end class MyStructure<K, V>
 	
 	/**
 	 * Returns the myStructure object of line "row"
 	 * @param row Line of myStructure required
 	 * @return myStructure object of line required (indicated in "row")
 	 */
-	public MyStructure<T, E> getMyStructure(int row)
-	{
+	public MyStructure<T, E> getMyStructure(int row) {
 		return array.get(row);
 	} // end getMyStructure(int row)
 
@@ -119,8 +120,7 @@ public class ArrayList2d<T, E> implements Cloneable
 	 * @param row
 	 * @param num
 	 */
-	public void ensureCapacity(int row, int num)
-	{
+	public void ensureCapacity(int row, int num) {
 		ensureCapacity(row);
 		while (row < getNumRows())
 		{
@@ -163,8 +163,7 @@ public class ArrayList2d<T, E> implements Cloneable
 	 * @param row Line number to add the data passed by
 	 * @param key The value of "key" (fracDim) of line to be set
 	 */
-	public void add(E data, int row, T key)
-	{
+	public void add(E data, int row, T key) {
 		ensureCapacity(row);
 		while (row >= getNumRows())
 		{
@@ -199,8 +198,7 @@ public class ArrayList2d<T, E> implements Cloneable
 	 * @param col Column number to add the data
 	 * @param data Data to be add
 	 */
-	public void add(int row, int col, E data)
-	{
+	public void add(int row, int col, E data) {
 		if (array.get(row) != null) {
 			array.get(row).cluster.add(col, data);
 		}
@@ -211,8 +209,7 @@ public class ArrayList2d<T, E> implements Cloneable
 	 * @param data Data to be add
 	 * @param row Line number to add the data
 	 */
-	public void add(E data, int row)
-	{
+	public void add(E data, int row) {
 		ensureCapacity(row);
 		while (row >= getNumRows())
 		{
@@ -231,8 +228,7 @@ public class ArrayList2d<T, E> implements Cloneable
 	 * @param row Line number to add the data
 	 * @param data Data to be add
 	 */
-	public void add(int row, E data)
-	{
+	public void add(int row, E data) {
 		array.get(row).cluster.add(data);
 	} // end add(int row, E data)
 
@@ -242,10 +238,9 @@ public class ArrayList2d<T, E> implements Cloneable
 	 * @param col Column number in which the element is
 	 * @return The element required
 	 */
-	public E get(int row, int col)
-	{
+	public E get(int row, int col) {
 		return array.get(row).cluster.get(col);
-	}
+	} // end get(int row, int col)
 	
 	/**
 	 * Returns the element at the specified position (row, col) in this list2d, without removing it from list2d
@@ -253,10 +248,9 @@ public class ArrayList2d<T, E> implements Cloneable
 	 * @param col Column number in which the element is
 	 * @return The element required
 	 */
-	public ArrayList<E> get(int row)
-	{
+	public ArrayList<E> get(int row) {
 		return array.get(row).cluster;
-	}
+	} // end get(int row)
 
 	/**
 	 * Returns the element at the specified position (row,col) in this list2d, without removing it from list2d
@@ -304,7 +298,7 @@ public class ArrayList2d<T, E> implements Cloneable
 	 */
 	public T getKey(int row) {
 	    return array.get(row).fracDim;
-	}
+	} // end getKey(int row)
 
 	/**
 	 * Sets the key of the arrayList of elements at the specified line (row) in this list2d
@@ -313,7 +307,7 @@ public class ArrayList2d<T, E> implements Cloneable
 	 */
 	public void setKey(int row, T key) {
 	    array.get(row).fracDim = key;
-	}
+	} // end setKey(int row, T key)
 
 	/**
 	 * Replaces the element at the specified position (row, col) in this list with the specified element.
@@ -321,57 +315,62 @@ public class ArrayList2d<T, E> implements Cloneable
 	 * @param col Column of data to be set
 	 * @param data Data to be set
 	 */
-	public void set(int row, int col, E data)
-	{
+	public void set(int row, int col, E data) {
 		if (array.get(row) != null && array.get(row).cluster.get(col) != null) {
 			array.get(row).cluster.set(col,data);
 		}
-	}
+	} // end set(int row, int col, E data)
  
 	/**
 	 * Remove the data from column ("col") and row ("row")
 	 * @param row Line number
 	 * @param col Column number
 	 */
-	public void remove(int row, int col)
-	{
+	public void remove(int row, int col) {
 		if (array.get(row) != null && array.get(row).cluster.get(col) != null) {
 			array.get(row).cluster.remove(col);
 		}
-	}
+	} // end remove(int row, int col)
 	
 	/**
 	 * Remove the array of data (all line / myStructure) from row ("row")
 	 * @param row Line number
 	 * @param col Column number
 	 */
-	public void remove(int row)
-	{
+	public void remove(int row) {
 		if (array.get(row) != null) {
 			array.remove(row);
 		}
-	}
+	} // end remove(int row)
 	
 	/**
 	 * Transfer the row indicated ("row") from this object to the "target" object
 	 * @param row Line number to be transfered
 	 * @param target Object to receive the line from "this" object
 	 */
-	public void transferRowTo(int row, ArrayList2d<T, E> target)
-	{
+	public void transferRowTo(int row, ArrayList2d<T, E> target) {
 		target.array.add(array.get(row));
 		array.remove(row);
-	}
+	} // end transferRowTo(int row, ArrayList2d<T, E> target)
  
-	public void move(int row, int colSource, int colDest)
-	{
+	/**
+	 * Move the data from the column "colSource" to the column "colDest" in line "row"
+	 * @param row Line number
+	 * @param colSource Column of source position
+	 * @param colDest Column of target position
+	 */
+	public void move(int row, int colSource, int colDest) {
 		if (array.get(row) != null && array.get(row).cluster.get(colSource) != null && colDest < array.get(row).cluster.size()) {
 			array.get(row).cluster.add(colDest, array.get(row).cluster.remove(colSource)); // To be tested!?
 		}
-	}
+	} // end move(int row, int colSource, int colDest)
 
-	public boolean contains(E data)
-	{
+	/**
+	 * Informs if "this" object contains this data passed by
+	 * @param data Data to be checked
+	 * @return True if the data is contained in this object (ArrayList); False otherwise
+	 */
+	public boolean contains(E data) {
 		for (int i = 0; i < array.size(); i++)
 		{
 			if (array.get(i) != null && array.get(i).cluster.contains(data))
@@ -380,27 +379,38 @@ public class ArrayList2d<T, E> implements Cloneable
 			}
 		}
 		return false;
-	}
+	} // end contains(E data)
  
-	public boolean containsInRow(E data, int row)
-	{
+	/**
+	 * Informs if "this" object contains this data in the line ("row") indicated
+	 * @param data Data to be checked
+	 * @param row Line number to be search for
+	 * @return True if the data is contained in this line (row) from this object (ArrayList); False otherwise
+	 */
+	public boolean containsInRow(E data, int row) {
 		if (array.get(row) != null && array.get(row).cluster.contains(data))
 		{
 			return true;
 		}
 		return false;
-	}
+	} // end containsInRow(E data, int row)
 	
-	public int getNumRows()
-	{
+	/**
+	 * Inform the size of line from this object (ArrayList) 
+	 * @return Number of lines (size)
+	 */
+	public int getNumRows() {
 		return array.size();
-	}
+	} // end getNumRows()
  
-	public int getNumCols(int row)
-	{
+	/**
+	 * Inform the size of columns from this line ("row") of this object (ArrayList) 
+	 * @return Number of columns (size)
+	 */
+	public int getNumCols(int row) {
 		if (array.get(row) != null) {
 			return array.get(row).cluster.size();
 		}
 		return 0;
-	}
+	} // end getNumCols(int row)
 }
