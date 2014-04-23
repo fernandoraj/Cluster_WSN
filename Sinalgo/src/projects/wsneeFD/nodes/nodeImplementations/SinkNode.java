@@ -301,7 +301,7 @@ public class SinkNode extends SimpleNode
 							
 							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
 							
-							System.out.println("Source Node from Message Received: NodeID = "+currentNode.ID);
+							System.out.println("\nSource Node from Message Received: NodeID = "+currentNode.ID);
 							
 							ArrayList2d<Double, SimpleNode> cloneCluster = nodeGroups.clone2(); // (1)
 							insertNewNodeInClusters(cloneCluster, currentNode); // (2)
@@ -315,13 +315,13 @@ public class SinkNode extends SimpleNode
 								cloneCluster.setKey(i, FD3BigInt.calculatesFractalDimensions(cloneCluster.get(i)));
 //							    System.out.println("Fractal Dimension of cluster "+i+" = "+cloneCluster.getKey(i));
 							}
-							System.out.println("\nDepois de calcular FD: cloneCluster:");
-							System.out.println(cloneCluster);
-
 							System.out.println("Aqui: nodeGroups:");
 							System.out.println(nodeGroups);
 							
-							//TODO: TEORICAMENTE, ESTÁ FALTANDO APENAS OS PASSOS 3) 4) E 5):
+							System.out.println("\nDepois de calcular FD: cloneCluster:");
+							System.out.println(cloneCluster);
+							
+							// TEORICAMENTE, ESTÁ FALTANDO APENAS OS PASSOS 4), 5), 6), 7) E 8):
 							/* 4) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
 							 * 5) Remover o antigo nó sensor (que enviou a mensagem) do seu cluster anterior;
 							 * 6) Adicionar o(s) novo(s) nó(s) para o cluster selecionado no passo anterior;
@@ -332,10 +332,35 @@ public class SinkNode extends SimpleNode
 							 */
 							
 							int codeMinFDDiff = minimumFractalDimensionDiff(nodeGroups, cloneCluster); // (4)
-							if (codeMinFDDiff < 0) {
-								System.out.println("Error in minimumFractalDimensionDiff: "+codeMinFDDiff);
+							
+							if (codeMinFDDiff < 0) { // If any error happens in the calculation of the minimum difference of Fractal Dimension
+								System.out.println("\nError in minimumFractalDimensionDiff: "+codeMinFDDiff);
+								
+								cloneCluster = new ArrayList2d<Double, SimpleNode>(); // Reboot the cloneCluster object
+								
+								int lineClusterFromCurrentNode = searchAndReplaceNodeInCluster(currentNode); // Replace the node and return his cluster line
+								
+								if (lineClusterFromCurrentNode >= 0) {
+									triggerSplitFromCluster(nodeGroups, cloneCluster, lineClusterFromCurrentNode); // (*)Remove the current cluster from nodeGroups to cloneCluster
+									classifyNodesByAllParams(cloneCluster);
+									setClustersFromNodes(cloneCluster);
+									
+									receiveMessageToAllInvolvedSensors(cloneCluster); // Calculates the coefs and send them to the right sensor nodes which are "waiting"
+									
+									if (cloneCluster != null) {
+										cloneCluster.transferRowTo(0, nodeGroups); // Returns the cluster removed in (*) to nodeGroups
+									}
+									
+									System.out.println("nodeGroups 3:");
+									System.out.println(nodeGroups);
+
+									Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
+
+									cloneCluster = null;
+								} // end if (lineClusterFromCurrentNode >= 0)
+								
 							} // end if (codeMinFDDiff < 0)
-							else {
+							else { // If the "codeMinFDDiff" represents the line of cluster with the minimum difference of Fractal Dimension
 								System.out.println("\nSearching and removing node from old cluster...");
 								int oldCLuster = searchAndRemoveNodeFromCluster(nodeGroups, currentNode); // Remove the old node from the old cluster (5)
 								System.out.println("Done... Node removed from cluster number "+oldCLuster);
@@ -356,7 +381,6 @@ public class SinkNode extends SimpleNode
 
 								//Descartar cloneCluster!!! => 
 								cloneCluster = new ArrayList2d<Double, SimpleNode>(); //null;
-// PAREI AQUI !!!
 
 								triggerSplitFromCluster(nodeGroups, cloneCluster, codeMinFDDiff); 
 
@@ -372,7 +396,11 @@ public class SinkNode extends SimpleNode
 								System.out.println("nodeGroups 2:");
 								System.out.println(nodeGroups);
 
+								Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
+
 								cloneCluster = null;
+
+								//TODO: PAREI AQUI !!!
 
 							} // end else from if (codeMinFDDiff < 0)
 							
@@ -422,7 +450,7 @@ public class SinkNode extends SimpleNode
 							
 							
 							unifyClusters(nodeGroups, newCluster); // (7) // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
-							Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
+							Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
 							
 							// TODO: Test if it must br done currentNumberOfActiveSensors = (numTotalOfSensors - numMessagesOfLowBatteryReceived)
 							if (((double)numTotalOfSensors / (double)Global.clustersCount) <= minimumOccupancyRatePerCluster) { // Begin MERGE operation
@@ -1333,7 +1361,7 @@ public class SinkNode extends SimpleNode
 				lineCLuster = line;
 //				node.myCluster = currentNode.myCluster;
 				cluster.remove(line, col); // It removes the node "node" from the line and col of cluster
-				if (cluster.get(line) != null) {
+				if (cluster.get(line) != null) { // After removing node, if the current cluster become empty, so it must be removed 
 					if (cluster.get(line).size() == 0) {
 						cluster.remove(line);
 					}
