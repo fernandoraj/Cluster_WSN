@@ -301,6 +301,10 @@ public class SinkNode extends SimpleNode
 							
 							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
 							
+							if (Global.currentTime >= 556.0) {
+								System.out.println(" * * * BEGIN DEBUG * * * ");
+							}
+							
 							System.out.println("\nSource Node from Message Received: NodeID = "+currentNode.ID);
 							
 							ArrayList2d<Double, SimpleNode> cloneCluster = nodeGroups.clone2(); // (1)
@@ -361,9 +365,16 @@ public class SinkNode extends SimpleNode
 								
 							} // end if (codeMinFDDiff < 0)
 							else { // If the "codeMinFDDiff" represents the line of cluster with the minimum difference of Fractal Dimension
+								int nodeGroupsSizeBefore = nodeGroups.getNumRows();
+								
 								System.out.println("\nSearching and removing node from old cluster...");
 								int oldCLuster = searchAndRemoveNodeFromCluster(nodeGroups, currentNode); // Remove the old node from the old cluster (5)
 								System.out.println("Done... Node removed from cluster number "+oldCLuster);
+								
+								// If the "searchAndRemoveNodeFromCluster()" removed a line from nodeGroups and this line (removed) is above the other (codeMinFDDiff)
+								if (nodeGroups.getNumRows() < nodeGroupsSizeBefore && codeMinFDDiff >= oldCLuster) { 
+									codeMinFDDiff--; // Then the "codeMinFDDiff" value must have "shifted" one "position"(codeMinFDDiff = codeMinFDDiff - 1;)
+								}
 								
 								System.out.println("\nInserting new node in new cluster ...");
 								insertNewNodeInClusterLine(nodeGroups, currentNode, codeMinFDDiff); // Insert the new received node in the new correct line in cluster (6)
@@ -606,8 +617,8 @@ public class SinkNode extends SimpleNode
 	} //end handleMessages()
 	
 	/**
-	 * 
-	 * @param cluster
+	 * Call the receiveMessage() method to all aproprieted sensors nodes in "cluster", according the case (ACS = true OR ACS = false)
+	 * @param cluster 
 	 */
 	private void receiveMessageToAllInvolvedSensors(ArrayList2d<Double, SimpleNode> cluster) {
 		for (int line = 0; line < cluster.getNumRows(); line++) // For each line (group/cluster) from cluster // (6)
@@ -647,6 +658,7 @@ public class SinkNode extends SimpleNode
 		if (curCluster == null || newCluster == null || curCluster.getNumRows() == 0 || newCluster.getNumRows() == 0) {
 			return -1; // Error code (1)
 		}
+		System.out.println("|newCluster.fracDim("+0+")["+newCluster.getKey(0)+"] - curCluster.fracDim("+0+")["+curCluster.getKey(0)+"]| = "+Math.abs(newCluster.getKey(0) - curCluster.getKey(0)));
 		minDiff = Math.abs(newCluster.getKey(0) - curCluster.getKey(0));
 		minLine = 0;
 		for (int line = 1; line < curCluster.getNumRows(); line++) {
@@ -657,7 +669,7 @@ public class SinkNode extends SimpleNode
 			}
 		}
 		if (minDiff > FDthreshold) {
-			System.out.println("minDiff = "+minDiff+" minLine = "+minLine+" curCluster.fracDim = "+curCluster.getKey(minLine)+" newCluster.fracDim = "+newCluster.getKey(minLine));
+			System.out.println("\n  Line = "+minLine+" minDiff = "+minDiff+" curCluster.fracDim = "+curCluster.getKey(minLine)+" newCluster.fracDim = "+newCluster.getKey(minLine));
 			return -2; // Error code (2)
 		}
 		return minLine;
