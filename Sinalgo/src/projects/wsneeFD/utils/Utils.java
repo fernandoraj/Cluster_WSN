@@ -16,7 +16,7 @@ public class Utils {
 	 * Print debug messages only if the <code>inDebugMode</code> static variable is <code>true</code>.
 	 * @param message Message to be printed in the console.
 	 */
-	public static void printForDebug(String message) {
+	public static void printForDebug(Object message) {
 		if (inDebugMode) {
 			System.out.println("inDebugMode: " + message);
 		}
