@@ -190,13 +190,14 @@ public class SinkNode extends SimpleNode
 		else {
 			System.out.println("Using Representative Nodes approach...  ACS = false");
 		}
+		System.out.println("The FDmode is "+FDmodeOn);
 		System.out.println("The sensor delay is "+SimpleNode.limitPredictionError);
 		System.out.println("The cluster delay is "+SimpleNode.maxErrorsPerCluster);
 		for (int numTypes = 0; numTypes < thresholdErrors.length; numTypes++) {
 			System.out.println("The threshold of error (max error) is "+thresholdErrors[numTypes]+" for data type (SensedType) in position "+dataSensedTypes[numTypes]);
 		}
-		System.out.println("The size of time slot is "+sizeTimeSlot);
-		System.out.println("The size of time slot for merge is "+sizeTimeSlotForMerge);
+		System.out.println("The size of time slot (initial) is "+sizeTimeSlot);
+		System.out.println("The size of time slot (for merge) is "+sizeTimeSlotForMerge);
 		for (int numTypes = 0; numTypes < spacialThresholdErrors.length; numTypes++) {
 			System.out.println("The spacial threshold of error (spacialThresholdError) is "+spacialThresholdErrors[numTypes]+" for data type (SensedType) in position "+dataSensedTypes[numTypes]);
 		}
@@ -300,12 +301,12 @@ public class SinkNode extends SimpleNode
 						if (FDmodeOn) { // Se estiver no modo Dimensão Fractal!
 							
 							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
-							
-							if (Global.currentTime >= 556.0) {
+/*
+							if (Global.currentTime >= 228.0) {
 								System.out.println(" * * * BEGIN DEBUG * * * ");
 							}
-							
-							System.out.println("\nSource Node from Message Received: NodeID = "+currentNode.ID);
+*/							
+							Utils.printForDebug("\nSource Node from Message Received: NodeID = "+currentNode.ID);
 							
 							ArrayList2d<Double, SimpleNode> cloneCluster = nodeGroups.clone2(); // (1)
 							insertNewNodeInClusters(cloneCluster, currentNode); // (2)
@@ -319,11 +320,11 @@ public class SinkNode extends SimpleNode
 								cloneCluster.setKey(i, FD3BigInt.calculatesFractalDimensions(cloneCluster.get(i)));
 //							    System.out.println("Fractal Dimension of cluster "+i+" = "+cloneCluster.getKey(i));
 							}
-							System.out.println("Aqui: nodeGroups:");
-							System.out.println(nodeGroups);
+							Utils.printForDebug("Aqui: nodeGroups:");
+							Utils.printForDebug(nodeGroups);
 							
-							System.out.println("\nDepois de calcular FD: cloneCluster:");
-							System.out.println(cloneCluster);
+							Utils.printForDebug("\nDepois de calcular FD: cloneCluster:");
+							Utils.printForDebug(""+cloneCluster);
 							
 							// TEORICAMENTE, ESTÁ FALTANDO APENAS OS PASSOS 4), 5), 6), 7) E 8):
 							/* 4) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
@@ -338,7 +339,7 @@ public class SinkNode extends SimpleNode
 							int codeMinFDDiff = minimumFractalDimensionDiff(nodeGroups, cloneCluster); // (4)
 							
 							if (codeMinFDDiff < 0) { // If any error happens in the calculation of the minimum difference of Fractal Dimension
-								System.out.println("\nError in minimumFractalDimensionDiff: "+codeMinFDDiff);
+								Utils.printForDebug("\nError in minimumFractalDimensionDiff: "+codeMinFDDiff);
 								
 								cloneCluster = new ArrayList2d<Double, SimpleNode>(); // Reboot the cloneCluster object
 								
@@ -355,8 +356,8 @@ public class SinkNode extends SimpleNode
 										cloneCluster.transferRowTo(0, nodeGroups); // Returns the cluster removed in (*) to nodeGroups
 									}
 									
-									System.out.println("nodeGroups 3:");
-									System.out.println(nodeGroups);
+									Utils.printForDebug("nodeGroups 3:");
+									Utils.printForDebug(""+nodeGroups);
 
 									Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
 
@@ -366,35 +367,46 @@ public class SinkNode extends SimpleNode
 							} // end if (codeMinFDDiff < 0)
 							else { // If the "codeMinFDDiff" represents the line of cluster with the minimum difference of Fractal Dimension
 								int nodeGroupsSizeBefore = nodeGroups.getNumRows();
+//								System.out.println("\nAntes: nodeGroupsSizeBefore = "+nodeGroupsSizeBefore+" codeMinFDDiff = "+codeMinFDDiff);
 								
-								System.out.println("\nSearching and removing node from old cluster...");
+								Utils.printForDebug("\nSearching and removing node from old cluster...");
 								int oldCLuster = searchAndRemoveNodeFromCluster(nodeGroups, currentNode); // Remove the old node from the old cluster (5)
-								System.out.println("Done... Node removed from cluster number "+oldCLuster);
+								Utils.printForDebug("Done... Node removed from cluster number "+oldCLuster);
+								
+//								System.out.println("\nDurante: nodeGroupsSizeBefore = "+nodeGroupsSizeBefore+" nodeGroups.getNumRows() = "+nodeGroups.getNumRows()+" codeMinFDDiff = "+codeMinFDDiff+" oldCLuster = "+oldCLuster);
 								
 								// If the "searchAndRemoveNodeFromCluster()" removed a line from nodeGroups and this line (removed) is above the other (codeMinFDDiff)
 								if (nodeGroups.getNumRows() < nodeGroupsSizeBefore && codeMinFDDiff >= oldCLuster) { 
 									codeMinFDDiff--; // Then the "codeMinFDDiff" value must have "shifted" one "position"(codeMinFDDiff = codeMinFDDiff - 1;)
 								}
 								
-								System.out.println("\nInserting new node in new cluster ...");
+//								System.out.println("\nDepois de if (nodeGroups.getNumRows() < nodeGroupsSizeBefore ... ): codeMinFDDiff = "+codeMinFDDiff+" nodeGroups.getNumRows() = "+nodeGroups.getNumRows());
+								
+								Utils.printForDebug("\nInserting new node in new cluster ...");
 								insertNewNodeInClusterLine(nodeGroups, currentNode, codeMinFDDiff); // Insert the new received node in the new correct line in cluster (6)
-								System.out.println("New node inserted in cluster number "+codeMinFDDiff);
+								Utils.printForDebug("New node inserted in cluster number "+codeMinFDDiff);
 								
 								nodeGroups.setKey(codeMinFDDiff, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(codeMinFDDiff))); // (7)
-								System.out.println("\nNew Fractal Dimension of cluster "+codeMinFDDiff+" from nodeGroups is "+nodeGroups.getKey(codeMinFDDiff));
-							    System.out.println("Fractal Dimension of cluster Number = "+codeMinFDDiff+" CHOSEN from cloneCluster is "+cloneCluster.getKey(codeMinFDDiff));
+								Utils.printForDebug("\nNew Fractal Dimension of cluster "+codeMinFDDiff+" from nodeGroups is "+nodeGroups.getKey(codeMinFDDiff));
+								Utils.printForDebug("Fractal Dimension of cluster Number = "+codeMinFDDiff+" CHOSEN from cloneCluster is "+cloneCluster.getKey(codeMinFDDiff));
 
-								System.out.println("\ncloneCluster:");
-								System.out.println(cloneCluster);
+							    Utils.printForDebug("\ncloneCluster 1:");
+							    Utils.printForDebug(""+cloneCluster);
 
-								System.out.println("nodeGroups 1:");
-								System.out.println(nodeGroups);
+							    Utils.printForDebug("nodeGroups 1:");
+							    Utils.printForDebug(""+nodeGroups);
 
 								//Descartar cloneCluster!!! => 
 								cloneCluster = new ArrayList2d<Double, SimpleNode>(); //null;
 
 								triggerSplitFromCluster(nodeGroups, cloneCluster, codeMinFDDiff); 
-
+/*
+								System.out.println("nodeGroups 1,5: Depois do triggerSplitFromCluster com codeMinFDDiff = "+codeMinFDDiff);
+								System.out.println(nodeGroups);
+								
+								System.out.println("\ncloneCluster 1,5:");
+								System.out.println(cloneCluster);
+*/								
 								classifyNodesByAllParams(cloneCluster); // Investigar... (8.1)
 								setClustersFromNodes(cloneCluster); // Investigar... (8.2)
 								
@@ -403,10 +415,10 @@ public class SinkNode extends SimpleNode
 								if (cloneCluster != null) {
 									cloneCluster.transferRowTo(0, nodeGroups); //unifyClusters(nodeGroups, cloneCluster);
 								}
-								
+/*
 								System.out.println("nodeGroups 2:");
 								System.out.println(nodeGroups);
-
+*/
 								Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
 
 								cloneCluster = null;
@@ -570,8 +582,8 @@ public class SinkNode extends SimpleNode
 								    nodeGroups.setKey(i, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(i)));
 //								    System.out.println("Fractal Dimension of cluster "+i+" = "+nodeGroups.getKey(i));
 								}
-								System.out.println("Tehee");
-								System.out.println(nodeGroups);
+//								System.out.println("Tehee");
+								Utils.printForDebug(nodeGroups);
 							}
 //							printClusterArray(nodeGroups);
 							
@@ -658,18 +670,18 @@ public class SinkNode extends SimpleNode
 		if (curCluster == null || newCluster == null || curCluster.getNumRows() == 0 || newCluster.getNumRows() == 0) {
 			return -1; // Error code (1)
 		}
-		System.out.println("|newCluster.fracDim("+0+")["+newCluster.getKey(0)+"] - curCluster.fracDim("+0+")["+curCluster.getKey(0)+"]| = "+Math.abs(newCluster.getKey(0) - curCluster.getKey(0)));
+		Utils.printForDebug("|newCluster.fracDim("+0+")["+newCluster.getKey(0)+"] - curCluster.fracDim("+0+")["+curCluster.getKey(0)+"]| = "+Math.abs(newCluster.getKey(0) - curCluster.getKey(0)));
 		minDiff = Math.abs(newCluster.getKey(0) - curCluster.getKey(0));
 		minLine = 0;
 		for (int line = 1; line < curCluster.getNumRows(); line++) {
-			System.out.println("|newCluster.fracDim("+line+")["+newCluster.getKey(line)+"] - curCluster.fracDim("+line+")["+curCluster.getKey(line)+"]| = "+Math.abs(newCluster.getKey(line) - curCluster.getKey(line)));
+			Utils.printForDebug("|newCluster.fracDim("+line+")["+newCluster.getKey(line)+"] - curCluster.fracDim("+line+")["+curCluster.getKey(line)+"]| = "+Math.abs(newCluster.getKey(line) - curCluster.getKey(line)));
 			if (Math.abs(newCluster.getKey(line) - curCluster.getKey(line)) < minDiff) {
 				minLine = line;
 				minDiff = Math.abs(newCluster.getKey(line) - curCluster.getKey(line));
 			}
 		}
 		if (minDiff > FDthreshold) {
-			System.out.println("\n  Line = "+minLine+" minDiff = "+minDiff+" curCluster.fracDim = "+curCluster.getKey(minLine)+" newCluster.fracDim = "+newCluster.getKey(minLine));
+			Utils.printForDebug("\n  Line = "+minLine+" minDiff = "+minDiff+" curCluster.fracDim = "+curCluster.getKey(minLine)+" newCluster.fracDim = "+newCluster.getKey(minLine));
 			return -2; // Error code (2)
 		}
 		return minLine;
@@ -1076,7 +1088,7 @@ public class SinkNode extends SimpleNode
 						col++;
 					} // end while ((col < tempCluster.getNumCols(line)) && (tempCluster.get(line, col).batLevel == firstWsnMsgRespInLine.batLevel) && (tempCluster.get(line, col).hopsToTarget < firstWsnMsgRespInLine.hopsToTarget) )
 					if (sameBatLevel) {
-						changePositionInLine(line, minIndexNumHopsToSink);
+						changePositionInLine(tempCluster, line, minIndexNumHopsToSink);
 					} // end if (sameBatLevel)
 				} // end if (tempCluster.get(line, 0) != null)
 			} // end for (int line=0; line < tempCluster.getNumRows(); line++)
@@ -1167,8 +1179,8 @@ public class SinkNode extends SimpleNode
 	 * @param line 
 	 * @param index 
 	 */
-	private void changePositionInLine(int line, int index) {
-		nodeGroups.move(line, index, 0);
+	private void changePositionInLine(ArrayList2d<Double, SimpleNode> cluster, int line, int index) {
+		cluster.move(line, index, 0);
 	} // end changeMessagePositionInLine(int line, int index)
 	
 	/**
