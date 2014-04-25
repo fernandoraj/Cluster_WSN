@@ -34,7 +34,7 @@ import sinalgo.tools.Tools;
  * In our simulation, this node is also able to do in-networking data prediction using 
  * regression models.
  * @author Fernando Rodrigues / Alex Lacerda
- *
+ * For RMSE calculation, search for: Global.predictionsCount and Global.squaredError
  */
 public class SimpleNode extends Node 
 {
@@ -42,7 +42,9 @@ public class SimpleNode extends Node
 	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"<p>
 	 * [Eng] Indicates the size of Sliding Window from sensor readings to be send to sink node when there is a "novelty".
 	 */
-	protected static int slidingWindowSize = 10; // According ADAGA-P* = 7
+	protected static int slidingWindowSize = 10; // According ADAGA-P* = 7 	// This value would be, at least, 10 ^ N, N = quantity of dimensions from data, 
+																			// i.e., number of dimensions from "dataSensedTypes", e.g., if dataSensedTypes
+																			// = {4,5} => N = 2 => sizeTimeSlot >= 10^2 = 100.
 
 	/**
 	 * Número máximo(limite) de predições dos erros de qualquer nó de sensor - Isso também pode ser expressado em percentual(double) do total de timeslot.<p> 
@@ -1095,7 +1097,11 @@ public class SimpleNode extends Node
 	 */
 	protected void triggerPredictions(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors)
 	{
-
+/*
+		if (Global.currentTime >= 448.0) { // Round to initiate the Debug Mode
+			System.out.println(" * * * BEGIN DEBUG * * * ");
+		}
+*/
 		DataRecord dataRecord = getData(this, dataSensedTypes);
 		
 		if (dataRecord != null) {
@@ -1111,7 +1117,7 @@ public class SimpleNode extends Node
 
 				//TODO: TriggerPredictions -> isValuePredictInValueReading
 				//for
-				boolean[] hitsInThisReading = arePredictValuesInReadingValues(values, predictionValues, maxErrors);
+				boolean[] hitsInThisReading = arePredictValuesInReadingValues(values, predictionValues, maxErrors); // RMSE Calculation in this method
 				for (int cont = 0; cont < hitsInThisReading.length; cont++) {
 					if (!hitsInThisReading[cont]) {
 						numPredictionErrorsPerType[cont]++;
@@ -1368,7 +1374,7 @@ public class SimpleNode extends Node
 
 				// Code inserted in else block according to Prof. Everardo request in 25/09/2013
 
-				Global.predictionsCount++;
+				Global.predictionsCount++; // RMSE
 				this.predictionsCount++;
 
 				Global.squaredError += Math.pow((predictionValues[numTypes] - values[numTypes]), 2); // RMSE
