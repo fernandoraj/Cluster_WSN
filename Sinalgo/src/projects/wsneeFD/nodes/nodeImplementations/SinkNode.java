@@ -302,11 +302,12 @@ public class SinkNode extends SimpleNode
 							
 							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
 /*
-							if (Global.currentTime >= 228.0) {
-								System.out.println(" * * * BEGIN DEBUG * * * ");
+							if (Global.currentTime >= 159.0 && currentNode.ID == 15) {
+								System.out.println("nodeGroups: \n"+nodeGroups);
 							}
 */							
 							Utils.printForDebug("\nSource Node from Message Received: NodeID = "+currentNode.ID);
+//							System.out.println("\nSource Node from Message Received: NodeID = "+currentNode.ID+" in Round "+Global.currentTime);
 							
 							ArrayList2d<Double, SimpleNode> cloneCluster = nodeGroups.clone2(); // (1)
 							insertNewNodeInClusters(cloneCluster, currentNode); // (2)
@@ -324,7 +325,7 @@ public class SinkNode extends SimpleNode
 							Utils.printForDebug(nodeGroups);
 							
 							Utils.printForDebug("\nDepois de calcular FD: cloneCluster:");
-							Utils.printForDebug(""+cloneCluster);
+							Utils.printForDebug(cloneCluster);
 							
 							// TEORICAMENTE, ESTÁ FALTANDO APENAS OS PASSOS 4), 5), 6), 7) E 8):
 							/* 4) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
