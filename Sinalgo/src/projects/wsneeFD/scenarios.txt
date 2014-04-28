@@ -1,4 +1,31 @@
 #Intel Lab Data Scenario
+             
+(Run Configurations)
+
+Name: <Run wsn>
+
+Project: <Sinalgo>
+
+Main class: sinalgo.Run
+
+Arguments: -project <wsn> -gen 54 <wsn>:SimpleNode PositionFile (<Caminho para o arquivo "mote_locs_formatado.txt">mote_locs_formatado.txt) 
+             -gen 1 <wsn>:SinkNode Line2D  
+              -overwrite  SimulationName=WsnClusterWithIntelLabsDataset
+              
+(Debug Configurations)            
+             
+Name: <Debug wsneeFD>
+
+Project: <Sinalgo>
+
+Main class: sinalgo.runtime.Main
+
+Arguments: -project wsneeFD -gen 54 wsneeFD:SimpleNode PositionFile (<Caminho para o arquivo "mote_locs_formatado.txt">mote_locs_formatado.txt) 
+             -gen 1 wsneeFD:SinkNode Line2D  
+              -overwrite  SimulationName=WsnEEClusterWithIntelLabsDataset
+              
+
+[Old configuration]:
 -project wsn -gen 54 wsn:SimpleNode PositionFile (data\mote_locs_formatado.txt) 
              -gen 1 wsn:SinkNode Random  
              -overwrite dimX=40 dimY=30
