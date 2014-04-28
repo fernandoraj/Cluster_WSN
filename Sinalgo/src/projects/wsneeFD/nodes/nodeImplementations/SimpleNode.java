@@ -233,6 +233,12 @@ public class SimpleNode extends Node
 	 */
 	private double initialErrorRound;
 	
+	/**
+	 * Salva o round(ciclo) em que o último TriggerPrediction ocorreu.<p>
+	 * [Eng]Saves the round in which the last TriggerPrediction occurred.
+	 */
+	private double lastRoundTriggered;
+	
 	private boolean validPredictions = true;
 	
 	private boolean canMakePredictions = false; // variavel para saber se o node pode fazer predições;
@@ -414,7 +420,7 @@ public class SimpleNode extends Node
 					System.out.println("* * * ID = 39 OR ID = 15 ! ! !");
 				}
 */				
-				// TODO:
+				//
 				if (wsnMsgResp.typeMsg == 5) {
 					//System.out.println("DirectMessageTimer(); received by the node "+this.ID+" from node "+wsnMsgResp.source.ID+" in Round = "+Global.currentTime);
 					validPredictions = false;
@@ -485,8 +491,7 @@ public class SimpleNode extends Node
 			errorsInThisCluster = 0; // Então zera a quantidade de erros deste cluster
 		}
 */		
-		//TODO:
-		if (errorsInThisCluster == maxErrorsPerCluster) // Send "toPorUmaMessage" to all sensors in this cluster
+		if (errorsInThisCluster == maxErrorsPerCluster) // Send "toPorUmaMessage" (minusOne) to all sensors in this cluster
 		{
 			this.minusOne = true; // Set the flag "minusOne" from this sensor (ClusterHead) to true, indicates that the next prediction error should not consider the RMSE.
 			// Envia uma mensagem para cada um dos nós do cluster atual para que os mesmos saibam que falta um erro (miss) para atingir o limite de erros deste cluster (sensores devem descartar acúmulo de RMSE)
@@ -513,7 +518,7 @@ public class SimpleNode extends Node
 
 			wsnMsgResp.target = null; // wsnMsgResp.target = SinkNode; || wsnMsgResp.target = null; || wsnMsgResp.target = Tools.getNodeByID(55);
 			
-			// TODO: Disparar uma mensagem para todos os nós do mesmo cluster para que o atributo "validPredictions" torne-se falso até que o sink envie nova
+			// Disparar uma mensagem para todos os nós do mesmo cluster para que o atributo "validPredictions" torne-se falso até que o sink envie nova
 			// mensagem com novos coeficientes e torne o atr. "validPredictions" igual a true.
 			validPredictions = false;
 			
@@ -694,10 +699,11 @@ public class SimpleNode extends Node
 		Global.sensorReadingsCount++; // Increments the global count of sensor readings
 		numTotalSensorReadings++; // Increments the local count of sensor readings
 /*
-		if (Global.currentTime > 100 && numTotalSensorReadings > Global.currentTime + 1) { // TODO
+		if (Global.currentTime > 100 && numTotalSensorReadings > Global.currentTime + 1) {
 			System.out.println(" * * * Sensor ID = "+this.ID+": numTotalSensorReadings (performSensorReading) = "+numTotalSensorReadings+" and Global.currentTime = "+Global.currentTime);
 		}
 */
+//		System.out.println("NoID: "+this.ID+" making reading in Round = "+Global.currentTime);
 		if (sensorReadingsQueue != null && sensorReadingsQueue.isEmpty())
 		{
 			loadSensorReadings();
@@ -982,7 +988,7 @@ public class SimpleNode extends Node
 			this.ownTimeSlot = wsnMessage.sizeTimeSlot;
 			
 			windowSize = slidingWindowSize;
-			validPredictions = true; // TODO:
+			validPredictions = true;
 			//System.out.println("nodeID = "+this.ID+": validPredictions TRUE in Round = "+Global.currentTime);
 			triggerPredictions(wsnMessage.dataSensedTypes, coefsA, coefsB, maxErrors);
 		}
@@ -1024,7 +1030,6 @@ public class SimpleNode extends Node
  * Data type       Data         Hora       Round ID  Temp   Hum    Lum   Volt
  */
 		
-		// TODO:
 		String sensorReading = currentNode.performSensorReading(); 
 		
 		if (sensorReading != null && dataSensedTypes != null && dataSensedTypes.length > 0)
@@ -1097,11 +1102,12 @@ public class SimpleNode extends Node
 	 */
 	protected void triggerPredictions(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors)
 	{
-
-		if (Global.currentTime >= 2752.0) { // Round to initiate the Debug Mode
-			System.out.println(" * * * BEGIN DEBUG * * * ");
+		// TODO: Alterar número do round desejado
+/*
+		if (Global.currentTime >= 140.0) { // Round to initiate the Debug Mode
+//			System.out.println(" * Debug On * ");
 		}
-
+*/
 		DataRecord dataRecord = getData(this, dataSensedTypes);
 		
 		if (dataRecord != null) {
@@ -1115,7 +1121,7 @@ public class SimpleNode extends Node
 				
 				lastRoundRead = dataRecord.round;
 
-				//TODO: TriggerPredictions -> isValuePredictInValueReading
+				//TriggerPredictions -> isValuePredictInValueReading
 				//for
 				boolean[] hitsInThisReading = arePredictValuesInReadingValues(values, predictionValues, maxErrors); // RMSE Calculation in this method
 				for (int cont = 0; cont < hitsInThisReading.length; cont++) {
@@ -1145,16 +1151,18 @@ public class SimpleNode extends Node
 
 								((SimpleNode)nodes[i]).addDataRecordItens(nodeData);
 								
-								double[] sensorValues = nodeData.values;
-								
-								for (int cont = 0; cont < sensorValues.length; cont++) {
-									// Code inserted in else block according to Prof. Everardo request in 25/09/2013
-									Global.predictionsCount++;
-									((SimpleNode)nodes[i]).predictionsCount++;
-		
-									Global.squaredError += Math.pow((predictionValues[cont] - sensorValues[cont]), 2); // Used for RMSE calculation
-									((SimpleNode)nodes[i]).squaredError += Math.pow((predictionValues[cont] - sensorValues[cont]), 2);
-									// End of Code inserted		
+								if (nodeData != null && nodeData.values != null) {
+									double[] sensorValues = nodeData.values;
+									
+									for (int cont = 0; cont < sensorValues.length; cont++) {
+										// Code inserted in else block according to Prof. Everardo request in 25/09/2013
+										Global.predictionsCount++;
+										((SimpleNode)nodes[i]).predictionsCount++;
+			
+										Global.squaredError += Math.pow((predictionValues[cont] - sensorValues[cont]), 2); // Used for RMSE calculation
+										((SimpleNode)nodes[i]).squaredError += Math.pow((predictionValues[cont] - sensorValues[cont]), 2);
+										// End of Code inserted		
+									}
 								}
 /*
 								System.out.print("\t");
@@ -1230,7 +1238,7 @@ public class SimpleNode extends Node
 							addThisNodeToPath(wsnMsgResp);
 							
 							wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
-							// TODO:
+
 							DirectMessageTimer timer = new DirectMessageTimer(wsnMsgResp, clusterHead); // Envia uma mensagem diretamente para o 
 																										// ClusterHead deste nó sensor
 							timer.startRelative(1, this);
@@ -1320,12 +1328,13 @@ public class SimpleNode extends Node
 	 */
 	public final void triggerPrediction(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors)
 	{
-		
 		if (canMakePredictions) {
-			// TODO:
 			//System.out.println("    SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions ="+canMakePredictions);
 			if (validPredictions) {
-				triggerPredictions(dataSensedTypes, coefsA, coefsB, maxErrors);
+				if (Global.currentTime > lastRoundTriggered) { // Ensures that the same prediction will not be executed more than once in the same round for the same sensor
+					lastRoundTriggered = Global.currentTime;
+					triggerPredictions(dataSensedTypes, coefsA, coefsB, maxErrors);
+				}
 			}
 		}
 /*
@@ -1390,7 +1399,7 @@ public class SimpleNode extends Node
 			{
 				Global.numberOfMissesInThisRound++;
 				hits[numTypes] = false;
-				//TODO: isValuePredictInValueReading
+				// isValuePredictInValueReading
 				if (!minusOne) {
 		
 					Global.predictionsCount++;
