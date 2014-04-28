@@ -1097,11 +1097,11 @@ public class SimpleNode extends Node
 	 */
 	protected void triggerPredictions(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors)
 	{
-/*
-		if (Global.currentTime >= 448.0) { // Round to initiate the Debug Mode
+
+		if (Global.currentTime >= 2752.0) { // Round to initiate the Debug Mode
 			System.out.println(" * * * BEGIN DEBUG * * * ");
 		}
-*/
+
 		DataRecord dataRecord = getData(this, dataSensedTypes);
 		
 		if (dataRecord != null) {
