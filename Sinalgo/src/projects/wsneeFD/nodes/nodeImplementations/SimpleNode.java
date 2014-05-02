@@ -50,13 +50,13 @@ public class SimpleNode extends Node
 	 * Número máximo(limite) de predições dos erros de qualquer nó de sensor - Isso também pode ser expressado em percentual(double) do total de timeslot.<p> 
 	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	protected static final double limitPredictionError = 5; // SensorDelay
+	protected static final double limitPredictionError = 1; //5; // SensorDelay
 	
 	/**
 	 *  Número máximo(limite) de erro dos nós dos sensores por cluster -  Sobre o limite, o cluster head comunica-se com o sink.<p>
 	 * [Eng] Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink.
 	 */
-	public static final int maxErrorsPerCluster = 5; // ClusterDelay
+	public static final int maxErrorsPerCluster = 1; // ClusterDelay
 	
 	/**
 	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"<p>
