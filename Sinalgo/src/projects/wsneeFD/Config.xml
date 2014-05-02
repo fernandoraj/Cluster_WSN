@@ -257,7 +257,7 @@
 		<!--  Our Own Settings                                                      -->
 		<!--***********************************************************************-->
 		<ExternalFilesPath>
-			<SensorReadingsFilePath value="data/sensor_readings/data_0.0_percent_min_20000_2.0_filtrated_by_DATE.txt"/> <!-- file containing the sensor readings from the Intel Lab WSN -->
+			<SensorReadingsFilePath value="data/sensor_readings/data_0.0_percent_min_20000_2.0_filtrated_by_DATE-ErrorSens15.txt"/> <!-- file containing the sensor readings from the Intel Lab WSN -->
 		</ExternalFilesPath>
 		
 		<SensorReadingsLoadBlockSize value = "20000"/> <!-- amount of sensor readings (file lines) to be loaded from the file to the memory of the node -->
