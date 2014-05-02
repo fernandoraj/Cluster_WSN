@@ -191,6 +191,9 @@ public class SinkNode extends SimpleNode
 			System.out.println("Using Representative Nodes approach...  ACS = false");
 		}
 		System.out.println("The FDmode is "+FDmodeOn);
+		if (FDmodeOn) {
+			System.out.println("   The FDthreshold is "+FDthreshold);
+		}
 		System.out.println("The sensor delay is "+SimpleNode.limitPredictionError);
 		System.out.println("The cluster delay is "+SimpleNode.maxErrorsPerCluster);
 		for (int numTypes = 0; numTypes < thresholdErrors.length; numTypes++) {
