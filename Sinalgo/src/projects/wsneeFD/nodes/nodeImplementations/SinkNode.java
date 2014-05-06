@@ -123,9 +123,9 @@ public class SinkNode extends SimpleNode
 	 */
 	private static ArrayList2d<Double, SimpleNode> nodeGroups;
 	
-	private ArrayList2d<Double, SimpleNode> newCluster;
+	private static ArrayList2d<Double, SimpleNode> newCluster;
 	
-	private ArrayList2d<Double, SimpleNode> nodesToReceiveDataReading;
+	private static ArrayList2d<Double, SimpleNode> nodesToReceiveDataReading;
 	
 	/**
 	 * "Lista Negra" é uma lista de mensagens (nós de origem) já recebidos pelo sink (e removido os nodesToReceiveDataReading) <p>
@@ -432,14 +432,16 @@ public class SinkNode extends SimpleNode
 						else {
 							// COLOCAR AS PRÓXIMAS LINHAS (MARCADAS*) PARA DENTRO DESTE ELSE!
 // *DAQUI...
-							if (Global.currentTime >= 100 && Global.currentTime <= 110 || Global.currentTime >= 999.0) {
+							if (Global.currentTime >= 100 && Global.currentTime <= 200 || Global.currentTime >= 999.0) {
 								System.out.println("Round = "+Global.currentTime+"\nnodeGroups: \n"+nodeGroups);
 							}
 
 							int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // (1)
 							if (lineFromCluster >= 0) {
+								nodesToReceiveDataReading=ensuresArrayList2d(nodesToReceiveDataReading);
 //								expectedNumberOfSensors += sendSenseRequestMessageToAllSensorsInCluster(nodeGroups, lineFromCluster);
-								triggerSplitFromCluster(nodeGroups, nodesToReceiveDataReading, lineFromCluster); // (2)
+								//triggerSplitFromCluster(nodeGroups, nodesToReceiveDataReading, lineFromCluster); // (2)
+								nodeGroups.transferRowTo(lineFromCluster, nodesToReceiveDataReading);
 							}
 							newCluster = ensuresArrayList2d(newCluster);
 							
