@@ -243,7 +243,8 @@ public class SimpleNode extends Node
 	
 	private boolean canMakePredictions = false; // variavel para saber se o node pode fazer predições;
 	
-	private boolean minusOne = false; // Flag to set that the ClusterHead from this node will send "news" to sink in the next error (miss), so hereafter the nodes must don't compute the RMSE to error case
+	private boolean minusOne = false; // Flag to set that the ClusterHead from this node will send "news" 
+	//to sink in the next error (miss), so hereafter the nodes must don't compute the RMSE to error case
 
 	public SimpleNode() {
 		super();
@@ -493,8 +494,10 @@ public class SimpleNode extends Node
 */		
 		if (errorsInThisCluster == maxErrorsPerCluster) // Send "toPorUmaMessage" (minusOne) to all sensors in this cluster
 		{
-			this.minusOne = true; // Set the flag "minusOne" from this sensor (ClusterHead) to true, indicates that the next prediction error should not consider the RMSE.
-			// Envia uma mensagem para cada um dos nós do cluster atual para que os mesmos saibam que falta um erro (miss) para atingir o limite de erros deste cluster (sensores devem descartar acúmulo de RMSE)
+			this.minusOne = true; // Set the flag "minusOne" from this sensor (ClusterHead) to true, 
+			// indicates that the next prediction error should not consider the RMSE.
+			// Envia uma mensagem para cada um dos nós do cluster atual para que os mesmos saibam que falta um erro (miss) 
+			// para atingir o limite de erros deste cluster (sensores devem descartar acúmulo de RMSE)
 			for (int i = 0; i < this.myCluster.members.size(); i++) {
 				
 				SimpleNode targetNode = this.myCluster.members.get(i);
@@ -1411,6 +1414,10 @@ public class SimpleNode extends Node
 			}
 			
 		}
+/*
+		System.out.print("\t");
+		printNodeRMSE();
+*/
 		return hits;
 	} // end arePredictValuesInReadingValues(double[] values, double[] predictionValues, double maxError)
 	
