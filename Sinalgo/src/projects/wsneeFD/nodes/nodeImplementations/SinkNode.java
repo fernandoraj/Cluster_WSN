@@ -19,9 +19,6 @@ import sinalgo.nodes.messages.Inbox;
 import sinalgo.nodes.messages.Message;
 import sinalgo.runtime.Global;
 import sinalgo.runtime.Runtime;
-//import java.util.Iterator;
-//import sinalgo.nodes.timers.Timer;
-//import sinalgo.nodes.TimerCollection;
 
 public class SinkNode extends SimpleNode 
 {
@@ -43,13 +40,13 @@ public class SinkNode extends SimpleNode
 	 * Indica que o sink node sinaliza para todos os outros nós que deve ficar continuamente com sensoriamento (usando Cluster Heads) <p>
 	 * [Eng] Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = true; // ACS: false = Representative Nodes; true = Cluster Heads
+	private boolean allSensorsMustContinuoslySense = false; // ACS: false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Indica quando o modo de clusterização usando Dimensão Fractal está ligado (ativo = true)
 	 * [Eng] Indicates whether the Fractal Dimension clustering is in ON mode (active = true)
 	 */
-	private final boolean FDmodeOn = true;
+	private final boolean FDmodeOn = false;
 
 	/**
 	 * Indica o limiar de diferença de Dimensão Fractal mínima entre duas medições de um mesmo cluster (antes e depois da adição dos novos dados) para que o mesmo seja válido (não seja considerado "ruído")
@@ -304,11 +301,11 @@ public class SinkNode extends SimpleNode
 						if (FDmodeOn) { // Se estiver no modo Dimensão Fractal!
 							
 							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
-/*
-							if (Global.currentTime >= 159.0 && currentNode.ID == 15) {
+
+							if (Global.currentTime >= 999.0) {
 								System.out.println("nodeGroups: \n"+nodeGroups);
 							}
-*/							
+							
 							Utils.printForDebug("\nSource Node from Message Received: NodeID = "+currentNode.ID);
 //							System.out.println("\nSource Node from Message Received: NodeID = "+currentNode.ID+" in Round "+Global.currentTime);
 							
@@ -435,6 +432,9 @@ public class SinkNode extends SimpleNode
 						else {
 							// COLOCAR AS PRÓXIMAS LINHAS (MARCADAS*) PARA DENTRO DESTE ELSE!
 // *DAQUI...
+							if (Global.currentTime >= 100 && Global.currentTime <= 110 || Global.currentTime >= 999.0) {
+								System.out.println("Round = "+Global.currentTime+"\nnodeGroups: \n"+nodeGroups);
+							}
 
 							int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // (1)
 							if (lineFromCluster >= 0) {
@@ -478,6 +478,10 @@ public class SinkNode extends SimpleNode
 							
 							unifyClusters(nodeGroups, newCluster); // (7) // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
 							Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
+							
+							if (Global.currentTime >= 100 && Global.currentTime <= 110 || Global.currentTime >= 200.0) {
+								System.out.println("After unifyClusters!\nnodeGroups: \n"+nodeGroups);
+							}
 							
 							// TODO: Test if it must br done currentNumberOfActiveSensors = (numTotalOfSensors - numMessagesOfLowBatteryReceived)
 							if (((double)numTotalOfSensors / (double)Global.clustersCount) <= minimumOccupancyRatePerCluster) { // Begin MERGE operation
