@@ -43,7 +43,7 @@ public class SimpleNode extends Node
 	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"<p>
 	 * [Eng] Indicates the size of Sliding Window from sensor readings to be send to sink node when there is a "novelty".
 	 */
-	protected static int slidingWindowSize = 7;
+	protected static int slidingWindowSize = 10;
 	
 	/**
 	 * Armazenar o nó que será usado para alcançar a Estação-Base<p>
@@ -140,7 +140,7 @@ public class SimpleNode extends Node
 	 * Máxino (limite) de numero de erros de predições de qualquer nó de sensor - Isso também pode ser expressado em porcentagem (Ex: double - real) do total do slot de tempo<p>
 	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	protected static final int limitPredictionError = 5; // delay (abbrev.)
+	protected static final int limitPredictionError = 1; // delay (abbrev.)
 	
 	protected boolean newCoefsReceived = false; // Indicates whether the current sensor node already received the first (new) coefficients from the sink node
 	
