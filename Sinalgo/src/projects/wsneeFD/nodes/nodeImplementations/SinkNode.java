@@ -40,13 +40,13 @@ public class SinkNode extends SimpleNode
 	 * Indica que o sink node sinaliza para todos os outros nós que deve ficar continuamente com sensoriamento (usando Cluster Heads) <p>
 	 * [Eng] Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
 	 */
-	private boolean allSensorsMustContinuoslySense = false; // ACS: false = Representative Nodes; true = Cluster Heads
+	private final boolean ACS = true; // ACS(allSensorsMustContinuoslySense): false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Indica quando o modo de clusterização usando Dimensão Fractal está ligado (ativo = true)
 	 * [Eng] Indicates whether the Fractal Dimension clustering is in ON mode (active = true)
 	 */
-	private final boolean FDmodeOn = false;
+	private final boolean FDmodeOn = true;
 
 	/**
 	 * Indica o limiar de diferença de Dimensão Fractal mínima entre duas medições de um mesmo cluster (antes e depois da adição dos novos dados) para que o mesmo seja válido (não seja considerado "ruído")
@@ -180,8 +180,8 @@ public class SinkNode extends SimpleNode
 		super();
 		this.setColor(Color.RED);
 		System.out.println("The number of sensors is "+numTotalOfSensors);
-		System.out.println("The status for continuos sense is "+allSensorsMustContinuoslySense);
-		if (allSensorsMustContinuoslySense) {
+		System.out.println("The status for continuos sense is "+ACS);
+		if (ACS) {
 			System.out.println("Using Cluster Head approach... ACS = true");
 		}
 		else {
@@ -191,8 +191,8 @@ public class SinkNode extends SimpleNode
 		if (FDmodeOn) {
 			System.out.println("   The FDthreshold is "+FDthreshold);
 		}
-		System.out.println("The sensor delay is "+SimpleNode.limitPredictionError);
-		System.out.println("The cluster delay is "+SimpleNode.maxErrorsPerCluster);
+		System.out.println("The sensor delay is "+SimpleNode.sensorDelay);
+		System.out.println("The cluster delay is "+SimpleNode.clusterDelay);
 		for (int numTypes = 0; numTypes < thresholdErrors.length; numTypes++) {
 			System.out.println("The threshold of error (max error) is "+thresholdErrors[numTypes]+" for data type (SensedType) in position "+dataSensedTypes[numTypes]);
 		}
@@ -301,11 +301,11 @@ public class SinkNode extends SimpleNode
 						if (FDmodeOn) { // Se estiver no modo Dimensão Fractal!
 							
 							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
-
+/*
 							if (Global.currentTime >= 999.0) {
 								System.out.println("nodeGroups: \n"+nodeGroups);
 							}
-							
+*/							
 							Utils.printForDebug("\nSource Node from Message Received: NodeID = "+currentNode.ID);
 //							System.out.println("\nSource Node from Message Received: NodeID = "+currentNode.ID+" in Round "+Global.currentTime);
 							
@@ -400,6 +400,7 @@ public class SinkNode extends SimpleNode
 								//Descartar cloneCluster!!! => 
 								cloneCluster = new ArrayList2d<Double, SimpleNode>(); //null;
 
+								//TODO: Testar o uso de "triggerSplitFromCluster()"
 								triggerSplitFromCluster(nodeGroups, cloneCluster, codeMinFDDiff); 
 /*
 								System.out.println("nodeGroups 1,5: Depois do triggerSplitFromCluster com codeMinFDDiff = "+codeMinFDDiff);
@@ -432,16 +433,17 @@ public class SinkNode extends SimpleNode
 						else {
 							// COLOCAR AS PRÓXIMAS LINHAS (MARCADAS*) PARA DENTRO DESTE ELSE!
 // *DAQUI...
+/*
 							if (Global.currentTime >= 100 && Global.currentTime <= 200 || Global.currentTime >= 999.0) {
 								System.out.println("Round = "+Global.currentTime+"\nnodeGroups: \n"+nodeGroups);
 							}
-
+*/
 							int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // (1)
 							if (lineFromCluster >= 0) {
 								nodesToReceiveDataReading=ensuresArrayList2d(nodesToReceiveDataReading);
 //								expectedNumberOfSensors += sendSenseRequestMessageToAllSensorsInCluster(nodeGroups, lineFromCluster);
-								//triggerSplitFromCluster(nodeGroups, nodesToReceiveDataReading, lineFromCluster); // (2)
-								nodeGroups.transferRowTo(lineFromCluster, nodesToReceiveDataReading);
+								triggerSplitFromCluster(nodeGroups, nodesToReceiveDataReading, lineFromCluster); // (2)
+								//nodeGroups.transferRowTo(lineFromCluster, nodesToReceiveDataReading);
 							}
 							newCluster = ensuresArrayList2d(newCluster);
 							
@@ -452,39 +454,13 @@ public class SinkNode extends SimpleNode
 							
 							receiveMessageToAllInvolvedSensors(newCluster);
 							
-/*
-							for (int line = 0; line < newCluster.getNumRows(); line++) // For each line (group/cluster) from newCluster // (6)
-							{
-								int numSensors = newCluster.getNumCols(line);
-								Utils.printForDebug("Cluster / Line number = "+line);
-		
-								if (!allSensorsMustContinuoslySense) { // If only the representative nodes must sensing (Representative nodes approach)
-									SimpleNode representativeNode = newCluster.get(line, 0); // Get the Representative Node (or Cluster Head)
-									representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
-									receiveMessage(representativeNode, null);
-								} // end if (!allSensorsMustContinuoslySense)
-								
-								else { // If all nodes in cluters must sensing, and not only the representative nodes (Cluster heads approach)
-									Node chNode = newCluster.get(line, 0); // Cluster Head from the current cluster/line
-									for (int col=0; col < numSensors; col++) // For each colunm from that line in newCluster
-									{
-										SimpleNode currentNode = newCluster.get(line, col); // Get the current node
-										currentNode.myCluster.sizeTimeSlot = sensorTimeSlot; // If all sensor nodes in each cluster must continuosly sense, so the sizeTimeSlot doesn't matter
-										receiveMessage(currentNode, chNode);
-									} // end for (int col=0; col < numSensors; col++)
-								} // end else if (!allSensorsMustContinuoslySense)
-									
-							} // end for (int line=0; line < newCluster.getNumRows(); line++)
-*/
-							
-							
 							unifyClusters(nodeGroups, newCluster); // (7) // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
 							Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
-							
+/*
 							if (Global.currentTime >= 100 && Global.currentTime <= 110 || Global.currentTime >= 200.0) {
 								System.out.println("After unifyClusters!\nnodeGroups: \n"+nodeGroups);
 							}
-							
+*/
 							// TODO: Test if it must br done currentNumberOfActiveSensors = (numTotalOfSensors - numMessagesOfLowBatteryReceived)
 							if (((double)numTotalOfSensors / (double)Global.clustersCount) <= minimumOccupancyRatePerCluster) { // Begin MERGE operation
 								canReceiveMsgResponseError = false;
@@ -522,7 +498,7 @@ public class SinkNode extends SimpleNode
 					else if (wsnMsgResp.typeMsg == 4) { // Se é uma mensagem de um Nó Representativo/Cluster Head cujo nível da bateria está abaixo do mínimo (SimpleNode.minBatLevelInClusterHead)
 						numMessagesOfLowBatteryReceived++;
 						
-						if (allSensorsMustContinuoslySense) { // Se é uma mensagem de um Cluster Head // Se for um ClusterHead (ClusterHead != null)
+						if (ACS) { // Se é uma mensagem de um Cluster Head // Se for um ClusterHead (ClusterHead != null)
 							
 							int lineFromClusterNode = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // Procura a linha (cluster) da mensagem recebida e atualiza a mesma naquela linha
 							
@@ -601,7 +577,7 @@ public class SinkNode extends SimpleNode
 							canReceiveMsgResponseError = true;
 						 	
 							if (nodeGroups != null) { // If there is a message group created
-								if (!allSensorsMustContinuoslySense) { // If only the representative nodes must sensing
+								if (!ACS) { // If only the representative nodes must sensing
 									for (int line=0; line < nodeGroups.getNumRows(); line++) { // For each line (group/cluster) from messageGroups
 										SimpleNode representativeNode = nodeGroups.get(line, 0); // Get the Representative Node (or Cluster Head)
 										int numSensors = nodeGroups.getNumCols(line);
@@ -648,7 +624,7 @@ public class SinkNode extends SimpleNode
 			int numSensors = cluster.getNumCols(line);
 			Utils.printForDebug("Cluster / Line number = "+line);
 
-			if (!allSensorsMustContinuoslySense) { // If only the representative nodes must sensing (Representative nodes approach)
+			if (!ACS) { // If only the representative nodes must sensing (Representative nodes approach)
 				SimpleNode representativeNode = cluster.get(line, 0); // Get the Representative Node (or Cluster Head)
 				representativeNode.myCluster.sizeTimeSlot = calculatesTheSizeTimeSlotFromRepresentativeNode(sizeTimeSlot, numSensors);
 				receiveMessage(representativeNode, null);
@@ -890,7 +866,6 @@ public class SinkNode extends SimpleNode
 	private void triggerSplitFromCluster(ArrayList2d<Double, SimpleNode> sourceClusters, ArrayList2d<Double, SimpleNode> targetClusters, int lineFromCluster) {
 		// IDEIA: O nó representativo acabou de enviar seus últimos dados de leitura (sensoriamento), então ele não precisa enviar novamente
 		// Remover cluster (nós do cluster) de messageGroups
-		targetClusters = ensuresArrayList2d(targetClusters);
 		
 		if (sourceClusters != null && targetClusters != null) {
 /*			
