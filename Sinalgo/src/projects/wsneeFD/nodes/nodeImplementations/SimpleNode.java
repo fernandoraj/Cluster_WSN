@@ -47,16 +47,16 @@ public class SimpleNode extends Node
 																			// = {4,5} => N = 2 => sizeTimeSlot >= 10^2 = 100.
 
 	/**
-	 * Número máximo(limite) de predições dos erros de qualquer nó de sensor - Isso também pode ser expressado em percentual(double) do total de timeslot.<p> 
+	 * Número máximo(limite) de predições dos erros de qualquer nó sensor - Isso também pode ser expressado em percentual(double) do total de timeslot.<p> 
 	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	protected static final double limitPredictionError = 1; //5; // SensorDelay
+	protected static final double sensorDelay = 5; //1; // SensorDelay = (was) limitPredictionError
 	
 	/**
 	 *  Número máximo(limite) de erro dos nós dos sensores por cluster -  Sobre o limite, o cluster head comunica-se com o sink.<p>
 	 * [Eng] Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink.
 	 */
-	public static final int maxErrorsPerCluster = 1; // ClusterDelay
+	public static final int clusterDelay = 5; //1; // ClusterDelay = (was) maxErrorsPerCluster
 	
 	/**
 	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"<p>
@@ -492,7 +492,7 @@ public class SimpleNode extends Node
 			errorsInThisCluster = 0; // Então zera a quantidade de erros deste cluster
 		}
 */		
-		if (errorsInThisCluster == maxErrorsPerCluster) // Send "toPorUmaMessage" (minusOne) to all sensors in this cluster
+		if (errorsInThisCluster == clusterDelay) // Send "toPorUmaMessage" (minusOne) to all sensors in this cluster
 		{
 			this.minusOne = true; // Set the flag "minusOne" from this sensor (ClusterHead) to true, 
 			// indicates that the next prediction error should not consider the RMSE.
@@ -511,13 +511,13 @@ public class SimpleNode extends Node
 		
 		}
 		
-		if (errorsInThisCluster > maxErrorsPerCluster)
+		if (errorsInThisCluster > clusterDelay)
 		{
 			// Deve informar ao Sink tal problema, para que o mesmo providencie o tratamento correto (Qual seja!???)
 			
 			addThisNodeToPath(wsnMsgResp);
 
-			Utils.printForDebug("@ @ The number of prediction errors in this Cluster ("+errorsInThisCluster+") EXCEEDED the maximum limit of the prediction errors per Cluster ("+maxErrorsPerCluster+")! NoID = "+this.ID+"\n");
+			Utils.printForDebug("@ @ The number of prediction errors in this Cluster ("+errorsInThisCluster+") EXCEEDED the maximum limit of the prediction errors per Cluster ("+clusterDelay+")! NoID = "+this.ID+"\n");
 
 			wsnMsgResp.target = null; // wsnMsgResp.target = SinkNode; || wsnMsgResp.target = null; || wsnMsgResp.target = Tools.getNodeByID(55);
 			
@@ -1181,7 +1181,7 @@ public class SimpleNode extends Node
 					else { // if (nodes == null)
 //						System.out.println("Node with NULL CLuster = "+this.ID);
 					}
-					if (numPredictionErrors == (limitPredictionError)) // Send "toPorUmaMessage" (minusOne) to all sensors in this cluster
+					if (numPredictionErrors == (sensorDelay)) // Send "toPorUmaMessage" (minusOne) to all sensors in this cluster
 					{
 						this.minusOne = true;
 					}
@@ -1224,7 +1224,7 @@ public class SimpleNode extends Node
 
 					if (!exit) {
 
-						if (numPredictionErrors > limitPredictionError) { // Se o número máximo de erros de predição por sensor foi atingido para este 
+						if (numPredictionErrors > sensorDelay) { // Se o número máximo de erros de predição por sensor foi atingido para este 
 							// sensor e o mesmo tem um ClusterHead (!=null), então este último deve ser reportado (avisado)
 
 							WsnMsgResponse wsnMsgResp;
@@ -1232,7 +1232,7 @@ public class SimpleNode extends Node
 							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, this.ownTimeSlot, dataSensedTypes);
 							//wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 5, this.ownTimeSlot, dataSensedType);
 							
-							Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+limitPredictionError+")! NoID = "+this.ID+"\n");
+							Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+sensorDelay+")! NoID = "+this.ID+"\n");
 							Utils.printForDebug("* * * * The predicted value NO is within the margin of error of the value read! NoID = "+this.ID);
 							Utils.printForDebug("Round = "+lastRoundRead+": Vpredito[0] = "+predictionValues[0]+", Vlido[0] = "+values[0]+", Limiar[0] = "+maxErrors[0]+"\n");
 							
@@ -1265,7 +1265,7 @@ public class SimpleNode extends Node
 				else // if (this.clusterHead == null) - Se não existe ClusterHead, mas sim apenas Nó Representativo
 				{
 				
-					if ((numPredictionErrors <= limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Se o número de erros de predição é menor do que o limite aceitável de erros (limitPredictionError) e o número de predições executadas é menor do que o máximo de predições para o cluster deste nó sensor
+					if ((numPredictionErrors <= sensorDelay) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Se o número de erros de predição é menor do que o limite aceitável de erros (limitPredictionError) e o número de predições executadas é menor do que o máximo de predições para o cluster deste nó sensor
 					{
 						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedTypes, coefsA, coefsB, maxErrors); // Então dispara uma nova predição - laço de predições
 						newPredictionTimer.startRelative(1, this); 
@@ -1275,11 +1275,11 @@ public class SimpleNode extends Node
 					{
 						WsnMsgResponse wsnMsgResp;
 						
-						if (!(numPredictionErrors <= limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Caso tenha saído do laço de predição por ter excedido o número máximo de erros de predição e não pelo limite do seu time slot (número máximo de predições a serem feitas por este Nó Representativo - ou Cluster Head - deste cluster)
+						if (!(numPredictionErrors <= sensorDelay) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Caso tenha saído do laço de predição por ter excedido o número máximo de erros de predição e não pelo limite do seu time slot (número máximo de predições a serem feitas por este Nó Representativo - ou Cluster Head - deste cluster)
 						{
 							wsnMsgResp = new WsnMsgResponse(1, this, clusterHead, this, 2, (this.myCluster.sizeTimeSlot - numTotalPredictions), dataSensedTypes);
 							
-							Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+limitPredictionError+")! NoID = "+this.ID+"\n");
+							Utils.printForDebug("* The number of prediction errors ("+numPredictionErrors+") REACHED the maximum limit of the prediction errors ("+sensorDelay+")! NoID = "+this.ID+"\n");
 							Utils.printForDebug("* * * * The predicted value NO is within the margin of error of the value read! NoID = "+this.ID);
 							Utils.printForDebug("Round = "+lastRoundRead+": Vpredito[0] = "+predictionValues[0]+", Vlido[0] = "+values[0]+", Limiar[0] = "+maxErrors[0]+"\n");
 						}
