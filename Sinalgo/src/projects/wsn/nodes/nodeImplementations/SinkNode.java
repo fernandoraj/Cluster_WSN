@@ -47,7 +47,7 @@ public class SinkNode extends SimpleNode  {
 		System.out.println("The type of data sensed is "+dataSensedType);
 		System.out.println("The threshold of error (max error) is "+thresholdError);
 		System.out.println("The size of sliding window is "+SimpleNode.slidingWindowSize);
-		System.out.println("The size of delay to send novelties is "+SimpleNode.limitPredictionError);
+		System.out.println("The size of delay to send novelties is "+SimpleNode.sensorDelay);
 		if (approachType == 0) {
 			System.out.println("The approach type is Adaga-P*");
 			if (SimpleNode.newContinuousSensingModeEnable) {
@@ -63,7 +63,7 @@ public class SinkNode extends SimpleNode  {
 			Global.log.logln("The type of data sensed is "+dataSensedType);
 			Global.log.logln("The threshold of error (max error) is "+thresholdError);
 			Global.log.logln("The size of sliding window is "+SimpleNode.slidingWindowSize);
-			Global.log.logln("The size of delay to send novelties is "+SimpleNode.limitPredictionError+"\n");
+			Global.log.logln("The size of delay to send novelties is "+SimpleNode.sensorDelay+"\n");
 			Global.log.logln("The approach type is "+approachType+" (0 = temporal correlation (Adaga-P*); 2 = Naive)");
 	}
 

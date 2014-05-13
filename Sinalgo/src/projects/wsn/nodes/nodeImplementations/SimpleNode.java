@@ -140,7 +140,7 @@ public class SimpleNode extends Node
 	 * Máxino (limite) de numero de erros de predições de qualquer nó de sensor - Isso também pode ser expressado em porcentagem (Ex: double - real) do total do slot de tempo<p>
 	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	protected static final int limitPredictionError = 1; // delay (abbrev.)
+	protected static final int sensorDelay = 5; // delay (abbrev.) = limitPredictionError (old)
 	
 	protected boolean newCoefsReceived = false; // Indicates whether the current sensor node already received the first (new) coefficients from the sink node
 	
@@ -662,7 +662,7 @@ public class SimpleNode extends Node
 				if (isValuePredictInValueReading(value, predictionValue, maxError))
 				{
 */
-				if (numPredictionErrors <= limitPredictionError) // Se o número máximo de erros de predição for menor que o limite máximo permitido
+				if (numPredictionErrors <= sensorDelay) // Se o número máximo de erros de predição for menor que o limite máximo permitido
 				{
 					ultimoRoundLido = Integer.parseInt(linhas[2]);
 //					lastValueRead = value;
