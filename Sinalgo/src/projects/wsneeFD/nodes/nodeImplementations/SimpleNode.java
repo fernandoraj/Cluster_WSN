@@ -50,13 +50,13 @@ public class SimpleNode extends Node
 	 * Número máximo(limite) de predições dos erros de qualquer nó sensor - Isso também pode ser expressado em percentual(double) do total de timeslot.<p> 
 	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	protected static final double sensorDelay = 5; //1; // SensorDelay = (was) limitPredictionError
+	protected static final double sensorDelay = 1; //1; //5; // SensorDelay = (was) limitPredictionError
 	
 	/**
 	 *  Número máximo(limite) de erro dos nós dos sensores por cluster -  Sobre o limite, o cluster head comunica-se com o sink.<p>
 	 * [Eng] Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink.
 	 */
-	public static final int clusterDelay = 5; //1; // ClusterDelay = (was) maxErrorsPerCluster
+	public static final int clusterDelay = 1; //1; //5; //ClusterDelay = (was) maxErrorsPerCluster
 	
 	/**
 	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"<p>
@@ -1105,7 +1105,7 @@ public class SimpleNode extends Node
 	 */
 	protected void triggerPredictions(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors)
 	{
-		// TODO: Alterar número do round desejado
+		// Alterar número do round desejado
 /*
 		if (Global.currentTime >= 140.0) { // Round to initiate the Debug Mode
 //			System.out.println(" * Debug On * ");
@@ -1131,6 +1131,7 @@ public class SimpleNode extends Node
 					if (!hitsInThisReading[cont]) {
 						numPredictionErrorsPerType[cont]++;
 						numPredictionErrors++; // Contador do número de erros de predição
+//						System.out.println(" * * Prediction Error: SensorID = "+this.ID+" numPredictionErrors = "+numPredictionErrors+" numPredictionErrorsPerType[cont="+cont+"] = "+numPredictionErrorsPerType[cont]);
 					}
 				} // end if (!isValuePredictInValueReading(value, predictionValue, maxError))
 
