@@ -52,7 +52,7 @@ public class SinkNode extends SimpleNode
 	 * Indica o limiar de diferença de Dimensão Fractal mínima entre duas medições de um mesmo cluster (antes e depois da adição dos novos dados) para que o mesmo seja válido (não seja considerado "ruído")
 	 * [Eng] Indicates the minimum difference threshold of Fractal Dimension between two measurements of the same cluster (before and after the addiction of new data) so that it is valid (don't be considered "noise")
 	 */
-	private final Double FDthreshold = new Double(0.03); // Value based on "EXPERIMENTAL RESULTS" of "Using the Fractal Dimension to Cluster Datasets" paper.
+	private final Double FDthreshold = new Double(0.06); // 0.03 (Value based on "EXPERIMENTAL RESULTS" of "Using the Fractal Dimension to Cluster Datasets" paper)
 	
 	/**
 	 * Quantidade de rounds (ciclos) a ser saltado para cada leitura sequencial dos sensores, no caso de uso da abordagem de ClusterHeads (ACS=True) <br>
@@ -70,7 +70,7 @@ public class SinkNode extends SimpleNode
 	 * Tipos de dados a serem sensoriados (lidos nos nós sensores), que, para os dados do "Intel Lab Data", podem ser: temperatura = 4, 
 	 * umidade = 5, luminosidade = 6 ou voltagem = 7. <br>
 	 * [Eng] Types of data to be sensed (read in the sensor nodes), which, for Intel Lab Data, can be: 
-	 * temperature = 4; humidity = 5; brightness("lum") = 6 or voltage = 7;
+	 * temperature(t) = 4; humidity(h) = 5; brightness(l) = 6 or voltage(v) = 7;
 	 */
 	public static int[] dataSensedTypes = {4}; //{4}; //{4,5}; //{4,5,6};
 	
@@ -84,7 +84,7 @@ public class SinkNode extends SimpleNode
 	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
 	 * [Eng] Limit of acceptable magnitude difference (spatial error) for the readings of sensor nodes / - which can be between 0.0 (no errors accepted) and 1.0 (accepts any error)
 	 */
-	private double[] spacialThresholdErrors = {1.5}; //{1.5}; //{1.5, 1.5}; //{2.0, 2.5, 70.0};
+	private double[] spacialThresholdErrors = {1.5}; //{1.5}; //{1.5,1.5}; //{2.0, 2.5, 70.0};
 	
 	/**
 	 * Percentual mínimo do número de rounds iguais das medições de 2 sensores para que os mesmos sejam classificados no mesmo cluster <br>
@@ -560,7 +560,7 @@ public class SinkNode extends SimpleNode
 							Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in messageGroups) to the Global.clustersCount attribute
 							setClustersFromNodes(nodeGroups);
 							
-							//TODO:FDmodeON to be checked
+							//FDmodeON to be checked
 							if (FDmodeOn) {
 								System.out.println("");
 								//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
@@ -667,7 +667,9 @@ public class SinkNode extends SimpleNode
 			}
 		}
 		if (minDiff > FDthreshold) {
-			Utils.printForDebug("\n  Line = "+minLine+" minDiff = "+minDiff+" curCluster.fracDim = "+curCluster.getKey(minLine)+" newCluster.fracDim = "+newCluster.getKey(minLine));
+			Utils.printForDebug("\n  ClusterLine = "+minLine+" minDiff = "+minDiff+" curCluster.fracDim = "+curCluster.getKey(minLine)+" newCluster.fracDim = "+newCluster.getKey(minLine));
+			//TODO: Apagar / comentar linha abaixo!
+//			System.out.println("FDthreshold noise discarded! ClusterLine = "+minLine+" minDiff = "+minDiff+" curCluster.fracDim = "+curCluster.getKey(minLine)+" newCluster.fracDim = "+newCluster.getKey(minLine));
 			return -2; // Error code (2)
 		}
 		return minLine;
@@ -1495,7 +1497,6 @@ public class SinkNode extends SimpleNode
 		int[] currentRound = new int[currentSize];
 		
 		//Data read from current sensor (from ArrayList2d)
-		//TODO: Analizar a corretude!!!
 		for (int cont = 0; cont < currentSize; cont++) {
 			currentValues[cont] = currentNode.getDataRecordValues(cont);
 		}
@@ -1515,7 +1516,6 @@ public class SinkNode extends SimpleNode
 		int[] newRound = new int[newSize];
 		
 		//Data read from new sensor (from message received)
-		//TODO: Analizar a corretude2!!!
 		for (int cont = 0; cont < newSize; cont++) {
 			newValues[cont] = newNode.getDataRecordValues(cont);
 		}
