@@ -153,7 +153,7 @@ public class SynchronousRuntimeThread extends Thread {
 			if(Global.isGuiMode) { //redraw the graph all 'refreshRate' Steps except the last
 				if((i%refreshRate) == (refreshRate-1)){
 					if(i != numberOfRounds-1){
-						runtime.getGUI().redrawGUINow(); // this is a SYNCHRONOUS call to redraw the graph! 
+						runtime.getGUI().redrawGUINow(); // this is a SYNCHRONOUS call to redraw the graph!
 					}
 				}
 				runtime.getGUI().setRoundsPerformed((int)(Global.currentTime));
@@ -230,6 +230,12 @@ public class SynchronousRuntimeThread extends Thread {
 
 			Global.numberOfHitsInThisRound = 0;
 			Global.numberOfMissesInThisRound = 0;
+			
+			if((i%refreshRate) == (refreshRate-1)){
+				if(i != numberOfRounds-1){
+					myPrint(); //AddByMe
+				}
+			}
 
 		}
 		
@@ -257,6 +263,27 @@ public class SynchronousRuntimeThread extends Thread {
 		}		
 */
 		
+		myPrint(); //AddByMe
+
+		if(Global.isGuiMode) {
+			runtime.getGUI().redrawGUINow();
+			runtime.getGUI().setStartButtonEnabled(true);
+		} else { // we reached the end of a synchronous simulation in batch mode
+			if(LogL.HINTS) {
+				Date tem = new Date();
+				long time = tem.getTime() - Global.startTime.getTime();
+				Global.log.logln("Simulation stopped regularly after "+Global.currentTime+" rounds during "+time+" ms");
+				Global.log.logln("Which makes "+(time/Global.currentTime)+" ms per round.\n");
+			}
+			Main.exitApplication(); // exit explicitely, s.t. CustomGlobal.onExit() is called
+		}
+		Global.isRunning = false;
+	}
+
+	/**
+	 * AddByMe
+	 */
+	private void myPrint() {
 		double RMSE = 0.0;
 		if(Global.predictionsCount > 0) {
 			RMSE = Math.sqrt(Global.squaredError / Global.predictionsCount);
@@ -274,19 +301,5 @@ public class SynchronousRuntimeThread extends Thread {
 		if(LogL.ROUND_DETAIL){
 			Global.log.logln("# # The Global RMSE is "+RMSE+"\n");
 		}
-
-		if(Global.isGuiMode) {
-			runtime.getGUI().redrawGUINow();
-			runtime.getGUI().setStartButtonEnabled(true);
-		} else { // we reached the end of a synchronous simulation in batch mode
-			if(LogL.HINTS) {
-				Date tem = new Date();
-				long time = tem.getTime() - Global.startTime.getTime();
-				Global.log.logln("Simulation stopped regularly after "+Global.currentTime+" rounds during "+time+" ms");
-				Global.log.logln("Which makes "+(time/Global.currentTime)+" ms per round.\n");
-			}
-			Main.exitApplication(); // exit explicitely, s.t. CustomGlobal.onExit() is called
-		}
-		Global.isRunning = false;
 	}
 }
