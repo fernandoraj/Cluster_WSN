@@ -40,13 +40,13 @@ public class SinkNode extends SimpleNode
 	 * Indica que o sink node sinaliza para todos os outros nós que deve ficar continuamente com sensoriamento (usando Cluster Heads) <p>
 	 * [Eng] Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
 	 */
-	private final boolean ACS = false; // ACS(allSensorsMustContinuoslySense): false = Representative Nodes; true = Cluster Heads
+	private final boolean ACS = true; // ACS(allSensorsMustContinuoslySense): false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Indica quando o modo de clusterização usando Dimensão Fractal está ligado (ativo = true)
 	 * [Eng] Indicates whether the Fractal Dimension clustering is in ON mode (active = true)
 	 */
-	private final boolean FDmodeOn = false;
+	private final boolean FDmodeOn = true;
 
 	/**
 	 * Indica o limiar de diferença de Dimensão Fractal mínima entre duas medições de um mesmo cluster (antes e depois da adição dos novos dados) para que o mesmo seja válido (não seja considerado "ruído")
@@ -551,7 +551,7 @@ public class SinkNode extends SimpleNode
 							Double initialFracDim = new Double(0.0);
 							nodeGroups.add((SimpleNode)wsnMsgResp.source, 0, initialFracDim); // Add the initial sensor node(SimpleNode) to the group 0 - line 0 (ArrayList2d of SimpleNode)
 						}
-						else { // If there is a message group (SensorCluster), then adds the wsnMsgResp representing a sensor to group, classifing this message/sensor in correct cluster/line
+						else { // If there is a sensor group (SensorCluster), then adds the wsnMsgResp.source representing a sensor to group, classifing this sensor in correct cluster/line
 							addNodeInCluster(nodeGroups, (SimpleNode)wsnMsgResp.source);
 						}
 						
@@ -1196,13 +1196,13 @@ public class SinkNode extends SimpleNode
 				SimpleNode currentNode = tempCluster.get(line, col);
 				if (testDistanceBetweenSensorPositions(currentNode, newNode))
 				{
-					if (testSimilarityMeasureWithPairRounds(currentNode, newNode)) // If this (new)message (with sensor readings) already is dissimilar to current message
+					if (testSimilarityMeasureWithPairRounds(currentNode, newNode)) // If this (new)node (with sensor readings) is similar to current message
 					{
-						continueThisLine = true; // Then this (new)message doesn't belong to this cluster / line / group
+						continueThisLine = true; // Then this (new)node belongs to this cluster / line / group
 					}
 					else
 					{
-						continueThisLine = false;
+						continueThisLine = false; // Otherwise, this (new)node doesn't belong to this cluster / line / group
 					}
 				}
 				else
@@ -1470,14 +1470,12 @@ public class SinkNode extends SimpleNode
 	} // end isEqualNode(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 	
 	/**
-	 * Ele testa se há divergência (falta de similaridade) entre os dois conjunto de medida de 2 Sensores trazidos por 2 mensagens <p>
+	 * Ele testa se há divergência (falta de similaridade) entre os dois conjuntos de medidas de 2 Sensores trazidos por 2 mensagens <p>
 	 * [Eng] It tests if there is dissimilarity (lack of similarity) between the 2 set of measure from 2 sensor brought by the 2 messages
 	 * @param currentWsnMsg Representa a mensagem atual do grupo de mensagens (messageGroups) em um "<WsnMsgResponse> ArrayList2d" estrutura <p>[Eng] Represents the current message from the group of messages (messageGroups) in a "ArrayList2d<WsnMsgResponse>" structure 
 	 * @param newNode Representa a mensagem chegou recentemente no nó sorvedouro, enviado a partir do nó sensor fonte <p>[Eng] Represents the recently arrived message in the sink node, sent from the source sensor node 
 	 * @return Verdadeiro caso as duas mensagens são diferentes, ou seja, de clusters diferentes (ou "grupos"); falsos, caso contrário <p>[Eng] True case the two messages are DISsimilar, i.e., from different clusters (or "groups"); False, otherwise
 	 */
-	
-	
 	private boolean testSimilarityMeasureWithPairRounds(SimpleNode currentNode, SimpleNode newNode)
 	{
 //		boolean sameSize = true;
@@ -1560,15 +1558,16 @@ public class SinkNode extends SimpleNode
 				}
 			}
 		}
-
+		
+		// Similarity Measures - BEGIN
 		if (numEqualKeys > 0)
 		{
 			int cont = 0;
-			while ((cont < dataSensedTypes.length) && (sumDifs[cont]/numEqualKeys <= spacialThresholdErrors[cont])) { // It tests if all attributes (dimensions) are in mSimilarityMagnitude
+			while ((cont < dataSensedTypes.length) && (sumDifs[cont]/numEqualKeys <= spacialThresholdErrors[cont])) { // It tests if ALL attributes (dimensions) are in mSimilarityMagnitude
 				cont++;
 			}
 			if (cont == dataSensedTypes.length) {
-				mSimilarityMagnitude = true;
+				mSimilarityMagnitude = true; // Multiple m-Magnitude
 			}
 
 		}
@@ -1590,13 +1589,14 @@ public class SinkNode extends SimpleNode
 		}
 		if (contN > 0.0) {
 			int cont = 0;
-			while ((cont < dataSensedTypes.length) && (contN1[cont]/contN >= thresholdErrors[cont])) { // It tests if all attributes (dimensions) are in tSimilarityTrend
+			while ((cont < dataSensedTypes.length) && (contN1[cont]/contN >= thresholdErrors[cont])) { // It tests if ALL attributes (dimensions) are in tSimilarityTrend
 				cont++;
 			}
 			if (cont == dataSensedTypes.length) {
-				tSimilarityTrend = true;
+				tSimilarityTrend = true; // Multiple t-Trend
 			}	
 		}
+		// Similarity Measures - END
 
 		return (mSimilarityMagnitude && tSimilarityTrend);
 	} // end testSimilarityMeasureWithPairRounds(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
