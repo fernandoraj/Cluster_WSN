@@ -40,19 +40,19 @@ public class SinkNode extends SimpleNode
 	 * Indica que o sink node sinaliza para todos os outros nós que deve ficar continuamente com sensoriamento (usando Cluster Heads) <p>
 	 * [Eng] Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
 	 */
-	private final boolean ACS = true; // ACS(allSensorsMustContinuoslySense): false = Representative Nodes; true = Cluster Heads
+	private final boolean ACS = false; // ACS(allSensorsMustContinuoslySense): false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Indica quando o modo de clusterização usando Dimensão Fractal está ligado (ativo = true)
 	 * [Eng] Indicates whether the Fractal Dimension clustering is in ON mode (active = true)
 	 */
-	private final boolean FDmodeOn = true;
+	private final boolean FDmodeOn = false;
 
 	/**
 	 * Indica o limiar de diferença de Dimensão Fractal mínima entre duas medições de um mesmo cluster (antes e depois da adição dos novos dados) para que o mesmo seja válido (não seja considerado "ruído")
 	 * [Eng] Indicates the minimum difference threshold of Fractal Dimension between two measurements of the same cluster (before and after the addiction of new data) so that it is valid (don't be considered "noise")
 	 */
-	private final Double FDthreshold = new Double(0.06); // 0.03 (Value based on "EXPERIMENTAL RESULTS" of "Using the Fractal Dimension to Cluster Datasets" paper)
+	private final Double FDthreshold = new Double(0.03); // 0.03 (Value based on "EXPERIMENTAL RESULTS" of "Using the Fractal Dimension to Cluster Datasets" paper)
 	
 	/**
 	 * Quantidade de rounds (ciclos) a ser saltado para cada leitura sequencial dos sensores, no caso de uso da abordagem de ClusterHeads (ACS=True) <br>
