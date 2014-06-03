@@ -1,0 +1,25 @@
+Algumas informações importantes sobre este projeto:
+
+1) Ele simula uma rede de sensores usando os dados do caso de teste real conhecido como "Intel Lab Data" (mais informações em: http://db.csail.mit.edu/labdata/labdata.html)
+	Dados importados (em .txt) para a subpasta / subprojeto: /data/sensor_readings (lá se encontram várias arquivos com diferentes versões "filtradas" a partir do arquivo original ("data.txt");
+
+2) Ele utiliza as chamadas "Medidas de Similaridade" para fazer o agrupamento dos sensores em clusters. Estas medidas, por sua vez, utilizam-se dos parâmetros: m-Magnitude (atributo "spacialThresholdErrors") 
+e t-Trend (atributo "thresholdErrors") para calcular as medidas e verificar quais sensores devem ficar agrupados em cada cluster. O parâmetro de distância máxima entre os sensores (atributo "maxDistance") 
+é opcional e só será utilizado na prática se o valor do atributo correspondente for maior do que 0(zero).
+
+3) A manutenção dos clusters pode ser realizada por dois métodos: i) As próprias "Medidas de Similaridade", ou ii) O Clustering Fractal (ou "Fractal Clustering" - FC). Isso é determinado pelo valor do atributo
+(flag booleano) "FDmodeOn". Se FDmodeOn = true, então é utilizado "Fractal Clustering"; caso contrário, é utilizado "Medidas de Similaridade".
+
+4) O escalonamento (scheduling) de sensores dentro de cada cluster pode ser feito através de duas políticas: i) Os Nós Representativos ("Representative Nodes" - RN), ou ii) Os "Cluster Heads" (CH). Isso será 
+determinado pelo valor do atributo (flag booleano) "ACS" (que vem de "All sensors must Continuosly Sense", ou seja, todos os sensores devem sensoriar continuamente). Se ACS = true, então é habilitado o mode de 
+Cluster Heads; caso contrário, é habilitado o modo de Nós Representativos.
+
+
+
+Na classe SinkNode, as informações sobre as Medidas de Similaridade (Similarity Measures) podem ser encontradas no método "testSimilarityMeasureWithPairRounds(SimpleNode currentNode, SimpleNode newNode)"
+na parte marcada entre as tags: "Similarity Measures - BEGIN" e "Similarity Measures - END".
+
+Uso da flag "AddByMe" para marcar alterações realizadas, por exemplo, na classe "SynchronousRuntimeThread" do pacote "sinalgo.runtime".
+
+Obs.: Alteramos alguns valores (default) diretamente no arquivo \src\projects\wsneeFD\Config.xml
+
