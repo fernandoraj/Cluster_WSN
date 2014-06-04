@@ -56,7 +56,7 @@ public class SimpleNode extends Node
 	 *  Número máximo(limite) de erro dos nós dos sensores por cluster -  Sobre o limite, o cluster head comunica-se com o sink.<p>
 	 * [Eng] Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink.
 	 */
-	public static final int clusterDelay = 1; //1; //5; //ClusterDelay = (was) maxErrorsPerCluster
+	public static final int clusterDelay = 0; //1; //5; //ClusterDelay = (was) maxErrorsPerCluster
 	
 	/**
 	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"<p>
@@ -322,7 +322,7 @@ public class SimpleNode extends Node
 				{ 
 //					this.setColor(Color.YELLOW);
 //					Integer nextNodeId = wsnMessage.popFromPath();
-
+					//TODO: Descobrir quando deve ser executada a linha abaixo:
 					canMakePredictions = Boolean.TRUE;
 					forward = Boolean.FALSE;
 					
@@ -571,7 +571,7 @@ public class SimpleNode extends Node
 		TimerCollection tc = this.getTimers();
 		tc.clear();
 		canMakePredictions = false;
-	}
+	} // end startMerge()
 	
 	/**
 	 * 
@@ -579,7 +579,7 @@ public class SimpleNode extends Node
 	public void freeNextNode()
 	{
 		nextNodeToBaseStation = null;
-	}
+	} // end freeNextNode()
 	
 	/**
 	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual<p>[Eng] Prepare the message "wsnMsgResp" to be sended for the sink increasing the data read by the actual node.
