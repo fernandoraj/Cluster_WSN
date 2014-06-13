@@ -938,7 +938,7 @@ public class SimpleNode extends Node
 	 * @param time Parâmetro de tempo a ter o valor da grandeza predito<p>[Eng]Parameter of time to has the value by predicted grandeur.
 	 * @return Valor predito para o parâmetro sensoreado no tempo dado<p>[Eng]Predicted value to sensored parameter in a determined time.
 	 */
-	private double[] makePredictions(double[] A, double[] B, double time)
+	private double[] makePredictions(double[] A, double[] B, double time) // Cálculo da predição / predições dos valores
 	{
 		double[] predictions = new double[A.length];
 		for (int numTypes = 0; numTypes < A.length; numTypes++) {
@@ -1368,7 +1368,7 @@ public class SimpleNode extends Node
 	 * @param maxErrors Limiar de erro para o calculo da predição para o sensor<p>[Eng] Threshold error to the calculation of prediction for this sensor
 	 * @return Verdadeiro se o valor sensoriado(lido) está dentro do valor de predição (mais ou menos no limiar de erro) ou falso, caso contrário<p>[Eng] True if the sensed (read) value is in the predicted value (more or less the threshold error) ou False, otherwise
 	 */
-	protected boolean[] arePredictValuesInReadingValues(double[] values, double[] predictionValues, double[] maxErrors)
+	protected boolean[] arePredictValuesInReadingValues(double[] values, double[] predictionValues, double[] maxErrors) // Comparação dos valores resultantes do cálculo da predição com os valores reais (lidos)
 	{
 		// Code moved to else block below - according to Prof. Everardo request in 25/09/2013: RMSE should only be computed when data are not sent to the sink
 /*
