@@ -13,6 +13,8 @@ import java.util.Vector;
 import projects.defaultProject.nodes.timers.DirectMessageTimer;
 import projects.wsneeFD.nodes.messages.WsnMsg;
 import projects.wsneeFD.nodes.messages.WsnMsgResponse;
+import projects.wsneeFD.nodes.messages.WsnMsgResponse.DataRecord;
+import projects.wsneeFD.nodes.messages.WsnMsgResponse.MessageItens;
 import projects.wsneeFD.nodes.timers.PredictionTimer;
 import projects.wsneeFD.nodes.timers.WsnMessageResponseTimer;
 import projects.wsneeFD.nodes.timers.WsnMessageTimer;
@@ -50,13 +52,13 @@ public class SimpleNode extends Node
 	 * Número máximo(limite) de predições dos erros de qualquer nó sensor - Isso também pode ser expressado em percentual(double) do total de timeslot.<p> 
 	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	protected static final double sensorDelay = 1; //1; //5; // SensorDelay = (was) limitPredictionError
+	protected static final double sensorDelay = 2; //1; //5; // SensorDelay = (was) limitPredictionError
 	
 	/**
 	 *  Número máximo(limite) de erro dos nós dos sensores por cluster -  Sobre o limite, o cluster head comunica-se com o sink.<p>
 	 * [Eng] Maximum (limit) Number of sensor node's error messages per cluster - above this limit, the cluster head communicates to sink.
 	 */
-	public static final int clusterDelay = 0; //1; //5; //ClusterDelay = (was) maxErrorsPerCluster
+	public static final int clusterDelay = 5; //1; //5; //ClusterDelay = (was) maxErrorsPerCluster
 	
 	/**
 	 * Indica o tamanho da janela deslizante das leituras do sensor que serão enviadas ao sink node quando houver uma "novidade"<p>
@@ -325,7 +327,8 @@ public class SimpleNode extends Node
 					//TODO: Descobrir quando deve ser executada a linha abaixo:
 					canMakePredictions = Boolean.TRUE;
 					forward = Boolean.FALSE;
-					
+
+//					System.out.println("NodeID = "+this.ID+" Round = "+Global.currentTime+" hopsToTarget = "+this.hopsToTarget);
 					//Definir roteamento de mensagem
 					if (wsnMessage.target != this)
 					{
@@ -424,7 +427,7 @@ public class SimpleNode extends Node
 				//
 				if (wsnMsgResp.typeMsg == 5) {
 					//System.out.println("DirectMessageTimer(); received by the node "+this.ID+" from node "+wsnMsgResp.source.ID+" in Round = "+Global.currentTime);
-					validPredictions = false;
+					// validPredictions = false; // Desabilitar "validPredictions" para que sensores continuem sensoriando após o CH deste cluster haver detectado extrapolação do número de erros (errorsInThisRound > clusterDelay)
 					//this.minusOne = false;
 				}
 				else if (wsnMsgResp.typeMsg == 6) {
@@ -487,6 +490,26 @@ public class SimpleNode extends Node
 			case 5: // Aviso de parada de sensoriamento
 				break;				
 		}
+		
+		if (errorsInThisCluster > 0) {
+			System.out.println("MessageErrorReceivedByCH: SensorIDSource = "+wsnMsgResp.source.ID+" ChID = "+this.ID+" NumErrors = "+errorsInThisCluster);
+		}
+		
+		if (messageItensPackage == null) {
+			messageItensPackage = new Vector<MessageItens>();
+		}
+		
+		
+		
+		
+		
+		//TODO: PAREI AQUI! Precisa alterar as inner classes para que se tornem classe "reais" (externas).
+//		messageItensPackage.add((this.messageItensPackage)wsnMsgResp.messageItens);
+		
+	
+		
+		
+		
 /*		
 		if (Global.currentTime > (initialErrorRound + maxErrorsPerCluster)) { // Se o tempo (round/ciclo/ticket) atual for maior do que o inicial mais o número máximo de erros por cluster
 			errorsInThisCluster = 0; // Então zera a quantidade de erros deste cluster
@@ -523,11 +546,11 @@ public class SimpleNode extends Node
 			
 			// Disparar uma mensagem para todos os nós do mesmo cluster para que o atributo "validPredictions" torne-se falso até que o sink envie nova
 			// mensagem com novos coeficientes e torne o atr. "validPredictions" igual a true.
-			validPredictions = false;
+			// validPredictions = false; // Desabilitar "validPredictions" para que sensores continuem sensoriando após o CH deste cluster haver detectado extrapolação do número de erros (errorsInThisRound > clusterDelay)
 			
 			//Node.timers.clear(); // Limpar todos os timers deste nó (ClusterHead) e dos outros nós do mesmo cluster
 			
-			// Envia uma mensagem para cada um dos nós do cluster atual para que os mesmos parem de sensoriar (cessem as predições)
+			// Envia uma mensagem para cada um dos nós do cluster atual para que os mesmos entrem em modo de "Pre-WaitingMode"
 			for (int i = 0; i < this.myCluster.members.size(); i++) {
 				
 				SimpleNode targetNode = this.myCluster.members.get(i);
@@ -991,7 +1014,7 @@ public class SimpleNode extends Node
 			this.ownTimeSlot = wsnMessage.sizeTimeSlot;
 			
 			windowSize = slidingWindowSize;
-			validPredictions = true;
+			// validPredictions = true;
 			//System.out.println("nodeID = "+this.ID+": validPredictions TRUE in Round = "+Global.currentTime);
 			triggerPredictions(wsnMessage.dataSensedTypes, coefsA, coefsB, maxErrors);
 		}
@@ -1009,6 +1032,7 @@ public class SimpleNode extends Node
 			{
 				wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).typs, dataRecordItens.get(cont).values, dataRecordItens.get(cont).time, dataRecordItens.get(cont).batLevel, dataRecordItens.get(cont).round); 
 			}
+			wsnMsgResp.messageItens.sourceNode = this;
 		}
 	} // end addDataRecordItensInWsnMsgResponse(WsnMsgResponse wsnMsgResp)
 	
@@ -1334,12 +1358,12 @@ public class SimpleNode extends Node
 	{
 		if (canMakePredictions) {
 			//System.out.println("    SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions ="+canMakePredictions);
-			if (validPredictions) {
+			//if (validPredictions) { // Desabilitar "validPredictions" para que sensores continuem sensoriando após o CH deste cluster haver detectado extrapolação do número de erros (errorsInThisRound > clusterDelay)
 				if (Global.currentTime > lastRoundTriggered) { // Ensures that the same prediction will not be executed more than once in the same round for the same sensor
 					lastRoundTriggered = Global.currentTime;
 					triggerPredictions(dataSensedTypes, coefsA, coefsB, maxErrors);
 				}
-			}
+			//}
 		}
 /*
 		else {
@@ -1492,6 +1516,17 @@ public class SimpleNode extends Node
 	} // end DataRecord
 	
 	public Vector<DataRecord> dataRecordItens;
+	
+	public class MessageItens {
+		public Node sourceNode;
+		Vector<DataRecord> dataRecordItens;
+		
+		public MessageItens() {
+			dataRecordItens = new Vector<DataRecord>();
+		}
+	}
+	
+	public Vector<MessageItens> messageItensPackage;
 	
 	/**
 	 * Adiciona os respectivos valores para o atributo dataRecordItens do sensor (SimpleNode)<p>[Eng] Adds the respective values to dataRecordItens attribute from this sensor (SimpleNode)

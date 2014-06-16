@@ -163,11 +163,22 @@ public class WsnMsgResponse extends Message {
 	
 	public Vector<DataRecord> dataRecordItens;
 	
+	public class MessageItens {
+		public Node sourceNode;
+		Vector<DataRecord> dataRecordItens;
+		
+		public MessageItens() {
+			dataRecordItens = new Vector<DataRecord>();
+		}
+	}
+	
+	public MessageItens messageItens;
+	
 	public void addDataRecordItens(int[] typs, double[] vals, double tim, double bat, int rnd)
 	{
-		if (this.dataRecordItens == null)
+		if (this.messageItens == null)
 		{
-			this.dataRecordItens = new Vector<DataRecord>();
+			this.messageItens = new MessageItens();
 		}
 		DataRecord dr = new DataRecord();
 		
@@ -177,7 +188,7 @@ public class WsnMsgResponse extends Message {
 		dr.batLevel = bat;
 		dr.round = rnd;
 		
-		dataRecordItens.add(dr);
+		messageItens.dataRecordItens.add(dr);
 		naoLido = true;
 	}
 	

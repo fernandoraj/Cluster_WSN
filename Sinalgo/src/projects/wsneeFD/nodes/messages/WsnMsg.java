@@ -111,6 +111,11 @@ public class WsnMsg extends Message {
 		double[] coefsB;
 	}
 	
+	public class NodesCoefs {
+		Node node;
+		coefEquation coefs;
+	}
+	
 	/**
 	 * Indica se a mensagem teve seus coeficientes da equação de regressão configurados <p>
 	 * [Eng] Indicates whether the message had its coefficients of the regression equation configured

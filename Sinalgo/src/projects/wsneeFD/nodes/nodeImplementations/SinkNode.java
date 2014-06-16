@@ -297,7 +297,7 @@ public class SinkNode extends SimpleNode
 						 * 6) Estudar demais alterações necessárias e possíveis efeitos colaterais...
 						 */
 						
-						//TODO: TO BE TESTED! (18/04/2014)
+						// TO BE TESTED! (18/04/2014)
 						if (FDmodeOn) { // Se estiver no modo Dimensão Fractal!
 							
 							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
@@ -307,7 +307,7 @@ public class SinkNode extends SimpleNode
 							}
 */							
 							Utils.printForDebug("\nSource Node from Message Received: NodeID = "+currentNode.ID);
-//							System.out.println("\nSource Node from Message Received: NodeID = "+currentNode.ID+" in Round "+Global.currentTime);
+//							System.out.println("\nSource Node from Message Received: NodeID = "+currentNode.ID+" in Round "+Global.currentTime+" and hopsToTarget = "+currentNode.hopsToTarget);
 							
 							ArrayList2d<Double, SimpleNode> cloneCluster = nodeGroups.clone2(); // (1)
 							insertNewNodeInClusters(cloneCluster, currentNode); // (2)
