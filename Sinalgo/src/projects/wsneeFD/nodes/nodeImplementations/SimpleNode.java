@@ -241,8 +241,12 @@ public class SimpleNode extends Node
 	 */
 	private double lastRoundTriggered;
 	
-	private boolean validPredictions = true;
+//	private boolean validPredictions = true;
 	
+	private boolean inWaitingNewsMode = false; // Flag para indicar que os sensores 
+	// neste cluster devem fazer o sensoriamento armazenando as novidades para posterior
+	// comparação com os novos coeficientes a serem recebidos do sink node.
+
 	private boolean canMakePredictions = false; // variavel para saber se o node pode fazer predições;
 	
 	private boolean minusOne = false; // Flag to set that the ClusterHead from this node will send "news" 
@@ -428,6 +432,7 @@ public class SimpleNode extends Node
 				if (wsnMsgResp.typeMsg == 5) {
 					//System.out.println("DirectMessageTimer(); received by the node "+this.ID+" from node "+wsnMsgResp.source.ID+" in Round = "+Global.currentTime);
 					// validPredictions = false; // Desabilitar "validPredictions" para que sensores continuem sensoriando após o CH deste cluster haver detectado extrapolação do número de erros (errorsInThisRound > clusterDelay)
+					inWaitingNewsMode = true;
 					//this.minusOne = false;
 				}
 				else if (wsnMsgResp.typeMsg == 6) {
