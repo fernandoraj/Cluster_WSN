@@ -11,10 +11,11 @@ import java.util.Stack;
 import java.util.Vector;
 
 import projects.defaultProject.nodes.timers.DirectMessageTimer;
+import projects.wsneeFD.nodes.messages.DataRecordItens;
+import projects.wsneeFD.nodes.messages.MessageItem;
 import projects.wsneeFD.nodes.messages.WsnMsg;
 import projects.wsneeFD.nodes.messages.WsnMsgResponse;
-import projects.wsneeFD.nodes.messages.WsnMsgResponse.DataRecord;
-import projects.wsneeFD.nodes.messages.WsnMsgResponse.MessageItens;
+import projects.wsneeFD.nodes.messages.DataRecord;
 import projects.wsneeFD.nodes.timers.PredictionTimer;
 import projects.wsneeFD.nodes.timers.WsnMessageResponseTimer;
 import projects.wsneeFD.nodes.timers.WsnMessageTimer;
@@ -122,7 +123,12 @@ public class SimpleNode extends Node
 	protected int numTotalPredictions;
 	
 	/**
-	 * Número de predições de erros do nó do sensor nesse timeslot.<p>
+	 * Flag para indicar que os erros (novidades) serão contabilizados por round e não por tipo de dados
+	 */
+	protected boolean countErrorsPerRound = true;
+	
+	/**
+	 * Número de predições de erros do nó do sensor.<p>
 	 * [Eng] Number of prediction errors of the sensor node in this timeslot.
 	 */
 	protected int numPredictionErrors;
@@ -133,6 +139,18 @@ public class SimpleNode extends Node
 	 */
 	protected int[] numPredictionErrorsPerType;
 	
+	/**
+	 * Número total de predições de erros do nó sensor por cada tipo de dados.<p>
+	 * [Eng] Total number of prediction errors of the sensor node for each one data type.
+	 */
+	protected int numPredictionErrorsTotalPerType;
+
+	/**
+	 * Número de predições de erros do nó sensor, contando, no máximo, um erro a cada round, independente da quantidade de tipos de dados com erro.<p>
+	 * [Eng] Number of prediction errors of the sensor node in this timeslot.
+	 */
+	protected int numPredictionErrorsPerRound;
+
 	/**
 	 * Cluster que esse nó pertence.<p>
 	 * [Eng] Cluster to which this node belongs.
@@ -166,6 +184,12 @@ public class SimpleNode extends Node
 	private double predictionsCount = 0.0;
 	
 	private double squaredError = 0.0;
+	
+	public Vector<MessageItem> messageItensPackage;
+	
+	public DataRecordItens dataRecordItens;
+	
+
 	
 	/**
 	 * Caminho (formado pelos ID's dos nós) até o sink node, em forma de pilha <p>
@@ -444,7 +468,6 @@ public class SimpleNode extends Node
 /*
  * Neste caso, algum nó sensor pertencente ao mesmo cluster em que este nó (this) é o Cluster Head, está enviando uma mensagem para ele (CH)
  * informando que houve erro de predição.
- * O CH irá verificar, a cada 2 ou mais mensagens de erro de predição e verificará se os sensores que enviaram tais mensagens estão dentro dos limiares de similaridade.
  */					
 					countErrorMessages(wsnMsgResp);
 										
@@ -501,18 +524,12 @@ public class SimpleNode extends Node
 		}
 		
 		if (messageItensPackage == null) {
-			messageItensPackage = new Vector<MessageItens>();
+			messageItensPackage = new Vector<MessageItem>();
 		}
 		
-		
-		
-		
-		
-		//TODO: PAREI AQUI! Precisa alterar as inner classes para que se tornem classe "reais" (externas).
-//		messageItensPackage.add((this.messageItensPackage)wsnMsgResp.messageItens);
-		
-	
-		
+		if (wsnMsgResp.messageItemToCH != null) {
+			messageItensPackage.add(wsnMsgResp.messageItemToCH);
+		}
 		
 		
 /*		
@@ -541,7 +558,7 @@ public class SimpleNode extends Node
 		
 		if (errorsInThisCluster > clusterDelay)
 		{
-			// Deve informar ao Sink tal problema, para que o mesmo providencie o tratamento correto (Qual seja!???)
+			wsnMsgResp.messageItemsToSink = messageItensPackage;
 			
 			addThisNodeToPath(wsnMsgResp);
 
@@ -1029,17 +1046,17 @@ public class SimpleNode extends Node
 	 * Adiciona os últimos valores lidos anteriormente a mensagem que vai para o sink.<p>[Eng] Adds all itens in dataRecordItens vector for the (WsnMsgResponse) wsnMsgResp / Adds the last values previously read to the message that goes to the sink
 	 * @param wsnMsgResp Mensagem resposta que recebe os itens dataRecordItens <p>[Eng] Message Response that receives the dataRecordItens itens
 	 */
-	protected void addDataRecordItensInWsnMsgResponse(WsnMsgResponse wsnMsgResp)
-	{
-		if (dataRecordItens != null)
-		{
-			for (int cont=0; cont < dataRecordItens.size(); cont++) //for(int cont=0; cont<slidingWindowSize; cont++)
-			{
-				wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).typs, dataRecordItens.get(cont).values, dataRecordItens.get(cont).time, dataRecordItens.get(cont).batLevel, dataRecordItens.get(cont).round); 
-			}
-			wsnMsgResp.messageItens.sourceNode = this;
-		}
-	} // end addDataRecordItensInWsnMsgResponse(WsnMsgResponse wsnMsgResp)
+//	protected void addDataRecordItensInWsnMsgResponse(WsnMsgResponse wsnMsgResp)
+//	{
+//		if (dataRecordItens != null)
+//		{
+//			for (int cont=0; cont < dataRecordItens.size(); cont++) //for(int cont=0; cont<slidingWindowSize; cont++)
+//			{
+//				wsnMsgResp.addDataRecordItens(dataRecordItens.get(cont).typs, dataRecordItens.get(cont).values, dataRecordItens.get(cont).time, dataRecordItens.get(cont).batLevel, dataRecordItens.get(cont).round); 
+//			}
+//			wsnMsgResp.messageItens.sourceNode = this;
+//		}
+//	} // end addDataRecordItensInWsnMsgResponse(WsnMsgResponse wsnMsgResp)
 	
 	/**
 	 * Retorna os dados(no DataRecord) do sensor(currentNode) de acordo com o tipo de dados(dataType) indicado<p>
@@ -1140,6 +1157,7 @@ public class SimpleNode extends Node
 //			System.out.println(" * Debug On * ");
 		}
 */
+		
 		DataRecord dataRecord = getData(this, dataSensedTypes);
 		
 		if (dataRecord != null) {
@@ -1156,15 +1174,24 @@ public class SimpleNode extends Node
 				//TriggerPredictions -> isValuePredictInValueReading
 				//for
 				boolean[] hitsInThisReading = arePredictValuesInReadingValues(values, predictionValues, maxErrors); // RMSE Calculation in this method
+				boolean notYet = true;
 				for (int cont = 0; cont < hitsInThisReading.length; cont++) {
 					if (!hitsInThisReading[cont]) {
 						numPredictionErrorsPerType[cont]++;
-						numPredictionErrors++; // Contador do número de erros de predição
+						numPredictionErrorsTotalPerType++;
+						if (notYet) {
+							numPredictionErrorsPerRound++; // Contador do número de erros de predição por round
+							notYet = false;
+						}
 //						System.out.println(" * * Prediction Error: SensorID = "+this.ID+" numPredictionErrors = "+numPredictionErrors+" numPredictionErrorsPerType[cont="+cont+"] = "+numPredictionErrorsPerType[cont]);
 					}
 				} // end if (!isValuePredictInValueReading(value, predictionValue, maxError))
 
-				addDataRecordItens(dataSensedTypes, values, quantTime, batLevel, round); // Removido (comentado) da linha 987
+				numPredictionErrors = (countErrorsPerRound ? numPredictionErrorsPerRound : numPredictionErrorsTotalPerType); // O número de erros a ser contabilizado vai depender do valor do Flag 
+				// "countErrorsPerRound": Se ele for "true", o num. de erros é contabilizado como sendo 1 erro a cada round que algum (qualquer) dos tipos de dados sendo sensoriados der erro;
+				// Caso contrário, será contabilizado um erro para cada tipo de dados diferente sendo sensoriado.
+				
+				dataRecordItens.add(dataSensedTypes, values, quantTime, batLevel, round, windowSize);
 				
 				if (numPredictionErrors > 0) { // Se há erros de predição, então exibe uma mensagem
 					Utils.printForDebug("* * * * The number of prediction errors is "+numPredictionErrors+"! NoID = "+this.ID+"\n");
@@ -1236,7 +1263,7 @@ public class SimpleNode extends Node
 
 							wsnMsgResp = new WsnMsgResponse(1, this, null, this, messageType, 0, dataSensedTypes);
 							
-							addDataRecordItensInWsnMsgResponse(wsnMsgResp);
+//							addDataRecordItensInWsnMsgResponse(wsnMsgResp); // TODO: CORRIGIR
 
 							addThisNodeToPath(wsnMsgResp);
 													
@@ -1266,7 +1293,12 @@ public class SimpleNode extends Node
 							Utils.printForDebug("* * * * The predicted value NO is within the margin of error of the value read! NoID = "+this.ID);
 							Utils.printForDebug("Round = "+lastRoundRead+": Vpredito[0] = "+predictionValues[0]+", Vlido[0] = "+values[0]+", Limiar[0] = "+maxErrors[0]+"\n");
 							
-							addDataRecordItensInWsnMsgResponse(wsnMsgResp);
+							wsnMsgResp.messageItemToCH = new MessageItem(this, dataRecordItens);
+							
+							
+							
+							
+							
 							
 							addThisNodeToPath(wsnMsgResp);
 							
@@ -1481,112 +1513,6 @@ public class SimpleNode extends Node
 		return this.pathToSenderNode;
 	}
 	
-	/**
-	 * Atualiza o "dataRecordItens" estrutura do "currentNode" pela leitura de "windowSize" quantidade de dados do tipo "dataType" <p>
-	 * [Eng] Updates the "dataRecordItens" structure from the "currentNode" by the reading of "windowSize" quantity of data from type "dataType"
-	 * @param currentNode Sensor node to have the dataRecordItens updated
-	 * @param dataTypes Types of data to be read by sensor
-	 */
-	private void updateDataRecordItens(SimpleNode currentNode, int[] dataTypes) {
-		for (int i=0; i < windowSize; i++) { // TODO: check and change windowSize to slidingWindowSize
-			currentNode.dataRecordItens.add(getData(currentNode, dataTypes));
-		}
-		while (currentNode.dataRecordItens.size() > windowSize) { // TODO: change windowSize to slidingWindowSize
-			currentNode.dataRecordItens.removeElementAt(0);
-		}
-	}
-	
-	/**
-	 * Interior da classe(estrutura) para armazenar os dados importante dos sensores lidos, como:<p>
-	 * tipo char(Tipo do dado do sensor, e.g.: t=temp.,h=Hum., l=Lum. or v=Volt.), <br>
-	 * valor double(Valor absoluto), <br>
-	 * Tempo double (Data/tempo do valor lido),<br>
-	 * batLevel double(Nível de potencia da bateria no sensor) e <br>
-	 * Round int (Número do round)<p>
-	 * [Eng]Inner class (structure) to store important data from sersors readings, like: <p>
-	 * char type (Type of sensor data, e.g.: t=Temp., h=Hum., l=Lum. or v=Volt.), <br>
-	 * double value (Absolute value), <br>
-	 * double time (Date/time from value reading), <br> 
-	 * double batLevel (Battery power level sensor) and <br> 
-	 * int round (Round number) 
-	 * @author Fernando Rodrigues
-	 */
-	public class DataRecord
-	{
-		public int[] typs;
-		public double[] values;
-		public double time;
-		public double batLevel;
-		public int round;
-	} // end DataRecord
-	
-	public Vector<DataRecord> dataRecordItens;
-	
-	public class MessageItens {
-		public Node sourceNode;
-		Vector<DataRecord> dataRecordItens;
-		
-		public MessageItens() {
-			dataRecordItens = new Vector<DataRecord>();
-		}
-	}
-	
-	public Vector<MessageItens> messageItensPackage;
-	
-	/**
-	 * Adiciona os respectivos valores para o atributo dataRecordItens do sensor (SimpleNode)<p>[Eng] Adds the respective values to dataRecordItens attribute from this sensor (SimpleNode)
-	 * @param typ Tipo de dado do sensor, como t=Temp., h=Hum., l=Lum. or v=Volt.<p>[Eng] Type of sensor data, like t=Temp., h=Hum., l=Lum. or v=Volt.
-	 * @param val Valor Absoluto<p>[Eng] Absolute value
-	 * @param tim Data/Tempo do valor lido no formato double<p> [Eng] Date/time from value reading in double format
-	 * @param bat Nível de Potência da bateria no sensor<p>[Eng] Battery power level sensor
-	 * @param rnd Número do round<p>[Eng] Round number
-	 */
-	public void addDataRecordItens(int[] typs, double[] vals, double tim, double bat, int rnd)
-	{
-		if (this.dataRecordItens == null)
-		{
-			this.dataRecordItens = new Vector<DataRecord>();
-		}
-		DataRecord dr = new DataRecord();
-		
-		dr.typs = typs;
-		dr.values = vals;
-		dr.time = tim;
-		dr.batLevel = bat;
-		dr.round = rnd;
-		
-		dataRecordItens.add(dr);
-		//Implements a FIFO structure with the vector 'dataRecordItens' with at most 'slidingWindowSize' elements
-		while (dataRecordItens.size() > windowSize)
-		{
-			dataRecordItens.removeElementAt(0);
-		}
-		nonRead = true;
-	} // end addDataRecordItens(char typ, double val, double tim, double bat, int rnd)
-
-	/**
-	 * Adiciona os respectivos valores para o atributo dataRecordItens do sensor (SimpleNode)<p>[Eng] Adds the respective values to dataRecordItens attribute from this sensor (SimpleNode)
-	 * @param dataRecord O registo de dados com os dados a serem adicionar ao "dataRecordItens" vector a partir do sensor de corrente <p> [Eng] Data record with the data to be add to "dataRecordItens" vector from the current sensor
-	 */
-	
-	public void addDataRecordItens(DataRecord dataRecord)
-	{
-		if (dataRecord == null) {
-			return;
-		}
-
-		if (this.dataRecordItens == null)
-		{
-			this.dataRecordItens = new Vector<DataRecord>();
-		}
-		dataRecordItens.add(dataRecord);
-		//Implements a FIFO structure with the vector 'dataRecordItens' with at most 'slidingWindowSize' elements
-		while (dataRecordItens.size() > slidingWindowSize)
-		{
-			dataRecordItens.removeElementAt(0);
-		}
-		nonRead = true;
-	} // end addDataRecordItens(char typ, double val, double tim, double bat, int rnd)
 	
 	
 	private boolean nonRead = true;
