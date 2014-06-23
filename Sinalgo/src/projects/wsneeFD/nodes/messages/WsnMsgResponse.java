@@ -151,18 +151,10 @@ public class WsnMsgResponse extends Message {
 	private double[] batLevels;
 	
 	private int[] rounds;
-	
-	public class DataRecord
-	{
-		int[] typs;
-		double[] values;
-		double time;
-		double batLevel;
-		int round;
-	}
-	
+		
+	/*
 	public Vector<DataRecord> dataRecordItens;
-	
+
 	public class MessageItens {
 		public Node sourceNode;
 		Vector<DataRecord> dataRecordItens;
@@ -171,9 +163,12 @@ public class WsnMsgResponse extends Message {
 			dataRecordItens = new Vector<DataRecord>();
 		}
 	}
+*/	
+	public MessageItem messageItemToCH;
 	
-	public MessageItens messageItens;
-	
+	public Vector<MessageItem> messageItemsToSink;
+
+/*
 	public void addDataRecordItens(int[] typs, double[] vals, double tim, double bat, int rnd)
 	{
 		if (this.messageItens == null)
@@ -191,7 +186,8 @@ public class WsnMsgResponse extends Message {
 		messageItens.dataRecordItens.add(dr);
 		naoLido = true;
 	}
-	
+*/	
+/*	
 	private void lerDados()
 	{
 		if (naoLido)
@@ -260,7 +256,8 @@ public class WsnMsgResponse extends Message {
 		lerDados();
 		return rounds;
 	}
-	
+*/
+
 	/**
 	 * Construtor básico da Classe <p>
 	 * [Eng] Basic constructor class
@@ -364,7 +361,7 @@ public class WsnMsgResponse extends Message {
 		msg.sizeTimeSlot = this.sizeTimeSlot;
 		msg.dataSensedTypes = this.dataSensedTypes;
 		msg.thresholdError = this.thresholdError;
-		msg.dataRecordItens = this.dataRecordItens;
+		msg.messageItemToCH = this.messageItemToCH;
 		msg.pathToSenderNode = this.pathToSenderNode;
 		msg.spacialThresholdError = this.spacialThresholdError;
 		msg.spatialPos = this.spatialPos;
