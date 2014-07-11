@@ -26,7 +26,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 
-import projects.wsneeFD.nodes.nodeImplementations.SimpleNode.DataRecord;
+import projects.wsneeFD.nodes.messages.DataRecord;
 import projects.wsneeFD.nodes.nodeImplementations.SimpleNode;
 
 public class FD3BigInt {
@@ -444,7 +444,7 @@ public class FD3BigInt {
 		ArrayList<DataRecord> datum = dataReadings(cluster);
 
 		/* FIND OUT HOW MANY COORDINATES POINTS HAVE -- 1?, 2?, 3?, MORE? */
-		embedDim = ((SimpleNode.DataRecord) cluster.get(0).dataRecordItens.get(0)).values.length;
+		embedDim = ((DataRecord) cluster.get(0).dataRecordItens.get(0)).values.length;
 
 		maxMin(datum);
 		max = pmax;
