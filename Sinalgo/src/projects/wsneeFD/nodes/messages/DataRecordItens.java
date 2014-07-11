@@ -17,7 +17,35 @@ public class DataRecordItens
 {
 	public Vector<DataRecord> dataRecords;
 
+	private boolean nonRead = true;
 	
+	private int[][] types2;
+	
+	private double[][] values2;
+	
+	private double[] times;
+	
+	private double[] batLevels;
+	
+	private int[] rounds;
+	
+
+	/**
+	 * Retorna o tamanho do "dataRecords" contido neste "DataRecordItens"
+	 * @return tamanho do dataRecords
+	 */
+	public int size() {
+		return dataRecords.size();
+	} // end size()
+	
+	/**
+	 * Returns the element at the specified position in "dataRecords" Vector.
+	 * @param i index of element to return
+	 * @return object at the specified index
+	 */
+	public DataRecord get(int i) {
+		return dataRecords.get(i);
+	} // end get(int i)
 	
 	/**
 	 * Atualiza o "dataRecords" estrutura do "currentNode" pela leitura de "windowSize" quantidade de dados do tipo "dataType" <p>
@@ -61,12 +89,13 @@ public class DataRecordItens
 		{
 			dataRecords.removeElementAt(0);
 		}
-		//nonRead = true;
+		nonRead = true;
 	} // end add(char typ, double val, double tim, double bat, int rnd, int windowSize)
 
 	/**
 	 * Adiciona os respectivos valores para o atributo dataRecords do sensor (SimpleNode)<p>[Eng] Adds the respective values to dataRecords attribute from this sensor (SimpleNode)
-	 * @param dataRecord O registo de dados com os dados a serem adicionar ao "dataRecords" vector a partir do sensor de corrente <p> [Eng] Data record with the data to be add to "dataRecords" vector from the current sensor
+	 * @param dataRecord O registo de dados com os dados a serem adicionados ao "dataRecords" vector a partir do sensor atual <p> [Eng] Data record with the data to be add to "dataRecords" vector from the current sensor
+	 * @param slidingWindowSize Indica o tamanho da janela de dados a serem mantidos
 	 */	
 	public void add(DataRecord dataRecord, int slidingWindowSize)
 	{
@@ -86,8 +115,78 @@ public class DataRecordItens
 		{
 			dataRecords.removeElementAt(0);
 		}
-//		nonRead = true;
+		nonRead = true;
 	} // end adddataRecords(char typ, double val, double tim, double bat, int rnd)
 
+	
+	private void readData()
+	{
+		if (nonRead)
+		{
+			int tam = 0;
+			if (dataRecords != null)
+			{
+				tam = dataRecords.size();
+			}
+			types2 = new int[tam][];
+			values2 = new double[tam][];
+			times = new double[tam];
+			batLevels = new double[tam];
+			rounds = new int[tam];
+			
+			for (int i=0; i<tam; i++)
+			{
+				if (dataRecords.get(i) != null)
+				{
+					types2[i] = ((DataRecord)dataRecords.get(i)).typs;
+					values2[i] = ((DataRecord)dataRecords.get(i)).values;
+					times[i] = ((DataRecord)dataRecords.get(i)).time;
+					batLevels[i] = ((DataRecord)dataRecords.get(i)).batLevel;
+					rounds[i] = ((DataRecord)dataRecords.get(i)).round;
+				}
+				else
+				{
+					types2[i] = null;
+					values2[i] = null;
+					times[i] = 0.0;
+					batLevels[i] = 0.0;
+					rounds[i] = 0;
+				}
+			}
+			
+			nonRead = false;
+		}
+	}
+	
+	public int[] getDataRecordTypes(int ind)
+	{
+		readData();
+		return types2[ind];
+	}
+	
+	public double[] getDataRecordValues(int ind)
+	{
+		readData();
+		return values2[ind];
+	}
+
+	public double[] getDataRecordTimes()
+	{
+		readData();
+		return times;
+	}
+
+	public double[] getDataRecordBatLevels()
+	{
+		readData();
+		return batLevels;
+	}
+	
+	public int[] getDataRecordRounds()
+	{
+		readData();
+		return rounds;
+	}
+	
 	
 } // end dataRecords
