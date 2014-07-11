@@ -53,7 +53,7 @@ public class SimpleNode extends Node
 	 * Número máximo(limite) de predições dos erros de qualquer nó sensor - Isso também pode ser expressado em percentual(double) do total de timeslot.<p> 
 	 * [Eng] Maximum (limit) Number of prediction errors of any sensor node - It also could be expressed in percentage (i.e., double) from total timeSlot
 	 */
-	protected static final double sensorDelay = 2; //1; //5; // SensorDelay = (was) limitPredictionError
+	protected static final double sensorDelay = 5; //1; //5; // SensorDelay = (was) limitPredictionError
 	
 	/**
 	 *  Número máximo(limite) de erro dos nós dos sensores por cluster -  Sobre o limite, o cluster head comunica-se com o sink.<p>
@@ -699,9 +699,15 @@ public class SimpleNode extends Node
 					lastBatLevel = batLevel;
 					lastRoundRead = round;
 
-					addDataRecordItens(dataSensedTypes, values, quantTime, batLevel, round);
-
-					wsnMsgResp.addDataRecordItens(dataSensedTypes, values, quantTime, batLevel, round);
+					if (dataRecordItens == null) {
+						dataRecordItens = new DataRecordItens();
+					}
+					dataRecordItens.add(dataSensedTypes, values, quantTime, batLevel, round, windowSize);
+					
+					if (wsnMsgResp.messageItemsToSink == null) {
+						wsnMsgResp.messageItemsToSink = new Vector<MessageItem>();
+					}
+					wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItens));
 					
 				}//if (linhas.length > 4)
 			}//if (dataLine != null && dataSensedType != null && medida != 0)
@@ -1191,6 +1197,9 @@ public class SimpleNode extends Node
 				// "countErrorsPerRound": Se ele for "true", o num. de erros é contabilizado como sendo 1 erro a cada round que algum (qualquer) dos tipos de dados sendo sensoriados der erro;
 				// Caso contrário, será contabilizado um erro para cada tipo de dados diferente sendo sensoriado.
 				
+				if (dataRecordItens == null) {
+					dataRecordItens = new DataRecordItens();
+				}
 				dataRecordItens.add(dataSensedTypes, values, quantTime, batLevel, round, windowSize);
 				
 				if (numPredictionErrors > 0) { // Se há erros de predição, então exibe uma mensagem
@@ -1209,7 +1218,7 @@ public class SimpleNode extends Node
 							
 								DataRecord nodeData = getData((SimpleNode)nodes[i], dataSensedTypes); // Calcular o RMSE
 
-								((SimpleNode)nodes[i]).addDataRecordItens(nodeData);
+//								((SimpleNode)nodes[i]).addDataRecordItens(nodeData); // Não haverá mais a abordagem de Nós Representativos! IGNORAR.
 								
 								if (nodeData != null && nodeData.values != null) {
 									double[] sensorValues = nodeData.values;
@@ -1263,7 +1272,20 @@ public class SimpleNode extends Node
 
 							wsnMsgResp = new WsnMsgResponse(1, this, null, this, messageType, 0, dataSensedTypes);
 							
-//							addDataRecordItensInWsnMsgResponse(wsnMsgResp); // TODO: CORRIGIR
+							// Caso o CH (nó atual) esteja com nível de bateria no nível mínimo [(batLevel <= minBatLevelInClusterHead)]
+							// então este nó (CH) deve notificar o Sink [wsnMsgResp.messageItemsToSink = messageItensPackage], repassando para ele os MessageItens, 
+							// com as leituras dos sensores recebidos até então (caso haja)
+							// MAIS as leituras feitas por este mesmo sensor (CH) [messageItensPackage.add(new MessageItem(this, dataRecordItens))]
+							
+							if (messageItensPackage == null) {
+								messageItensPackage = new Vector<MessageItem>();
+							}
+							
+							if (dataRecordItens != null) {
+								messageItensPackage.add(new MessageItem(this, dataRecordItens));
+							}
+
+							wsnMsgResp.messageItemsToSink = messageItensPackage;
 
 							addThisNodeToPath(wsnMsgResp);
 													
@@ -1352,7 +1374,7 @@ public class SimpleNode extends Node
 							Utils.printForDebug("* * The total loops predictions ("+numTotalPredictions+") REACHED the maximum of loops predictions (TimeSlot proprio = "+this.ownTimeSlot+") of this representative node / cluster! NoID = "+this.ID+"\n");						
 						}					
 						
-						addDataRecordItensInWsnMsgResponse(wsnMsgResp);
+//						addDataRecordItensInWsnMsgResponse(wsnMsgResp); // Não haverá mais a abordagem de Nós Representativos! IGNORAR.
 
 						addThisNodeToPath(wsnMsgResp);
 						
@@ -1515,7 +1537,7 @@ public class SimpleNode extends Node
 	
 	
 	
-	private boolean nonRead = true;
+/*	private boolean nonRead = true;
 	
 	private int[][] types2;
 	
@@ -1525,9 +1547,9 @@ public class SimpleNode extends Node
 	
 	private double[] batLevels;
 	
-	private int[] rounds;
+	private int[] rounds;*/
 	
-	private void readData()
+/*	private void readData()
 	{
 		if (nonRead)
 		{
@@ -1595,5 +1617,5 @@ public class SimpleNode extends Node
 		readData();
 		return rounds;
 	}
-	
+*/	
 }
