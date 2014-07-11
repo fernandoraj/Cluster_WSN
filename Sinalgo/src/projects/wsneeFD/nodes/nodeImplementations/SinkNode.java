@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.Vector;
 
 import projects.wsneeFD.nodes.messages.WsnMsg;
 import projects.wsneeFD.nodes.messages.WsnMsgResponse;
@@ -300,139 +301,149 @@ public class SinkNode extends SimpleNode
 						// TO BE TESTED! (18/04/2014)
 						if (FDmodeOn) { // Se estiver no modo Dimensão Fractal!
 							
-							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
-/*
-							if (Global.currentTime >= 999.0) {
-								System.out.println("nodeGroups: \n"+nodeGroups);
+							// TODO: Alteração: Tratar cada um dos nós contidos em MessageItens que virão junto com a messageResponse recebida do CH, e não mais SOMENTE com o nó de origem ((SimpleNode)wsnMsgResp.source)
+							
+							Vector<SimpleNode> receivedNodes = new Vector<SimpleNode>();
+							for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
+								receivedNodes.add((SimpleNode)wsnMsgResp.messageItemsToSink.get(i).sourceNode);
 							}
-*/							
-							Utils.printForDebug("\nSource Node from Message Received: NodeID = "+currentNode.ID);
-//							System.out.println("\nSource Node from Message Received: NodeID = "+currentNode.ID+" in Round "+Global.currentTime+" and hopsToTarget = "+currentNode.hopsToTarget);
 							
-							ArrayList2d<Double, SimpleNode> cloneCluster = nodeGroups.clone2(); // (1)
-							insertNewNodeInClusters(cloneCluster, currentNode); // (2)
-							
-//							System.out.println("\nAntes de calcular FD: cloneCluster:");
-//							System.out.println(cloneCluster);
-
-							//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
-//							System.out.println("");
-							for (int i = 0; i < cloneCluster.getNumRows(); i++) { // (3)
-								cloneCluster.setKey(i, FD3BigInt.calculatesFractalDimensions(cloneCluster.get(i)));
-//							    System.out.println("Fractal Dimension of cluster "+i+" = "+cloneCluster.getKey(i));
-							}
-							Utils.printForDebug("Aqui: nodeGroups:");
-							Utils.printForDebug(nodeGroups);
-							
-							Utils.printForDebug("\nDepois de calcular FD: cloneCluster:");
-							Utils.printForDebug(cloneCluster);
-							
-							// TEORICAMENTE, ESTÁ FALTANDO APENAS OS PASSOS 4), 5), 6), 7) E 8):
-							/* 4) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
-							 * 5) Remover o antigo nó sensor (que enviou a mensagem) do seu cluster anterior;
-							 * 6) Adicionar o(s) novo(s) nó(s) para o cluster selecionado no passo anterior;
-							 * 7) Recalcular a Dimensão Fractal do cluster que recebeu os novos dados do nó sensor;
-							 * 8) Estudar demais alterações necessárias e possíveis efeitos colaterais:
-							 * 		8.1) Reclassificar os nós dentro dos clusters para escolha dos Nós Representativos / Cluster Heads
-							 * 		8.2) Reconfigurar os clusters de cada nó sensor (myCluster) de acordo com a nova configuração
-							 */
-							
-							int codeMinFDDiff = minimumFractalDimensionDiff(nodeGroups, cloneCluster); // (4)
-							
-							if (codeMinFDDiff < 0) { // If any error happens in the calculation of the minimum difference of Fractal Dimension
-								Utils.printForDebug("\nError in minimumFractalDimensionDiff: "+codeMinFDDiff);
+							for (int i = 0; i < receivedNodes.size(); i++) {
+								SimpleNode currentNode = receivedNodes.get(i);
+	//							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
+	/*
+								if (Global.currentTime >= 999.0) {
+									System.out.println("nodeGroups: \n"+nodeGroups);
+								}
+	*/							
+								Utils.printForDebug("\nSource Node from Message Received: NodeID = "+currentNode.ID);
+	//							System.out.println("\nSource Node from Message Received: NodeID = "+currentNode.ID+" in Round "+Global.currentTime+" and hopsToTarget = "+currentNode.hopsToTarget);
 								
-								cloneCluster = new ArrayList2d<Double, SimpleNode>(); // Reboot the cloneCluster object
+								ArrayList2d<Double, SimpleNode> cloneCluster = nodeGroups.clone2(); // (1)
+								insertNewNodeInClusters(cloneCluster, currentNode); // (2)
 								
-								int lineClusterFromCurrentNode = searchAndReplaceNodeInCluster(currentNode); // Replace the node and return his cluster line
+	//							System.out.println("\nAntes de calcular FD: cloneCluster:");
+	//							System.out.println(cloneCluster);
+	
+								//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
+	//							System.out.println("");
+								for (int cont = 0; cont < cloneCluster.getNumRows(); cont++) { // (3)
+									cloneCluster.setKey(cont, FD3BigInt.calculatesFractalDimensions(cloneCluster.get(cont)));
+	//							    System.out.println("Fractal Dimension of cluster "+i+" = "+cloneCluster.getKey(i));
+								}
+								Utils.printForDebug("Aqui: nodeGroups:");
+								Utils.printForDebug(nodeGroups);
 								
-								if (lineClusterFromCurrentNode >= 0) {
-									triggerSplitFromCluster(nodeGroups, cloneCluster, lineClusterFromCurrentNode); // (*)Remove the current cluster from nodeGroups to cloneCluster
-									classifyNodesByAllParams(cloneCluster);
-									setClustersFromNodes(cloneCluster);
+								Utils.printForDebug("\nDepois de calcular FD: cloneCluster:");
+								Utils.printForDebug(cloneCluster);
+								
+								// TEORICAMENTE, ESTÁ FALTANDO APENAS OS PASSOS 4), 5), 6), 7) E 8):
+								/* 4) Verificar qual cluster sofreu menor diferença da nova dimensão fractal para a antiga (anterior);
+								 * 5) Remover o antigo nó sensor (que enviou a mensagem) do seu cluster anterior;
+								 * 6) Adicionar o(s) novo(s) nó(s) para o cluster selecionado no passo anterior;
+								 * 7) Recalcular a Dimensão Fractal do cluster que recebeu os novos dados do nó sensor;
+								 * 8) Estudar demais alterações necessárias e possíveis efeitos colaterais:
+								 * 		8.1) Reclassificar os nós dentro dos clusters para escolha dos Nós Representativos / Cluster Heads
+								 * 		8.2) Reconfigurar os clusters de cada nó sensor (myCluster) de acordo com a nova configuração
+								 */
+								
+								int codeMinFDDiff = minimumFractalDimensionDiff(nodeGroups, cloneCluster); // (4)
+								
+								if (codeMinFDDiff < 0) { // If any error happens in the calculation of the minimum difference of Fractal Dimension
+									Utils.printForDebug("\nError in minimumFractalDimensionDiff: "+codeMinFDDiff);
 									
-									receiveMessageToAllInvolvedSensors(cloneCluster); // Calculates the coefs and send them to the right sensor nodes which are "waiting"
+									cloneCluster = new ArrayList2d<Double, SimpleNode>(); // Reboot the cloneCluster object
 									
-									if (cloneCluster != null) {
-										cloneCluster.transferRowTo(0, nodeGroups); // Returns the cluster removed in (*) to nodeGroups
+									int lineClusterFromCurrentNode = searchAndReplaceNodeInCluster(currentNode); // Replace the node and return his cluster line
+									
+									if (lineClusterFromCurrentNode >= 0) {
+										triggerSplitFromCluster(nodeGroups, cloneCluster, lineClusterFromCurrentNode); // (*)Remove the current cluster from nodeGroups to cloneCluster
+										classifyNodesByAllParams(cloneCluster);
+										setClustersFromNodes(cloneCluster);
+										
+										receiveMessageToAllInvolvedSensors(cloneCluster); // Calculates the coefs and send them to the right sensor nodes which are "waiting"
+										
+										if (cloneCluster != null) {
+											cloneCluster.transferRowTo(0, nodeGroups); // Returns the cluster removed in (*) to nodeGroups
+										}
+										
+										Utils.printForDebug("nodeGroups 3:");
+										Utils.printForDebug(""+nodeGroups);
+	
+										Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
+	
+										cloneCluster = null;
+									} // end if (lineClusterFromCurrentNode >= 0)
+									
+								} // end if (codeMinFDDiff < 0)
+								else { // If the "codeMinFDDiff" represents the line of cluster with the minimum difference of Fractal Dimension
+									int nodeGroupsSizeBefore = nodeGroups.getNumRows();
+	//								System.out.println("\nAntes: nodeGroupsSizeBefore = "+nodeGroupsSizeBefore+" codeMinFDDiff = "+codeMinFDDiff);
+									
+									Utils.printForDebug("\nSearching and removing node from old cluster...");
+									int oldCLuster = searchAndRemoveNodeFromCluster(nodeGroups, currentNode); // Remove the old node from the old cluster (5)
+									Utils.printForDebug("Done... Node removed from cluster number "+oldCLuster);
+									
+	//								System.out.println("\nDurante: nodeGroupsSizeBefore = "+nodeGroupsSizeBefore+" nodeGroups.getNumRows() = "+nodeGroups.getNumRows()+" codeMinFDDiff = "+codeMinFDDiff+" oldCLuster = "+oldCLuster);
+									
+									// If the "searchAndRemoveNodeFromCluster()" removed a line from nodeGroups and this line (removed) is above the other (codeMinFDDiff)
+									if (nodeGroups.getNumRows() < nodeGroupsSizeBefore && codeMinFDDiff >= oldCLuster) { 
+										codeMinFDDiff--; // Then the "codeMinFDDiff" value must have "shifted" one "position"(codeMinFDDiff = codeMinFDDiff - 1;)
 									}
 									
-									Utils.printForDebug("nodeGroups 3:");
-									Utils.printForDebug(""+nodeGroups);
-
+	//								System.out.println("\nDepois de if (nodeGroups.getNumRows() < nodeGroupsSizeBefore ... ): codeMinFDDiff = "+codeMinFDDiff+" nodeGroups.getNumRows() = "+nodeGroups.getNumRows());
+									
+									Utils.printForDebug("\nInserting new node in new cluster ...");
+									insertNewNodeInClusterLine(nodeGroups, currentNode, codeMinFDDiff); // Insert the new received node in the new correct line in cluster (6)
+									Utils.printForDebug("New node inserted in cluster number "+codeMinFDDiff);
+									
+									nodeGroups.setKey(codeMinFDDiff, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(codeMinFDDiff))); // (7)
+									Utils.printForDebug("\nNew Fractal Dimension of cluster "+codeMinFDDiff+" from nodeGroups is "+nodeGroups.getKey(codeMinFDDiff));
+									Utils.printForDebug("Fractal Dimension of cluster Number = "+codeMinFDDiff+" CHOSEN from cloneCluster is "+cloneCluster.getKey(codeMinFDDiff));
+	
+								    Utils.printForDebug("\ncloneCluster 1:");
+								    Utils.printForDebug(""+cloneCluster);
+	
+								    Utils.printForDebug("nodeGroups 1:");
+								    Utils.printForDebug(""+nodeGroups);
+	
+									//Descartar cloneCluster!!! => 
+									cloneCluster = new ArrayList2d<Double, SimpleNode>(); //null;
+	
+									//TODO: Testar o uso de "triggerSplitFromCluster()"
+									triggerSplitFromCluster(nodeGroups, cloneCluster, codeMinFDDiff); 
+	/*
+									System.out.println("nodeGroups 1,5: Depois do triggerSplitFromCluster com codeMinFDDiff = "+codeMinFDDiff);
+									System.out.println(nodeGroups);
+									
+									System.out.println("\ncloneCluster 1,5:");
+									System.out.println(cloneCluster);
+	*/								
+									classifyNodesByAllParams(cloneCluster); // Investigar... (8.1)
+									setClustersFromNodes(cloneCluster); // Investigar... (8.2)
+									
+									receiveMessageToAllInvolvedSensors(cloneCluster);
+									
+									if (cloneCluster != null) {
+										cloneCluster.transferRowTo(0, nodeGroups); //unifyClusters(nodeGroups, cloneCluster);
+									}
+	/*
+									System.out.println("nodeGroups 2:");
+									System.out.println(nodeGroups);
+	*/
 									Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
-
+	
 									cloneCluster = null;
-								} // end if (lineClusterFromCurrentNode >= 0)
+	
+									//TODO: PAREI AQUI !!!
+	
+								} // end else from if (codeMinFDDiff < 0)
 								
-							} // end if (codeMinFDDiff < 0)
-							else { // If the "codeMinFDDiff" represents the line of cluster with the minimum difference of Fractal Dimension
-								int nodeGroupsSizeBefore = nodeGroups.getNumRows();
-//								System.out.println("\nAntes: nodeGroupsSizeBefore = "+nodeGroupsSizeBefore+" codeMinFDDiff = "+codeMinFDDiff);
-								
-								Utils.printForDebug("\nSearching and removing node from old cluster...");
-								int oldCLuster = searchAndRemoveNodeFromCluster(nodeGroups, currentNode); // Remove the old node from the old cluster (5)
-								Utils.printForDebug("Done... Node removed from cluster number "+oldCLuster);
-								
-//								System.out.println("\nDurante: nodeGroupsSizeBefore = "+nodeGroupsSizeBefore+" nodeGroups.getNumRows() = "+nodeGroups.getNumRows()+" codeMinFDDiff = "+codeMinFDDiff+" oldCLuster = "+oldCLuster);
-								
-								// If the "searchAndRemoveNodeFromCluster()" removed a line from nodeGroups and this line (removed) is above the other (codeMinFDDiff)
-								if (nodeGroups.getNumRows() < nodeGroupsSizeBefore && codeMinFDDiff >= oldCLuster) { 
-									codeMinFDDiff--; // Then the "codeMinFDDiff" value must have "shifted" one "position"(codeMinFDDiff = codeMinFDDiff - 1;)
-								}
-								
-//								System.out.println("\nDepois de if (nodeGroups.getNumRows() < nodeGroupsSizeBefore ... ): codeMinFDDiff = "+codeMinFDDiff+" nodeGroups.getNumRows() = "+nodeGroups.getNumRows());
-								
-								Utils.printForDebug("\nInserting new node in new cluster ...");
-								insertNewNodeInClusterLine(nodeGroups, currentNode, codeMinFDDiff); // Insert the new received node in the new correct line in cluster (6)
-								Utils.printForDebug("New node inserted in cluster number "+codeMinFDDiff);
-								
-								nodeGroups.setKey(codeMinFDDiff, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(codeMinFDDiff))); // (7)
-								Utils.printForDebug("\nNew Fractal Dimension of cluster "+codeMinFDDiff+" from nodeGroups is "+nodeGroups.getKey(codeMinFDDiff));
-								Utils.printForDebug("Fractal Dimension of cluster Number = "+codeMinFDDiff+" CHOSEN from cloneCluster is "+cloneCluster.getKey(codeMinFDDiff));
-
-							    Utils.printForDebug("\ncloneCluster 1:");
-							    Utils.printForDebug(""+cloneCluster);
-
-							    Utils.printForDebug("nodeGroups 1:");
-							    Utils.printForDebug(""+nodeGroups);
-
-								//Descartar cloneCluster!!! => 
-								cloneCluster = new ArrayList2d<Double, SimpleNode>(); //null;
-
-								//TODO: Testar o uso de "triggerSplitFromCluster()"
-								triggerSplitFromCluster(nodeGroups, cloneCluster, codeMinFDDiff); 
-/*
-								System.out.println("nodeGroups 1,5: Depois do triggerSplitFromCluster com codeMinFDDiff = "+codeMinFDDiff);
-								System.out.println(nodeGroups);
-								
-								System.out.println("\ncloneCluster 1,5:");
-								System.out.println(cloneCluster);
-*/								
-								classifyNodesByAllParams(cloneCluster); // Investigar... (8.1)
-								setClustersFromNodes(cloneCluster); // Investigar... (8.2)
-								
-								receiveMessageToAllInvolvedSensors(cloneCluster);
-								
-								if (cloneCluster != null) {
-									cloneCluster.transferRowTo(0, nodeGroups); //unifyClusters(nodeGroups, cloneCluster);
-								}
-/*
-								System.out.println("nodeGroups 2:");
-								System.out.println(nodeGroups);
-*/
-								Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
-
-								cloneCluster = null;
-
-								//TODO: PAREI AQUI !!!
-
-							} // end else from if (codeMinFDDiff < 0)
+							} // end for (int i = 0; i < receivedNodes.size(); i++)
 							
 						} // end if (FDmodeOn)
-						else {
-							// COLOCAR AS PRÓXIMAS LINHAS (MARCADAS*) PARA DENTRO DESTE ELSE!
-// *DAQUI...
+						
+						else { // Modo "Medidas de Similaridade"
 /*
 							if (Global.currentTime >= 100 && Global.currentTime <= 200 || Global.currentTime >= 999.0) {
 								System.out.println("Round = "+Global.currentTime+"\nnodeGroups: \n"+nodeGroups);
@@ -487,7 +498,7 @@ public class SinkNode extends SimpleNode
 							} // end if (((double)numTotalOfSensors / (double)Global.clustersCount) <= minimumOccupancyRatePerCluster)
 // ...*ATÉ AQUI!
 							
-						}
+						} // end else // Modo "Medidas de Similaridade"
 						
 					} // end if (wsnMsgResp.typeMsg == 2 || wsnMsgResp.typeMsg == 3)
 /*
@@ -497,6 +508,7 @@ public class SinkNode extends SimpleNode
 */					
 					else if (wsnMsgResp.typeMsg == 4) { // Se é uma mensagem de um Nó Representativo/Cluster Head cujo nível da bateria está abaixo do mínimo (SimpleNode.minBatLevelInClusterHead)
 						numMessagesOfLowBatteryReceived++;
+						// TODO: CORRIGIR!
 						
 						if (ACS) { // Se é uma mensagem de um Cluster Head // Se for um ClusterHead (ClusterHead != null)
 							
@@ -1496,10 +1508,10 @@ public class SinkNode extends SimpleNode
 		
 		//Data read from current sensor (from ArrayList2d)
 		for (int cont = 0; cont < currentSize; cont++) {
-			currentValues[cont] = currentNode.getDataRecordValues(cont);
+			currentValues[cont] = currentNode.dataRecordItens.getDataRecordValues(cont);
 		}
 
-		currentRound = currentNode.getDataRecordRounds();
+		currentRound = currentNode.dataRecordItens.getDataRecordRounds();
 
 		int newSize;
 		double[][] newValues;
@@ -1515,10 +1527,10 @@ public class SinkNode extends SimpleNode
 		
 		//Data read from new sensor (from message received)
 		for (int cont = 0; cont < newSize; cont++) {
-			newValues[cont] = newNode.getDataRecordValues(cont);
+			newValues[cont] = newNode.dataRecordItens.getDataRecordValues(cont);
 		}
 
-		newRound = newNode.getDataRecordRounds();
+		newRound = newNode.dataRecordItens.getDataRecordRounds();
 
 		HashMap<Integer, double[]> hashCurrentMsg, hashNewMsg;
 		
@@ -1625,9 +1637,9 @@ public class SinkNode extends SimpleNode
 
 			//Dados lidos do sensor correspondente
 			for (int cont=0; cont < size; cont++) {
-				valores[cont] = receivedNode.getDataRecordValues(cont);
+				valores[cont] = receivedNode.dataRecordItens.getDataRecordValues(cont);
 			}
-			tempos = receivedNode.getDataRecordTimes();
+			tempos = receivedNode.dataRecordItens.getDataRecordTimes();
 
 			//Coeficientes de regressão linear com os vetores acima
 			double[] coeficientesA, coeficientesB;
