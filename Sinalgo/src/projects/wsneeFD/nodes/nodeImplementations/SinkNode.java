@@ -59,7 +59,7 @@ public class SinkNode extends SimpleNode
 	 * Quantidade de rounds (ciclos) a ser saltado para cada leitura sequencial dos sensores, no caso de uso da abordagem de ClusterHeads (ACS=True) <br>
 	 * [Eng] Number of rounds (cycles) to be jumped for each sequential sensor reading in the case of using the approach of ClusterHeads (ACS=True)
 	 */
-	public static final int sensorTimeSlot = 1;
+	public static final int sensorTimeSlot = 2000;
 	
 	/**
 	 * Número de dados sensoriados por time slot (Tamanho do time slot) <br>
@@ -304,8 +304,14 @@ public class SinkNode extends SimpleNode
 							// TODO: Alteração: Tratar cada um dos nós contidos em MessageItens que virão junto com a messageResponse recebida do CH, e não mais SOMENTE com o nó de origem ((SimpleNode)wsnMsgResp.source)
 							
 							Vector<SimpleNode> receivedNodes = new Vector<SimpleNode>();
-							for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
-								receivedNodes.add((SimpleNode)wsnMsgResp.messageItemsToSink.get(i).sourceNode);
+							
+							if (wsnMsgResp.messageItemsToSink != null) {
+								for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
+									receivedNodes.add((SimpleNode)wsnMsgResp.messageItemsToSink.get(i).sourceNode);
+								}
+							}
+							else {
+								System.out.println("Error: wsnMsgResp.messageItemsToSink == null");
 							}
 							
 							for (int i = 0; i < receivedNodes.size(); i++) {
