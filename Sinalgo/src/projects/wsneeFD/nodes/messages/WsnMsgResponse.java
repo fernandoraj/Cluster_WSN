@@ -366,6 +366,7 @@ public class WsnMsgResponse extends Message {
 		msg.spacialThresholdError = this.spacialThresholdError;
 		msg.spatialPos = this.spatialPos;
 		msg.batLevel = this.batLevel;
+		msg.messageItemsToSink = this.messageItemsToSink;
 		return msg;
 	}
 
