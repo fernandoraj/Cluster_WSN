@@ -53,7 +53,17 @@ public class SinkNode extends SimpleNode
 	 * Indica o limiar de diferença de Dimensão Fractal mínima entre duas medições de um mesmo cluster (antes e depois da adição dos novos dados) para que o mesmo seja válido (não seja considerado "ruído")
 	 * [Eng] Indicates the minimum difference threshold of Fractal Dimension between two measurements of the same cluster (before and after the addiction of new data) so that it is valid (don't be considered "noise")
 	 */
-	private final Double FDthreshold = new Double(0.03); // 0.03 (Value based on "EXPERIMENTAL RESULTS" of "Using the Fractal Dimension to Cluster Datasets" paper)
+	private final Double FDNoiseThreshold = new Double(0.03); // 0.03 (Value based on "EXPERIMENTAL RESULTS" of "Using the Fractal Dimension to Cluster Datasets" paper)
+	
+	/**
+	 * 
+	 */
+	private final Double FDdiffForSplitThreshold = new Double(0.1); // Value based on "Splitting clusters" (Section 4.5) of "Using the Fractal Dimension to Cluster Datasets" full paper
+	
+	/**
+	 * 
+	 */
+	private final Integer FDnumMaxSeqNoiseForSplit = new Integer(3); // Experimental value - It is only a suggestion!
 	
 	/**
 	 * Quantidade de rounds (ciclos) a ser saltado para cada leitura sequencial dos sensores, no caso de uso da abordagem de ClusterHeads (ACS=True) <br>
@@ -124,9 +134,6 @@ public class SinkNode extends SimpleNode
 	 */
 	private static ArrayList2d<Double, SimpleNode> nodeGroups;
 	
-	private static ArrayList2d<Double, SimpleNode> newCluster;
-	
-	private static ArrayList2d<Double, SimpleNode> nodesToReceiveDataReading;
 	
 	/**
 	 * "Lista Negra" é uma lista de mensagens (nós de origem) já recebidos pelo sink (e removido os nodesToReceiveDataReading) <p>
@@ -190,7 +197,7 @@ public class SinkNode extends SimpleNode
 		}
 		System.out.println("The FDmode is "+FDmodeOn);
 		if (FDmodeOn) {
-			System.out.println("   The FDthreshold is "+FDthreshold);
+			System.out.println("   The FDthreshold is "+FDNoiseThreshold);
 		}
 		System.out.println("The sensor delay is "+SimpleNode.sensorDelay);
 		System.out.println("The cluster delay is "+SimpleNode.clusterDelay);
@@ -301,10 +308,13 @@ public class SinkNode extends SimpleNode
 						// TO BE TESTED! (18/04/2014)
 						if (FDmodeOn) { // Se estiver no modo Dimensão Fractal!
 							
-							// TODO: Alteração: Tratar cada um dos nós contidos em MessageItens que virão junto com a messageResponse recebida do CH, e não mais SOMENTE com o nó de origem ((SimpleNode)wsnMsgResp.source)
-							
 							Vector<SimpleNode> receivedNodes = new Vector<SimpleNode>();
 							
+							// TODO: Testar!!!
+/*							if (Global.currentTime > 160037) {
+								System.out.println("@ @ @ Sink: Round "+Global.currentTime+" started!");
+							}
+*/							
 							if (wsnMsgResp.messageItemsToSink != null) {
 								for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
 									receivedNodes.add((SimpleNode)wsnMsgResp.messageItemsToSink.get(i).sourceNode);
@@ -317,11 +327,7 @@ public class SinkNode extends SimpleNode
 							for (int i = 0; i < receivedNodes.size(); i++) {
 								SimpleNode currentNode = receivedNodes.get(i);
 	//							SimpleNode currentNode = (SimpleNode)wsnMsgResp.source;
-	/*
-								if (Global.currentTime >= 999.0) {
-									System.out.println("nodeGroups: \n"+nodeGroups);
-								}
-	*/							
+
 								Utils.printForDebug("\nSource Node from Message Received: NodeID = "+currentNode.ID);
 	//							System.out.println("\nSource Node from Message Received: NodeID = "+currentNode.ID+" in Round "+Global.currentTime+" and hopsToTarget = "+currentNode.hopsToTarget);
 								
@@ -356,30 +362,40 @@ public class SinkNode extends SimpleNode
 								int codeMinFDDiff = minimumFractalDimensionDiff(nodeGroups, cloneCluster); // (4)
 								
 								if (codeMinFDDiff < 0) { // If any error happens in the calculation of the minimum difference of Fractal Dimension
-									Utils.printForDebug("\nError in minimumFractalDimensionDiff: "+codeMinFDDiff);
 									
-									cloneCluster = new ArrayList2d<Double, SimpleNode>(); // Reboot the cloneCluster object
-									
-									int lineClusterFromCurrentNode = searchAndReplaceNodeInCluster(currentNode); // Replace the node and return his cluster line
-									
-									if (lineClusterFromCurrentNode >= 0) {
-										triggerSplitFromCluster(nodeGroups, cloneCluster, lineClusterFromCurrentNode); // (*)Remove the current cluster from nodeGroups to cloneCluster
-										classifyNodesByAllParams(cloneCluster);
-										setClustersFromNodes(cloneCluster);
+									if (codeMinFDDiff == -3) { // In this case, the split process happens to the cluster of "splitClusterFromNode"
+										//TODO: Parei AQUI!!!
 										
-										receiveMessageToAllInvolvedSensors(cloneCluster); // Calculates the coefs and send them to the right sensor nodes which are "waiting"
+										splitClusterFromNode(nodeGroups, currentNode);
 										
-										if (cloneCluster != null) {
-											cloneCluster.transferRowTo(0, nodeGroups); // Returns the cluster removed in (*) to nodeGroups
-										}
+									}
+									else { // if (codeMinFDDiff == -1 || codeMinFDDiff == -2)
+										Utils.printForDebug("\nError in minimumFractalDimensionDiff: "+codeMinFDDiff);
 										
-										Utils.printForDebug("nodeGroups 3:");
-										Utils.printForDebug(""+nodeGroups);
-	
-										Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
-	
-										cloneCluster = null;
-									} // end if (lineClusterFromCurrentNode >= 0)
+										cloneCluster = new ArrayList2d<Double, SimpleNode>(); // Reboot the cloneCluster object
+										
+										int lineClusterFromCurrentNode = searchAndReplaceNodeInCluster(currentNode); // Replace the node and return his cluster line
+										
+										if (lineClusterFromCurrentNode >= 0) {
+											triggerSplitFromCluster(nodeGroups, cloneCluster, lineClusterFromCurrentNode); // (*)Remove the current cluster from nodeGroups to cloneCluster
+											classifyNodesByAllParams(cloneCluster);
+											setClustersFromNodes(cloneCluster);
+											
+											receiveMessageToAllInvolvedSensors(cloneCluster); // Calculates the coefs and send them to the right sensor nodes which are "waiting"
+											
+											if (cloneCluster != null) {
+												cloneCluster.transferRowTo(0, nodeGroups); // Returns the cluster removed in (*) to nodeGroups
+											}
+											
+											Utils.printForDebug("nodeGroups 3:");
+											Utils.printForDebug(""+nodeGroups);
+		
+											Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
+		
+											cloneCluster = null;
+											
+										} // end if (lineClusterFromCurrentNode >= 0)
+									}
 									
 								} // end if (codeMinFDDiff < 0)
 								else { // If the "codeMinFDDiff" represents the line of cluster with the minimum difference of Fractal Dimension
@@ -455,7 +471,11 @@ public class SinkNode extends SimpleNode
 								System.out.println("Round = "+Global.currentTime+"\nnodeGroups: \n"+nodeGroups);
 							}
 */
-							int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // (1)
+							//TODO: SplitClusterFromNode(ArrayList2d, SimpleNode) - Criar método
+							
+							splitClusterFromNode(nodeGroups, (SimpleNode)wsnMsgResp.source);
+							
+/*							int lineFromCluster = searchAndReplaceNodeInCluster((SimpleNode)wsnMsgResp.source); // (1)
 							if (lineFromCluster >= 0) {
 								nodesToReceiveDataReading=ensuresArrayList2d(nodesToReceiveDataReading);
 //								expectedNumberOfSensors += sendSenseRequestMessageToAllSensorsInCluster(nodeGroups, lineFromCluster);
@@ -472,6 +492,9 @@ public class SinkNode extends SimpleNode
 							receiveMessageToAllInvolvedSensors(newCluster);
 							
 							unifyClusters(nodeGroups, newCluster); // (7) // TESTAR SE MÉTODO FUNCIONA CORRETAMENTE!!!???
+*/
+							
+							
 							Global.clustersCount = nodeGroups.getNumRows(); // It sets the number of clusters (lines in nodeGroups) to the Global.clustersCount attribute
 /*
 							if (Global.currentTime >= 100 && Global.currentTime <= 110 || Global.currentTime >= 200.0) {
@@ -570,7 +593,7 @@ public class SinkNode extends SimpleNode
 							nodeGroups.add((SimpleNode)wsnMsgResp.source, 0, initialFracDim); // Add the initial sensor node(SimpleNode) to the group 0 - line 0 (ArrayList2d of SimpleNode)
 						}
 						else { // If there is a sensor group (SensorCluster), then adds the wsnMsgResp.source representing a sensor to group, classifing this sensor in correct cluster/line
-							addNodeInCluster(nodeGroups, (SimpleNode)wsnMsgResp.source);
+							addNodeInCluster(nodeGroups, (SimpleNode)wsnMsgResp.source); // Adds the current sensor node (wsnMsgResp.source) in correct cluster of "nodeGroups"
 						}
 						
 						if (numMessagesReceived >= numTotalOfSensors) { // In this point, clusters should be "closed", and the sensors inside them being classified
@@ -633,6 +656,31 @@ public class SinkNode extends SimpleNode
 	} //end handleMessages()
 	
 	/**
+	 * Makes the split process inside the "clusterGroup" from the cluster which contains the "currentNode" and append the intermediate resulting clusters at the end of "clusterGroup"
+	 * @param clusterGroup Group of all formed clusters
+	 * @param currentNode Node that sensed / read novelties sended to the sink, which triggered the current split process
+	 */
+	private void splitClusterFromNode(ArrayList2d<Double, SimpleNode> clusterGroup, SimpleNode currentNode) {
+		ArrayList2d<Double, SimpleNode> newCluster = new ArrayList2d<Double, SimpleNode>();
+		ArrayList2d<Double, SimpleNode> nodesToReceiveDataReading = new ArrayList2d<Double, SimpleNode>();
+
+		int lineFromCluster = searchAndReplaceNodeInCluster(currentNode, clusterGroup); // Procura o "node" passado (currentNode) no cluster "clusterGroup", substitui (atualiza) o node e retorna o número da linha (cluster) do mesmo
+		
+		if (lineFromCluster >= 0) { // Se existe tal nó sensor("currentNode") em algum cluster do grupo de clusters("clusterGroup")
+			triggerSplitFromCluster(clusterGroup, nodesToReceiveDataReading, lineFromCluster); // (2)
+			//nodeGroups.transferRowTo(lineFromCluster, nodesToReceiveDataReading);
+		}
+		
+		addNodesInNewCluster(nodesToReceiveDataReading, newCluster); // (3)
+		classifyNodesByAllParams(newCluster); // (4)
+		setClustersFromNodes(newCluster); // (5)
+		
+		receiveMessageToAllInvolvedSensors(newCluster);
+		
+		unifyClusters(clusterGroup, newCluster); // (7)
+	} // end splitClusterFromNode(ArrayList2d<Double, SimpleNode> clusterGroup, SimpleNode currentNode)
+	
+	/**
 	 * Call the receiveMessage() method to all aproprieted sensors nodes in "cluster", according the case (ACS = true OR ACS = false)
 	 * @param cluster 
 	 */
@@ -672,7 +720,7 @@ public class SinkNode extends SimpleNode
 		int minLine;
 		Double minDiff;
 		if (curCluster == null || newCluster == null || curCluster.getNumRows() == 0 || newCluster.getNumRows() == 0) {
-			return -1; // Error code (1)
+			return (-1); // Error code (-1)
 		}
 		Utils.printForDebug("|newCluster.fracDim("+0+")["+newCluster.getKey(0)+"] - curCluster.fracDim("+0+")["+curCluster.getKey(0)+"]| = "+Math.abs(newCluster.getKey(0) - curCluster.getKey(0)));
 		minDiff = Math.abs(newCluster.getKey(0) - curCluster.getKey(0));
@@ -684,14 +732,18 @@ public class SinkNode extends SimpleNode
 				minDiff = Math.abs(newCluster.getKey(line) - curCluster.getKey(line));
 			}
 		}
-		if (minDiff > FDthreshold) {
+		if (minDiff > FDdiffForSplitThreshold) { // TODO:P1
+			Utils.printForDebug("\n  ClusterLine = "+minLine+" minDiff = "+minDiff+" curCluster.fracDim = "+curCluster.getKey(minLine)+" newCluster.fracDim = "+newCluster.getKey(minLine));
+			return (-3); // Error code (-3) - Run split process in current cluster using Initialization Algorithm (Similarity Measures)
+		}
+		if (minDiff > FDNoiseThreshold) {
 			Utils.printForDebug("\n  ClusterLine = "+minLine+" minDiff = "+minDiff+" curCluster.fracDim = "+curCluster.getKey(minLine)+" newCluster.fracDim = "+newCluster.getKey(minLine));
 			//TODO: Apagar / comentar linha abaixo!
 //			System.out.println("FDthreshold noise discarded! ClusterLine = "+minLine+" minDiff = "+minDiff+" curCluster.fracDim = "+curCluster.getKey(minLine)+" newCluster.fracDim = "+newCluster.getKey(minLine));
-			return -2; // Error code (2)
+			return (-2); // Error code (-2) - Code for "noise"
 		}
 		return minLine;
-	}
+	} // end minimumFractalDimensionDiff(ArrayList2d<Double, SimpleNode> curCluster, ArrayList2d<Double, SimpleNode> newCluster)
 	
 	/**
 	 * Chama o método "freeNextNode ()" para cada nó sensor na rede para apagar (definido como null) o atributo "nextNodeToBaseStation" e
@@ -1190,7 +1242,7 @@ public class SinkNode extends SimpleNode
 	
 	/**
 	 * Adiciona o objeto SimpleNode (newNode), passado como parâmetro, na linha correta ("Cluster") a partir do tempCluster (ArrayList2d), 
-	 * de acordo com a Medida de Dissimilaridade
+	 * de acordo com a Medida de Similaridade
 	 * PS:. Cada linha tempCluster (ArrayList2d de objetos SimpleNode) representa um cluster de sensores
 	 * classificada pela Medida de Dissimilaridade a partir de dados sensoriados, armazenado em WsnMsgResponse.dataRecordItens <p>
 	 * [Eng] Adds the WsnMsgResponse object (newWsnMsgResp), passed by parameter, in the correct line ("Cluster") from the tempCluster (ArrayList2d) according with the Dissimilarity Measure 
@@ -1350,6 +1402,52 @@ public class SinkNode extends SimpleNode
 		return lineCLuster;
 	} // end searchAndReplaceNodeInCluster(SimpleNode newNode)
 
+	
+	/**
+	 * Procura o objeto SimpleNode, na posição correta em "Cluster" de "nodeGroups" (ArrayList2d)
+	 * e substitui com o que é passado por parâmetro
+	 * PS:. Cada linha de "nodeGroups" (ArrayList2d de objetos SimpleNode) representa um cluster de sensores (SimpleNode) 
+	 * classificada pela Medida de Dissimilaridade a partir dos dados sensoriados, armazenados em SimpleNode.dataRecordItens <p>
+	 * [Eng] Search the SimpleNode object, in the correct position in "Cluster" from the "nodeGroups" (ArrayList2d) 
+	 * and replace him with the one passed by parameter
+	 * PS.: Each line in "nodeGroups" (ArrayList2d of objects SimpleNode) represents a cluster of sensors (SimpleNode), 
+	 * classified by Dissimilarity Measure from yours data sensed, stored on SimpleNode.dataRecordItens
+	 *  
+	 * @param newNode Nó sensor a ser classificado  <p>[Eng] Sensor node to be classified
+	 */
+	private int searchAndReplaceNodeInCluster(SimpleNode newNode, ArrayList2d<Double, SimpleNode> cluster) {
+		int lineCLuster = -1;
+		if (cluster == null) { // If there isn't a message group yet
+			Utils.printForDebug("ERROR in searchAndReplaceNodeInCluster method: There isn't cluster object instanciated yet!");
+		} // end if (cluster == null)
+		else {
+			boolean found = false;
+			int line = 0, col = 0;
+			SimpleNode currentNode = null;
+			while ((!found) && (line < cluster.getNumRows())) {
+				col = 0;
+				while ((!found) && (col < cluster.getNumCols(line))) {
+					currentNode = cluster.get(line, col);
+					if (isEqualNode(currentNode, newNode)) {
+						found = true;
+					} // end if (isEqualNode(currentNode, newNode))
+					else {
+						col++;
+					} // end else from if (isEqualNode(currentNode, newNode))
+				}
+				if (!found) {
+					line++;
+				} // end if (!found)
+			}
+			if (found) {
+				lineCLuster = line;
+				newNode.myCluster = currentNode.myCluster;
+				cluster.set(line, col, newNode); // It sets the new node "newNode" in the line and col (cluster) of cluster
+			} // end if (found)
+		} // end else from if (cluster == null)
+		return lineCLuster;
+	} // end searchAndReplaceNodeInCluster(SimpleNode newNode)
+
 	/**
 	 * Procura o objeto SimpleNode, no cluster "cluster" (ArrayList2d)
 	 * e, caso encontre tal objeto, remove o mesmo do cluster passado
@@ -1398,7 +1496,7 @@ public class SinkNode extends SimpleNode
 			} // end if (found)
 		} // end else from if (nodeGroups == null)
 		return lineCLuster;
-	} // end searchAndReplaceNodeInCluster(SimpleNode newNode)
+	} // end searchAndRemoveNodeFromCluster(ArrayList2d<Double, SimpleNode> cluster, SimpleNode node)
 
 	
 	/**
