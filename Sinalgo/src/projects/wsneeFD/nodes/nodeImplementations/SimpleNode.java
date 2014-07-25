@@ -190,6 +190,7 @@ public class SimpleNode extends Node
 	
 	public DataRecordItens dataRecordItens;
 	
+	public int numSeqNoiseCount = 0;
 
 	
 	/**
@@ -418,7 +419,6 @@ public class SimpleNode extends Node
 						windowSize = wsnMessage.sizeTimeSlot;
 
 						prepareMessage(wsnMsgResp, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedTypes); 
-						// TODO: Adaptar!
 					
 					}
 					addThisNodeToPath(wsnMsgResp);
@@ -498,8 +498,7 @@ public class SimpleNode extends Node
 	 * Contabiliza o número de mensagens de erro recebidas por cada Cluster Head (sensor representativo de um cluster / agrupamento) de acordo com o tipo de erro<p>[Eng] Counts the number of error messages received by each Cluster Head(representative sensor of a cluster / grouping) according to the type of error
 	 * @param wsnMsgResp Mensagem contendo o código de tipo do erro detectado (pode ser erro de predição, número limite de predições ultrapassado ou baixo nível de energia no CH).<p>[Eng] Message containing the code of type error detected( could be prediction error, number limit exceeded predictions or lowest level of energy in the CH).
 	 */
-	private void countErrorMessages(WsnMsgResponse wsnMsgResp)
-	{
+	private void countErrorMessages(WsnMsgResponse wsnMsgResp) {
 		Integer type = wsnMsgResp.typeMsg;
 		
 		if (errorsInThisCluster == 0) { //Se é o primeiro erro (notificação de novidade) deste cluster
@@ -529,8 +528,12 @@ public class SimpleNode extends Node
 			messageItensPackage = new Vector<MessageItem>();
 		}
 		
+		//TODO: Testar método searchAndReplaceOrAddMessageItemInPackage(MessageItem, Vector<MessageItem>)
 		if (wsnMsgResp.messageItemToCH != null) {
-			messageItensPackage.add(wsnMsgResp.messageItemToCH);
+			MessageItem newMessageItem = wsnMsgResp.messageItemToCH;
+			searchAndReplaceOrAddMessageItemInPackage(newMessageItem, messageItensPackage);
+
+//			messageItensPackage.add(wsnMsgResp.messageItemToCH);
 		}
 		
 		
@@ -545,7 +548,7 @@ public class SimpleNode extends Node
 			// indicates that the next prediction error should not consider the RMSE.
 			// Envia uma mensagem para cada um dos nós do cluster atual para que os mesmos saibam que falta um erro (miss) 
 			// para atingir o limite de erros deste cluster (sensores devem descartar acúmulo de RMSE)
-			for (int i = 0; i < this.myCluster.members.size(); i++) {
+/*			for (int i = 0; i < this.myCluster.members.size(); i++) {
 				
 				SimpleNode targetNode = this.myCluster.members.get(i);
 				
@@ -555,12 +558,15 @@ public class SimpleNode extends Node
 																										  // nó "targetNode" deste cluster
 				timer.startRelative(1, this);
 			}			
-		
+*/		
 		}
 		
 		if (errorsInThisCluster > clusterDelay)
 		{
-			if (messageItensPackage == null) {
+/*			if (Global.currentTime > 160037) {
+				System.out.println("Round "+Global.currentTime+" started!");
+			}
+*/			if (messageItensPackage == null) {
 				System.out.println(" @ @ @ messageItensPackage == null");
 			}
 				
@@ -582,8 +588,8 @@ public class SimpleNode extends Node
 			
 			//Node.timers.clear(); // Limpar todos os timers deste nó (ClusterHead) e dos outros nós do mesmo cluster
 			
-			// Envia uma mensagem para cada um dos nós do cluster atual para que os mesmos entrem em modo de "Pre-WaitingMode"
-			for (int i = 0; i < this.myCluster.members.size(); i++) {
+			// Envia uma mensagem para cada um dos nós do cluster atual para que os mesmos entrem em modo de "Pre-WaitingMode" - DEPRECATED!
+/*			for (int i = 0; i < this.myCluster.members.size(); i++) {
 				
 				SimpleNode targetNode = this.myCluster.members.get(i);
 				
@@ -593,7 +599,7 @@ public class SimpleNode extends Node
 																										  // nó "targetNode" deste cluster
 				timer.startRelative(1, this);
 			}			
-			
+*/			
 			if (nextNodeToBaseStation != null) {
 				WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
 				timer.startRelative(1, this); // Envia a mensagem para o próximo nó no caminho do sink no próximo round (1)
@@ -610,8 +616,7 @@ public class SimpleNode extends Node
 	 * [Eng] Adds the current node to the return path of the message back from the sink node to this node
 	 * @param wsnMsgResp Mensagem de resposta a ter o nó atual adicionado (empilhado) em seu caminho do sink para o nó de origem<p>[Eng] Message Response which current node to be add (pushed) in the path from the sink to the source node 
 	 */
-	private void addThisNodeToPath(WsnMsgResponse wsnMsgResp)
-	{
+	private void addThisNodeToPath(WsnMsgResponse wsnMsgResp) {
 		wsnMsgResp.pushToPath(this.ID);
 		//hopsToTarget++;
 //		wsnMsgResp.saltosAteDestino++; // Transferido para o método pushToPath() da classe WsnMsgResponse
@@ -621,8 +626,7 @@ public class SimpleNode extends Node
 	 * Inicia o processo de merge no SimpleNode <p>
 	 * [Eng] Starts the merge process in SimpleNode
 	 */
-	public void startMerge()
-	{
+	public void startMerge() {
 		TimerCollection tc = this.getTimers();
 		tc.clear();
 		canMakePredictions = false;
@@ -631,17 +635,26 @@ public class SimpleNode extends Node
 	/**
 	 * 
 	 */
-	public void freeNextNode()
-	{
+	public void freeNextNode() {
 		nextNodeToBaseStation = null;
 	} // end freeNextNode()
 	
-	//TODO: triggerReading
-	
+	/**
+	 * Engatilha / chama o método que dispara o processo de leitura dos dados, de forma recursiva
+	 * @param wsnMsgResp Mensagem de resposta para carga dos dados lidos
+	 * @param sizeTimeSlot Tamanho / quantidade de dados / leituras a serem realizadas (restante)
+	 * @param dataSensedTypes Códigos (posições no array de dados) dos tipos de dados a serem lidos
+	 */
 	public void triggerReading(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes) {
 		triggerReadings(wsnMsgResp, sizeTimeSlot, dataSensedTypes);
-	}
+	} // end triggerReading(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
 	
+	/**
+	 * Dispara o processo de leitura / carga de dados inicial (fase de aprendizagem) 
+	 * @param wsnMsgResp Mensagem de resposta para carga dos dados lidos
+	 * @param sizeTimeSlot Tamanho / quantidade de dados / leituras a serem realizadas
+	 * @param dataSensedTypes Códigos (posições no array de dados) dos tipos de dados a serem lidos
+	 */
 	public void triggerReadings(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes) {
 		
 		int numSequenceVoltageData = 7; //Position of voltage data according the data structure in "data*.txt" file
@@ -729,7 +742,7 @@ public class SimpleNode extends Node
 			dataLine = performSensorReading();
 		}//if (i<sizeTimeSlot)
 */
-	}
+	} // end triggerReadings(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
 	
 	/**
 	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual<p>[Eng] Prepare the message "wsnMsgResp" to be sended for the sink increasing the data read by the actual node.
@@ -978,8 +991,7 @@ public class SimpleNode extends Node
 	 * @param hour String no formato HH:MM:SS.LLLLL representando a hora da leitura do valor pelo sensor (H-Hora, M-Minuto, S-Segundo, L-Milisegundo)<p>[Eng] String to format HH:MM:SS.LLLLL representing a hour by reading of the value from sensor(H-Hour, M-Minutes, S-Seconds, L-Milliseconds)
 	 * @return Quantidade de milisegundos total representando aquele instante de tempo (Data + Hora) segundo o padrão do Java<p>[Eng] Total quantity of milliseconds representing that instant of time( date + Hour) according to the Java. 
 	 */
-	private long parseCalendarHours(String yearMonthDay, String hour)
-	{
+	private long parseCalendarHours(String yearMonthDay, String hour) {
 		String[] dates = yearMonthDay.split("-");
 		String[] hours = hour.split(":");
 		String certain = "";
@@ -1013,8 +1025,7 @@ public class SimpleNode extends Node
 	 * @param time Parâmetro de tempo a ter o valor da grandeza predito<p>[Eng]Parameter of time to has the value by predicted grandeur.
 	 * @return Valor predito para o parâmetro sensoreado no tempo dado<p>[Eng]Predicted value to sensored parameter in a determined time.
 	 */
-	private double[] makePredictions(double[] A, double[] B, double time) // Cálculo da predição / predições dos valores
-	{
+	private double[] makePredictions(double[] A, double[] B, double time) { // Cálculo da predição / predições dos valores
 		double[] predictions = new double[A.length];
 		for (int numTypes = 0; numTypes < A.length; numTypes++) {
 			predictions[numTypes] = A[numTypes] + B[numTypes]*time;
@@ -1028,8 +1039,7 @@ public class SimpleNode extends Node
 	 * [Eng] It starts a timer to send the message passed to the next node in path to destination node. 
 	 * @param wsnMessage Mensagem a ser enviado para o nó destino. <p>[Eng] Message to be sended to destination node
 	 */
-	protected void sendToNextNodeInPath(WsnMsg wsnMessage)
-	{
+	protected void sendToNextNodeInPath(WsnMsg wsnMessage) {
 		Integer nextNodeId = wsnMessage.popFromPath();
 		WsnMessageTimer timer;
 		Node nextNode;
@@ -1051,8 +1061,7 @@ public class SimpleNode extends Node
 	 * from the message passed by and trigger the predictions for this node
 	 * @param wsnMessage Mensagem que possui os coeficientes lidos.<p> [Eng] Message which have the coefficients read
 	 */
-	protected void receiveCoefficients(WsnMsg wsnMessage)
-	{
+	protected void receiveCoefficients(WsnMsg wsnMessage) {
 		this.clusterHead = wsnMessage.getClusterHead();
 		if (wsnMessage.hasCoefs())
 		{
@@ -1179,8 +1188,7 @@ public class SimpleNode extends Node
 	 * @param maxErrors Limiares de erro para o cálculo de predições para este sensor<p>
 	 * [Eng] Threshold errors to the calculation of predictions for this sensor
 	 */
-	protected void triggerPredictions(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors) // TODO: Marcador!
-	{
+	protected void triggerPredictions(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors) {
 		// Alterar número do round desejado
 /*
 		if (Global.currentTime >= 140.0) { // Round to initiate the Debug Mode
@@ -1305,8 +1313,12 @@ public class SimpleNode extends Node
 								messageItensPackage = new Vector<MessageItem>();
 							}
 							
+							
+							//TODO: Testar método searchAndReplaceOrAddMessageItemInPackage(MessageItem, Vector<MessageItem>)
 							if (dataRecordItens != null) {
-								messageItensPackage.add(new MessageItem(this, dataRecordItens));
+								MessageItem newMessageItem = new MessageItem(this, dataRecordItens);
+								searchAndReplaceOrAddMessageItemInPackage(newMessageItem, messageItensPackage);
+//								messageItensPackage.add(new MessageItem(this, dataRecordItens));
 							}
 
 							wsnMsgResp.messageItemsToSink = messageItensPackage;
@@ -1429,6 +1441,28 @@ public class SimpleNode extends Node
 			}// end if (dataRecord != null)
 			
 	}// end triggerPredictions(String dataSensedType, double coefA, double coefB, double maxError)
+	
+	/**
+	 * Search the "sourceNode" from the "miNew" (MessageItem) in package "miPack" (vector of MessageItens): If found, replace the "MessageItem" with the old data with the new one; Otherwise, 
+	 * adds the new MessageItem in "miPack"
+	 * @param miNew MessageItem with the new data from "SourceNode"
+	 * @param miPack Vector (package) of MessageItens to be searched and added / updated
+	 */
+	private void searchAndReplaceOrAddMessageItemInPackage(MessageItem miNew, Vector<MessageItem> miPack) {
+		if (miNew != null && miPack != null) {
+			boolean foundEqualSourceNode = false;
+			for (MessageItem miCurrent: miPack) {
+				if (miCurrent.sourceNode == miNew.sourceNode) {
+					miCurrent = miNew;
+					foundEqualSourceNode = true;
+					continue;
+				} // end if (miCurrent.sourceNode == miNew.sourceNode)
+			} // end for (MessageItem miCurrent: miPack)
+			if (!foundEqualSourceNode) {
+				miPack.add(miNew);
+			} // end if (!foundEqualSourceNode)
+		} // end if (mi != null && miPack != null)
+	} // end searchAndReplaceOrAddMessageItemInPackage(MessageItem miNew, Vector<MessageItem> miPack)
 	
 	/**
 	 * Isso chama o método triggerPredictions
