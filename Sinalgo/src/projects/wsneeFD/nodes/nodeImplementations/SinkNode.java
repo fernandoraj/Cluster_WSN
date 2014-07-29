@@ -311,10 +311,10 @@ public class SinkNode extends SimpleNode
 							Vector<SimpleNode> receivedNodes = new Vector<SimpleNode>();
 							
 							// TODO: Testar!!!
-/*							if (Global.currentTime > 160037) {
+							if (Global.currentTime > 160037) {
 								System.out.println("@ @ @ Sink: Round "+Global.currentTime+" started!");
 							}
-*/							
+							
 							if (wsnMsgResp.messageItemsToSink != null) {
 								for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
 									receivedNodes.add((SimpleNode)wsnMsgResp.messageItemsToSink.get(i).sourceNode);
