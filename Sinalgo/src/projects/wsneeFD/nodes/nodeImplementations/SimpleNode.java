@@ -563,10 +563,10 @@ public class SimpleNode extends Node
 		
 		if (errorsInThisCluster > clusterDelay)
 		{
-/*			if (Global.currentTime > 160037) {
+			if (Global.currentTime > 160037) {
 				System.out.println("Round "+Global.currentTime+" started!");
 			}
-*/			if (messageItensPackage == null) {
+			if (messageItensPackage == null) {
 				System.out.println(" @ @ @ messageItensPackage == null");
 			}
 				
