@@ -8,18 +8,18 @@ public class ReadingTimer extends Timer {
 
 	private WsnMsgResponse wsnMsgResp;
 	private Integer sizeTimeSlot;
-	private int[] dataSensedTypes;
+//	private int[] dataSensedTypes;
 	
-	public ReadingTimer(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
+	public ReadingTimer(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot)//, int[] dataSensedTypes)
 	{
 		this.wsnMsgResp = wsnMsgResp;
 		this.sizeTimeSlot = sizeTimeSlot;
-		this.dataSensedTypes = dataSensedTypes;
+//		this.dataSensedTypes = dataSensedTypes;
 	}
 	
 	@Override
 	public void fire() {
-		((SimpleNode)node).triggerReading(wsnMsgResp, sizeTimeSlot, dataSensedTypes);
+		((SimpleNode)node).triggerReading(wsnMsgResp, sizeTimeSlot);
 	}
 
 }
