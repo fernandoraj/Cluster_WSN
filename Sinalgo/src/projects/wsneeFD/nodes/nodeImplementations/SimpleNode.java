@@ -18,6 +18,7 @@ import projects.wsneeFD.nodes.messages.WsnMsg;
 import projects.wsneeFD.nodes.messages.WsnMsgResponse;
 import projects.wsneeFD.nodes.timers.PredictionTimer;
 import projects.wsneeFD.nodes.timers.ReadingTimer;
+import projects.wsneeFD.nodes.timers.SelectionTimer;
 import projects.wsneeFD.nodes.timers.WsnMessageResponseTimer;
 import projects.wsneeFD.nodes.timers.WsnMessageTimer;
 import projects.wsneeFD.utils.FileHandler;
@@ -277,7 +278,14 @@ public class SimpleNode extends Node
 	
 	private boolean minusOne = false; // Flag to set that the ClusterHead from this node will send "news" 
 	//to sink in the next error (miss), so hereafter the nodes must don't compute the RMSE to error case
+	
+	private boolean receivedCoefs = false;
 
+	int[] dataSensedTypes;
+	double[] coefsA;
+	double[] coefsB;
+	double[] maxErrors;
+	
 	public SimpleNode() {
 		super();
 		numPredictionErrorsPerType = new int[SinkNode.dataSensedTypes.length];
@@ -354,7 +362,7 @@ public class SimpleNode extends Node
 				{ 
 //					this.setColor(Color.YELLOW);
 //					Integer nextNodeId = wsnMessage.popFromPath();
-					//TODO: Descobrir quando deve ser executada a linha abaixo:
+					//TODO: Remover a linha abaixo:
 					canMakePredictions = Boolean.TRUE;
 					forward = Boolean.FALSE;
 
@@ -410,6 +418,8 @@ public class SimpleNode extends Node
 					
 					WsnMsgResponse wsnMsgResp = new WsnMsgResponse(1, this, null, this, 0, 1, null);
 					
+					WsnMsgResponse wsnMsgResp2 = new WsnMsgResponse(1, this, null, this, 0, 1, null); // TODO: To be tested!
+					
 					if (wsnMessage != null)
 					{
 //	CASO O CLUSTER PRECISE SOFRER UM SPLIT, CADA UM DOS NÓS DO CLUSTER DEVE RECEBER UMA MENS. SOLICITANDO UM NOVO ENVIO DE DADOS PARA O SINK
@@ -426,6 +436,9 @@ public class SimpleNode extends Node
 					if (nextNodeToBaseStation != null) {
 						WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
 						timer.startRelative((wsnMessage.sizeTimeSlot*SinkNode.sensorTimeSlot), this); // Espera por (wsnMessage.sizeTimeSlot*SinkNode.sensorTimeSlot) rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+						
+						SelectionTimer selectionTimer = new SelectionTimer(wsnMsgResp2);
+						selectionTimer.startRelative(((wsnMessage.sizeTimeSlot*SinkNode.sensorTimeSlot)+SinkNode.sensorTimeSlot), this); // Espera por (wsnMessage.sizeTimeSlot*SinkNode.sensorTimeSlot)+SinkNode.sensorTimeSlot rounds e testa se o nó já recebeu seus coeficientes ()
 					}
 					
 					//Devemos alterar o campo forwardingHop(da mensagem) para armazenar o noh que vai encaminhar a mensagem.
@@ -528,7 +541,6 @@ public class SimpleNode extends Node
 			messageItensPackage = new Vector<MessageItem>();
 		}
 		
-		//TODO: Testar método searchAndReplaceOrAddMessageItemInPackage(MessageItem, Vector<MessageItem>)
 		if (wsnMsgResp.messageItemToCH != null) {
 			MessageItem newMessageItem = wsnMsgResp.messageItemToCH;
 			searchAndReplaceOrAddMessageItemInPackage(newMessageItem, messageItensPackage);
@@ -645,17 +657,16 @@ public class SimpleNode extends Node
 	 * @param sizeTimeSlot Tamanho / quantidade de dados / leituras a serem realizadas (restante)
 	 * @param dataSensedTypes Códigos (posições no array de dados) dos tipos de dados a serem lidos
 	 */
-	public void triggerReading(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes) {
-		triggerReadings(wsnMsgResp, sizeTimeSlot, dataSensedTypes);
+	public void triggerReading(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot) {
+		triggerReadings(wsnMsgResp, sizeTimeSlot);
 	} // end triggerReading(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
 	
 	/**
 	 * Dispara o processo de leitura / carga de dados inicial (fase de aprendizagem) 
 	 * @param wsnMsgResp Mensagem de resposta para carga dos dados lidos
 	 * @param sizeTimeSlot Tamanho / quantidade de dados / leituras a serem realizadas
-	 * @param dataSensedTypes Códigos (posições no array de dados) dos tipos de dados a serem lidos
 	 */
-	public void triggerReadings(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes) {
+	public void triggerReadings(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot) {
 		
 		int numSequenceVoltageData = 7; //Position of voltage data according the data structure in "data*.txt" file
 		int numSequenceRound = 2;
@@ -666,7 +677,7 @@ public class SimpleNode extends Node
  * Data type       Data         Hora       Round ID  Temp   Hum    Lum   Volt
  */
 
-		String dataLine = performSensorReading();
+		String dataLine = performSensorReading(); // Faz o sensoriamento / leitura de dados do ambiente
 
 		if (dataLine != null && dataSensedTypes != null && dataSensedTypes.length > 0)
 		{
@@ -733,7 +744,7 @@ public class SimpleNode extends Node
 			
 		if (sizeTimeSlot>0)
 		{
-			ReadingTimer newReadingTimer = new ReadingTimer(wsnMsgResp, sizeTimeSlot, dataSensedTypes); // Então dispara uma nova predição - laço de predições
+			ReadingTimer newReadingTimer = new ReadingTimer(wsnMsgResp, sizeTimeSlot); // Então dispara uma nova predição - laço de predições
 			newReadingTimer.startRelative(SinkNode.sensorTimeSlot, this); 
 		} // end while (sizeTimeSlot>0)
 	
@@ -742,7 +753,7 @@ public class SimpleNode extends Node
 			dataLine = performSensorReading();
 		}//if (i<sizeTimeSlot)
 */
-	} // end triggerReadings(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
+	} // end triggerReadings(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot)
 	
 	/**
 	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual<p>[Eng] Prepare the message "wsnMsgResp" to be sended for the sink increasing the data read by the actual node.
@@ -752,10 +763,85 @@ public class SimpleNode extends Node
 	 */
 	private void prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
 	{
-		
-		triggerReadings(wsnMsgResp, sizeTimeSlot, dataSensedTypes);
-		
+		triggerReadings(wsnMsgResp, sizeTimeSlot);
 	} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
+
+	public void oneReading(WsnMsgResponse wsnMsgResp) {
+		
+		int numSequenceVoltageData = 7; //Position of voltage data according the data structure in "data*.txt" file
+		int numSequenceRound = 2;
+/*
+ * Exemple:
+ * 				2004-03-21 19:02:26.792489 65528 4 87.383 45.4402 5.52 2.31097
+ * Position         [0]         [1]         [2] [3]  [4]    [5]    [6]   [7]
+ * Data type       Data         Hora       Round ID  Temp   Hum    Lum   Volt
+ */
+
+		String dataLine = performSensorReading(); // Faz o sensoriamento / leitura de dados do ambiente
+
+		if (dataLine != null && dataSensedTypes != null && dataSensedTypes.length > 0)
+		{
+			String lines[] = dataLine.split(" ");
+			
+			double[] values = new double[dataSensedTypes.length];
+			double quantTime;
+			double batLevel;
+			int round;
+			if (lines.length > 4)
+			{
+				round = Integer.parseInt(lines[numSequenceRound]); //Número do round
+				
+				for (int nTypes = 0; nTypes < dataSensedTypes.length; nTypes++) {
+					if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals("")) {
+						values[nTypes] = 0.0;
+					}  // end if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals(""))
+					else {
+						try {
+							values[nTypes] = Double.parseDouble(lines[dataSensedTypes[nTypes]]);
+						}//try
+						catch (NumberFormatException e) {
+							values[nTypes] = 0.0;
+						}//catch
+					} // end else if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals(""))
+				} // end for (int nTypes = 0; nTypes < dataSensedTypes.length; nTypes++)
+				
+				
+				if (lines[numSequenceVoltageData] == null || lines[numSequenceVoltageData].equals("")) {
+					batLevel = 0.0;
+				}
+				else {
+					try {
+						batLevel = Double.parseDouble(lines[numSequenceVoltageData]);
+					}//try
+					catch (NumberFormatException e) {
+						batLevel = 0.0;
+					}//catch
+				}//else
+				
+				quantTime = parseCalendarHours(lines[0], lines[1]);
+				
+				lastValuesRead = values;
+				lastTimeRead = quantTime;
+				lastBatLevel = batLevel;
+				lastRoundRead = round;
+
+				if (dataRecordItens == null) {
+					dataRecordItens = new DataRecordItens();
+				}
+				dataRecordItens.add(dataSensedTypes, values, quantTime, batLevel, round, windowSize);
+				
+				if (wsnMsgResp.messageItemsToSink == null) {
+					wsnMsgResp.messageItemsToSink = new Vector<MessageItem>();
+				}
+				wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItens));
+				
+			}//if (linhas.length > 4)
+		}//if (dataLine != null && dataSensedType != null && medida != 0)
+		wsnMsgResp.batLevel = lastBatLevel; // Level of battery from last reading of sensor node
+		wsnMsgResp.spatialPos = wsnMsgResp.source.getPosition(); // Spacial position from the source node from message response
+
+	} // end oneReading(WsnMsgResponse wsnMsgResp)
+	
 	
 	/** 
 	 * Verifica se o ID do sensor passado como parâmetro é igual ao ID deste nó.<p>[Eng] Verifies whether the sensor ID passed as parameter is equal to the ID of this node.
@@ -1065,9 +1151,10 @@ public class SimpleNode extends Node
 		this.clusterHead = wsnMessage.getClusterHead();
 		if (wsnMessage.hasCoefs())
 		{
-			double[] coefsA = wsnMessage.getCoefsA();
-			double[] coefsB = wsnMessage.getCoefsB();
-			double[] maxErrors = wsnMessage.getThresholdErrors();
+			coefsA = wsnMessage.getCoefsA();
+			coefsB = wsnMessage.getCoefsB();
+			maxErrors = wsnMessage.getThresholdErrors();
+			receivedCoefs = true;
 	
 			this.numTotalPredictions = 0;
 			this.numPredictionErrors = 0;
@@ -1077,7 +1164,7 @@ public class SimpleNode extends Node
 			windowSize = slidingWindowSize;
 			// validPredictions = true;
 			//System.out.println("nodeID = "+this.ID+": validPredictions TRUE in Round = "+Global.currentTime);
-			triggerPredictions(wsnMessage.dataSensedTypes, coefsA, coefsB, maxErrors);
+			//triggerPredictions(wsnMessage.dataSensedTypes, coefsA, coefsB, maxErrors);
 		}
 	} // end receiveCoefficients(WsnMsg wsnMessage)
 	
@@ -1188,7 +1275,7 @@ public class SimpleNode extends Node
 	 * @param maxErrors Limiares de erro para o cálculo de predições para este sensor<p>
 	 * [Eng] Threshold errors to the calculation of predictions for this sensor
 	 */
-	protected void triggerPredictions(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors) {
+	protected void triggerPredictions() { //(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors) {
 		// Alterar número do round desejado
 /*
 		if (Global.currentTime >= 140.0) { // Round to initiate the Debug Mode
@@ -1314,7 +1401,6 @@ public class SimpleNode extends Node
 							}
 							
 							
-							//TODO: Testar método searchAndReplaceOrAddMessageItemInPackage(MessageItem, Vector<MessageItem>)
 							if (dataRecordItens != null) {
 								MessageItem newMessageItem = new MessageItem(this, dataRecordItens);
 								searchAndReplaceOrAddMessageItemInPackage(newMessageItem, messageItensPackage);
@@ -1374,8 +1460,7 @@ public class SimpleNode extends Node
 //						else {
 						
 						// Se o modo de sensoriamento é contínuo, continua fazendo predição
-						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedTypes, coefsA, coefsB, maxErrors); // Então dispara uma nova predição - laço de predições
-						//newPredictionTimer.startRelative(1, this); 
+						PredictionTimer newPredictionTimer = new PredictionTimer(); //dataSensedTypes, coefsA, coefsB, maxErrors); // Então dispara uma nova predição - laço de predições
 						newPredictionTimer.startRelative(SinkNode.sensorTimeSlot, this);
 //						}
 					} // end (!exit)
@@ -1387,7 +1472,7 @@ public class SimpleNode extends Node
 				
 					if ((numPredictionErrors <= sensorDelay) && (numTotalPredictions < this.myCluster.sizeTimeSlot)) // Se o número de erros de predição é menor do que o limite aceitável de erros (limitPredictionError) e o número de predições executadas é menor do que o máximo de predições para o cluster deste nó sensor
 					{
-						PredictionTimer newPredictionTimer = new PredictionTimer(dataSensedTypes, coefsA, coefsB, maxErrors); // Então dispara uma nova predição - laço de predições
+						PredictionTimer newPredictionTimer = new PredictionTimer(); //dataSensedTypes, coefsA, coefsB, maxErrors); // Então dispara uma nova predição - laço de predições
 						//newPredictionTimer.startRelative(1, this); 
 						newPredictionTimer.startRelative(SinkNode.sensorTimeSlot, this);
 					} // end if ((numPredictionErrors < limitPredictionError) && (numTotalPredictions < this.myCluster.sizeTimeSlot))
@@ -1472,23 +1557,55 @@ public class SimpleNode extends Node
 	 * @param coefsB Coeficiente B da equação de regressão para esse sensor<p>[Eng] Coefficient B from the Regression Equation for this sensor
 	 * @param maxErrors Erro limiar para calculação da predição para esse sensor.<p>[Eng] Threshold error to the calculation of prediction for this sensor
 	 */
-	public final void triggerPrediction(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors) // TODO: Marcador2!
-	{
-		if (canMakePredictions) {
+	public final void triggerPrediction() {
+//		if (canMakePredictions) {
 			//System.out.println("    SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions ="+canMakePredictions);
 			//if (validPredictions) { // Desabilitar "validPredictions" para que sensores continuem sensoriando após o CH deste cluster haver detectado extrapolação do número de erros (errorsInThisRound > clusterDelay)
-				if (Global.currentTime > lastRoundTriggered) { // Ensures that the same prediction will not be executed more than once in the same round for the same sensor
-					lastRoundTriggered = Global.currentTime;
-					triggerPredictions(dataSensedTypes, coefsA, coefsB, maxErrors);
-				}
+//				if (Global.currentTime > lastRoundTriggered) { // Ensures that the same prediction will not be executed more than once in the same round for the same sensor
+//					lastRoundTriggered = Global.currentTime;
+					triggerPredictions(); //(dataSensedTypes, coefsA, coefsB, maxErrors);
+//				}
 			//}
-		}
+//		}
 /*
 		else {
 			System.out.println("nodeID = "+this.ID+": validPredictions FALSE in Round = "+Global.currentTime);
 		}
 */
+	} // end triggerPrediction()
+
+	
+	public final void triggerSelection(WsnMsgResponse wsnMsgResp) //(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors)
+	{
+		if (receivedCoefs) {
+			//System.out.println("    SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions ="+canMakePredictions);
+			
+			// Mandar dados já lidos em "buffer" para o Sink!
+			// TODO: Testar "if" abaixo!
+			if (wsnMsgResp != null && wsnMsgResp.messageItemsToSink != null) {
+
+				WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
+				timer.startRelative(1, this); // Espera por (wsnMessage.sizeTimeSlot*SinkNode.sensorTimeSlot) rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+			
+			}
+			triggerPredictions();
+		}
+		else {
+			// if () // Se atingiu o SensorDelay
+			// Então mandar os dados para o Sink - "Esvaziar o buffer"
+			
+			// Fazer a leitura - TriggerReadings "like"
+			oneReading(wsnMsgResp);
+
+			// Chama o triggerSelection() (em loop)
+			SelectionTimer newSelectionTimer = new SelectionTimer(wsnMsgResp); // Então dispara uma nova predição - laço de predições
+			newSelectionTimer.startRelative(SinkNode.sensorTimeSlot, this);
+
+ 			System.out.println("nodeID = "+this.ID+": validPredictions FALSE in Round = "+Global.currentTime);
+			
+		}
 	} // end triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
+
 	
 	/**
 	 * It prints the RMSE (Root Mean Square Error) for this sensor <p>
