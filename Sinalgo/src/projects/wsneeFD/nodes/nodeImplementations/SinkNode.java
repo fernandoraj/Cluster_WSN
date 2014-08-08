@@ -61,9 +61,9 @@ public class SinkNode extends SimpleNode
 	private final Double FDdiffForSplitThreshold = new Double(0.1); // Value based on "Splitting clusters" (Section 4.5) of "Using the Fractal Dimension to Cluster Datasets" full paper
 	
 	/**
-	 * 
+	 * Número máximo de "ruídos" sequenciais de um sensor antes de o mesmo disparar um split de cluster
 	 */
-	private final Integer FDnumMaxSeqNoiseForSplit = new Integer(3); // Experimental value - It is only a suggestion!
+	private final int FDnumMaxSeqNoiseForSplit = 3; // Experimental value - It is only a suggestion!
 	
 	/**
 	 * Quantidade de rounds (ciclos) a ser saltado para cada leitura sequencial dos sensores, no caso de uso da abordagem de ClusterHeads (ACS=True) <br>
@@ -310,11 +310,10 @@ public class SinkNode extends SimpleNode
 							
 							Vector<SimpleNode> receivedNodes = new Vector<SimpleNode>();
 							
-							// TODO: Testar!!!
-							if (Global.currentTime > 160037) {
+/*							if (Global.currentTime > 160037) {
 								System.out.println("@ @ @ Sink: Round "+Global.currentTime+" started!");
 							}
-							
+*/							
 							if (wsnMsgResp.messageItemsToSink != null) {
 								for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
 									receivedNodes.add((SimpleNode)wsnMsgResp.messageItemsToSink.get(i).sourceNode);
@@ -362,14 +361,22 @@ public class SinkNode extends SimpleNode
 								int codeMinFDDiff = minimumFractalDimensionDiff(nodeGroups, cloneCluster); // (4)
 								
 								if (codeMinFDDiff < 0) { // If any error happens in the calculation of the minimum difference of Fractal Dimension
-									
-									if (codeMinFDDiff == -3) { // In this case, the split process happens to the cluster of "splitClusterFromNode"
-										//TODO: Parei AQUI!!!
-										
-										splitClusterFromNode(nodeGroups, currentNode);
-										
+									if (Global.currentTime > 184000) {
+										System.out.println("@ @ @ Round: "+Global.currentTime+" : currentNode("+currentNode.ID+").getNumSeqNoiseCount() = "+currentNode.getNumSeqNoiseCount()+" => FDnumMaxSeqNoiseForSplit = "+FDnumMaxSeqNoiseForSplit);
+									}
+									if ((codeMinFDDiff == -3) || (currentNode.getNumSeqNoiseCount() > FDnumMaxSeqNoiseForSplit)) { // If it happens a noise greatter than "FDdiffForSplitThreshold" or there was more than "FDnumMaxSeqNoiseForSplit" sequential noises
+										splitClusterFromNode(nodeGroups, currentNode); // So, the split process happens to the cluster of "splitClusterFromNode"
+										System.out.println("Warning: splitClusterFromNode(nodeGroups, currentNode.ID = "+currentNode.ID+") !!!");
 									}
 									else { // if (codeMinFDDiff == -1 || codeMinFDDiff == -2)
+										if (codeMinFDDiff == -2) { // If there was a noise (minDiff > FDNoiseThreshold)
+											currentNode.setNumSeqNoiseCount((currentNode.getNumSeqNoiseCount() + 1)); // So, it must increment the count of sequential noises from the current node
+											System.out.println("WArning: currentNode.setNumSeqNoiseCount(("+currentNode.getNumSeqNoiseCount()+" + 1)) - currentNode.ID = "+currentNode.ID+" !!!");
+										}
+										else if (currentNode.getNumSeqNoiseCount() > 0) { // If there wasn't a noise and the count of "sequential noise" from the current node is greater than zero (already initialized)
+											currentNode.setNumSeqNoiseCount(0); // then it must reset the counter to zero
+											System.out.println("WARning: currentNode.setNumSeqNoiseCount(0) - currentNode.ID = "+currentNode.ID+"!!!");
+										}
 										Utils.printForDebug("\nError in minimumFractalDimensionDiff: "+codeMinFDDiff);
 										
 										cloneCluster = new ArrayList2d<Double, SimpleNode>(); // Reboot the cloneCluster object
@@ -606,7 +613,12 @@ public class SinkNode extends SimpleNode
 								System.out.println("");
 								//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
 								for (int i = 0; i < nodeGroups.getNumRows(); i++) {
-								    nodeGroups.setKey(i, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(i)));
+									if (nodeGroups.get(i) != null) {
+										nodeGroups.setKey(i, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(i)));
+									}
+									else {
+										System.out.println("nodeGroups.get("+i+") == null");
+									}
 //								    System.out.println("Fractal Dimension of cluster "+i+" = "+nodeGroups.getKey(i));
 								}
 //								System.out.println("Tehee");
@@ -746,7 +758,7 @@ public class SinkNode extends SimpleNode
 	} // end minimumFractalDimensionDiff(ArrayList2d<Double, SimpleNode> curCluster, ArrayList2d<Double, SimpleNode> newCluster)
 	
 	/**
-	 * Chama o método "freeNextNode ()" para cada nó sensor na rede para apagar (definido como null) o atributo "nextNodeToBaseStation" e
+	 * Chama o método "freeNextNode()" para cada nó sensor na rede para apagar (definido como null) o atributo "nextNodeToBaseStation" e
      * definir o "nextNodeToBaseStation" do nó sink (this) para si mesmo (this) <p>
 	 * [Eng] Calls the "freeNextNode()" method for each sensor node in the network for clear (set as null) the "nextNodeToBaseStation" attribute and
 	 * set the "nextNodeToBaseStation" from sink node (this) to itself (this)
@@ -808,17 +820,22 @@ public class SinkNode extends SimpleNode
 	 */
 	void classifyNodesByAllParams(ArrayList2d<Double, SimpleNode> cluster) {
 		Utils.printForDebug("@ @ @ MessageGroups BEFORE classification:\n");
-		printClusterArray2d(cluster);
+//		printClusterArray2d(cluster);
 		
 		classifyRepresentativeNodesByResidualEnergy(cluster); // (Re)classifica os nós dos clusters por energia residual
 		
 		Utils.printForDebug("@ @ @ MessageGroups AFTER FIRST classification:\n");
-		printClusterArray2d(cluster);
+//		printClusterArray2d(cluster);
 		
 		classifyRepresentativeNodesByHopsToSink(cluster); // (Re)classifica os nós dos clusters por saltos até o sink node 
 		
 		Utils.printForDebug("@ @ @ MessageGroups AFTER SECOND classification:\n");
-		printClusterArray2d(cluster);
+		if (nodeGroups != null) {
+			printClusterArray2d(nodeGroups);
+		}
+		else {
+			printClusterArray2d(cluster);
+		}
 	} // end classifyNodesByAllParams(ArrayList2d<WsnMsgResponse> cluster)
 	
 	/**
