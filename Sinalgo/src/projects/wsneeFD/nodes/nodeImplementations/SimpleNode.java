@@ -127,7 +127,7 @@ public class SimpleNode extends Node
 	/**
 	 * Flag para indicar que os erros (novidades) serão contabilizados por round e não por tipo de dados
 	 */
-	protected boolean countErrorsPerRound = true;
+	protected boolean mustCountErrorsPerRound = true;
 	
 	/**
 	 * Número de predições de erros do nó do sensor.<p>
@@ -183,17 +183,50 @@ public class SimpleNode extends Node
 	 */
 	private static final double minBatLevelInClusterHead = 2.1; // According KAMAL, A. R. M.; HAMID, M. A. Reliable data approximation in wireless sensor network. Ad Hoc Networks, n. July, jul. 2013. (l. 540)
 	
+	/**
+	 * Contador do número de predições executadas por tal sensor.<p>
+	 * [Eng] Count the number of predictions carried out by a sensor.
+	 */
 	private double predictionsCount = 0.0;
 	
+	/**
+	 * Variável local para armazenar o somatório do Erro Quadrático (EQ) (SUM((predictionValues - values) ^ 2)) usado para calcular o RMSE (Erro quadrático médio).
+	 * [Eng] Local variable to store the sum of Square Error(SE) (SUM((predictionValues - values) ^ 2)) used to calculate the RMSE (Root mean square error).
+	 */
 	private double squaredError = 0.0;
 	
+	/**
+	 * Vetor (array / conjunto) de itens de mensagem usado para armazenar os dados lidos por cada sensor, para envio para o seu CH e, posteriormente, para o Sink.
+	 * [Eng] Array / Vector of message items used to store the data read by each sensor, for sending to its CH and subsequently to the Sink.
+	 */
 	public Vector<MessageItem> messageItensPackage;
 	
+	/**
+	 * Conjunto de itens de leituras de dados.
+	 * [Eng] Set of data read itens.
+	 */
 	public DataRecordItens dataRecordItens;
 	
-	public int numSeqNoiseCount = 0;
+	/**
+	 * Contador do número de "ruídos" sequenciais apresentados pelo sensor.
+	 * [Eng] Count of the number of sequential "noise" presented by the sensor.
+	 */
+	private int numSeqNoiseCount = 0;
 
-	
+	/**
+	 * @return the numSeqNoiseCount
+	 */
+	public int getNumSeqNoiseCount() {
+		return numSeqNoiseCount;
+	}
+
+	/**
+	 * @param numSeqNoiseCount the numSeqNoiseCount to set
+	 */
+	public void setNumSeqNoiseCount(int numSeqNoiseCount) {
+		this.numSeqNoiseCount = numSeqNoiseCount;
+	}
+
 	/**
 	 * Caminho (formado pelos ID's dos nós) até o sink node, em forma de pilha <p>
 	 * [Eng] Path (consisting of ID's of nodes) to the sink node in stack form
@@ -533,10 +566,10 @@ public class SimpleNode extends Node
 				break;				
 		}
 		
-		if (errorsInThisCluster > 0) {
+/*		if (errorsInThisCluster > 0) {
 			System.out.println("MessageErrorReceivedByCH: SensorIDSource = "+wsnMsgResp.source.ID+" ChID = "+this.ID+" NumErrors = "+errorsInThisCluster);
 		}
-		
+*/		
 		if (messageItensPackage == null) {
 			messageItensPackage = new Vector<MessageItem>();
 		}
@@ -575,9 +608,10 @@ public class SimpleNode extends Node
 		
 		if (errorsInThisCluster > clusterDelay)
 		{
-			if (Global.currentTime > 160037) {
+/*			if (Global.currentTime > 160037) {
 				System.out.println("Round "+Global.currentTime+" started!");
 			}
+*/			
 			if (messageItensPackage == null) {
 				System.out.println(" @ @ @ messageItensPackage == null");
 			}
@@ -763,6 +797,7 @@ public class SimpleNode extends Node
 	 */
 	private void prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
 	{
+		this.dataSensedTypes = dataSensedTypes;
 		triggerReadings(wsnMsgResp, sizeTimeSlot);
 	} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 
@@ -1282,7 +1317,6 @@ public class SimpleNode extends Node
 //			System.out.println(" * Debug On * ");
 		}
 */
-		
 		DataRecord dataRecord = getData(this, dataSensedTypes);
 		
 		if (dataRecord != null) {
@@ -1312,7 +1346,7 @@ public class SimpleNode extends Node
 					}
 				} // end if (!isValuePredictInValueReading(value, predictionValue, maxError))
 
-				numPredictionErrors = (countErrorsPerRound ? numPredictionErrorsPerRound : numPredictionErrorsTotalPerType); // O número de erros a ser contabilizado vai depender do valor do Flag 
+				numPredictionErrors = (mustCountErrorsPerRound ? numPredictionErrorsPerRound : numPredictionErrorsTotalPerType); // O número de erros a ser contabilizado vai depender do valor do Flag 
 				// "countErrorsPerRound": Se ele for "true", o num. de erros é contabilizado como sendo 1 erro a cada round que algum (qualquer) dos tipos de dados sendo sensoriados der erro;
 				// Caso contrário, será contabilizado um erro para cada tipo de dados diferente sendo sensoriado.
 				
@@ -1575,8 +1609,7 @@ public class SimpleNode extends Node
 	} // end triggerPrediction()
 
 	
-	public final void triggerSelection(WsnMsgResponse wsnMsgResp) //(int[] dataSensedTypes, double[] coefsA, double[] coefsB, double[] maxErrors)
-	{
+	public final void triggerSelection(WsnMsgResponse wsnMsgResp) {
 		if (receivedCoefs) {
 			//System.out.println("    SensorID = "+this.ID+" Round = "+Global.currentTime+" canMakePredictions ="+canMakePredictions);
 			
@@ -1589,7 +1622,7 @@ public class SimpleNode extends Node
 			
 			}
 			triggerPredictions();
-		}
+		} // end if (receivedCoefs)
 		else {
 			// if () // Se atingiu o SensorDelay
 			// Então mandar os dados para o Sink - "Esvaziar o buffer"
@@ -1601,10 +1634,10 @@ public class SimpleNode extends Node
 			SelectionTimer newSelectionTimer = new SelectionTimer(wsnMsgResp); // Então dispara uma nova predição - laço de predições
 			newSelectionTimer.startRelative(SinkNode.sensorTimeSlot, this);
 
- 			System.out.println("nodeID = "+this.ID+": validPredictions FALSE in Round = "+Global.currentTime);
+ 			System.out.println("nodeID = "+this.ID+": receivedCoefs FALSE in Round = "+Global.currentTime);
 			
-		}
-	} // end triggerPrediction(String dataSensedType, double coefA, double coefB, double maxError)
+		} // end else from if (receivedCoefs)
+	} // end triggerSelection(WsnMsgResponse wsnMsgResp)
 
 	
 	/**
