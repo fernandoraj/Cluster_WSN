@@ -364,14 +364,22 @@ public class SinkNode extends SimpleNode
 									if (Global.currentTime > 184000) {
 										System.out.println("@ @ @ Round: "+Global.currentTime+" : currentNode("+currentNode.ID+").getNumSeqNoiseCount() = "+currentNode.getNumSeqNoiseCount()+" => FDnumMaxSeqNoiseForSplit = "+FDnumMaxSeqNoiseForSplit);
 									}
-									if ((codeMinFDDiff == -3) || (currentNode.getNumSeqNoiseCount() > FDnumMaxSeqNoiseForSplit)) { // If it happens a noise greatter than "FDdiffForSplitThreshold" or there was more than "FDnumMaxSeqNoiseForSplit" sequential noises
+									if ((codeMinFDDiff == -3) || (currentNode.getNumSeqNoiseCount() >= FDnumMaxSeqNoiseForSplit)) { // If it happens a noise greatter than "FDdiffForSplitThreshold" or there was more than "FDnumMaxSeqNoiseForSplit" sequential noises
 										splitClusterFromNode(nodeGroups, currentNode); // So, the split process happens to the cluster of "splitClusterFromNode"
+//										setFracDimFromClusters(nodeGroups);
 										System.out.println("Warning: splitClusterFromNode(nodeGroups, currentNode.ID = "+currentNode.ID+") !!!");
+										currentNode.setNumSeqNoiseCount(0);
 									}
 									else { // if (codeMinFDDiff == -1 || codeMinFDDiff == -2)
 										if (codeMinFDDiff == -2) { // If there was a noise (minDiff > FDNoiseThreshold)
 											currentNode.setNumSeqNoiseCount((currentNode.getNumSeqNoiseCount() + 1)); // So, it must increment the count of sequential noises from the current node
-											System.out.println("WArning: currentNode.setNumSeqNoiseCount(("+currentNode.getNumSeqNoiseCount()+" + 1)) - currentNode.ID = "+currentNode.ID+" !!!");
+											System.out.println("WArning: currentNode.setNumSeqNoiseCount(("+currentNode.getNumSeqNoiseCount()+")) - currentNode.ID = "+currentNode.ID+" !!!");
+											if ((currentNode.getNumSeqNoiseCount() == FDnumMaxSeqNoiseForSplit)) { // If it happens "FDnumMaxSeqNoiseForSplit" sequential noises
+												splitClusterFromNode(nodeGroups, currentNode); // So, the split process happens to the cluster of "splitClusterFromNode"
+//												setFracDimFromClusters(nodeGroups);
+												System.out.println("getNumSeqNoiseCount() == FDnumMaxSeqNoiseForSplit => splitClusterFromNode(nodeGroups, currentNode.ID = "+currentNode.ID+") !!!");
+												currentNode.setNumSeqNoiseCount(0);
+											}
 										}
 										else if (currentNode.getNumSeqNoiseCount() > 0) { // If there wasn't a noise and the count of "sequential noise" from the current node is greater than zero (already initialized)
 											currentNode.setNumSeqNoiseCount(0); // then it must reset the counter to zero
@@ -611,16 +619,19 @@ public class SinkNode extends SimpleNode
 							//FDmodeON to be checked
 							if (FDmodeOn) {
 								System.out.println("");
+								
 								//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
-								for (int i = 0; i < nodeGroups.getNumRows(); i++) {
+								setFracDimFromClusters(nodeGroups);
+								
+/*								for (int i = 0; i < nodeGroups.getNumRows(); i++) {
 									if (nodeGroups.get(i) != null) {
 										nodeGroups.setKey(i, FD3BigInt.calculatesFractalDimensions(nodeGroups.get(i)));
 									}
 									else {
 										System.out.println("nodeGroups.get("+i+") == null");
 									}
-//								    System.out.println("Fractal Dimension of cluster "+i+" = "+nodeGroups.getKey(i));
 								}
+*/
 //								System.out.println("Tehee");
 								Utils.printForDebug(nodeGroups);
 							}
@@ -668,6 +679,25 @@ public class SinkNode extends SimpleNode
 	} //end handleMessages()
 	
 	/**
+	 * It sets the fractal dimension for all clusters in group of clusters passed by parameter, ie.,
+	 * Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
+	 * @param clusterGroup
+	 */
+	private void setFracDimFromClusters(ArrayList2d<Double, SimpleNode> clusterGroup) {
+		if (clusterGroup != null) {
+			for (int i = 0; i < clusterGroup.getNumRows(); i++) {
+				if (clusterGroup.get(i) != null) {
+					clusterGroup.setKey(i, FD3BigInt.calculatesFractalDimensions(clusterGroup.get(i)));
+				}
+				else {
+					System.out.println("clusterGroup.get("+i+") == null");
+				}
+	//		    System.out.println("Fractal Dimension of cluster "+i+" = "+clusterGroup.getKey(i));
+			} // end for (int i = 0; i < clusterGroup.getNumRows(); i++)
+		} // end if (clusterGroup != null)
+	} // end setFracDimFromClusters(ArrayList2d<Double, SimpleNode> clusterGroup)
+	
+	/**
 	 * Makes the split process inside the "clusterGroup" from the cluster which contains the "currentNode" and append the intermediate resulting clusters at the end of "clusterGroup"
 	 * @param clusterGroup Group of all formed clusters
 	 * @param currentNode Node that sensed / read novelties sended to the sink, which triggered the current split process
@@ -688,6 +718,7 @@ public class SinkNode extends SimpleNode
 		setClustersFromNodes(newCluster); // (5)
 		
 		receiveMessageToAllInvolvedSensors(newCluster);
+		setFracDimFromClusters(newCluster); //TODO: Testar se esta abordagem funciona corretamente
 		
 		unifyClusters(clusterGroup, newCluster); // (7)
 	} // end splitClusterFromNode(ArrayList2d<Double, SimpleNode> clusterGroup, SimpleNode currentNode)
@@ -849,6 +880,7 @@ public class SinkNode extends SimpleNode
 				currentCluster.setMembers( clusterGroup.get(line) );
 				for (int col=0; col < clusterGroup.getNumCols(line); col++) {
 					SimpleNode currentNode = clusterGroup.get(line, col);
+//					currentNode.setNumSeqNoiseCount(0); // TODO: Investigar se é possível fazer isso para todos os casos
 					currentNode.myCluster = currentCluster;
 				} // end for (int col=0; col < clusterGroup.getNumCols(line); col++)
 			} // end for (int line=0; line < clusterGroup.getNumRows(); line++)
@@ -887,6 +919,7 @@ public class SinkNode extends SimpleNode
 				tempClusterReceiver.add(tempClusterGiver.get(rowGiver, col), rowReceiver);
 				col++;
 			} // end while (col < tempClusterGiver.getNumCols(rowIndexes.get(rowGiver)))
+			tempClusterReceiver.setKey(rowReceiver, tempClusterGiver.getKey(rowGiver));
 			rowGiver++;
 			rowReceiver++;
 		} // end while (rowGiver < rowIndexes.size())
