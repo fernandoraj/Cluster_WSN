@@ -619,7 +619,7 @@ public class SinkNode extends SimpleNode
 							
 							//FDmodeON to be checked
 							if (FDmodeOn) {
-								System.out.println("");
+//								System.out.println("");
 								
 								//Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
 								setFracDimFromClusters(nodeGroups);
