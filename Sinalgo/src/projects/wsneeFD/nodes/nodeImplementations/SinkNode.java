@@ -56,7 +56,8 @@ public class SinkNode extends SimpleNode
 	private final Double FDNoiseThreshold = new Double(0.03); // 0.03 (Value based on "EXPERIMENTAL RESULTS" of "Using the Fractal Dimension to Cluster Datasets" paper)
 	
 	/**
-	 * 
+	 * Indica o limite de diferença de Dimensão Fractal mínima para que o "ruído" seja considerado um novo (split de) cluster.
+	 * [Eng] Indicates the minimum difference threshold of Fractal Dimension to the "noise"  be considered a new cluster (or a cluster split).
 	 */
 	private final Double FDdiffForSplitThreshold = new Double(0.1); // Value based on "Splitting clusters" (Section 4.5) of "Using the Fractal Dimension to Cluster Datasets" full paper
 	
@@ -361,29 +362,29 @@ public class SinkNode extends SimpleNode
 								int codeMinFDDiff = minimumFractalDimensionDiff(nodeGroups, cloneCluster); // (4)
 								
 								if (codeMinFDDiff < 0) { // If any error happens in the calculation of the minimum difference of Fractal Dimension
-									if (Global.currentTime > 184000) {
+/*									if (Global.currentTime > 184000) {
 										System.out.println("@ @ @ Round: "+Global.currentTime+" : currentNode("+currentNode.ID+").getNumSeqNoiseCount() = "+currentNode.getNumSeqNoiseCount()+" => FDnumMaxSeqNoiseForSplit = "+FDnumMaxSeqNoiseForSplit);
 									}
-									if ((codeMinFDDiff == -3) || (currentNode.getNumSeqNoiseCount() >= FDnumMaxSeqNoiseForSplit)) { // If it happens a noise greatter than "FDdiffForSplitThreshold" or there was more than "FDnumMaxSeqNoiseForSplit" sequential noises
+*/									if ((codeMinFDDiff == -3) || (currentNode.getNumSeqNoiseCount() >= FDnumMaxSeqNoiseForSplit)) { // If it happens a noise greatter than "FDdiffForSplitThreshold" or there was more than "FDnumMaxSeqNoiseForSplit" sequential noises
 										splitClusterFromNode(nodeGroups, currentNode); // So, the split process happens to the cluster of "splitClusterFromNode"
 //										setFracDimFromClusters(nodeGroups);
-										System.out.println("Warning: splitClusterFromNode(nodeGroups, currentNode.ID = "+currentNode.ID+") !!!");
+//										System.out.println("Warning: splitClusterFromNode(nodeGroups, currentNode.ID = "+currentNode.ID+") !!!");
 										currentNode.setNumSeqNoiseCount(0);
 									}
 									else { // if (codeMinFDDiff == -1 || codeMinFDDiff == -2)
 										if (codeMinFDDiff == -2) { // If there was a noise (minDiff > FDNoiseThreshold)
 											currentNode.setNumSeqNoiseCount((currentNode.getNumSeqNoiseCount() + 1)); // So, it must increment the count of sequential noises from the current node
-											System.out.println("WArning: currentNode.setNumSeqNoiseCount(("+currentNode.getNumSeqNoiseCount()+")) - currentNode.ID = "+currentNode.ID+" !!!");
+//											System.out.println("WArning: currentNode.setNumSeqNoiseCount(("+currentNode.getNumSeqNoiseCount()+")) - currentNode.ID = "+currentNode.ID+" !!!");
 											if ((currentNode.getNumSeqNoiseCount() == FDnumMaxSeqNoiseForSplit)) { // If it happens "FDnumMaxSeqNoiseForSplit" sequential noises
 												splitClusterFromNode(nodeGroups, currentNode); // So, the split process happens to the cluster of "splitClusterFromNode"
 //												setFracDimFromClusters(nodeGroups);
-												System.out.println("getNumSeqNoiseCount() == FDnumMaxSeqNoiseForSplit => splitClusterFromNode(nodeGroups, currentNode.ID = "+currentNode.ID+") !!!");
+//												System.out.println("getNumSeqNoiseCount() == FDnumMaxSeqNoiseForSplit => splitClusterFromNode(nodeGroups, currentNode.ID = "+currentNode.ID+") !!!");
 												currentNode.setNumSeqNoiseCount(0);
 											}
 										}
 										else if (currentNode.getNumSeqNoiseCount() > 0) { // If there wasn't a noise and the count of "sequential noise" from the current node is greater than zero (already initialized)
 											currentNode.setNumSeqNoiseCount(0); // then it must reset the counter to zero
-											System.out.println("WARning: currentNode.setNumSeqNoiseCount(0) - currentNode.ID = "+currentNode.ID+"!!!");
+//											System.out.println("WARning: currentNode.setNumSeqNoiseCount(0) - currentNode.ID = "+currentNode.ID+"!!!");
 										}
 										Utils.printForDebug("\nError in minimumFractalDimensionDiff: "+codeMinFDDiff);
 										
@@ -424,7 +425,7 @@ public class SinkNode extends SimpleNode
 	//								System.out.println("\nDurante: nodeGroupsSizeBefore = "+nodeGroupsSizeBefore+" nodeGroups.getNumRows() = "+nodeGroups.getNumRows()+" codeMinFDDiff = "+codeMinFDDiff+" oldCLuster = "+oldCLuster);
 									
 									// If the "searchAndRemoveNodeFromCluster()" removed a line from nodeGroups and this line (removed) is above the other (codeMinFDDiff)
-									if (nodeGroups.getNumRows() < nodeGroupsSizeBefore && codeMinFDDiff >= oldCLuster) { 
+									if (nodeGroups.getNumRows() < nodeGroupsSizeBefore && codeMinFDDiff >= oldCLuster && codeMinFDDiff > 0) { 
 										codeMinFDDiff--; // Then the "codeMinFDDiff" value must have "shifted" one "position"(codeMinFDDiff = codeMinFDDiff - 1;)
 									}
 									
