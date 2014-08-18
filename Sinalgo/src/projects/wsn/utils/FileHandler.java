@@ -30,7 +30,7 @@ public class FileHandler {
 	 * Número de leituras iniciais de nós sensores (para cada sensor) para ser ignorado no processo de filtragem<p>
 	 * [Eng] Number of initial sensor nodes readings (by each sensor) to be disregarded in the filtering process
 	 */
-	static final int quantLearning = 100;
+	static final int quantLearning = 70;
 	
 	/**
 	 * Número de nós sensores na simulação (Intel Lab Data)<p>
@@ -618,7 +618,7 @@ public class FileHandler {
 			//TypeData.DATE, TypeData.TIME, TypeData.EPOCH, TypeData.SENSORID, TypeData.TEMP, TypeData.HUM, TypeData.LUM, TypeData.VOLT
 			//Remember of configuring "quantLearning" attribute value
 			//FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_10000.txt", TypeData.TEMP, 10.0);
-			FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_20000.txt", TypeData.DATE, 2.0);
+			FileHandler.generateFiltratedFile("data/sensor_readings/data_0.0_percent_min_20000_2.0_filtrated_by_DATE-ErrorSens15.txt", TypeData.DATE, 2.0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
