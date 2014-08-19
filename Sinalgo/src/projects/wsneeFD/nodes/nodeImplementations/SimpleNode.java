@@ -1474,10 +1474,6 @@ public class SimpleNode extends Node
 							wsnMsgResp.messageItemToCH = new MessageItem(this, dataRecordItens);
 							
 							
-							
-							
-							
-							
 							addThisNodeToPath(wsnMsgResp);
 							
 							wsnMsgResp.batLevel = batLevel; // Update the level of battery from last reading of sensor node message
@@ -1487,10 +1483,16 @@ public class SimpleNode extends Node
 							timer.startRelative(1, this);
 							//System.out.println("new DirectMessageTimer(wsnMsgResp, clusterHead); from node "+this.ID+" to node "+clusterHead.ID+" in Round = "+Global.currentTime);
 							
-							numPredictionErrors = 0; // Reinicia a contagem dos erros de predição, depois de ter enviado uma mensagem inicial para o 
-													// ClusterHead
+							numPredictionErrors = 0; // Reinicia a contagem dos erros de predição, depois de ter enviado uma mensagem inicial para o ClusterHead
+							numPredictionErrorsPerRound = 0;
+							numPredictionErrorsTotalPerType = 0;
+							if (numPredictionErrorsPerType != null) {
+								for (int cont = 0; cont < numPredictionErrorsPerType.length; cont++) {
+									numPredictionErrorsPerType[cont] = 0;
+								} // end for(int cont = 0; cont < numPredictionErrorsPerType.length; cont++)
+							} // end if (numPredictionErrorsPerType != null)
 						
-						} // end if (numPredictionErrors >= limitPredictionError)
+						} // end if (numPredictionErrors > sensorDelay)
 //						else {
 						
 						// Se o modo de sensoriamento é contínuo, continua fazendo predição
