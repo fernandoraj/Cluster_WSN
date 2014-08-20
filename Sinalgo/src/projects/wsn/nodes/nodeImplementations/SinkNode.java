@@ -65,6 +65,8 @@ public class SinkNode extends SimpleNode  {
 			Global.log.logln("The size of sliding window is "+SimpleNode.slidingWindowSize);
 			Global.log.logln("The size of delay to send novelties is "+SimpleNode.sensorDelay+"\n");
 			Global.log.logln("The approach type is "+approachType+" (0 = temporal correlation (Adaga-P*); 2 = Naive)");
+			
+			construirRoteamento();
 	}
 
 	@Override
