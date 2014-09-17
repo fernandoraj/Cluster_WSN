@@ -199,9 +199,15 @@ public class SinkNode extends SimpleNode
 		System.out.println("The FDmode is "+FDmodeOn);
 		if (FDmodeOn) {
 			System.out.println("   The FDthreshold is "+FDNoiseThreshold);
+			System.out.println("   The FDdiffForSplitThreshold is "+FDdiffForSplitThreshold);
+			System.out.println("   The FDnumMaxSeqNoiseForSplit is "+FDnumMaxSeqNoiseForSplit);
+		}
+		else {
+			System.out.println("The minimum occupancy rate per cluster (for Merge) is "+minimumOccupancyRatePerCluster);
 		}
 		System.out.println("The sensor delay is "+SimpleNode.sensorDelay);
 		System.out.println("The cluster delay is "+SimpleNode.clusterDelay);
+		System.out.println("The sensor time slot is "+sensorTimeSlot);
 		for (int numTypes = 0; numTypes < thresholdErrors.length; numTypes++) {
 			System.out.println("The threshold of error (max error) is "+thresholdErrors[numTypes]+" for data type (SensedType) in position "+dataSensedTypes[numTypes]);
 		}
@@ -212,7 +218,6 @@ public class SinkNode extends SimpleNode
 		}
 		System.out.println("The size of sliding window is "+SimpleNode.slidingWindowSize);
 		System.out.println("The maximum distance between sensors in the same cluster is "+maxDistance);
-		System.out.println("The minimum occupancy rate per cluster (for Merge) is "+minimumOccupancyRatePerCluster);
 //		System.out.println("The type of data sensed is "+dataSensedType);
 
 		
