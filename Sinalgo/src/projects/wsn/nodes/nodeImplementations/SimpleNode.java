@@ -437,8 +437,8 @@ public class SimpleNode extends Node
 			}			
 			bufferedReader.close();
 		if (sensorReadingsQueue.size() < sensorReadingsLoadBlockSize) {
-			System.err.println("NodeID: " + this.ID + " has already read all the sensor readings of the file. " +
-					"\n It has only " + sensorReadingsQueue.size() + " readings in its memory (sensorReadingsLoadedFromFile list)");
+//			System.err.println("NodeID: " + this.ID + " has already read all the sensor readings of the file. " +
+//					"\n It has only " + sensorReadingsQueue.size() + " readings in its memory (sensorReadingsLoadedFromFile list)");
 		}
 
 		lastLineLoadedFromSensorReadingsFile = lastLineLoadedFromSensorReadingsFile + lineCounter; //updates the last line read from the file
