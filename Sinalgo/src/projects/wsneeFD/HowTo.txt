@@ -23,3 +23,15 @@ Uso da flag "AddByMe" para marcar alterações realizadas, por exemplo, na class
 
 Obs.: Alteramos alguns valores (default) diretamente no arquivo \src\projects\wsneeFD\Config.xml
 
+
+Para que o projeto possa ser executado corretamente, devemos adicionar uma nova configuração de execução (em "Run Configurations...", no menu "Run", submenu 
+"Run Configurations..."): Lá se deve criar uma nova configuração (se ainda não existir), clicando no primeiro botão acima à esquerda da tela ("New launch 
+configuration"), e colocar um nome sugestivo (p. ex.: "FCWsnEE"); na aba Main, selecionar <Project:> = "Sinalgo" e em <Main class:> = "sinalgo.runtime.Main". 
+Deixar as três caixas de seleção abaixo desmarcadas;
+na aba "Arguments", deve-se preencher o campo <Program arguments:> com o seguinte script:
+
+"-project wsneeFD -gen 54 wsneeFD:SimpleNode PositionFile (/Users/fernando1/Documents/My Classes/UFC/Doutorado/Doutorado - PPGIA/Artigos/Redes de Sensores/Ferramentas3/data/mote_locs_formatado.txt) 
+             -gen 1 wsneeFD:SinkNode Line2D  
+              -overwrite  SimulationName=WsnClusterWithIntelLabsDataset"
+
+Pronto! Finalmente é só clicar em <Apply> e depois em <Run> que a simulação será executada.
