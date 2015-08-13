@@ -1,0 +1,228 @@
+> Starting SINALGO in GUI-Mode for project wsneeFD.
+
+The size of time slot is 70
+The threshold of error (max error) is 0.05 for data type (SensedType) in position 4
+The size of sliding window is 10
+
+> Initialization terminated.
+
+------------------------------------------------------
+General Config
+------------------------------------------------------
+Command Line arguments: -project wsneeFD -gen 54 wsneeFD:SimpleNode PositionFile (/Users/fernando1/Documents/My Classes/UFC/Doutorado/Doutorado - PPGIA/Artigos/Redes de Sensores/Ferramentas/data/mote_locs_formatado.txt) -gen 1 wsneeFD:SinkNode Line2D -overwrite SimulationName=WsnEEClusterWithIntelLabsDataset 
+Java VM arguments: -Xmx500m 
+Class path: binaries/bin:binaries/jdom.jar
+------------------------------------------------------
+Configuration settings
+------------------------------------------------------
+ Simulation Area
+    dimensions = 2
+    dimX = 45
+    dimY = 35
+    dimZ = 500
+ Simulation
+    asynchronousMode = false
+    mobility = false
+    interference = false
+    interferenceIsAdditive = true
+    canReceiveWhileSending = true
+    canReceiveMultiplePacketsInParallel = true
+    edgeType = sinalgo.nodes.edges.BidirectionalEdge
+    exitOnTerminationInGUI = false
+    initializeConnectionsOnStartup = false
+    refreshRate = 100
+    generateNAckMessages = false
+    handleEmptyEventQueue = true
+    javaCmd = java
+    javaVMmaxMem = 500
+ Random number generators
+    useSameSeedAsInPreviousRun = false
+    useFixedSeed = false
+    fixedSeed = 77654767234
+ Logging
+    logFileName = logfile
+    outputToConsole = false
+    logToTimeDirectory = true
+    logConfiguration = true
+    eagerFlush = false
+ GUI
+    extendedControl = true
+    drawArrows = false
+    zoomStep = 1.2
+    wheelZoomStep = 1.05
+    minZoomFactor = 0.05
+    draw3DGraphNodesInProperOrder = true
+    usePerspectiveView = true
+    perspectiveViewDistance = 40
+ Background map in 2D
+    useMap = false
+    map = images/map.jpg
+ Models
+    DefaultMessageTransmissionModel = ConstantTime
+    DefaultConnectivityModel = UDG
+    DefaultDistributionModel = Random
+    DefaultInterferenceModel = NoInterference
+    DefaultMobilityModel = NoMobility
+    DefaultReliabilityModel = ReliableDelivery
+    DefaultNodeImplementation = wsn:SimpleNode
+    showModelsOfAllProjects = false
+ Node storage, position transformation
+    guiPositionTransformation2D = sinalgo.gui.transformation.Transformation2D
+    guiPositionTransformation3D = sinalgo.gui.transformation.Transformation3D
+    nodeCollection2D = sinalgo.runtime.nodeCollection.Geometric2DNodeCollection
+    nodeCollection3D = sinalgo.runtime.nodeCollection.Geometric3DNodeCollection
+ Export Settings
+    epsToPdfCommand = epstopdf %s
+    epsDrawDeploymentAreaBoundingBox = true
+    epsDrawBackgroundWhite = true
+ Animation Settings
+    showMessageAnimations = true
+    messageAnimationEnvelopeWidth = 1.0
+    messageAnimationEnvelopeHeight = 1.0
+    messageAnimationEnvelopeColor = r=255,g=255,b=0
+ Diverse Settings
+    showOptimizationHints = true
+    drawEdges = true
+    drawNodes = true
+    shownEventQueueSize = 10
+    outputTextFieldHeight = 200
+    arrowLength = 8
+    arrowWidth = 1
+    defaultRoundNumber = 100
+------------------------------------------------------
+Custom settings
+------------------------------------------------------
+ externalfilespath/sensorreadingsfilepath = data/sensor_readings/data_0.0_percent_min_20000_2.0_filtrated_by_DATE-ErrorSens15.txt
+ geometricnodecollection/rmax = 10
+ messagetransmission/constanttime = 1
+ node/defaultsize = 1
+ qudg/connectionprobability = 0.6
+ qudg/probabilitytype = constant
+ qudg/rmax = 6
+ qudg/rmin = 4
+ randomdirection/movetime/distribution = Uniform
+ randomdirection/movetime/max = 20
+ randomdirection/movetime/min = 5
+ randomdirection/nodespeed/distribution = Gaussian
+ randomdirection/nodespeed/mean = 10
+ randomdirection/nodespeed/variance = 20
+ randomdirection/waitingtime/distribution = Poisson
+ randomdirection/waitingtime/lambda = 10
+ randomwaypoint/speed/distribution = Gaussian
+ randomwaypoint/speed/mean = 10
+ randomwaypoint/speed/variance = 20
+ randomwaypoint/waitingtime/distribution = Poisson
+ randomwaypoint/waitingtime/lambda = 10
+ sensorreadingsloadblocksize = 20000
+ simulationname = WsnEEClusterWithIntelLabsDataset
+ sinr/alpha = 2
+ sinr/beta = 0.7
+ sinr/noise = 0
+ udg/rmax = 7
+------------------------------------------------------
+Seed for Random Number Generators
+------------------------------------------------------
+ Randomly selected seed: 8909528116615518622
+------------------------------------------------------
+End of settings
+------------------------------------------------------
+
+> Starting the Simulation.
+
+Round; RMSE                ;Number of Messages
+
+
+Round	RMSE	NumMsg	#Clust	#SRead
+100	0,235	605	18	3795
+101	0,233	638	18	3815
+102	0,23	638	18	3844
+103	0,229	662	18	3873
+104	0,231	662	18	3912
+105	0,235	676	18	3951
+106	0,251	676	18	3998
+107	0,262	682	18	4045
+108	0,492	683	18	4096
+109	0,609	685	18	4147
+110	0,69	691	18	4200
+111	0,679	691	18	4252
+112	0,659	701	18	4304
+113	0,637	702	18	4352
+114	0,621	712	18	4400
+115	0,606	714	18	4447
+116	0,591	720	18	4494
+117	0,59	720	18	4540
+118	0,578	728	18	4585
+119	0,567	728	18	4629
+120	0,557	734	18	4673
+130	0,493	783	16	5113
+131	0,49	783	16	5157
+132	0,486	798	16	5201
+133	0,483	798	16	5245
+134	0,48	813	16	5289
+135	0,477	813	16	5335
+136	0,474	827	16	5381
+137	0,471	827	16	5428
+138	0,469	842	16	5474
+139	0,467	843	16	5522
+140	0,465	856	16	5568
+141	0,463	875	16	5617
+142	0,46	885	16	5663
+143	0,457	908	16	5711
+144	0,456	931	16	5741
+145	0,456	950	16	5773
+146	0,455	972	16	5803
+147	0,455	974	16	5834
+148	0,455	982	16	5865
+149	0,455	987	16	5895
+150	0,454	996	16	5925
+151	0,454	1007	16	5954
+152	0,453	1014	16	5983
+153	0,453	1023	16	6012
+154	0,452	1027	16	6042
+155	0,452	1031	16	6071
+156	0,451	1037	16	6100
+157	0,451	1041	16	6128
+158	0,45	1048	16	6157
+159	0,45	1051	16	6185
+160	0,449	1057	16	6215
+161	0,449	1058	16	6244
+162	0,448	1062	16	6274
+163	0,448	1062	16	6303
+164	0,448	1069	16	6332
+165	0,448	1069	16	6361
+166	0,448	1079	16	6390
+167	0,447	1079	16	6418
+168	0,447	1090	16	6446
+169	0,447	1090	16	6475
+170	0,446	1098	16	6503
+171	0,446	1098	16	6533
+172	0,446	1103	16	6562
+173	0,445	1103	16	6592
+174	0,445	1115	16	6622
+175	0,445	1116	16	6651
+176	0,447	1128	16	6680
+177	0,447	1129	16	6703
+178	0,447	1139	16	6725
+179	0,447	1140	16	6747
+180	0,446	1144	16	6769
+181	0,446	1145	16	6792
+182	0,446	1156	16	6815
+183	0,446	1157	16	6837
+184	0,446	1176	16	6859
+185	0,449	1177	16	6874
+186	0,452	1196	16	6889
+187	0,452	1198	16	6904
+188	0,452	1210	16	6919
+189	0,452	1213	16	6934
+190	0,452	1231	16	6948
+191	0,452	1237	16	6967
+192	0,452	1250	16	6984
+193	0,451	1255	16	7006
+194	0,45	1262	16	7028
+195	0,449	1264	16	7053
+196	0,448	1268	16	7078
+197	0,447	1270	16	7104
+198	0,446	1273	16	7130
+199	0,445	1275	16	7156
+200	0,444	1278	16	7182
+210	0,437	1310	15	7458

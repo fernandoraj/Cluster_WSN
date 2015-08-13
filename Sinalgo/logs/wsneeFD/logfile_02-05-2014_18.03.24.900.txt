@@ -1,0 +1,205 @@
+> Starting SINALGO in GUI-Mode for project wsneeFD.
+
+The size of time slot is 70
+The threshold of error (max error) is 0.05 for data type (SensedType) in position 4
+The size of sliding window is 10
+
+> Initialization terminated.
+
+------------------------------------------------------
+General Config
+------------------------------------------------------
+Command Line arguments: -project wsneeFD -gen 54 wsneeFD:SimpleNode PositionFile (/Users/fernando1/Documents/My Classes/UFC/Doutorado/Doutorado - PPGIA/Artigos/Redes de Sensores/Ferramentas/data/mote_locs_formatado.txt) -gen 1 wsneeFD:SinkNode Line2D -overwrite SimulationName=WsnEEClusterWithIntelLabsDataset 
+Java VM arguments: -Xmx500m 
+Class path: binaries/bin:binaries/jdom.jar
+------------------------------------------------------
+Configuration settings
+------------------------------------------------------
+ Simulation Area
+    dimensions = 2
+    dimX = 45
+    dimY = 35
+    dimZ = 500
+ Simulation
+    asynchronousMode = false
+    mobility = false
+    interference = false
+    interferenceIsAdditive = true
+    canReceiveWhileSending = true
+    canReceiveMultiplePacketsInParallel = true
+    edgeType = sinalgo.nodes.edges.BidirectionalEdge
+    exitOnTerminationInGUI = false
+    initializeConnectionsOnStartup = false
+    refreshRate = 140
+    generateNAckMessages = false
+    handleEmptyEventQueue = true
+    javaCmd = java
+    javaVMmaxMem = 500
+ Random number generators
+    useSameSeedAsInPreviousRun = false
+    useFixedSeed = false
+    fixedSeed = 77654767234
+ Logging
+    logFileName = logfile
+    outputToConsole = false
+    logToTimeDirectory = true
+    logConfiguration = true
+    eagerFlush = false
+ GUI
+    extendedControl = true
+    drawArrows = false
+    zoomStep = 1.2
+    wheelZoomStep = 1.05
+    minZoomFactor = 0.05
+    draw3DGraphNodesInProperOrder = true
+    usePerspectiveView = true
+    perspectiveViewDistance = 40
+ Background map in 2D
+    useMap = false
+    map = images/map.jpg
+ Models
+    DefaultMessageTransmissionModel = ConstantTime
+    DefaultConnectivityModel = UDG
+    DefaultDistributionModel = Random
+    DefaultInterferenceModel = NoInterference
+    DefaultMobilityModel = NoMobility
+    DefaultReliabilityModel = ReliableDelivery
+    DefaultNodeImplementation = wsn:SimpleNode
+    showModelsOfAllProjects = false
+ Node storage, position transformation
+    guiPositionTransformation2D = sinalgo.gui.transformation.Transformation2D
+    guiPositionTransformation3D = sinalgo.gui.transformation.Transformation3D
+    nodeCollection2D = sinalgo.runtime.nodeCollection.Geometric2DNodeCollection
+    nodeCollection3D = sinalgo.runtime.nodeCollection.Geometric3DNodeCollection
+ Export Settings
+    epsToPdfCommand = epstopdf %s
+    epsDrawDeploymentAreaBoundingBox = true
+    epsDrawBackgroundWhite = true
+ Animation Settings
+    showMessageAnimations = true
+    messageAnimationEnvelopeWidth = 1.0
+    messageAnimationEnvelopeHeight = 1.0
+    messageAnimationEnvelopeColor = r=255,g=255,b=0
+ Diverse Settings
+    showOptimizationHints = true
+    drawEdges = true
+    drawNodes = true
+    shownEventQueueSize = 10
+    outputTextFieldHeight = 200
+    arrowLength = 8
+    arrowWidth = 1
+    defaultRoundNumber = 140
+------------------------------------------------------
+Custom settings
+------------------------------------------------------
+ externalfilespath/sensorreadingsfilepath = data/sensor_readings/data_0.0_percent_min_20000_2.0_filtrated_by_DATE-ErrorSens15.txt
+ geometricnodecollection/rmax = 10
+ messagetransmission/constanttime = 1
+ node/defaultsize = 1
+ qudg/connectionprobability = 0.6
+ qudg/probabilitytype = constant
+ qudg/rmax = 6
+ qudg/rmin = 4
+ randomdirection/movetime/distribution = Uniform
+ randomdirection/movetime/max = 20
+ randomdirection/movetime/min = 5
+ randomdirection/nodespeed/distribution = Gaussian
+ randomdirection/nodespeed/mean = 10
+ randomdirection/nodespeed/variance = 20
+ randomdirection/waitingtime/distribution = Poisson
+ randomdirection/waitingtime/lambda = 10
+ randomwaypoint/speed/distribution = Gaussian
+ randomwaypoint/speed/mean = 10
+ randomwaypoint/speed/variance = 20
+ randomwaypoint/waitingtime/distribution = Poisson
+ randomwaypoint/waitingtime/lambda = 10
+ sensorreadingsloadblocksize = 20000
+ simulationname = WsnEEClusterWithIntelLabsDataset
+ sinr/alpha = 2
+ sinr/beta = 0.7
+ sinr/noise = 0
+ udg/rmax = 7
+------------------------------------------------------
+Seed for Random Number Generators
+------------------------------------------------------
+ Randomly selected seed: -6211500288933526066
+------------------------------------------------------
+End of settings
+------------------------------------------------------
+
+> Starting the Simulation.
+
+Round; RMSE                ;Number of Messages
+
+
+Round	RMSE	NumMsg	#Clust	#SRead
+140	0,463	817	18	5571
+141	0,46	835	18	5619
+142	0,457	843	18	5666
+143	0,454	862	18	5714
+144	0,453	884	18	5746
+145	0,453	903	18	5780
+146	0,452	923	18	5813
+147	0,452	926	18	5847
+148	0,452	928	18	5881
+149	0,452	948	18	5915
+150	0,452	951	18	5950
+151	0,452	984	18	5985
+152	0,465	990	18	6025
+153	0,464	1018	18	6062
+154	0,462	1025	18	6109
+155	0,46	1043	18	6151
+156	0,458	1051	18	6203
+157	0,456	1060	18	6247
+158	0,454	1067	18	6295
+159	0,453	1073	18	6338
+160	0,451	1079	18	6382
+161	0,45	1082	18	6426
+162	0,449	1086	18	6472
+163	0,448	1087	18	6517
+164	0,447	1095	18	6563
+165	0,446	1095	18	6608
+166	0,445	1105	18	6653
+167	0,444	1105	18	6697
+168	0,443	1117	18	6741
+169	0,442	1117	18	6785
+170	0,441	1127	18	6829
+171	0,44	1127	18	6874
+172	0,439	1135	18	6919
+173	0,438	1135	18	6966
+174	0,438	1149	18	7013
+175	0,437	1150	18	7060
+176	0,439	1163	18	7107
+177	0,438	1164	18	7147
+178	0,437	1176	18	7187
+179	0,436	1177	18	7228
+180	0,435	1182	18	7269
+190	0,439	1329	18	7525
+200	0,427	1407	18	7916
+210	0,415	1428	18	8412
+220	0,403	1461	18	8887
+230	0,393	1483	17	9379
+240	0,388	1514	17	9875
+250	0,384	1596	17	10233
+
+There was an Exception in Thread Thread[Thread-51,6,main] 
+
+Exception: java.lang.ArrayIndexOutOfBoundsException: -1: 
+
+Message: -1
+
+Cause: null
+
+StackTrace:     java.util.ArrayList.elementData(ArrayList.java:400)
+    java.util.ArrayList.get(ArrayList.java:413)
+    projects.wsneeFD.utils.ArrayList2d.get(ArrayList2d.java:252)
+    projects.wsneeFD.nodes.nodeImplementations.SinkNode.handleMessages(SinkNode.java:390)
+    sinalgo.nodes.Node.step(Node.java:954)
+    sinalgo.runtime.SynchronousRuntimeThread.run(SynchronousRuntimeThread.java:139)
+    
+
+sinalgo.runtime.Main.fatalError(Main.java:306)
+sinalgo.runtime.MyUncaughtExceptionHandler.uncaughtException(MyUncaughtExceptionHandler.java:72)
+java.lang.ThreadGroup.uncaughtException(ThreadGroup.java:1057)
+java.lang.ThreadGroup.uncaughtException(ThreadGroup.java:1052)
+java.lang.Thread.dispatchUncaughtException(Thread.java:1985)

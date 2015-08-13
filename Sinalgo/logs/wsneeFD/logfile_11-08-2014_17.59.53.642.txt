@@ -1,0 +1,236 @@
+> Starting SINALGO in GUI-Mode for project wsneeFD.
+
+The size of time slot is 70
+The threshold of error (max error) is 0.05 for data type (SensedType) in position 4
+The size of sliding window is 10
+
+> Initialization terminated.
+
+------------------------------------------------------
+General Config
+------------------------------------------------------
+Command Line arguments: -project wsneeFD -gen 54 wsneeFD:SimpleNode PositionFile (/Users/fernando1/Documents/My Classes/UFC/Doutorado/Doutorado - PPGIA/Artigos/Redes de Sensores/Ferramentas/data/mote_locs_formatado.txt) -gen 1 wsneeFD:SinkNode Line2D -overwrite SimulationName=WsnEEClusterWithIntelLabsDataset 
+Java VM arguments: -agentlib:jdwp=transport=dt_socket,suspend=y,address=localhost:53523 -Dfile.encoding=UTF-8 
+Class path: /Users/fernando1/Documents/My Classes/UFC/Doutorado/Doutorado - PPGIA/Artigos/Redes de Sensores/cluster-wsn/Sinalgo/binaries/bin:/Users/fernando1/Documents/My Classes/UFC/Doutorado/Doutorado - PPGIA/Artigos/Redes de Sensores/cluster-wsn/Sinalgo/binaries/jdom.jar
+------------------------------------------------------
+Configuration settings
+------------------------------------------------------
+ Simulation Area
+    dimensions = 2
+    dimX = 45
+    dimY = 35
+    dimZ = 500
+ Simulation
+    asynchronousMode = false
+    mobility = false
+    interference = false
+    interferenceIsAdditive = true
+    canReceiveWhileSending = true
+    canReceiveMultiplePacketsInParallel = true
+    edgeType = sinalgo.nodes.edges.BidirectionalEdge
+    exitOnTerminationInGUI = false
+    initializeConnectionsOnStartup = false
+    refreshRate = 140000
+    generateNAckMessages = false
+    handleEmptyEventQueue = true
+    javaCmd = java
+    javaVMmaxMem = 2000
+ Random number generators
+    useSameSeedAsInPreviousRun = false
+    useFixedSeed = false
+    fixedSeed = 77654767234
+ Logging
+    logFileName = logfile
+    outputToConsole = false
+    logToTimeDirectory = true
+    logConfiguration = true
+    eagerFlush = false
+ GUI
+    extendedControl = true
+    drawArrows = false
+    zoomStep = 1.2
+    wheelZoomStep = 1.05
+    minZoomFactor = 0.05
+    draw3DGraphNodesInProperOrder = true
+    usePerspectiveView = true
+    perspectiveViewDistance = 40
+ Background map in 2D
+    useMap = false
+    map = images/map.jpg
+ Models
+    DefaultMessageTransmissionModel = ConstantTime
+    DefaultConnectivityModel = UDG
+    DefaultDistributionModel = Random
+    DefaultInterferenceModel = NoInterference
+    DefaultMobilityModel = NoMobility
+    DefaultReliabilityModel = ReliableDelivery
+    DefaultNodeImplementation = wsn:SimpleNode
+    showModelsOfAllProjects = false
+ Node storage, position transformation
+    guiPositionTransformation2D = sinalgo.gui.transformation.Transformation2D
+    guiPositionTransformation3D = sinalgo.gui.transformation.Transformation3D
+    nodeCollection2D = sinalgo.runtime.nodeCollection.Geometric2DNodeCollection
+    nodeCollection3D = sinalgo.runtime.nodeCollection.Geometric3DNodeCollection
+ Export Settings
+    epsToPdfCommand = epstopdf %s
+    epsDrawDeploymentAreaBoundingBox = true
+    epsDrawBackgroundWhite = true
+ Animation Settings
+    showMessageAnimations = true
+    messageAnimationEnvelopeWidth = 1.0
+    messageAnimationEnvelopeHeight = 1.0
+    messageAnimationEnvelopeColor = r=255,g=255,b=0
+ Diverse Settings
+    showOptimizationHints = true
+    drawEdges = true
+    drawNodes = true
+    shownEventQueueSize = 10
+    outputTextFieldHeight = 200
+    arrowLength = 8
+    arrowWidth = 1
+    defaultRoundNumber = 140000
+------------------------------------------------------
+Custom settings
+------------------------------------------------------
+ externalfilespath/sensorreadingsfilepath = data/sensor_readings/data_0.0_percent_min_20000_2.0_filtrated_by_DATE-ErrorSens15_quantLearning_70.txt
+ geometricnodecollection/rmax = 10
+ messagetransmission/constanttime = 1
+ node/defaultsize = 1
+ qudg/connectionprobability = 0.6
+ qudg/probabilitytype = constant
+ qudg/rmax = 6
+ qudg/rmin = 4
+ randomdirection/movetime/distribution = Uniform
+ randomdirection/movetime/max = 20
+ randomdirection/movetime/min = 5
+ randomdirection/nodespeed/distribution = Gaussian
+ randomdirection/nodespeed/mean = 10
+ randomdirection/nodespeed/variance = 20
+ randomdirection/waitingtime/distribution = Poisson
+ randomdirection/waitingtime/lambda = 10
+ randomwaypoint/speed/distribution = Gaussian
+ randomwaypoint/speed/mean = 10
+ randomwaypoint/speed/variance = 20
+ randomwaypoint/waitingtime/distribution = Poisson
+ randomwaypoint/waitingtime/lambda = 10
+ sensorreadingsloadblocksize = 20000
+ simulationname = WsnEEClusterWithIntelLabsDataset
+ sinr/alpha = 2
+ sinr/beta = 0.7
+ sinr/noise = 0
+ udg/rmax = 7
+------------------------------------------------------
+Seed for Random Number Generators
+------------------------------------------------------
+ Randomly selected seed: 5265427722303613576
+------------------------------------------------------
+End of settings
+------------------------------------------------------
+
+> Starting the Simulation.
+
+Round; RMSE                ;Number of Messages
+
+
+Round	RMSE	NumMsg	#Clust	#SRead
+140.000	0	234	0	3780
+142.000	0	684	18	3780
+144.000	1,121	684	18	3834
+146.000	1,158	684	18	3887
+148.000	1,148	684	18	3940
+150.000	1,018	684	18	3993
+152.000	1,039	684	18	4046
+154.000	1,054	688	18	4099
+156.000	1,061	692	18	4152
+158.000	1,069	696	18	4205
+160.000	1,072	700	18	4258
+162.000	1,076	705	18	4311
+164.000	1,036	834	15	4364
+166.000	0,995	839	15	4417
+168.000	0,958	915	15	4470
+170.000	0,926	1000	15	4523
+172.000	0,896	1006	15	4576
+174.000	0,87	1108	15	4629
+176.000	0,846	1114	15	4682
+178.000	0,824	1187	15	4735
+180.000	0,804	1363	15	4788
+182.000	0,785	1384	15	4841
+184.000	0,768	1390	15	4894
+186.000	0,753	1528	15	4947
+188.000	0,738	1534	15	5000
+190.000	0,723	1584	15	5053
+192.000	0,712	1730	15	5106
+194.000	0,7	1736	15	5159
+196.000	0,688	1858	15	5212
+198.000	0,676	1960	15	5265
+200.000	0,666	1966	15	5318
+202.000	0,655	1972	15	5371
+204.000	0,646	2255	15	5424
+206.000	0,637	2261	15	5477
+208.000	0,628	2609	15	5530
+210.000	0,62	2762	15	5583
+212.000	0,612	3127	15	5636
+214.000	0,604	3492	15	5689
+216.000	0,597	3857	15	5742
+218.000	0,59	3863	15	5795
+220.000	0,583	4052	15	5848
+222.000	0,577	4058	15	5901
+224.000	0,571	4140	15	5954
+226.000	0,565	4182	15	6007
+228.000	0,559	4325	15	6060
+230.000	0,554	4331	15	6113
+232.000	0,549	4338	15	6166
+234.000	0,544	4437	15	6219
+236.000	0,539	4497	15	6272
+238.000	0,534	4547	15	6325
+240.000	0,529	4681	15	6378
+242.000	0,525	4784	15	6431
+244.000	0,52	4792	15	6484
+246.000	0,515	5034	15	6537
+248.000	0,511	5152	15	6590
+250.000	0,506	5269	15	6643
+252.000	0,502	5360	15	6696
+254.000	0,497	5456	15	6749
+256.000	0,493	5464	15	6802
+258.000	0,489	5980	15	6855
+260.000	0,486	5988	15	6908
+262.000	0,482	6094	15	6961
+264.000	0,478	6267	15	7014
+266.000	0,475	6373	15	7067
+268.000	0,471	6504	15	7120
+270.000	0,468	6625	15	7173
+272.000	0,464	6910	15	7226
+274.000	0,461	6918	15	7279
+276.000	0,458	6926	15	7332
+278.000	0,464	7183	15	7385
+280.000	0,461	7259	15	7438
+282.000	0,458	7392	15	7491
+284.000	0,456	7498	15	7544
+286.000	0,453	7752	15	7597
+288.000	0,45	7760	15	7650
+290.000	0,448	7989	15	7703
+292.000	0,445	7997	15	7756
+294.000	0,443	8149	15	7809
+296.000	0,44	8324	15	7862
+298.000	0,438	8753	15	7915
+300.000	0,436	8863	15	7968
+
+There was an Exception in Thread Thread[Thread-22,6,main] 
+
+Exception: java.lang.NullPointerException: 
+
+Message: null
+
+Cause: null
+
+StackTrace:     projects.wsneeFD.nodes.nodeImplementations.SinkNode.minimumFractalDimensionDiff(SinkNode.java:741)
+    projects.wsneeFD.nodes.nodeImplementations.SinkNode.handleMessages(SinkNode.java:361)
+    sinalgo.nodes.Node.step(Node.java:954)
+    sinalgo.runtime.SynchronousRuntimeThread.run(SynchronousRuntimeThread.java:139)
+    
+
+sinalgo.runtime.Main.fatalError(Main.java:306)
+sinalgo.runtime.MyUncaughtExceptionHandler.uncaughtException(MyUncaughtExceptionHandler.java:72)
+java.lang.ThreadGroup.uncaughtException(ThreadGroup.java:1057)
+java.lang.ThreadGroup.uncaughtException(ThreadGroup.java:1052)
+java.lang.Thread.dispatchUncaughtException(Thread.java:1985)

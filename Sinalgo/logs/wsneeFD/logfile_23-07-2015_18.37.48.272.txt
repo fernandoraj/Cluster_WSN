@@ -1,0 +1,22 @@
+> Starting SINALGO in GUI-Mode for project wsneeFD.
+
+There was an Exception in Thread Thread[Thread-1,5,main] 
+
+Exception: sinalgo.io.positionFile.PositionFileIO$PositionFileException: C:\Users\Fernando\Documents\My Classes\UFC\Doutorado\Doutorado - PPGIA\Artigos\Redes de Sensores\Ferramentas3\data\mote_locs_formatado.txt (No such file or directory): 
+
+Message: C:\Users\Fernando\Documents\My Classes\UFC\Doutorado\Doutorado - PPGIA\Artigos\Redes de Sensores\Ferramentas3\data\mote_locs_formatado.txt (No such file or directory)
+
+Cause: null
+
+StackTrace:     sinalgo.io.positionFile.PositionFileIO.getPositionFileReader(PositionFileIO.java:101)
+    projects.defaultProject.models.distributionModels.PositionFile.getNextPosition(PositionFile.java:30)
+    sinalgo.runtime.Runtime.createNodes(Runtime.java:604)
+    sinalgo.runtime.GUIRuntime.performMethod(GUIRuntime.java:160)
+    sinalgo.gui.dialogs.PercentualProgressDialog$UpdateThread.run(PercentualProgressDialog.java:180)
+    
+
+sinalgo.runtime.Main.fatalError(Main.java:306)
+sinalgo.runtime.MyUncaughtExceptionHandler.uncaughtException(MyUncaughtExceptionHandler.java:72)
+java.lang.ThreadGroup.uncaughtException(ThreadGroup.java:1057)
+java.lang.ThreadGroup.uncaughtException(ThreadGroup.java:1052)
+java.lang.Thread.dispatchUncaughtException(Thread.java:1985)
