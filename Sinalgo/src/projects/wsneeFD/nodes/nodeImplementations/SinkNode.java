@@ -32,8 +32,8 @@ public class SinkNode extends SimpleNode
 										// = {4,5} => N = 2 => sizeTimeSlot >= 10^2 = 100.
 	
 	/**
-	 * Número de dados sensoriados por time slot (Tamanho do time slot inicial) <br>
-	 * [Eng] Number of sensed data per time slot (initial time slot size)
+	 * Número de dados sensoriados por time slot (Tamanho do time slot) <br>
+	 * [Eng] Number of sensed data per time slot (time slot size)
 	 */
 	private Integer sizeTimeSlotForMerge = 25;
 	
