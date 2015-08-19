@@ -1,0 +1,4 @@
+HowTo - Data Files: data1.txt and data2.txt
+
+These two files can / must be unified (merged) to form just one file with the all data.
+For this, call / use the binary named FileMerge.exe in DOS, passing the files data1.txt and data2.txt (in that sort) to get (create) the file named "data.txt"
