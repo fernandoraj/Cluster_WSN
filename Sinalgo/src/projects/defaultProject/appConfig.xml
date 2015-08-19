@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<sinalgo>
-	<ProjectSelector windowWidth="800" windowHeight="600" lastChosenProject="wsn" windowPosX="312" windowPosY="88" isMaximized="true" selectedTab="1" />
-	<GUI windowWidth="1022" windowHeight="726" windowPosX="1" windowPosY="1" isMaximized="false" ControlPanelExpandSimulation="true" ControlPanelShowFullViewPanel="false" ControlPanelShowTextPanel="true" ControlPanelShowProjectControl="true" RunOperationIsLimited="true" helpWindowWidth="500" helpWindowHeight="500" helpWindowPosX="123" helpWindowPosY="198" helpWindowIsMaximized="false" />
-	<RandomSeed seedFromPreviousRun="-3652643508416289977" />
-	<App lastSelectedFileDirectory="" checkForUpdatesAtStartup="false" updateCheckTimeStamp="0" runCmdLineArgs="-project wsn -gen 54 wsn:SimpleNode PositionFile (C:\Users\Fernando\Documents\My Classes\UFC\Doutorado\Doutorado - PPGIA\Artigos\Redes de Sensores\Ferramentas\data\mote_locs_formatado.txt) -gen 1 wsn:SinkNode Random -overwrite SimulationName=WsnClusterWithIntelLabsDataset " />
-	<GenNodesDlg numNodes="1" />
-</sinalgo>
-
