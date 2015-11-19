@@ -313,7 +313,9 @@ public class SimpleNode extends Node
 	//to sink in the next error (miss), so hereafter the nodes must don't compute the RMSE to error case
 	
 	private boolean receivedCoefs = false;
-
+	
+	private double Somatorio;// guarda o somatorio para ajudar no calculo do vizinho mais proximo.
+	
 	int[] dataSensedTypes;
 	double[] coefsA;
 	double[] coefsB;
@@ -1744,6 +1746,14 @@ public class SimpleNode extends Node
 	
 	public Stack<Integer> getPathToSenderNode() {
 		return this.pathToSenderNode;
+	}
+
+	public double getSomatorio() {
+		return Somatorio;
+	}
+
+	public void setSomatorio(double somatorio) {
+		Somatorio = somatorio;
 	}
 	
 	

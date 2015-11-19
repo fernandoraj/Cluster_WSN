@@ -251,15 +251,21 @@ public class SinkNode extends SimpleNode
 		timer.startRelative(1, this);
 	} // end construirRoteamento()
 	
+	int k = 7; //Numero de nodes que vão ser colocados em cada cluster
+	
+	boolean VMP = true;//se true = abilita o codigo do vizinho mais proximo
+	
+	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); // lista de nodes que serão guardados caso VMP seja true
+
 	@Override
 	public void handleMessages(Inbox inbox) {
 		while (inbox.hasNext()) {
 			Message message = inbox.next();
-			
 			Utils.printForDebug("Global.numberOfMessagesOverAll = "+Global.numberOfMessagesOverAll);
 			Utils.printForDebug("Global.sensorReadingsCount = "+Global.sensorReadingsCount);
 			
 			if (message instanceof WsnMsgResponse) {
+				
 				this.setColor(Color.YELLOW);
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
 				
@@ -607,14 +613,45 @@ public class SinkNode extends SimpleNode
 						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!
 						((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
 						
-						if (nodeGroups == null) { // If there isn't a message group yet, then it does create one and adds the message to it
-							nodeGroups = new ArrayList2d<Double, SimpleNode>();
-							nodeGroups.ensureCapacity(numTotalOfSensors); // Ensure the capacity as the total number of sensors (nodes) in the data set
-							Double initialFracDim = new Double(0.0);
-							nodeGroups.add((SimpleNode)wsnMsgResp.source, 0, initialFracDim); // Add the initial sensor node(SimpleNode) to the group 0 - line 0 (ArrayList2d of SimpleNode)
+						if(VMP){//Aqui Faz o algoritmo do vizinho mais proximo, subistituindo o medida se similaridade quando a variavel for true
+							if(numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todas 54 primeiras nodes com as 70 leiturar iniciais
+								if(((SimpleNode)wsnMsgResp.source).dataRecordItens.size() == 70){
+									sensores.add((SimpleNode)wsnMsgResp.source);
+								}
+							}
+							int Cluster = 0;
+							if(numMessagesReceived == numTotalOfSensors){//quando os 54 nodes forem guardados, todos eles são clusterizados com o algoritmo do vizinho mais proximo
+								boolean newCluster = true, quit = false;
+								Double initialFracDim = new Double(0.0);
+								
+								while(!quit){//O calculo não para ate que todos os nodes forem clusterizados
+									if (nodeGroups == null) { // If there isn't a message group yet, then it does create one and adds the message to it
+										nodeGroups = new ArrayList2d<Double, SimpleNode>();
+										nodeGroups.ensureCapacity(numTotalOfSensors); // Ensure the capacity as the total number of sensors (nodes) in the data set
+										nodeGroups.add(sensores.remove(0), Cluster, initialFracDim); // Add the initial sensor node(SimpleNode) to the group 0 - line 0 (ArrayList2d of SimpleNode)
+										newCluster = false;
+									}
+									else if(newCluster){//Pega o primeiro da lista ordenada do menor numero para o maior em relação ao primeiro da ultima clusterização
+										nodeGroups.add(sensores.remove(0), Cluster, initialFracDim); // Add the initial sensor node(SimpleNode) to the group 0 - line 0 (ArrayList2d of SimpleNode)
+										newCluster = false;
+									}else{
+										quit = addNodesInCluster(Cluster);//algoritmo do vizinho mais proximo
+										Cluster++;//proximo cluster da lista 2d(proxima linha)
+										newCluster = true;
+									}
+								}
+							}
 						}
-						else { // If there is a sensor group (SensorCluster), then adds the wsnMsgResp.source representing a sensor to group, classifing this sensor in correct cluster/line
-							addNodeInCluster(nodeGroups, (SimpleNode)wsnMsgResp.source); // Adds the current sensor node (wsnMsgResp.source) in correct cluster of "nodeGroups"
+						else{
+							if (nodeGroups == null) { // If there isn't a message group yet, then it does create one and adds the message to it
+								nodeGroups = new ArrayList2d<Double, SimpleNode>();
+								nodeGroups.ensureCapacity(numTotalOfSensors); // Ensure the capacity as the total number of sensors (nodes) in the data set
+								Double initialFracDim = new Double(0.0);
+								nodeGroups.add((SimpleNode)wsnMsgResp.source, 0, initialFracDim); // Add the initial sensor node(SimpleNode) to the group 0 - line 0 (ArrayList2d of SimpleNode)
+							}
+							else { // If there is a sensor group (SensorCluster), then adds the wsnMsgResp.source representing a sensor to group, classifing this sensor in correct cluster/line
+								addNodeInCluster(nodeGroups, (SimpleNode)wsnMsgResp.source); // Adds the current sensor node (wsnMsgResp.source) in correct cluster of "nodeGroups"
+							}
 						}
 						
 						if (numMessagesReceived >= numTotalOfSensors) { // In this point, clusters should be "closed", and the sensors inside them being classified
@@ -672,18 +709,65 @@ public class SinkNode extends SimpleNode
 									}
 								} // end else
 							} // end if (messageGroups != null)
+						} // end if (stillNonclustered)
 						} // end if (numMessagesReceived >= numTotalOfSensors)
-					} // end if (stillNonclustered)
 					
 					else { // otherwise, if the sink have already been clustered all nodes for the first time
 						numMessagesExpectedReceived++;
 					} // end else if (stillNonclustered)
 					
 				} // end else
-			} // end if (message instanceof WsnMsg)
+			}// end if (message instanceof WsnMsg)
 		} //end while (inbox.hasNext())
 	} //end handleMessages()
 	
+	private boolean addNodesInCluster(int cluster) {
+		ArrayList<SimpleNode> tempList = new ArrayList<SimpleNode>();
+		ArrayList<SimpleNode> tempList2 = new ArrayList<SimpleNode>();
+		SimpleNode tempNode = nodeGroups.get(cluster, 0);
+		
+		for (int i = 0; i < sensores.size(); i++) {
+			double sum = 0;
+			for (int j = 0; j < tempNode.dataRecordItens.size(); j++) {
+				for (int k = 0; k < tempNode.dataRecordItens.get(0).values.length; k++) {
+					sum += Math.abs(tempNode.dataRecordItens.get(j).values[k] - sensores.get(i).dataRecordItens.get(j).values[k]);
+				}
+			}
+			sensores.get(i).setSomatorio(sum);
+			tempList.add(sensores.get(i));
+		}
+		int nTimes = tempList.size();
+		for (int i = 0; i < nTimes; i++) {
+			double num = 0, menor = 0;
+			int node = 0;
+
+			for (int j = 0; j < tempList.size(); j++) {
+				num = tempList.get(j).getSomatorio();
+				if (j == 0) {
+					menor = tempList.get(j).getSomatorio();
+					node = j;
+				} else if (num < menor) {
+					menor = num;
+					node = j;
+				}
+			}
+			tempList2.add(tempList.remove(node));
+		}
+		
+		for (int i = 0; i < k; i++) {
+			nodeGroups.add(tempList2.remove(0), cluster, 0.0);
+		}
+			
+		sensores.clear();
+		sensores.addAll(tempList2);
+		
+		if(sensores.isEmpty()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 	/**
 	 * It sets the fractal dimension for all clusters in group of clusters passed by parameter, ie.,
 	 * Calculates the Fractal Dimension (Capacity) of each cluster and saves it as "key" of each cluster (ArrayList)
@@ -1336,6 +1420,7 @@ public class SinkNode extends SimpleNode
 					continueThisLine = false;
 				}
 				col++;
+				
 			}
 			if ((continueThisLine) && (col == tempCluster.getNumCols(line)))
 			{
