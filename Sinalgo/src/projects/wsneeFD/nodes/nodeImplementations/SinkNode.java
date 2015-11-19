@@ -184,7 +184,16 @@ public class SinkNode extends SimpleNode
 	private boolean canReceiveMsgResponseError = false;
 	
 	private double minimumOccupancyRatePerCluster = 1.35; // MORPC: #TotalSensors = 54 / #CLusters = 40 => 54/40 = 1.35
+
+	int k = 5; //Número de nós que vão ser colocados em cada cluster, sem contar com o nó pivô
 	
+	boolean VMP = true; //Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP)
+	
+	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); //Lista de nós sensores que serão guardados, caso VMP seja true
+
+	/**
+	 * This method builds a new SinkNode
+	 */
 	public SinkNode() {
 		super();
 		this.setColor(Color.RED);
@@ -251,12 +260,6 @@ public class SinkNode extends SimpleNode
 		timer.startRelative(1, this);
 	} // end construirRoteamento()
 	
-	int k = 7; //Numero de nodes que vão ser colocados em cada cluster
-	
-	boolean VMP = true;//se true = abilita o codigo do vizinho mais proximo
-	
-	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); // lista de nodes que serão guardados caso VMP seja true
-
 	@Override
 	public void handleMessages(Inbox inbox) {
 		while (inbox.hasNext()) {
@@ -721,6 +724,11 @@ public class SinkNode extends SimpleNode
 		} //end while (inbox.hasNext())
 	} //end handleMessages()
 	
+	/**
+	 * Adds the nodes from the ArrayList "sensores" (removing from it) to the cluster in position "cluster"(param) of ArrayList2d nodeGroups, representing all clusters
+	 * @param cluster Indicates the number of cluster to be assembled (set)
+	 * @return true if the ArrayList "sensores" is empty (i.e. it has already finished clustering all sensors; false otherwise
+	 */
 	private boolean addNodesInCluster(int cluster) {
 		ArrayList<SimpleNode> tempList = new ArrayList<SimpleNode>();
 		ArrayList<SimpleNode> tempList2 = new ArrayList<SimpleNode>();
@@ -755,7 +763,9 @@ public class SinkNode extends SimpleNode
 		}
 		
 		for (int i = 0; i < k; i++) {
-			nodeGroups.add(tempList2.remove(0), cluster, 0.0);
+			if (!tempList2.isEmpty()) {
+				nodeGroups.add(tempList2.remove(0), cluster, 0.0);
+			}
 		}
 			
 		sensores.clear();
@@ -766,7 +776,7 @@ public class SinkNode extends SimpleNode
 		}else{
 			return false;
 		}
-	}
+	} // end addNodesInCluster(int cluster)
 
 	/**
 	 * It sets the fractal dimension for all clusters in group of clusters passed by parameter, ie.,
