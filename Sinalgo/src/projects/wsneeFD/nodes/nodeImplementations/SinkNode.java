@@ -47,7 +47,7 @@ public class SinkNode extends SimpleNode
 	 * Indica quando o modo de clusterização usando Dimensão Fractal está ligado (ativo = true)
 	 * [Eng] Indicates whether the Fractal Dimension clustering is in ON mode (active = true)
 	 */
-	private final boolean FDmodeOn = true;
+	private final boolean FDmodeOn = false;
 
 	/**
 	 * Indica o limiar de diferença de Dimensão Fractal mínima entre duas medições de um mesmo cluster (antes e depois da adição dos novos dados) para que o mesmo seja válido (não seja considerado "ruído")
@@ -185,12 +185,22 @@ public class SinkNode extends SimpleNode
 	
 	private double minimumOccupancyRatePerCluster = 1.35; // MORPC: #TotalSensors = 54 / #CLusters = 40 => 54/40 = 1.35
 
-	int k = 5; //Número de nós que vão ser colocados em cada cluster, sem contar com o nó pivô
+	int k = 10; // Número de nós que vão ser colocados em cada cluster, sem contar com o nó pivô
 	
-	boolean VMP = true; //Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP)
+	boolean VMP = false; // Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP)
 	
-	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); //Lista de nós sensores que serão guardados, caso VMP seja true
+	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); // Lista de nós sensores que serão guardados, caso VMP seja true
 
+	/**
+	 * If CodeTypeSimilarityTest = 0: Traditional SimilarityMeasure (with Magnitude and Trend)
+	 * If CodeTypeSimilarityTest = 1: SimilarityMeasure based on Coefficient of Variation (Cv) (with Magnitude and Cv)
+	 * If CodeTypeSimilarityTest = 2: SimilarityMeasure based on Coefficient of Pearson(Cp) (with Cp only)
+	 */
+	private int CodeTypeSimilarityTest = 0; // Usada no método "testSimilarityMeasureWithPairRounds" 
+											// se 0, teste tradicional; 
+											// se 1, teste com coeficiente de variação
+											// se 2, teste com coeficiente de Pearson
+	
 	/**
 	 * This method builds a new SinkNode
 	 */
@@ -228,7 +238,13 @@ public class SinkNode extends SimpleNode
 		System.out.println("The size of sliding window is "+SimpleNode.slidingWindowSize);
 		System.out.println("The maximum distance between sensors in the same cluster is "+maxDistance);
 //		System.out.println("The type of data sensed is "+dataSensedType);
-
+		if (VMP) {
+			System.out.println("The inicialization mode is KNN! K value is "+k);
+		}
+		else {
+			System.out.println("The inicialization mode is SM!");
+		}
+		
 		
 //		if(LogL.ROUND_DETAIL){
 			Global.log.logln("\nThe size of time slot is "+sizeTimeSlot);
@@ -1745,127 +1761,136 @@ public class SinkNode extends SimpleNode
 	 */
 	private boolean testSimilarityMeasureWithPairRounds(SimpleNode currentNode, SimpleNode newNode)
 	{
-//		boolean sameSize = true;
-		boolean mSimilarityMagnitude = false;
-		boolean tSimilarityTrend = false;
-		
-		int currentSize;
-		double[][] currentValues;
-		if (currentNode.dataRecordItens != null) {
-			currentSize = currentNode.dataRecordItens.size();
-			currentValues = new double[currentSize][];
-		}
-		else {
-			return (mSimilarityMagnitude && tSimilarityTrend);
-		}
-
-		int[] currentRound = new int[currentSize];
-		
-		//Data read from current sensor (from ArrayList2d)
-		for (int cont = 0; cont < currentSize; cont++) {
-			currentValues[cont] = currentNode.dataRecordItens.getDataRecordValues(cont);
-		}
-
-		currentRound = currentNode.dataRecordItens.getDataRecordRounds();
-
-		int newSize;
-		double[][] newValues;
-		if (newNode.dataRecordItens != null) {
-			newSize = newNode.dataRecordItens.size();
-			newValues = new double[newSize][];
-		}
-		else {
-			return (mSimilarityMagnitude && tSimilarityTrend);
-		}
-
-		int[] newRound = new int[newSize];
-		
-		//Data read from new sensor (from message received)
-		for (int cont = 0; cont < newSize; cont++) {
-			newValues[cont] = newNode.dataRecordItens.getDataRecordValues(cont);
-		}
-
-		newRound = newNode.dataRecordItens.getDataRecordRounds();
-
-		HashMap<Integer, double[]> hashCurrentMsg, hashNewMsg;
-		
-		hashCurrentMsg = new HashMap<Integer, double[]>();
-		hashNewMsg = new HashMap<Integer, double[]>();
-		
-		// Populates 2 HashMaps with the values from currentWsnMsg and newWsnMsg
-		for (int i=0,j=0; (i < currentSize || j < newSize); i++, j++)
-		{
-			if (i < currentSize)
-			{	
-				hashCurrentMsg.put(currentRound[i], currentValues[i]);
-			}
-			if (j < newSize)
-			{
-				hashNewMsg.put(newRound[j], newValues[j]);
-			}
-		}
-
-
-
-		
-		int numEqualKeys = 0;
-		
-		double[] sumDifs = new double[dataSensedTypes.length];
-		
-		Set<Integer> keys = hashCurrentMsg.keySet();
-		for (Integer key : keys)
-		{
-			if (hashNewMsg.containsKey(key))
-			{
-				numEqualKeys++;
-				double[] curValue = hashCurrentMsg.get(key);
-				double[] newValue = hashNewMsg.get(key);
-				for (int numTypes = 0; numTypes < dataSensedTypes.length; numTypes++) {
-					sumDifs[numTypes] += Math.abs(curValue[numTypes] - newValue[numTypes]);
+		switch (CodeTypeSimilarityTest) {
+			case 0: 
+				//		boolean sameSize = true;
+				boolean mSimilarityMagnitude = false;
+				boolean tSimilarityTrend = false;
+				
+				int currentSize;
+				double[][] currentValues;
+				if (currentNode.dataRecordItens != null) {
+					currentSize = currentNode.dataRecordItens.size();
+					currentValues = new double[currentSize][];
 				}
-			}
-		}
-		
-		// Similarity Measures - BEGIN
-		if (numEqualKeys > 0)
-		{
-			int cont = 0;
-			while ((cont < dataSensedTypes.length) && (sumDifs[cont]/numEqualKeys <= spacialThresholdErrors[cont])) { // It tests if ALL attributes (dimensions) are in mSimilarityMagnitude
-				cont++;
-			}
-			if (cont == dataSensedTypes.length) {
-				mSimilarityMagnitude = true; // Multiple m-Magnitude
-			}
+				else {
+					return (mSimilarityMagnitude && tSimilarityTrend);
+				}
 
-		}
+				int[] currentRound = new int[currentSize];
+				
+				//Data read from current sensor (from ArrayList2d)
+				for (int cont = 0; cont < currentSize; cont++) {
+					currentValues[cont] = currentNode.dataRecordItens.getDataRecordValues(cont);
+				}
 
-		double contN1[] = new double[dataSensedTypes.length];
-		double contN = currentSize; // = newSize; // Total size of sensed values from node
-		for (int i=1,j=1; (i < currentSize && j < newSize); i++, j++)
-		{
-			double[] difX = new double[dataSensedTypes.length];
-			double[] difY = new double[dataSensedTypes.length];
-			for (int numTypes = 0; numTypes < dataSensedTypes.length; numTypes++) {
-				difX[numTypes] = (currentValues[i][numTypes] - currentValues[i-1][numTypes]);
-				difY[numTypes] = (newValues[j][numTypes] - newValues[j-1][numTypes]);
-				if ((difX[numTypes] * difY[numTypes]) >= 0)
+				currentRound = currentNode.dataRecordItens.getDataRecordRounds();
+
+				int newSize;
+				double[][] newValues;
+				if (newNode.dataRecordItens != null) {
+					newSize = newNode.dataRecordItens.size();
+					newValues = new double[newSize][];
+				}
+				else {
+					return (mSimilarityMagnitude && tSimilarityTrend);
+				}
+
+				int[] newRound = new int[newSize];
+				
+				//Data read from new sensor (from message received)
+				for (int cont = 0; cont < newSize; cont++) {
+					newValues[cont] = newNode.dataRecordItens.getDataRecordValues(cont);
+				}
+
+				newRound = newNode.dataRecordItens.getDataRecordRounds();
+
+				HashMap<Integer, double[]> hashCurrentMsg, hashNewMsg;
+				
+				hashCurrentMsg = new HashMap<Integer, double[]>();
+				hashNewMsg = new HashMap<Integer, double[]>();
+				
+				// Populates 2 HashMaps with the values from currentWsnMsg and newWsnMsg
+				for (int i=0,j=0; (i < currentSize || j < newSize); i++, j++)
 				{
-					contN1[numTypes]++;
+					if (i < currentSize)
+					{	
+						hashCurrentMsg.put(currentRound[i], currentValues[i]);
+					}
+					if (j < newSize)
+					{
+						hashNewMsg.put(newRound[j], newValues[j]);
+					}
 				}
-			}
-		}
-		if (contN > 0.0) {
-			int cont = 0;
-			while ((cont < dataSensedTypes.length) && (contN1[cont]/contN >= thresholdErrors[cont])) { // It tests if ALL attributes (dimensions) are in tSimilarityTrend
-				cont++;
-			}
-			if (cont == dataSensedTypes.length) {
-				tSimilarityTrend = true; // Multiple t-Trend
-			}	
-		}
-		// Similarity Measures - END
 
-		return (mSimilarityMagnitude && tSimilarityTrend);
+
+
+				
+				int numEqualKeys = 0;
+				
+				double[] sumDifs = new double[dataSensedTypes.length];
+				
+				Set<Integer> keys = hashCurrentMsg.keySet();
+				for (Integer key : keys)
+				{
+					if (hashNewMsg.containsKey(key))
+					{
+						numEqualKeys++;
+						double[] curValue = hashCurrentMsg.get(key);
+						double[] newValue = hashNewMsg.get(key);
+						for (int numTypes = 0; numTypes < dataSensedTypes.length; numTypes++) {
+							sumDifs[numTypes] += Math.abs(curValue[numTypes] - newValue[numTypes]);
+						}
+					}
+				}
+				
+				// Similarity Measures - BEGIN
+				if (numEqualKeys > 0)
+				{
+					int cont = 0;
+					while ((cont < dataSensedTypes.length) && (sumDifs[cont]/numEqualKeys <= spacialThresholdErrors[cont])) { // It tests if ALL attributes (dimensions) are in mSimilarityMagnitude
+						cont++;
+					}
+					if (cont == dataSensedTypes.length) {
+						mSimilarityMagnitude = true; // Multiple m-Magnitude
+					}
+
+				}
+
+				double contN1[] = new double[dataSensedTypes.length];
+				double contN = currentSize; // = newSize; // Total size of sensed values from node
+				for (int i=1,j=1; (i < currentSize && j < newSize); i++, j++)
+				{
+					double[] difX = new double[dataSensedTypes.length];
+					double[] difY = new double[dataSensedTypes.length];
+					for (int numTypes = 0; numTypes < dataSensedTypes.length; numTypes++) {
+						difX[numTypes] = (currentValues[i][numTypes] - currentValues[i-1][numTypes]);
+						difY[numTypes] = (newValues[j][numTypes] - newValues[j-1][numTypes]);
+						if ((difX[numTypes] * difY[numTypes]) >= 0)
+						{
+							contN1[numTypes]++;
+						}
+					}
+				}
+				if (contN > 0.0) {
+					int cont = 0;
+					while ((cont < dataSensedTypes.length) && (contN1[cont]/contN >= thresholdErrors[cont])) { // It tests if ALL attributes (dimensions) are in tSimilarityTrend
+						cont++;
+					}
+					if (cont == dataSensedTypes.length) {
+						tSimilarityTrend = true; // Multiple t-Trend
+					}	
+				}
+				// Similarity Measures - END
+
+				return (mSimilarityMagnitude && tSimilarityTrend);
+			case 1:
+				break;
+			case 2:
+				break;
+
+		}
+		return false;
 	} // end testSimilarityMeasureWithPairRounds(WsnMsgResponse currentWsnMsg, WsnMsgResponse newWsnMsg)
 
 	/**
