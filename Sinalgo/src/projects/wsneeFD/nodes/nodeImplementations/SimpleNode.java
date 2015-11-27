@@ -1638,7 +1638,7 @@ public class SimpleNode extends Node
 			SelectionTimer newSelectionTimer = new SelectionTimer(wsnMsgResp); // Então dispara uma nova predição - laço de predições
 			newSelectionTimer.startRelative(SinkNode.sensorTimeSlot, this);
 
- 			System.out.println("nodeID = "+this.ID+": receivedCoefs FALSE in Round = "+Global.currentTime);
+ 			//System.out.println("nodeID = "+this.ID+": receivedCoefs FALSE in Round = "+Global.currentTime);
 			
 		} // end else from if (receivedCoefs)
 	} // end triggerSelection(WsnMsgResponse wsnMsgResp)
