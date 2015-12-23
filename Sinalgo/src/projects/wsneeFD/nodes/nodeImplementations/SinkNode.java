@@ -199,7 +199,8 @@ public class SinkNode extends SimpleNode
 	private int CodeTypeSimilarityTest = 0; // Usada no método "testSimilarityMeasureWithPairRounds" 
 											// se 0, teste tradicional; 
 											// se 1, teste com coeficiente de variação
-											// se 2, teste com coeficiente de Pearson
+											// se 2, teste com coeficiente de Pearson (se 3, teste com covariância)
+
 	
 	/**
 	 * This method builds a new SinkNode
