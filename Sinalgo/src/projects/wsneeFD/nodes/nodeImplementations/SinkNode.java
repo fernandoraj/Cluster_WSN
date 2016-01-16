@@ -47,7 +47,7 @@ public class SinkNode extends SimpleNode
 	 * Indica quando o modo de clusterização usando Dimensão Fractal está ligado (ativo = true)
 	 * [Eng] Indicates whether the Fractal Dimension clustering is in ON mode (active = true)
 	 */
-	private final boolean FDmodeOn = false;
+	private final boolean FDmodeOn = true;
 
 	/**
 	 * Indica o limiar de diferença de Dimensão Fractal mínima entre duas medições de um mesmo cluster (antes e depois da adição dos novos dados) para que o mesmo seja válido (não seja considerado "ruído")
@@ -185,7 +185,7 @@ public class SinkNode extends SimpleNode
 	
 	private double minimumOccupancyRatePerCluster = 1.35; // MORPC: #TotalSensors = 54 / #CLusters = 40 => 54/40 = 1.35
 
-	int k = 10; // Número de nós que vão ser colocados em cada cluster, sem contar com o nó pivô
+	int k = 16; // Número de nós que vão ser colocados em cada cluster, sem contar com o nó pivô
 	
 	boolean VMP = false; // Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP)
 	
