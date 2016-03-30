@@ -1762,7 +1762,7 @@ public class SinkNode extends SimpleNode
 	 */
 	private boolean testSimilarityMeasureWithPairRounds(SimpleNode currentNode, SimpleNode newNode)
 	{
-		switch (CodeTypeSimilarityTest) {
+		switch (CodeTypeSimilarityTest) { // VERIFICAR NOMENCLATURA!!! (AQUI!)
 			case 0: 
 				//		boolean sameSize = true;
 				boolean mSimilarityMagnitude = false;
