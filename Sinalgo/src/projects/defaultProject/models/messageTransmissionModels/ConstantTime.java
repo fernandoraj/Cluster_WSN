@@ -51,7 +51,7 @@ import sinalgo.runtime.Main;
  * <code>&lt;MessageTransmission ConstantTime="..."&gt;</code>
  * where ConstantTime specifies the time a message needs to arrive.
  */
-public class ConstantTime extends MessageTransmissionModel {
+public class ConstantTime extends MessageTransmissionModel{
 
 	private double time = 1.0;
 	
