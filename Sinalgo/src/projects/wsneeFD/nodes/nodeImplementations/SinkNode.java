@@ -278,6 +278,7 @@ public class SinkNode extends SimpleNode
 	} // end construirRoteamento()
 	
 	@Override
+	// AQUI!
 	public void handleMessages(Inbox inbox) {
 		while (inbox.hasNext()) {
 			Message message = inbox.next();
