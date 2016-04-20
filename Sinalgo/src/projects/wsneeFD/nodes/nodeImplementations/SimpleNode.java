@@ -804,6 +804,30 @@ public class SimpleNode extends Node
  * Data type       Data         Hora       Round ID  Temp   Hum    Lum   Volt
  */
 
+		
+/* teste
+ *  public static double rPearsonProduct (int[] a, int[] b){
+        int n = a.length; 
+        double suma = 0;
+        double sumb = 0;
+        double sumab = 0;
+        double sqsuma = 0;
+        double sqsumb = 0;
+        
+        for (int i=0; i<a.length;i++){            
+            suma =+ a[i];
+            sumb =+ b[i];
+            sqsuma =+ (a[i]*a[i]);
+            sqsumb =+ (b[i]*b[i]);
+            sumab =+ (a[i]*b[i]);            
+        }
+        double root1 = Math.sqrt(n*sqsuma - sqsumb);
+        double root2 = Math.sqrt(n*sqsumb - sqsumb);
+        //r = (n*SOM(XiYi) - SOM(X)SOM(Y))/math.sqrt(n*SOM((Xi)^2) - (SOM(Xi))^2*math.sqrt(n*SOM((Yi)^2) - (SOM(Yi))^2
+        double r = (n*(sumab)-(suma*sumb))/Math.sqrt(n*sqsuma - sqsumb)*Math.sqrt(n*sqsumb - sqsumb);
+        return r;
+    }
+ */
 		String dataLine = performSensorReading(); // Faz o sensoriamento / leitura de dados do ambiente
 
 		if (dataLine != null && dataSensedTypes != null && dataSensedTypes.length > 0)
@@ -846,9 +870,6 @@ public class SimpleNode extends Node
 								break;
 							default:
 						}
-								if(nTypes == 4){
-								sumTemp4 =+ values[nTypes];	
-							}
 						}//try
 						catch (NumberFormatException e) {
 							values[nTypes] = 0.0;
