@@ -823,9 +823,9 @@ public class SimpleNode extends Node
         }
         double root1 = Math.sqrt(n*sqsuma - sqsumb);
         double root2 = Math.sqrt(n*sqsumb - sqsumb);
-        //r = (n*SOM(XiYi) - SOM(X)SOM(Y))/math.sqrt(n*SOM((Xi)^2) - (SOM(Xi))^2*math.sqrt(n*SOM((Yi)^2) - (SOM(Yi))^2
+        //r = (n*SOM(XiYi) - SOM(X)SOM(Y))/math.sqrt(n*SOM((Xi)^2) - (SOM(Xi))^2*math.sqrt(n*SOM((Yi)^2) - (SOM(Yi))^2 //Font: https://goo.gl/tFi2zY
         double r = (n*(sumab)-(suma*sumb))/Math.sqrt(n*sqsuma - sqsumb)*Math.sqrt(n*sqsumb - sqsumb);
-        return r;
+        return r;		
     }
  */
 		String dataLine = performSensorReading(); // Faz o sensoriamento / leitura de dados do ambiente
