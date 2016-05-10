@@ -783,7 +783,8 @@ public class SimpleNode extends Node
 			ReadingTimer newReadingTimer = new ReadingTimer(wsnMsgResp, sizeTimeSlot); // Então dispara uma nova predição - laço de predições
 			newReadingTimer.startRelative(SinkNode.sensorTimeSlot, this); 
 		} // end while (sizeTimeSlot>0)
-	
+		
+		rPearsonProductMoment(dataRecordItens.getDataRecordValues(4), dataRecordItens.getDataRecordValues(5), dataRecordItens.getDataRecordValues(6));
 /*		if (sizeTimeSlot>=0) //Impede que seja perdida uma leitura do sensor
 		{
 			dataLine = performSensorReading();
@@ -792,135 +793,83 @@ public class SimpleNode extends Node
 	} // end triggerReadings(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot)
 	
 	 // AQUI!
+	/**
+	 * Calcula o coeficiente de correlação de pearson "r" entre os tipos de dados em dataRecordItens (por enquanto travado em 3 variáveis)
+	 * [Eng] Calculates the "r" pearson's product moment coefficient between the data types in dataRecordItens (still locked in 3 variables)
+	 * @param currentDataTypeX vetor de leituras da variável Temperatura (dataRecordItens.getDataRecordValues(4))
+	 * @param currentDataTypeY vetor de leituras da variável Umidade (dataRecordItens.getDataRecordValues(5))
+	 * @param currentDataTypeZ vetor de leituras da variável Luminosidade (dataRecordItens.getDataRecordValues(6))
+	 */
+	public void rPearsonProductMoment(double[] currentDataTypeX, double[] currentDataTypeY, double[] currentDataTypeZ){ 
+		double rxy= 0.0; // r entre x e y
+		double rxz= 0.0; // r entre x e z
+		double rzy= 0.0; // r entre z e y
+		int independant = 0; // decide quem será a variável independente: 0 = x; 1 = y; 2 = z; 
+		//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
+		rxy = ((sumOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))) * (sumOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY)))))/Math.sqrt(sumOfSquareOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))*sumOfSquareOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY))));
+		//(Sum((Xi-X)*(Zi-Z)))/(Sqrt(Sum((Xi-X)²*(Zi-Z)²)))
+		rxz = ((sumOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))) * (sumOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ)))))/Math.sqrt(sumOfSquareOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))*sumOfSquareOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ))));
+		//(Sum((Zi-Z)*(Yi-Y)))/(Sqrt(Sum((Zi-Z)²*(Yi-Y)²)))
+		rzy = ((sumOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ)))) * (sumOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY)))))/Math.sqrt(sumOfSquareOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ)))*sumOfSquareOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY))));		
 	
-	public void triggerReadingsWithPearsonsProductMomentCorrelation(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot) 
-	{
-		int numSequenceVoltageData = 7; //Position of voltage data according the data structure in "data*.txt" file
-		int numSequenceRound = 2;
-/*
- * Exemple:
- * 				2004-03-21 19:02:26.792489 65528 4 87.383 45.4402 5.52 2.31097
- * Position         [0]         [1]         [2] [3]  [4]    [5]    [6]   [7]
- * Data type       Data         Hora       Round ID  Temp   Hum    Lum   Volt
- */
-
-		
-/* teste
- *  public static double rPearsonProduct (int[] a, int[] b){
-        int n = a.length; 
-        double suma = 0;
-        double sumb = 0;
-        double sumab = 0;
-        double sqsuma = 0;
-        double sqsumb = 0;
-        
-        for (int i=0; i<a.length;i++){            
-            suma =+ a[i];
-            sumb =+ b[i];
-            sqsuma =+ (a[i]*a[i]);
-            sqsumb =+ (b[i]*b[i]);
-            sumab =+ (a[i]*b[i]);            
-        }
-        double root1 = Math.sqrt(n*sqsuma - sqsumb);
-        double root2 = Math.sqrt(n*sqsumb - sqsumb);
-        //r = (n*SOM(XiYi) - SOM(X)SOM(Y))/math.sqrt(n*SOM((Xi)^2) - (SOM(Xi))^2*math.sqrt(n*SOM((Yi)^2) - (SOM(Yi))^2 //Font: https://goo.gl/tFi2zY
-        double r = (n*(sumab)-(suma*sumb))/Math.sqrt(n*sqsuma - sqsumb)*Math.sqrt(n*sqsumb - sqsumb);
-        return r;		
-    }
- */
-		String dataLine = performSensorReading(); // Faz o sensoriamento / leitura de dados do ambiente
-
-		if (dataLine != null && dataSensedTypes != null && dataSensedTypes.length > 0)
-		{
-			String lines[] = dataLine.split(" ");
-			
-			double[] values = new double[dataSensedTypes.length];
-			double quantTime;
-			double batLevel;
-			double sumTemp4 = 0.0; // somatório das leituras de Temperatura - Pos 4
-			int nTemp = 0;
-			double sumHum5 = 0.0;  // somatório das leituras de Umidade - Pos 5
-			int nHum = 0;
-			double sumLum6 = 0.0;  // somatório das leituras de Luminosidade - Pos 6
-			int nLum = 0;
-			int round;
-			if (lines.length > 4)
-			{
-				round = Integer.parseInt(lines[numSequenceRound]); //Número do round
-				
-				for (int nTypes = 0; nTypes < dataSensedTypes.length; nTypes++) {
-					if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals("")) {
-						values[nTypes] = 0.0;
-					}  // end if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals(""))
-					else {
-						try {
-							values[nTypes] = Double.parseDouble(lines[dataSensedTypes[nTypes]]);
-							switch (nTypes){
-							case 4:
-								sumTemp4 =+ values[nTypes];
-								nTemp++;
-								break;
-							case 5:
-								sumHum5 =+ values[nTypes];
-								nHum++;
-								break;
-							case 6:
-								sumLum6 =+ values[nTypes];
-								nLum++;
-								break;
-							default:
-						}
-						}//try
-						catch (NumberFormatException e) {
-							values[nTypes] = 0.0;
-						}//catch
-					} // end else if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals(""))
-				} // end for (int nTypes = 0; nTypes < dataSensedTypes.length; nTypes++)
-				
-				
-				
-				
-				if (lines[numSequenceVoltageData] == null || lines[numSequenceVoltageData].equals("")) {
-					batLevel = 0.0;
-				}
-				else {
-					try {
-						batLevel = Double.parseDouble(lines[numSequenceVoltageData]);
-					}//try
-					catch (NumberFormatException e) {
-						batLevel = 0.0;
-					}//catch
-				}//else
-				
-				quantTime = parseCalendarHours(lines[0], lines[1]);
-				
-				lastValuesRead = values;
-				lastTimeRead = quantTime;
-				lastBatLevel = batLevel;
-				lastRoundRead = round;
-
-				if (dataRecordItens == null) {
-					dataRecordItens = new DataRecordItens();
-				}
-				dataRecordItens.add(dataSensedTypes, values, quantTime, batLevel, round, windowSize);
-				
-				if (wsnMsgResp.messageItemsToSink == null) {
-					wsnMsgResp.messageItemsToSink = new Vector<MessageItem>();
-				}
-				wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItens));
-				
-			}//if (linhas.length > 4)
-		}//if (dataLine != null && dataSensedType != null && medida != 0)
-		wsnMsgResp.batLevel = lastBatLevel; // Level of battery from last reading of sensor node
-		wsnMsgResp.spatialPos = wsnMsgResp.source.getPosition(); // Spacial position from the source node from message response
-
-		sizeTimeSlot--;
-			
-		if (sizeTimeSlot>0)
-		{
-			ReadingTimer newReadingTimer = new ReadingTimer(wsnMsgResp, sizeTimeSlot); // Então dispara uma nova predição - laço de predições
-			newReadingTimer.startRelative(SinkNode.sensorTimeSlot, this); 
+		double rankingOfX = rxy+rxz;
+		double maior = rankingOfX;
+		independant = 0;
+		double rankingOfY = rxy+rzy;
+		if (rankingOfY > maior){
+			maior = rankingOfY;
+			independant = 1;
 		}
+		double rankingOfZ = rxz+rzy;
+		if (rankingOfZ > maior){
+			maior = rankingOfZ;
+			independant = 2;
+		}
+	}
+	/**
+	 * Média para a Correlação de Pearson
+	 * [Eng]Mean for Pearson's Product Moment
+	 * @param currentDataTypes Tipo de dado onde a média será calculada
+	 * @return retorna a média
+	 */
+	public double mean4PPM(double[] currentDataTypes){ // calcula a média das leituras
+		double mean = 0.0;
+		int count = 0;
+		
+		for (int i=0; i < currentDataTypes.length; i++){
+			mean =+ currentDataTypes[i];
+			count++;
+		}
+		mean = mean/count;
+		return mean;
+	}
+	/**
+	 * Calcula o somatório(i=0; K) (N1 - N) + (N2 - N) +...+ (NK - N); onde N corresponde à media média
+	 * [Eng]Calculates the somation (i=0; K) (N1 - N) + (N2 - N) +...+ (NK - N); where N corresponds to the mean
+	 * @param currentDataTypes vetor a ser calculado
+	 * @param mean média do vetor inserido (dado pelo método mean4PPM)
+	 * @return double
+	 */
+	public double sumOfNiMinusMean (double[] currentDataTypes, double mean){// calcula o somatório de cada índice menos sua média
+		double sum = 0.0;
+		for (int i=0; i<currentDataTypes.length; i++){
+			sum =+ (currentDataTypes[i] - mean);
+		}
+		return sum;
+	}
+	/**
+	 * Calcula o somatório(i=0; K) (N1 - N)² + (N2 - N)² +...+ (NK - N)²; onde N corresponde à media média
+	 * [Eng]Calculates the somation (i=0; K) (N1 - N)² + (N2 - N)² +...+ (NK - N)²; where N corresponds to the mean
+	 * @param currentDataTypes vetor a ser calculado
+	 * @param mean média do vetor inserido (dado pelo método mean4PPM)
+	 * @return double
+	 */
+	public double sumOfSquareOfNiMinusMean (double[] currentDataTypes, double mean){// calcula o somatório de cada índice menos sua média
+		double sum = 0.0;
+		for (int i=0; i<currentDataTypes.length; i++){
+			sum =+ Math.pow((currentDataTypes[i] - mean), 2);
+		}
+		return sum;
 	}
 	/**
 	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual<p>[Eng] Prepare the message "wsnMsgResp" to be sended for the sink increasing the data read by the actual node.
