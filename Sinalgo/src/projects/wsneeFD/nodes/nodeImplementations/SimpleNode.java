@@ -729,7 +729,8 @@ public class SimpleNode extends Node
 				
 				for (int nTypes = 0; nTypes < dataSensedTypes.length; nTypes++) {
 					if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals("")) {
-						values[nTypes] = 0.0;
+						values[nTypes] = 0.0; // vetor[2] com as leiturs [t][u][l]
+						// criar matriz [sizeTimeSlot][datasSensedtTypes.length]
 					}  // end if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals(""))
 					else {
 						try {
@@ -778,12 +779,12 @@ public class SimpleNode extends Node
 
 		sizeTimeSlot--;
 			
-		if (sizeTimeSlot>0)
+		if (sizeTimeSlot>0) // recursão (disparo programado, porém segue executando em paralelo)
 		{
 			ReadingTimer newReadingTimer = new ReadingTimer(wsnMsgResp, sizeTimeSlot); // Então dispara uma nova predição - laço de predições
 			newReadingTimer.startRelative(SinkNode.sensorTimeSlot, this); 
 		} // end while (sizeTimeSlot>0)
-		
+		// nao deve estar aqui.
 		rPearsonProductMoment(dataRecordItens.getDataRecordValues(4), dataRecordItens.getDataRecordValues(5), dataRecordItens.getDataRecordValues(6));
 /*		if (sizeTimeSlot>=0) //Impede que seja perdida uma leitura do sensor
 		{
@@ -881,6 +882,7 @@ public class SimpleNode extends Node
 	{
 		this.dataSensedTypes = dataSensedTypes;
 		triggerReadings(wsnMsgResp, sizeTimeSlot);
+		// rPearsonProductMoment("deve receber a matriz" dataRecordItens.getDataRecordValues(4), dataRecordItens.getDataRecordValues(5), dataRecordItens.getDataRecordValues(6));
 	} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 
 	public void oneReading(WsnMsgResponse wsnMsgResp) {
