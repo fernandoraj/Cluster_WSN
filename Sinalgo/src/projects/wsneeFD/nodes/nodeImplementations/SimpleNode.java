@@ -314,6 +314,12 @@ public class SimpleNode extends Node
 	
 	private boolean receivedCoefs = false;
 	
+	/**
+	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados dentro de cada nó <p>
+	 * [Eng] Indicates if r Pearson's Product Moment will be used to correlate the different types of data inside every node
+	 */
+	private boolean rPPMIntraNode = false;
+	
 	private double Somatorio;// guarda o somatorio para ajudar no calculo do vizinho mais proximo.
 	
 	int[] dataSensedTypes;
@@ -686,7 +692,6 @@ public class SimpleNode extends Node
 	public void freeNextNode() {
 		nextNodeToBaseStation = null;
 	} // end freeNextNode()
-	
 	/**
 	 * Engatilha / chama o método que dispara o processo de leitura dos dados, de forma recursiva
 	 * @param wsnMsgResp Mensagem de resposta para carga dos dados lidos
@@ -784,8 +789,6 @@ public class SimpleNode extends Node
 			ReadingTimer newReadingTimer = new ReadingTimer(wsnMsgResp, sizeTimeSlot); // Então dispara uma nova predição - laço de predições
 			newReadingTimer.startRelative(SinkNode.sensorTimeSlot, this); 
 		} // end while (sizeTimeSlot>0)
-		// nao deve estar aqui.
-		rPearsonProductMoment(dataRecordItens.getDataRecordValues(4), dataRecordItens.getDataRecordValues(5), dataRecordItens.getDataRecordValues(6));
 /*		if (sizeTimeSlot>=0) //Impede que seja perdida uma leitura do sensor
 		{
 			dataLine = performSensorReading();
@@ -801,17 +804,19 @@ public class SimpleNode extends Node
 	 * @param currentDataTypeY vetor de leituras da variável Umidade (dataRecordItens.getDataRecordValues(5))
 	 * @param currentDataTypeZ vetor de leituras da variável Luminosidade (dataRecordItens.getDataRecordValues(6))
 	 */
-	public void rPearsonProductMoment(double[] currentDataTypeX, double[] currentDataTypeY, double[] currentDataTypeZ){ 
+	public void rPearsonProductMoment(double[] currentValue, Integer sizeTimeSlot, double[][] pearsonTable){
+
+		//for (int i=0; i<
 		double rxy= 0.0; // r entre x e y
 		double rxz= 0.0; // r entre x e z
 		double rzy= 0.0; // r entre z e y
 		int independant = 0; // decide quem será a variável independente: 0 = x; 1 = y; 2 = z; 
 		//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
-		rxy = ((sumOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))) * (sumOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY)))))/Math.sqrt(sumOfSquareOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))*sumOfSquareOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY))));
+		//rxy = ((sumOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))) * (sumOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY)))))/Math.sqrt(sumOfSquareOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))*sumOfSquareOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY))));
 		//(Sum((Xi-X)*(Zi-Z)))/(Sqrt(Sum((Xi-X)²*(Zi-Z)²)))
-		rxz = ((sumOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))) * (sumOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ)))))/Math.sqrt(sumOfSquareOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))*sumOfSquareOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ))));
+		//rxz = ((sumOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))) * (sumOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ)))))/Math.sqrt(sumOfSquareOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))*sumOfSquareOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ))));
 		//(Sum((Zi-Z)*(Yi-Y)))/(Sqrt(Sum((Zi-Z)²*(Yi-Y)²)))
-		rzy = ((sumOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ)))) * (sumOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY)))))/Math.sqrt(sumOfSquareOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ)))*sumOfSquareOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY))));		
+		//rzy = ((sumOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ)))) * (sumOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY)))))/Math.sqrt(sumOfSquareOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ)))*sumOfSquareOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY))));		
 	
 		double rankingOfX = rxy+rxz;
 		double maior = rankingOfX;
@@ -880,9 +885,12 @@ public class SimpleNode extends Node
 	 */
 	private void prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
 	{
+		double[][] pearsonTable = new double [sizeTimeSlot][dataSensedTypes.length]; // dúvida cruel... onde instanciar a matriz???
 		this.dataSensedTypes = dataSensedTypes;
 		triggerReadings(wsnMsgResp, sizeTimeSlot);
-		// rPearsonProductMoment("deve receber a matriz" dataRecordItens.getDataRecordValues(4), dataRecordItens.getDataRecordValues(5), dataRecordItens.getDataRecordValues(6));
+			if(rPPMIntraNode){
+			rPearsonProductMoment(lastValuesRead, sizeTimeSlot, pearsonTable);
+			}
 	} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 
 	public void oneReading(WsnMsgResponse wsnMsgResp) {
@@ -917,6 +925,8 @@ public class SimpleNode extends Node
 					else {
 						try {
 							values[nTypes] = Double.parseDouble(lines[dataSensedTypes[nTypes]]);
+							//matriz deverá receber os dados aqui!
+							//pearsonTable[round][nTypes] = values[nTypes];
 						}//try
 						catch (NumberFormatException e) {
 							values[nTypes] = 0.0;
