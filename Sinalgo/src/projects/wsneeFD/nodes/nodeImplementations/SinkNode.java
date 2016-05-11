@@ -84,7 +84,7 @@ public class SinkNode extends SimpleNode
 	 * [Eng] Types of data to be sensed (read in the sensor nodes), which, for Intel Lab Data, can be: 
 	 * temperature(t) = 4; humidity(h) = 5; brightness(l) = 6 or voltage(v) = 7;
 	 */
-	public static int[] dataSensedTypes = {4,5}; //{4}; //{4,5}; //{4,5,6};
+	public static int[] dataSensedTypes = {4,5,6}; //{4}; //{4,5}; //{4,5,6};
 	
 	/**
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
@@ -189,6 +189,24 @@ public class SinkNode extends SimpleNode
 	
 	boolean VMP = false; // Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP)
 	
+	/**
+	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados dentro de cada nó <p>
+	 * [Eng] Indicates if r Pearson's Product Moment will be used to correlate the different types of data inside every node
+	 */
+	private boolean rPPMIntraNode = false;
+	
+	/**
+	 * Define o menor grau de r, em módulo, necessário para que dois sensores sejam ditos correlacionados. Deve-se considerar o tamanho do
+	 * vetor como o resultado da combinação entre a quantidade de dados diferentes.
+	 * comb(n,p) = n!/(p!*(n-p)!)
+	 * e.g.: para dois tipos de dados (temperatura e umidade) o vetor tera uma posição, para três tipos de dados, quatro posições...
+	 * [Eng] Defines the minimum r degree , in absolute value, necessary for call two sensor nodes by correlated. it must be consider the 
+	 * size of vector as the result from  combination between the amount of different data types.
+	 * comb(n,p) = n!/(p!*(n-p)!)
+	 * e.g.: for two types of data (temperature and humidity) the vector will have one position, for three types of data, four positions
+	 */
+	private double[] rPearsonMinimal = {1.0, 0.5, 0.7};
+ 	
 	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); // Lista de nós sensores que serão guardados, caso VMP seja true
 
 	/**
