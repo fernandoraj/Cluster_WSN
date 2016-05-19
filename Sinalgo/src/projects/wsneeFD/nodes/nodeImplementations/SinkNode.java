@@ -47,7 +47,7 @@ public class SinkNode extends SimpleNode
 	 * Indica quando o modo de clusterização usando Dimensão Fractal está ligado (ativo = true)
 	 * [Eng] Indicates whether the Fractal Dimension clustering is in ON mode (active = true)
 	 */
-	private final boolean FDmodeOn = false;
+	private final boolean FDmodeOn = true;
 
 	/**
 	 * Indica o limiar de diferença de Dimensão Fractal mínima entre duas medições de um mesmo cluster (antes e depois da adição dos novos dados) para que o mesmo seja válido (não seja considerado "ruído")
@@ -84,19 +84,19 @@ public class SinkNode extends SimpleNode
 	 * [Eng] Types of data to be sensed (read in the sensor nodes), which, for Intel Lab Data, can be: 
 	 * temperature(t) = 4; humidity(h) = 5; brightness(l) = 6 or voltage(v) = 7;
 	 */
-	public static int[] dataSensedTypes = {5}; //{4}; //{4,5}; //{4,5,6};
+	public static int[] dataSensedTypes = {4,5,6}; //{4}; //{4,5}; //{4,5,6};
 	
 	/**
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
 	 * [Eng] Percentage of temporal acceptable error threshold for the readings of sensor nodes, which may be between 0.0 (accepts no errors) and 1.0 (accepts any error)
 	 */
-	private double[] thresholdErrors = {0.05}; //{0.05}; //{0.05,0.05}; //{0.05,0.05,0.05}; // thresholdErr: 0.05 = 5%
+	private double[] thresholdErrors = {0.05,0.05}; //{0.05}; //{0.05,0.05}; //{0.05,0.05,0.05}; // thresholdErr: 0.05 = 5%
 	
 	/**
 	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
 	 * [Eng] Limit of acceptable magnitude difference (spatial error) for the readings of sensor nodes / - which can be between 0.0 (no errors accepted) and 1.0 (accepts any error)
 	 */
-	private double[] spacialThresholdErrors = {1.5}; //{1.5}; //{1.5,1.5}; //{2.0, 2.5, 70.0};
+	private double[] spacialThresholdErrors = {1.5,1.5}; //{1.5}; //{1.5,1.5}; //{2.0, 2.5, 70.0};
 	
 	/**
 	 * Percentual mínimo do número de rounds iguais das medições de 2 sensores para que os mesmos sejam classificados no mesmo cluster <br>
@@ -185,10 +185,28 @@ public class SinkNode extends SimpleNode
 	
 	private double minimumOccupancyRatePerCluster = 1.35; // MORPC: #TotalSensors = 54 / #CLusters = 40 => 54/40 = 1.35
 
-	int k = 10; // Número de nós que vão ser colocados em cada cluster, sem contar com o nó pivô
+	int k = 16; // Número de nós que vão ser colocados em cada cluster, sem contar com o nó pivô
 	
 	boolean VMP = false; // Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP)
 	
+	/**
+	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados dentro de cada nó <p>
+	 * [Eng] Indicates if r Pearson's Product Moment will be used to correlate the different types of data inside every node
+	 */
+	private boolean rPPMIntraNode = false;
+	
+	/**
+	 * Define o menor grau de r, em módulo, necessário para que dois sensores sejam ditos correlacionados. Deve-se considerar o tamanho do
+	 * vetor como o resultado da combinação entre a quantidade de dados diferentes.
+	 * comb(n,p) = n!/(p!*(n-p)!)
+	 * e.g.: para dois tipos de dados (temperatura e umidade) o vetor tera uma posição, para três tipos de dados, quatro posições...
+	 * [Eng] Defines the minimum r degree , in absolute value, necessary for call two sensor nodes by correlated. it must be consider the 
+	 * size of vector as the result from  combination between the amount of different data types.
+	 * comb(n,p) = n!/(p!*(n-p)!)
+	 * e.g.: for two types of data (temperature and humidity) the vector will have one position, for three types of data, four positions
+	 */
+	private double[] rPearsonMinimal = {1.0, 0.5, 0.7};
+ 	
 	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); // Lista de nós sensores que serão guardados, caso VMP seja true
 
 	/**
@@ -278,6 +296,7 @@ public class SinkNode extends SimpleNode
 	} // end construirRoteamento()
 	
 	@Override
+	// AQUI!
 	public void handleMessages(Inbox inbox) {
 		while (inbox.hasNext()) {
 			Message message = inbox.next();
@@ -1762,7 +1781,7 @@ public class SinkNode extends SimpleNode
 	 */
 	private boolean testSimilarityMeasureWithPairRounds(SimpleNode currentNode, SimpleNode newNode)
 	{
-		switch (CodeTypeSimilarityTest) {
+		switch (CodeTypeSimilarityTest) { // VERIFICAR NOMENCLATURA!!! (AQUI!)
 			case 0: 
 				//		boolean sameSize = true;
 				boolean mSimilarityMagnitude = false;
