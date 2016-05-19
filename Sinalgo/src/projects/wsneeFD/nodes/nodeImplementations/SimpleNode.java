@@ -314,6 +314,12 @@ public class SimpleNode extends Node
 	
 	private boolean receivedCoefs = false;
 	
+	/**
+	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados dentro de cada nó <p>
+	 * [Eng] Indicates if r Pearson's Product Moment will be used to correlate the different types of data inside every node
+	 */
+	private boolean rPPMIntraNode = false;
+	
 	private double Somatorio;// guarda o somatorio para ajudar no calculo do vizinho mais proximo.
 	
 	int[] dataSensedTypes;
@@ -686,7 +692,6 @@ public class SimpleNode extends Node
 	public void freeNextNode() {
 		nextNodeToBaseStation = null;
 	} // end freeNextNode()
-	
 	/**
 	 * Engatilha / chama o método que dispara o processo de leitura dos dados, de forma recursiva
 	 * @param wsnMsgResp Mensagem de resposta para carga dos dados lidos
@@ -729,7 +734,8 @@ public class SimpleNode extends Node
 				
 				for (int nTypes = 0; nTypes < dataSensedTypes.length; nTypes++) {
 					if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals("")) {
-						values[nTypes] = 0.0;
+						values[nTypes] = 0.0; // vetor[2] com as leiturs [t][u][l]
+						// criar matriz [sizeTimeSlot][datasSensedtTypes.length]
 					}  // end if (lines[dataSensedTypes[nTypes]] == null || lines[dataSensedTypes[nTypes]].equals(""))
 					else {
 						try {
@@ -778,12 +784,11 @@ public class SimpleNode extends Node
 
 		sizeTimeSlot--;
 			
-		if (sizeTimeSlot>0)
+		if (sizeTimeSlot>0) // recursão (disparo programado, porém segue executando em paralelo)
 		{
 			ReadingTimer newReadingTimer = new ReadingTimer(wsnMsgResp, sizeTimeSlot); // Então dispara uma nova predição - laço de predições
 			newReadingTimer.startRelative(SinkNode.sensorTimeSlot, this); 
 		} // end while (sizeTimeSlot>0)
-	
 /*		if (sizeTimeSlot>=0) //Impede que seja perdida uma leitura do sensor
 		{
 			dataLine = performSensorReading();
@@ -791,6 +796,87 @@ public class SimpleNode extends Node
 */
 	} // end triggerReadings(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot)
 	
+	 // AQUI!
+	/**
+	 * Calcula o coeficiente de correlação de pearson "r" entre os tipos de dados em dataRecordItens (por enquanto travado em 3 variáveis)
+	 * [Eng] Calculates the "r" pearson's product moment coefficient between the data types in dataRecordItens (still locked in 3 variables)
+	 * @param currentDataTypeX vetor de leituras da variável Temperatura (dataRecordItens.getDataRecordValues(4))
+	 * @param currentDataTypeY vetor de leituras da variável Umidade (dataRecordItens.getDataRecordValues(5))
+	 * @param currentDataTypeZ vetor de leituras da variável Luminosidade (dataRecordItens.getDataRecordValues(6))
+	 */
+	public void rPearsonProductMoment(double[] currentValue, Integer sizeTimeSlot, double[][] pearsonTable){
+
+		//for (int i=0; i<
+		double rxy= 0.0; // r entre x e y
+		double rxz= 0.0; // r entre x e z
+		double rzy= 0.0; // r entre z e y
+		int independant = 0; // decide quem será a variável independente: 0 = x; 1 = y; 2 = z; 
+		//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
+		//rxy = ((sumOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))) * (sumOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY)))))/Math.sqrt(sumOfSquareOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))*sumOfSquareOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY))));
+		//(Sum((Xi-X)*(Zi-Z)))/(Sqrt(Sum((Xi-X)²*(Zi-Z)²)))
+		//rxz = ((sumOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))) * (sumOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ)))))/Math.sqrt(sumOfSquareOfNiMinusMean(currentDataTypeX,(mean4PPM(currentDataTypeX)))*sumOfSquareOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ))));
+		//(Sum((Zi-Z)*(Yi-Y)))/(Sqrt(Sum((Zi-Z)²*(Yi-Y)²)))
+		//rzy = ((sumOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ)))) * (sumOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY)))))/Math.sqrt(sumOfSquareOfNiMinusMean(currentDataTypeZ,(mean4PPM(currentDataTypeZ)))*sumOfSquareOfNiMinusMean(currentDataTypeY,(mean4PPM(currentDataTypeY))));		
+	
+		double rankingOfX = rxy+rxz;
+		double maior = rankingOfX;
+		independant = 0;
+		double rankingOfY = rxy+rzy;
+		if (rankingOfY > maior){
+			maior = rankingOfY;
+			independant = 1;
+		}
+		double rankingOfZ = rxz+rzy;
+		if (rankingOfZ > maior){
+			maior = rankingOfZ;
+			independant = 2;
+		}
+	}
+	/**
+	 * Média para a Correlação de Pearson
+	 * [Eng]Mean for Pearson's Product Moment
+	 * @param currentDataTypes Tipo de dado onde a média será calculada
+	 * @return retorna a média
+	 */
+	public double mean4PPM(double[] currentDataTypes){ // calcula a média das leituras
+		double mean = 0.0;
+		int count = 0;
+		
+		for (int i=0; i < currentDataTypes.length; i++){
+			mean =+ currentDataTypes[i];
+			count++;
+		}
+		mean = mean/count;
+		return mean;
+	}
+	/**
+	 * Calcula o somatório(i=0; K) (N1 - N) + (N2 - N) +...+ (NK - N); onde N corresponde à media média
+	 * [Eng]Calculates the somation (i=0; K) (N1 - N) + (N2 - N) +...+ (NK - N); where N corresponds to the mean
+	 * @param currentDataTypes vetor a ser calculado
+	 * @param mean média do vetor inserido (dado pelo método mean4PPM)
+	 * @return double
+	 */
+	public double sumOfNiMinusMean (double[] currentDataTypes, double mean){// calcula o somatório de cada índice menos sua média
+		double sum = 0.0;
+		for (int i=0; i<currentDataTypes.length; i++){
+			sum =+ (currentDataTypes[i] - mean);
+		}
+		return sum;
+	}
+	/**
+	 * Calcula o somatório(i=0; K) (N1 - N)² + (N2 - N)² +...+ (NK - N)²; onde N corresponde à media média
+	 * [Eng]Calculates the somation (i=0; K) (N1 - N)² + (N2 - N)² +...+ (NK - N)²; where N corresponds to the mean
+	 * @param currentDataTypes vetor a ser calculado
+	 * @param mean média do vetor inserido (dado pelo método mean4PPM)
+	 * @return double
+	 */
+	public double sumOfSquareOfNiMinusMean (double[] currentDataTypes, double mean){// calcula o somatório de cada índice menos sua média
+		double sum = 0.0;
+		for (int i=0; i<currentDataTypes.length; i++){
+			sum =+ Math.pow((currentDataTypes[i] - mean), 2);
+		}
+		return sum;
+	}
 	/**
 	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual<p>[Eng] Prepare the message "wsnMsgResp" to be sended for the sink increasing the data read by the actual node.
 	 * @param wsnMsgResp Mensagem a ser preparada para envio<p>[Eng] Message to be prepared for sending.
@@ -799,8 +885,12 @@ public class SimpleNode extends Node
 	 */
 	private void prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
 	{
+		double[][] pearsonTable = new double [sizeTimeSlot][dataSensedTypes.length]; // dúvida cruel... onde instanciar a matriz???
 		this.dataSensedTypes = dataSensedTypes;
 		triggerReadings(wsnMsgResp, sizeTimeSlot);
+			if(rPPMIntraNode){
+			rPearsonProductMoment(lastValuesRead, sizeTimeSlot, pearsonTable);
+			}
 	} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 
 	public void oneReading(WsnMsgResponse wsnMsgResp) {
@@ -835,6 +925,8 @@ public class SimpleNode extends Node
 					else {
 						try {
 							values[nTypes] = Double.parseDouble(lines[dataSensedTypes[nTypes]]);
+							//matriz deverá receber os dados aqui!
+							//pearsonTable[round][nTypes] = values[nTypes];
 						}//try
 						catch (NumberFormatException e) {
 							values[nTypes] = 0.0;
