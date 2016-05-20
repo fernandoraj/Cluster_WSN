@@ -90,13 +90,13 @@ public class SinkNode extends SimpleNode
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
 	 * [Eng] Percentage of temporal acceptable error threshold for the readings of sensor nodes, which may be between 0.0 (accepts no errors) and 1.0 (accepts any error)
 	 */
-	private double[] thresholdErrors = {0.05,0.05}; //{0.05}; //{0.05,0.05}; //{0.05,0.05,0.05}; // thresholdErr: 0.05 = 5%
+	private double[] thresholdErrors = {0.05,0.05,0.05}; //{0.05}; //{0.05,0.05}; //{0.05,0.05,0.05}; // thresholdErr: 0.05 = 5%
 	
 	/**
 	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
 	 * [Eng] Limit of acceptable magnitude difference (spatial error) for the readings of sensor nodes / - which can be between 0.0 (no errors accepted) and 1.0 (accepts any error)
 	 */
-	private double[] spacialThresholdErrors = {1.5,1.5}; //{1.5}; //{1.5,1.5}; //{2.0, 2.5, 70.0};
+	private double[] spacialThresholdErrors = {1.5,1.5,1.5}; //{1.5}; //{1.5,1.5}; //{2.0, 2.5, 70.0};
 	
 	/**
 	 * Percentual mínimo do número de rounds iguais das medições de 2 sensores para que os mesmos sejam classificados no mesmo cluster <br>
