@@ -205,7 +205,19 @@ public class SinkNode extends SimpleNode
 	 * comb(n,p) = n!/(p!*(n-p)!)
 	 * e.g.: for two types of data (temperature and humidity) the vector will have one position, for three types of data, four positions
 	 */
-	private double[] rPearsonMinimal = {1.0, 0.5, 0.7};
+	
+	
+	public int correlations(){
+		int sizeOfCorrelations = 0;
+		//double[] //criar vetor para armazenar limiares para passar quaisquer que sejam os valores. 
+		for (int i=0; i < dataSensedTypes.length-1; i++){
+			for(int j=i+1; j < dataSensedTypes.length; j++){
+				sizeOfCorrelations++;
+			}
+		}
+		return sizeOfCorrelations;
+	}
+	private double[] rPearsonMinimal = new double [correlations()];
  	
 	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); // Lista de nós sensores que serão guardados, caso VMP seja true
 
