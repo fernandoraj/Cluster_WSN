@@ -199,14 +199,14 @@ public class SinkNode extends SimpleNode
 	 * Define o menor grau de r, em módulo, necessário para que dois sensores sejam ditos correlacionados. Deve-se considerar o tamanho do
 	 * vetor como o resultado da combinação entre a quantidade de dados diferentes.
 	 * comb(n,p) = n!/(p!*(n-p)!)
-	 * e.g.: para dois tipos de dados (temperatura e umidade) o vetor tera uma posição, para três tipos de dados, quatro posições...
+	 * e.g.: para dois tipos de dados (temperatura e umidade) o vetor tera uma posição, para três tipos de dados, três posições...
 	 * [Eng] Defines the minimum r degree , in absolute value, necessary for call two sensor nodes by correlated. it must be consider the 
 	 * size of vector as the result from  combination between the amount of different data types.
 	 * comb(n,p) = n!/(p!*(n-p)!)
-	 * e.g.: for two types of data (temperature and humidity) the vector will have one position, for three types of data, four positions
+	 * e.g.: for two types of data (temperature and humidity) the vector will have one position, for three types of data, three positions
 	 */
 	
-	
+	/*
 	public int correlations(){
 		int sizeOfCorrelations = 0;
 		//double[] //criar vetor para armazenar limiares para passar quaisquer que sejam os valores. 
@@ -217,8 +217,10 @@ public class SinkNode extends SimpleNode
 		}
 		return sizeOfCorrelations;
 	}
-	private double[] rPearsonMinimal = new double [correlations()];
+	*/
+	public double[] rPearsonMinimal = {1.7,1.7,1.7};
  	
+	
 	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); // Lista de nós sensores que serão guardados, caso VMP seja true
 
 	/**
