@@ -813,6 +813,7 @@ public class SimpleNode extends Node
 	public void rPearsonProductMoment(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, Integer dataLength){
 		double[][] pearsonTable = new double [sizeTimeSlot][];
 		double[] means = new double[dataLength];
+		double[] score = new double[dataLength];
 		int nCorrelations =0;
 		for (int i=0; i < dataLength-1; i++){
 			for(int j=i+1; j < dataLength; j++){
@@ -820,8 +821,6 @@ public class SimpleNode extends Node
 			}
 		}
 		double[] correlation = new double[nCorrelations];
-		// linha 1823 SinkNODE
-		// tentar puxar os dados de(iteração 0 até sizeTimeSlot) wsnMsgResp.source.dataRecordItens.getDataRecordValues(<linha_de_dados_a_ser_lida>)
 		for (int i=0; i<sizeTimeSlot; i++){
 			pearsonTable[i] = ((SimpleNode) wsnMsgResp.source).dataRecordItens.getDataRecordValues(i);
 		}
@@ -836,7 +835,8 @@ public class SimpleNode extends Node
 			for(int j=i+1; j < dataLength; j++){
 				//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
 				correlation[nCorrelations] = ((attributesPPM(pearsonTable,means[i],i).sum)*(attributesPPM(pearsonTable,means[j],j).sum))/((attributesPPM(pearsonTable,means[i],i).sqrSum)*(attributesPPM(pearsonTable,means[j],j).sqrSum));
-				
+				score[i] = correlation[nCorrelations];
+				score[j] = correlation[nCorrelations];
 				nCorrelations++;
 			}
 		}
@@ -880,6 +880,22 @@ public class SimpleNode extends Node
 		}
 		
 		return sum;
+	}
+	/**
+	 * Return the largest index of an array;
+	 * @param score array with the sum of correlations
+	 * @return indie who is the most independant index; 
+	 */
+	public int whoIsIndependant (double[] score){
+		int indie = 0;
+		double maior = score[0];
+			for (int i=0;i<score.length;i++){
+				if (score[i] > maior){
+					maior = score[i];
+					indie = i;
+				}
+			}
+		return indie;
 	}
 	
 	/**
