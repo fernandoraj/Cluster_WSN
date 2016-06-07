@@ -835,8 +835,8 @@ public class SimpleNode extends Node
 			for(int j=i+1; j < dataLength; j++){
 				//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
 				correlation[nCorrelations] = ((attributesPPM(pearsonTable,means[i],i).sum)*(attributesPPM(pearsonTable,means[j],j).sum))/((attributesPPM(pearsonTable,means[i],i).sqrSum)*(attributesPPM(pearsonTable,means[j],j).sqrSum));
-				score[i] = correlation[nCorrelations];
-				score[j] = correlation[nCorrelations];
+				score[i] =+ Math.abs(correlation[nCorrelations]);
+				score[j] =+ Math.abs(correlation[nCorrelations]);
 				nCorrelations++;
 			}
 		}
@@ -886,7 +886,7 @@ public class SimpleNode extends Node
 	 * @param score array with the sum of correlations
 	 * @return indie who is the most independant index; 
 	 */
-	public int whoIsIndependant (double[] score){
+	public int whoIsIndependent (double[] score){
 		int indie = 0;
 		double maior = score[0];
 			for (int i=0;i<score.length;i++){
