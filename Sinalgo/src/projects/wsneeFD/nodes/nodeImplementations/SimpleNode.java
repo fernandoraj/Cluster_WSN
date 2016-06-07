@@ -835,8 +835,8 @@ public class SimpleNode extends Node
 			for(int j=i+1; j < dataLength; j++){
 				//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
 				correlation[nCorrelations] = ((attributesPPM(pearsonTable,means[i],i).sum)*(attributesPPM(pearsonTable,means[j],j).sum))/((attributesPPM(pearsonTable,means[i],i).sqrSum)*(attributesPPM(pearsonTable,means[j],j).sqrSum));
-				score[i] =+ Math.abs(correlation[nCorrelations]);
-				score[j] =+ Math.abs(correlation[nCorrelations]);
+				score[i] += Math.abs(correlation[nCorrelations]);
+				score[j] += Math.abs(correlation[nCorrelations]);
 				nCorrelations++;
 			}
 		}
@@ -853,7 +853,7 @@ public class SimpleNode extends Node
 		int count = 0;
 		
 		for (int i=0; i < currentDataTypes.length; i++){
-			mean =+ currentDataTypes[i][index];
+			mean += currentDataTypes[i][index];
 			count++;
 		}
 		mean = mean/count;
@@ -875,8 +875,8 @@ public class SimpleNode extends Node
 	public sumPPM attributesPPM (double[][] currentDataTypes, double mean, int index){// calcula o somatório de cada índice menos sua média
 		sumPPM sum = new sumPPM();
 		for (int i=0; i<currentDataTypes.length; i++){
-			sum.sum =+ (currentDataTypes[i][index] - mean);
-			sum.sqrSum =+ Math.pow((currentDataTypes[i][index] - mean), 2);
+			sum.sum += (currentDataTypes[i][index] - mean);
+			sum.sqrSum += Math.pow((currentDataTypes[i][index] - mean), 2);
 		}
 		
 		return sum;
