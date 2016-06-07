@@ -218,7 +218,7 @@ public class SinkNode extends SimpleNode
 		return sizeOfCorrelations;
 	}
 	*/
-	public double[] rPearsonMinimal = {1.7,1.7,1.7};
+	public double[] rPearsonMinimal = {0.7,0.7,0.7};
  	
 	
 	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); // Lista de nós sensores que serão guardados, caso VMP seja true
