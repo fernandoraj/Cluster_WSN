@@ -810,7 +810,7 @@ public class SimpleNode extends Node
 	 * @param currentDataTypeY vetor de leituras da variável Umidade (dataRecordItens.getDataRecordValues(5))
 	 * @param currentDataTypeZ vetor de leituras da variável Luminosidade (dataRecordItens.getDataRecordValues(6))
 	 */
-	public void rPearsonProductMoment(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, Integer dataLength){
+	public void rPearsonProductMoment(double[][] table, Integer sizeTimeSlot, Integer dataLength){
 		double[][] pearsonTable = new double [sizeTimeSlot][];
 		double[] means = new double[dataLength];
 		double[] score = new double[dataLength];
@@ -821,9 +821,9 @@ public class SimpleNode extends Node
 			}
 		}
 		double[] correlation = new double[nCorrelations];
-		for (int i=0; i<sizeTimeSlot; i++){
-			pearsonTable[i] = ((SimpleNode) wsnMsgResp.source).dataRecordItens.getDataRecordValues(i);
-		}
+		//for (int i=0; i<sizeTimeSlot; i++){
+		//	pearsonTable[i] = ((SimpleNode) wsnMsgResp.source).dataRecordItens.getDataRecordValues(i);
+		//}
 		//pearsonTable[][0] = dados de temperatura
 		//pearsonTable[][1] = dados de umidade
 		//pearsonTable[][2] = dados de Luminosidade
@@ -908,7 +908,19 @@ public class SimpleNode extends Node
 	{
 		this.dataSensedTypes = dataSensedTypes;
 		triggerReadings(wsnMsgResp, sizeTimeSlot);
+		DataRecordItens dataRecordItensToSink = new DataRecordItens();
+		double[][] valuesFromDataRecordItens = new double [sizeTimeSlot][dataSensedTypes.length];
+		if (wsnMsgResp.messageItemsToSink != null) {
+			for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
+				for (int j = 0; j < dataSensedTypes.length; j++){
+					dataRecordItensToSink = ((DataRecordItens)wsnMsgResp.messageItemsToSink.get(i).getDataRecordItens());
+					valuesFromDataRecordItens = dataRecordItensToSink.getDataRecordValues2();	
+				}
+			}
+		}
+		
 			if(rPPMIntraNode){
+				rPearsonProductMoment(dataRecordItensToSink.getDataRecordValues2() , sizeTimeSlot, dataSensedTypes.length);
 			//rPearsonProductMoment(lastValuesRead, sizeTimeSlot);
 			}
 	} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
