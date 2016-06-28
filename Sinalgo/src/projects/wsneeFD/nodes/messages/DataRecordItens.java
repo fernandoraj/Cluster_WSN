@@ -169,6 +169,12 @@ public class DataRecordItens
 		readData();
 		return values2[ind];
 	}
+	
+	public double[][] getDataRecordValues2()
+	{
+		readData();
+		return values2;
+	}
 
 	public double[] getDataRecordTimes()
 	{
