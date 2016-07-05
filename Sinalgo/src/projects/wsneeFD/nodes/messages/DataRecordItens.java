@@ -21,15 +21,15 @@ public class DataRecordItens
 	
 	private int[][] types2;
 	
-	private double[][] values2; // será substituída pelos coef. de regressão
+	private double[][] values2; // deverá conter somente a variavel independente e os valores não correlacionados
 	
-	private double[] times;	// será substituída pelos coef. de regressão
+	private double[] times;	// deverá conter somente a variavel independente e os valores não correlacionados
 	
 	private double[] batLevels;
 	
 	private int[] rounds;
 	
-
+// adicionar double[][] cofficients;
 	/**
 	 * Retorna o tamanho do "dataRecords" contido neste "DataRecordItens"
 	 * @return tamanho do dataRecords
