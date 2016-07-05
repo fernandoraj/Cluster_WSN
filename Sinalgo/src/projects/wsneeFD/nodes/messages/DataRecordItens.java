@@ -21,9 +21,9 @@ public class DataRecordItens
 	
 	private int[][] types2;
 	
-	private double[][] values2;
+	private double[][] values2; // será substituída pelos coef. de regressão
 	
-	private double[] times;
+	private double[] times;	// será substituída pelos coef. de regressão
 	
 	private double[] batLevels;
 	
@@ -128,6 +128,7 @@ public class DataRecordItens
 			{
 				tam = dataRecords.size();
 			}
+			// AQUI! verificar motivo do types2 ser um array bidimensional
 			types2 = new int[tam][];
 			values2 = new double[tam][];
 			times = new double[tam];

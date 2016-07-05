@@ -810,6 +810,7 @@ public class SimpleNode extends Node
 	 * @param currentDataTypeY vetor de leituras da variável Umidade (dataRecordItens.getDataRecordValues(5))
 	 * @param currentDataTypeZ vetor de leituras da variável Luminosidade (dataRecordItens.getDataRecordValues(6))
 	 */
+	// torcar para boolean
 	public void rPearsonProductMoment(double[][] table, Integer sizeTimeSlot, Integer dataLength){
 		double[][] pearsonTable = new double [sizeTimeSlot][];
 		double[] means = new double[dataLength];
@@ -897,6 +898,9 @@ public class SimpleNode extends Node
 			}
 		return indie;
 	}
+	public void regression (double[][] table, double [] times, Integer sizeTimeSlot, Integer dataLength){
+		
+	}
 	
 	/**
 	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual<p>[Eng] Prepare the message "wsnMsgResp" to be sended for the sink increasing the data read by the actual node.
@@ -910,18 +914,22 @@ public class SimpleNode extends Node
 		triggerReadings(wsnMsgResp, sizeTimeSlot);
 		DataRecordItens dataRecordItensToSink = new DataRecordItens();
 		double[][] valuesFromDataRecordItens = new double [sizeTimeSlot][dataSensedTypes.length];
+		double[] timesFromDataRecordItens = new double [sizeTimeSlot];
 		if (wsnMsgResp.messageItemsToSink != null) {
 			for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
 				for (int j = 0; j < dataSensedTypes.length; j++){
 					dataRecordItensToSink = ((DataRecordItens)wsnMsgResp.messageItemsToSink.get(i).getDataRecordItens());
-					valuesFromDataRecordItens = dataRecordItensToSink.getDataRecordValues2();	
+					valuesFromDataRecordItens = dataRecordItensToSink.getDataRecordValues2();
 				}
+				timesFromDataRecordItens = dataRecordItensToSink.getDataRecordTimes();
 			}
 		}
 		
 			if(rPPMIntraNode){
 				rPearsonProductMoment(dataRecordItensToSink.getDataRecordValues2() , sizeTimeSlot, dataSensedTypes.length);
-			//rPearsonProductMoment(lastValuesRead, sizeTimeSlot);
+				// b = Sum(ti - t_)(Si - S_)/Sum(ti-t_)^2
+				// t -> tempo ; S -> Valores
+				// a = (1/N)(Sum(Si - b*Sum(ti)) = S_ - b * t_
 			}
 	} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)
 
