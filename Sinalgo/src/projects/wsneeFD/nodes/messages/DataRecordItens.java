@@ -29,6 +29,9 @@ public class DataRecordItens
 	
 	private int[] rounds;
 	
+	private double[] regressionB;
+	
+	private double[] regressionA;
 // adicionar double[][] cofficients;
 	/**
 	 * Retorna o tamanho do "dataRecords" contido neste "DataRecordItens"
@@ -195,5 +198,15 @@ public class DataRecordItens
 		return rounds;
 	}
 	
-	
+	public void setRegressionCoefs(double[] b, double[] a)
+	{
+		regressionB = b;
+		regressionA = a;
+
+	}
+
+	public void clearValues (int index){
+
+		values2[index] = null;
+	}
 } // end dataRecords
