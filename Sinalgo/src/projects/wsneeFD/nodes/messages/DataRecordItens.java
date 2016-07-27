@@ -21,15 +21,18 @@ public class DataRecordItens
 	
 	private int[][] types2;
 	
-	private double[][] values2;
+	private double[][] values2; // deverá conter somente a variavel independente e os valores não correlacionados
 	
-	private double[] times;
+	private double[] times;	// deverá conter somente a variavel independente e os valores não correlacionados
 	
 	private double[] batLevels;
 	
 	private int[] rounds;
 	
-
+	private double[] regressionB;
+	
+	private double[] regressionA;
+// adicionar double[][] cofficients;
 	/**
 	 * Retorna o tamanho do "dataRecords" contido neste "DataRecordItens"
 	 * @return tamanho do dataRecords
@@ -128,6 +131,7 @@ public class DataRecordItens
 			{
 				tam = dataRecords.size();
 			}
+			// AQUI! verificar motivo do types2 ser um array bidimensional
 			types2 = new int[tam][];
 			values2 = new double[tam][];
 			times = new double[tam];
@@ -169,6 +173,12 @@ public class DataRecordItens
 		readData();
 		return values2[ind];
 	}
+	
+	public double[][] getDataRecordValues2()
+	{
+		readData();
+		return values2;
+	}
 
 	public double[] getDataRecordTimes()
 	{
@@ -188,5 +198,15 @@ public class DataRecordItens
 		return rounds;
 	}
 	
-	
+	public void setRegressionCoefs(double[] b, double[] a)
+	{
+		regressionB = b;
+		regressionA = a;
+
+	}
+
+	public void clearValues (int index){
+
+		values2[index] = null;
+	}
 } // end dataRecords

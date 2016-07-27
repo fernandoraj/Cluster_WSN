@@ -26,5 +26,8 @@ public class MessageItem {
 	public void add(DataRecord dr, int sWindSize) {
 		dataRecordItens.add(dr, sWindSize);
 	}
+	public DataRecordItens getDataRecordItens() {
+		return dataRecordItens;
+	}
 	
 } // end class MessageItem

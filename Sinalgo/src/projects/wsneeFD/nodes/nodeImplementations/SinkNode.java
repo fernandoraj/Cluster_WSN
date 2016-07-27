@@ -90,13 +90,13 @@ public class SinkNode extends SimpleNode
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
 	 * [Eng] Percentage of temporal acceptable error threshold for the readings of sensor nodes, which may be between 0.0 (accepts no errors) and 1.0 (accepts any error)
 	 */
-	private double[] thresholdErrors = {0.05,0.05}; //{0.05}; //{0.05,0.05}; //{0.05,0.05,0.05}; // thresholdErr: 0.05 = 5%
+	private double[] thresholdErrors = {0.05,0.05,0.05}; //{0.05}; //{0.05,0.05}; //{0.05,0.05,0.05}; // thresholdErr: 0.05 = 5%
 	
 	/**
 	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
 	 * [Eng] Limit of acceptable magnitude difference (spatial error) for the readings of sensor nodes / - which can be between 0.0 (no errors accepted) and 1.0 (accepts any error)
 	 */
-	private double[] spacialThresholdErrors = {1.5,1.5}; //{1.5}; //{1.5,1.5}; //{2.0, 2.5, 70.0};
+	private double[] spacialThresholdErrors = {1.5,1.5,1.5}; //{1.5}; //{1.5,1.5}; //{2.0, 2.5, 70.0};
 	
 	/**
 	 * Percentual mínimo do número de rounds iguais das medições de 2 sensores para que os mesmos sejam classificados no mesmo cluster <br>
@@ -199,14 +199,28 @@ public class SinkNode extends SimpleNode
 	 * Define o menor grau de r, em módulo, necessário para que dois sensores sejam ditos correlacionados. Deve-se considerar o tamanho do
 	 * vetor como o resultado da combinação entre a quantidade de dados diferentes.
 	 * comb(n,p) = n!/(p!*(n-p)!)
-	 * e.g.: para dois tipos de dados (temperatura e umidade) o vetor tera uma posição, para três tipos de dados, quatro posições...
+	 * e.g.: para dois tipos de dados (temperatura e umidade) o vetor tera uma posição, para três tipos de dados, três posições...
 	 * [Eng] Defines the minimum r degree , in absolute value, necessary for call two sensor nodes by correlated. it must be consider the 
 	 * size of vector as the result from  combination between the amount of different data types.
 	 * comb(n,p) = n!/(p!*(n-p)!)
-	 * e.g.: for two types of data (temperature and humidity) the vector will have one position, for three types of data, four positions
+	 * e.g.: for two types of data (temperature and humidity) the vector will have one position, for three types of data, three positions
 	 */
-	private double[] rPearsonMinimal = {1.0, 0.5, 0.7};
+	
+	/*
+	public int correlations(){
+		int sizeOfCorrelations = 0;
+		//double[] //criar vetor para armazenar limiares para passar quaisquer que sejam os valores. 
+		for (int i=0; i < dataSensedTypes.length-1; i++){
+			for(int j=i+1; j < dataSensedTypes.length; j++){
+				sizeOfCorrelations++;
+			}
+		}
+		return sizeOfCorrelations;
+	}
+	*/
+	public double[] rPearsonMinimal = {0.7,0.7,0.7};
  	
+	
 	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); // Lista de nós sensores que serão guardados, caso VMP seja true
 
 	/**
