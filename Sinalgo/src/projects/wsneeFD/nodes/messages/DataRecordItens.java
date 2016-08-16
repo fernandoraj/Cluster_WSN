@@ -28,7 +28,7 @@ public class DataRecordItens
 	private double[] batLevels;
 	
 	private int[] rounds;
-	
+	//TODO Colocar um flag(e/ou array de flags) indicando a presença(e/ou a quantidade) de coeficientes no dataRecordItensToSink para a remontagem de dados no sink
 	private double[] regressionB;
 	
 	private double[] regressionA;
