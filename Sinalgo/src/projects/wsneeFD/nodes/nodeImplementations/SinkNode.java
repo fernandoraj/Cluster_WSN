@@ -218,7 +218,8 @@ public class SinkNode extends SimpleNode
 		return sizeOfCorrelations;
 	}
 	*/
-	public double[] rPearsonMinimal = {0.7,0.7,0.7};
+	public double[] rPearsonMinimal = {0.7,0.7,0.7}; //graus mínimos de correlação a ser verificado entre as combinações de grandeza.
+	//e.g.: [0] indica o grau mínimo de corelação entre temperatura e umidade, [1] indica o grau mínimo de corelação entre temperatura e luminosidade, [2]indica o grau mínimo de corelação entre umidade e luminosidade,
  	
 	
 	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); // Lista de nós sensores que serão guardados, caso VMP seja true
