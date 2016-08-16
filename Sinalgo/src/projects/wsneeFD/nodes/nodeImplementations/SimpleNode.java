@@ -314,18 +314,31 @@ public class SimpleNode extends Node
 	
 	private boolean receivedCoefs = false;
 	
-	
+	/**
+	 * @param sum armazena o somatório.
+	 * @param sqrSum armazena o quadrado das somas.
+	 */
 	class SumPPM {
 		double sum;
 		double sqrSum;
 	}
-	 
+	/**
+	 * Armazena as informações necessárias para a análise da correlação.
+	 * @param coeficients armazena os coeficientes B e A da regressão.
+	 * @param independentIndex refere-se à qual índice do vetor correlations possui a maior 'pontuação' de correlações e portanto, será a variável independente.
+	 * @param combinations indica quantas combinações ocorreram de acordo com a quantidade de tipos de leituras
+	 * @param correlationFlag vetor que retorna verdadeiro onde cada correlação entre cada combinação de dois tipos de dados seja maior que rPearsonMinimal[].
+	 */
 	class Correlation {
 		regressionCoefs coeficients;
 		int independentIndex, combinations; 
 		boolean[] correlationFlag;
 	}
-	
+	/**
+	 * Armazena os valores dos coeficiente B e A para cada combinação correlacionada.
+	 * @param a retorna um 'a' para cada combinação;
+	 * @param b retorna um 'b' para cada combinação.
+	 */
 	class regressionCoefs{
 		double[] a;
 		double[] b;
