@@ -322,18 +322,18 @@ public class SimpleNode extends Node
 	
 	private boolean rPPMIntraNode = false;
 	
-	class sumPPM {
+	class SumPPM {
 		double sum;
 		double sqrSum;
 	}
 	 
-	class correlation {
-		regressionCoefs coeficients;
+	class Correlation {
+		RegressionCoefs coeficients;
 		int independentIndex, combinations; 
 		boolean[] correlationFlag;
 	}
 	
-	class regressionCoefs{
+	class RegressionCoefs{
 		double[] a;
 		double[] b;
 	}
@@ -823,7 +823,7 @@ public class SimpleNode extends Node
 		 * @param currentDataTypeZ vetor de leituras da variável Luminosidade (dataRecordItens.getDataRecordValues(6))
 		 */
 		// trocar para boolean
-		public correlation rPearsonProductMoment(double[][] table, double[] times, Integer sizeTimeSlot, Integer dataLength){
+		public Correlation rPearsonProductMoment(double[][] table, double[] times, Integer sizeTimeSlot, Integer dataLength){
 			//double[][] pearsonTable = new double [sizeTimeSlot][];
 			double[] means = new double[dataLength];
 			double[] score = new double[dataLength];
@@ -869,7 +869,7 @@ public class SimpleNode extends Node
 					}
 					//comparar aqui a correlação entre a variável independente com as demais variáveis
 				}
-			correlation output = new correlation();
+			Correlation output = new Correlation();
 			output.coeficients.b = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength).b;
 			output.coeficients.a = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength).a;
 			output.independentIndex = whoIsIndependent(correlation);
@@ -939,8 +939,8 @@ public class SimpleNode extends Node
 		 * @param mean média do vetor inserido (dado pelo método mean4PPM)
 		 * @return sumPPM
 		 */
-		public sumPPM attributesPPM (double[][] currentDataTypes, double mean, int index){// calcula o somatório de cada índice menos sua média
-			sumPPM sum = new sumPPM();
+		public SumPPM attributesPPM (double[][] currentDataTypes, double mean, int index){// calcula o somatório de cada índice menos sua média
+			SumPPM sum = new SumPPM();
 			for (int i=0; i < currentDataTypes.length; i++){
 				sum.sum += (currentDataTypes[i][index] - mean);
 				sum.sqrSum += Math.pow((currentDataTypes[i][index] - mean), 2);
@@ -964,7 +964,7 @@ public class SimpleNode extends Node
 				}
 			return indie;
 		}
-		public regressionCoefs regression (double[][] table, double [] times, Integer sizeTimeSlot, Integer dataLength){
+		public RegressionCoefs regression (double[][] table, double [] times, Integer sizeTimeSlot, Integer dataLength){
 			
 			double b[] = new double[dataLength-1];
 			double averageTimes, averageValues[];
@@ -988,7 +988,7 @@ public class SimpleNode extends Node
 			for (int i = 0; i < averageValues.length; i++) {
 				a[i] = (averageValues[i] - b[i]* averageTimes);
 			}
-			regressionCoefs coeficientes = new regressionCoefs();
+			RegressionCoefs coeficientes = new RegressionCoefs();
 			
 			coeficientes.b = b;
 			coeficientes.a = a;
@@ -1037,7 +1037,7 @@ public class SimpleNode extends Node
 			}
 			
 				if(rPPMIntraNode){
-					correlation attributes = new correlation();
+					Correlation attributes = new Correlation();
 					attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, sizeTimeSlot, dataSensedTypes.length);
 					dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);
 					for (int i=0 ; i < dataSensedTypes.length-1; i++){
