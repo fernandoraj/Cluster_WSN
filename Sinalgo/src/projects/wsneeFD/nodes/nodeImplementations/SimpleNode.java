@@ -440,7 +440,8 @@ public class SimpleNode extends Node
 					{ 
 //						sequenceNumber = wsnMessage.sequenceID;
 						//this.setColor(Color.RED);
-												
+						
+						//TODO: analisar este trecho para entender como é feito o tratamento das mensagens que chegam contendo os coeficientes
 						if (wsnMessage.hasCoefs()) // If this message contains / has coefficients (A and B), then 
 						{
 							//...então o nó deve receber os coeficientes enviados pelo sink e...
