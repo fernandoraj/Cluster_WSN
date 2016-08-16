@@ -314,13 +314,6 @@ public class SimpleNode extends Node
 	
 	private boolean receivedCoefs = false;
 	
-	/**
-	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados dentro de cada nó <p>
-	 * [Eng] Indicates if r Pearson's Product Moment will be used to correlate the different types of data inside every node
-	 */
-	
-	
-	private boolean rPPMIntraNode = false;
 	
 	class SumPPM {
 		double sum;
@@ -328,12 +321,12 @@ public class SimpleNode extends Node
 	}
 	 
 	class Correlation {
-		RegressionCoefs coeficients;
+		regressionCoefs coeficients;
 		int independentIndex, combinations; 
 		boolean[] correlationFlag;
 	}
 	
-	class RegressionCoefs{
+	class regressionCoefs{
 		double[] a;
 		double[] b;
 	}
@@ -964,7 +957,7 @@ public class SimpleNode extends Node
 				}
 			return indie;
 		}
-		public RegressionCoefs regression (double[][] table, double [] times, Integer sizeTimeSlot, Integer dataLength){
+		public regressionCoefs regression (double[][] table, double [] times, Integer sizeTimeSlot, Integer dataLength){
 			
 			double b[] = new double[dataLength-1];
 			double averageTimes, averageValues[];
@@ -988,7 +981,7 @@ public class SimpleNode extends Node
 			for (int i = 0; i < averageValues.length; i++) {
 				a[i] = (averageValues[i] - b[i]* averageTimes);
 			}
-			RegressionCoefs coeficientes = new RegressionCoefs();
+			regressionCoefs coeficientes = new regressionCoefs();
 			
 			coeficientes.b = b;
 			coeficientes.a = a;
@@ -1036,7 +1029,7 @@ public class SimpleNode extends Node
 				}
 			}
 			
-				if(rPPMIntraNode){
+				if(SinkNode.rPPMIntraNode){
 					Correlation attributes = new Correlation();
 					attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, sizeTimeSlot, dataSensedTypes.length);
 					dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);
