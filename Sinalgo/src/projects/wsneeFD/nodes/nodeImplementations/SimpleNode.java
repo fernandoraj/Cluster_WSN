@@ -866,7 +866,7 @@ public class SimpleNode extends Node
 				for (int i=0; i < dataLength; i++){
 					if (index != i){
 						correlationWithIndependent[i] = ((attributesPPM(table,means[index],index).sum)*(attributesPPM(table,means[i],i).sum))/((attributesPPM(table,means[index],index).sqrSum)*(attributesPPM(table,means[i],i).sqrSum));
-						if (correlationWithIndependent[i] > 0.7){
+						if (correlationWithIndependent[i] > SinkNode.rPearsonMinimal[i]){
 							isCorrelated[i] = true;
 							preparedValuesForRegression[i] = table[i];
 						}else{
