@@ -1050,6 +1050,7 @@ public class SimpleNode extends Node
 					for (int i=0 ; i < dataSensedTypes.length-1; i++){
 						if (i != attributes.independentIndex){ // há algo estranho acontecendo aqui!
 							if (attributes.correlationFlag[i]){ // se houve correlação do primeiro valor que não seja a variavel independente
+								dataRecordItensToSink.setThereIsCoefficients(true);
 								dataRecordItensToSink.clearValues(attributes.independentIndex);
 							}
 						}
@@ -1057,6 +1058,8 @@ public class SimpleNode extends Node
 					// b = Sum(ti - t_)(Si - S_)/Sum(ti-t_)^2
 					// t -> tempo ; S -> Valores
 					// a = (1/N)(Sum(Si - b*Sum(ti)) = S_ - b * t_
+					//dataRecordItens = dataRecordItensToSink;
+					wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItensToSink));
 				}
 		} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)	 
 
