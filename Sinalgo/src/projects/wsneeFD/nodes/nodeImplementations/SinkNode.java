@@ -666,9 +666,11 @@ public class SinkNode extends SimpleNode
 					if (stillNonclustered) { // If the sink still not clustered all nodes for the first time
 						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!
 						((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
-						
-						if(VMP){//Aqui Faz o algoritmo do vizinho mais proximo, subistituindo o medida se similaridade quando a variavel for true
-							if(numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todas 54 primeiras nodes com as 70 leiturar iniciais
+						if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getThereIsCoefficients()){
+							//TODO: continuar aqui.
+						}
+						if(VMP){//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
+							if(numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todos os 54 primeiros nós com as 70 leituras iniciais.
 								if(((SimpleNode)wsnMsgResp.source).dataRecordItens.size() == 70){
 									sensores.add((SimpleNode)wsnMsgResp.source);
 								}
