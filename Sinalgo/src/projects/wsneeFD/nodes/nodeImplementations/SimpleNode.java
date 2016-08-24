@@ -332,7 +332,7 @@ public class SimpleNode extends Node
 	class Correlation {
 		regressionCoefs coeficients;
 		int independentIndex, combinations; 
-		boolean[] correlationFlag;
+		boolean[] correlationFlag; //Vetor de booleanos de tamanho [dataSensedTypes -1] que indica a correlação da variável independente com os demais variáveis de sensoriamento.
 	}
 	/**
 	 * Armazena os valores dos coeficiente B e A para cada combinação correlacionada.
@@ -877,8 +877,8 @@ public class SimpleNode extends Node
 					//comparar aqui a correlação entre a variável independente com as demais variáveis
 				}
 			Correlation output = new Correlation();
-			output.coeficients.b = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength).b;
-			output.coeficients.a = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength).a;
+			output.coeficients.b = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength, isCorrelated).b;
+			output.coeficients.a = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength, isCorrelated).a;
 			output.independentIndex = whoIsIndependent(correlation);
 			output.correlationFlag = isCorrelated;
 			output.combinations = nCorrelations;
@@ -971,24 +971,31 @@ public class SimpleNode extends Node
 				}
 			return indie;
 		}
-		public regressionCoefs regression (double[][] table, double [] times, Integer sizeTimeSlot, Integer dataLength){
+		public regressionCoefs regression (double[][] table, double [] times, Integer sizeTimeSlot, Integer dataLength, boolean[]isCorrelated){
 			
 			double b[] = new double[dataLength-1];
 			double averageTimes, averageValues[];
 			averageTimes = calculatesAverage(times);
 			averageValues = calculatesAverage(table);
-			for (int i = 0; i < table.length; i++) {
-				double numerador = 0.0, denominador = 0.0, x = 0.0;
-				for (int j = 0; j < table.length; j++) {
-					x = times[j] - averageTimes;
-					numerador += x*(table[j][i] - averageValues[i]);
-					denominador += x*x;
+			for (int i=0 ; i < isCorrelated.length; i++){
+				if(isCorrelated[i]){
+					for (int j = 0; j < table.length; j++) {
+						double numerador = 0.0, denominador = 0.0, x = 0.0;
+						for (int k = 0; k < table.length; k++) {
+							x = times[k] - averageTimes;
+							numerador += x*(table[k][j] - averageValues[j]);
+							denominador += x*x;
+						}
+						if (denominador != 0) {
+							b[j] = (numerador/denominador);
+						}
+						else {
+							b[j] = 0.0;
+						}
+					}
 				}
-				if (denominador != 0) {
-					b[i] = (numerador/denominador);
-				}
-				else {
-					b[i] = 0.0;
+				else{
+					b[i]=0.0;
 				}
 			}
 			double a[] = new double[averageValues.length];
@@ -1046,20 +1053,23 @@ public class SimpleNode extends Node
 				if(SinkNode.rPPMIntraNode){
 					Correlation attributes = new Correlation();
 					attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, sizeTimeSlot, dataSensedTypes.length);
-					dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);
-					for (int i=0 ; i < dataSensedTypes.length-1; i++){
-						if (i != attributes.independentIndex){ // há algo estranho acontecendo aqui!
-							if (attributes.correlationFlag[i]){ // se houve correlação do primeiro valor que não seja a variavel independente
-								dataRecordItensToSink.setThereIsCoefficients(true);
-								dataRecordItensToSink.clearValues(attributes.independentIndex);
+					dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);	
+					int j=0;
+						for (int i=0 ; i < dataSensedTypes.length-1; i++){
+							if (i != attributes.independentIndex){
+								if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
+									dataRecordItensToSink.setThereIsCoefficients(true);
+									dataRecordItensToSink.clearValues(i);
+									j++;
+								}
 							}
 						}
-					}
 					// b = Sum(ti - t_)(Si - S_)/Sum(ti-t_)^2
 					// t -> tempo ; S -> Valores
 					// a = (1/N)(Sum(Si - b*Sum(ti)) = S_ - b * t_
 					//dataRecordItens = dataRecordItensToSink;
 					wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItensToSink));
+					SinkNode.rPPMIntraNode = false;
 				}
 		} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)	 
 
