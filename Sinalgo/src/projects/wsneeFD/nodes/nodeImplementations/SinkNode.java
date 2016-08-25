@@ -193,7 +193,7 @@ public class SinkNode extends SimpleNode
 	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados dentro de cada nó <p>
 	 * [Eng] Indicates if r Pearson's Product Moment will be used to correlate the different types of data inside every node
 	 */
-	private boolean rPPMIntraNode = false;
+	public static boolean rPPMIntraNode = false;
 	
 	/**
 	 * Define o menor grau de r, em módulo, necessário para que dois sensores sejam ditos correlacionados. Deve-se considerar o tamanho do
@@ -218,7 +218,8 @@ public class SinkNode extends SimpleNode
 		return sizeOfCorrelations;
 	}
 	*/
-	public double[] rPearsonMinimal = {0.7,0.7,0.7};
+	public static final double[] rPearsonMinimal = {0.7,0.7,0.7}; //graus mínimos de correlação a ser verificado entre as combinações de grandeza.
+	//e.g.: [0] indica o grau mínimo de corelação entre temperatura e umidade, [1] indica o grau mínimo de corelação entre temperatura e luminosidade, [2]indica o grau mínimo de corelação entre umidade e luminosidade,
  	
 	
 	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); // Lista de nós sensores que serão guardados, caso VMP seja true
@@ -665,9 +666,11 @@ public class SinkNode extends SimpleNode
 					if (stillNonclustered) { // If the sink still not clustered all nodes for the first time
 						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!
 						((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
-						
-						if(VMP){//Aqui Faz o algoritmo do vizinho mais proximo, subistituindo o medida se similaridade quando a variavel for true
-							if(numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todas 54 primeiras nodes com as 70 leiturar iniciais
+						if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getThereIsCoefficients()){
+							//TODO: continuar aqui.
+						}
+						if(VMP){//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
+							if(numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todos os 54 primeiros nós com as 70 leituras iniciais.
 								if(((SimpleNode)wsnMsgResp.source).dataRecordItens.size() == 70){
 									sensores.add((SimpleNode)wsnMsgResp.source);
 								}

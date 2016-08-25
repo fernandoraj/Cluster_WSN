@@ -28,6 +28,10 @@ public class DataRecordItens
 	private double[] batLevels;
 	
 	private int[] rounds;
+	//TODO Colocar um flag(e/ou array de flags) indicando a presença(e/ou a quantidade) de coeficientes no dataRecordItensToSink para a remontagem de dados no sink
+	private boolean thereIsCoefficients;
+	
+	private boolean[] correlationFlags;
 	
 	private double[] regressionB;
 	
@@ -196,6 +200,29 @@ public class DataRecordItens
 	{
 		readData();
 		return rounds;
+	}
+	public boolean getThereIsCoefficients(){
+		return thereIsCoefficients;
+	}
+	
+	public void setThereIsCoefficients(boolean result){
+		thereIsCoefficients = result;
+	}
+	
+	public boolean[] getCorrelationFlags(){
+		return correlationFlags;
+	}
+	
+	public void setCorrelationFlags(boolean[] results){
+		correlationFlags = results;
+	}
+	
+	public double[] getRegreesionCoefA(){
+		return regressionA;
+	}
+	
+	public double[] getRegressionCoefB(){
+		return regressionB;
 	}
 	
 	public void setRegressionCoefs(double[] b, double[] a)
