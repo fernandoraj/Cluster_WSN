@@ -855,27 +855,37 @@ public class SimpleNode extends Node
 			nCorrelations = 0;
 			for (int i=0; i < dataLength-1; i++){
 				for(int j=i+1; j < dataLength; j++){
-					//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
-					correlation[nCorrelations] = ((attributesPPM(table,means[i],i).sum)*(attributesPPM(table,means[j],j).sum))/((attributesPPM(table,means[i],i).sqrSum)*(attributesPPM(table,means[j],j).sqrSum));
-					score[i] += Math.abs(correlation[nCorrelations]);
-					score[j] += Math.abs(correlation[nCorrelations]);
+					if ((attributesPPM(table,means[i],i).sqrSum)*(attributesPPM(table,means[j],j).sqrSum) != 0.0){ // Se o denominador for diferente de zero (para evitar valor indefinido!)
+						//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
+						correlation[nCorrelations] = ((attributesPPM(table,means[i],i).sum)*(attributesPPM(table,means[j],j).sum))/((attributesPPM(table,means[i],i).sqrSum)*(attributesPPM(table,means[j],j).sqrSum));
+						score[i] += Math.abs(correlation[nCorrelations]);
+						score[j] += Math.abs(correlation[nCorrelations]);
+					}
+					else{
+						correlation[nCorrelations] = 0.0;
+					}
 					nCorrelations++;
 				}
 			}
 			double[][] preparedValuesForRegression = new double[sizeTimeSlot][];
 			int index = whoIsIndependent(score);
-				for (int i=0; i < dataLength; i++){
-					if (index != i){
+			for (int i=0; i < dataLength; i++){
+				if (index != i){
+					if ((attributesPPM(table,means[index],index).sqrSum)*(attributesPPM(table,means[i],i).sqrSum) != 0.0){ // Se o denominador for diferente de zero (para evitar valor indefinido!)
 						correlationWithIndependent[i] = ((attributesPPM(table,means[index],index).sum)*(attributesPPM(table,means[i],i).sum))/((attributesPPM(table,means[index],index).sqrSum)*(attributesPPM(table,means[i],i).sqrSum));
-						if (correlationWithIndependent[i] > SinkNode.rPearsonMinimal[i]){
-							isCorrelated[i] = true;
-							preparedValuesForRegression[i] = table[i];
-						}else{
-							isCorrelated[i] = false;
-						}
 					}
-					//comparar aqui a correlação entre a variável independente com as demais variáveis
+					else{
+						correlationWithIndependent[i] = 0.0;
+					}
+					if (correlationWithIndependent[i] > SinkNode.rPearsonMinimal[i]){
+						isCorrelated[i] = true;
+						preparedValuesForRegression[i] = table[i];
+					}else{
+						isCorrelated[i] = false;
+					}
 				}
+				//comparar aqui a correlação entre a variável independente com as demais variáveis
+			}
 			Correlation output = new Correlation();
 			output.coeficients.b = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength, isCorrelated).b;
 			output.coeficients.a = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength, isCorrelated).a;
@@ -1037,40 +1047,42 @@ public class SimpleNode extends Node
 		{
 			this.dataSensedTypes = dataSensedTypes;
 			triggerReadings(wsnMsgResp, sizeTimeSlot);
+			
+			//Aqui: Analisar qual o momento a ser chamado o método para cálculo do rPearsonProductMoment(), pois é necessário que todas as leituras iniciais já tenham sido realizadas!
 			DataRecordItens dataRecordItensToSink = new DataRecordItens();
 			double[][] valuesFromDataRecordItens = new double [sizeTimeSlot][dataSensedTypes.length];
 			double[] timesFromDataRecordItens = new double [sizeTimeSlot];
 			if (wsnMsgResp.messageItemsToSink != null) {
 				for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
-					for (int j = 0; j < dataSensedTypes.length; j++){
+					//for (int j = 0; j < dataSensedTypes.length; j++){
 						dataRecordItensToSink = ((DataRecordItens)wsnMsgResp.messageItemsToSink.get(i).getDataRecordItens());
 						valuesFromDataRecordItens = dataRecordItensToSink.getDataRecordValues2();
-					}
+					//}
 					timesFromDataRecordItens = dataRecordItensToSink.getDataRecordTimes();
 				}
 			}
 			
-				if(SinkNode.rPPMIntraNode){
-					Correlation attributes = new Correlation();
-					attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, sizeTimeSlot, dataSensedTypes.length);
-					dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);	
-					int j=0;
-						for (int i=0 ; i < dataSensedTypes.length-1; i++){
-							if (i != attributes.independentIndex){
-								if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
-									dataRecordItensToSink.setThereIsCoefficients(true);
-									dataRecordItensToSink.clearValues(i);
-									j++;
-								}
-							}
+			if (SinkNode.rPPMIntraNode){
+				Correlation attributes = new Correlation();
+				attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, sizeTimeSlot, dataSensedTypes.length);
+				dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);	
+				int j=0;
+				for (int i=0 ; i < dataSensedTypes.length-1; i++){
+					if (i != attributes.independentIndex){
+						if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
+							dataRecordItensToSink.setThereIsCoefficients(true);
+							dataRecordItensToSink.clearValues(i);
+							j++;
 						}
-					// b = Sum(ti - t_)(Si - S_)/Sum(ti-t_)^2
-					// t -> tempo ; S -> Valores
-					// a = (1/N)(Sum(Si - b*Sum(ti)) = S_ - b * t_
-					//dataRecordItens = dataRecordItensToSink;
-					wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItensToSink));
-					SinkNode.rPPMIntraNode = false;
+					}
 				}
+				// b = Sum(ti - t_)(Si - S_)/Sum(ti-t_)^2
+				// t -> tempo ; S -> Valores
+				// a = (1/N)(Sum(Si - b*Sum(ti)) = S_ - b * t_
+				//dataRecordItens = dataRecordItensToSink;
+				wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItensToSink));
+				SinkNode.rPPMIntraNode = false;
+			}
 		} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)	 
 
 	public void oneReading(WsnMsgResponse wsnMsgResp) {

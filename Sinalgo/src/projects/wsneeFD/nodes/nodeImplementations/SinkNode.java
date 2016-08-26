@@ -193,7 +193,7 @@ public class SinkNode extends SimpleNode
 	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados dentro de cada nó <p>
 	 * [Eng] Indicates if r Pearson's Product Moment will be used to correlate the different types of data inside every node
 	 */
-	public static boolean rPPMIntraNode = false;
+	public static boolean rPPMIntraNode = true;
 	
 	/**
 	 * Define o menor grau de r, em módulo, necessário para que dois sensores sejam ditos correlacionados. Deve-se considerar o tamanho do
