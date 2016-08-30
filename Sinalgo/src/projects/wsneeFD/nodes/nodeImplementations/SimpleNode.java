@@ -350,6 +350,12 @@ public class SimpleNode extends Node
 	double[] coefsB;
 	double[] maxErrors;
 	
+	/**
+	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados dentro de cada nó <p>
+	 * [Eng] Indicates if r Pearson's Product Moment will be used to correlate the different types of data inside each node
+	 */
+	public boolean rPPMIntraNodeLocal = true;
+	
 	public SimpleNode() {
 		super();
 		numPredictionErrorsPerType = new int[SinkNode.dataSensedTypes.length];
@@ -502,6 +508,42 @@ public class SimpleNode extends Node
 					if (nextNodeToBaseStation != null) {
 						WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
 						timer.startRelative((wsnMessage.sizeTimeSlot*SinkNode.sensorTimeSlot), this); // Espera por (wsnMessage.sizeTimeSlot*SinkNode.sensorTimeSlot) rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
+						
+						// Linhas 506 a 540 devem ser investigadas!
+						if (SinkNode.rPPMIntraNode && rPPMIntraNodeLocal){
+							DataRecordItens dataRecordItensToSink = new DataRecordItens();
+							double[][] valuesFromDataRecordItens = new double[wsnMessage.sizeTimeSlot][wsnMessage.dataSensedTypes.length];
+							double[] timesFromDataRecordItens = new double[wsnMessage.sizeTimeSlot];
+							if (wsnMsgResp.messageItemsToSink != null) {
+								for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
+									dataRecordItensToSink = ((DataRecordItens)wsnMsgResp.messageItemsToSink.get(i).getDataRecordItens());
+									valuesFromDataRecordItens = dataRecordItensToSink.getDataRecordValues2();
+									timesFromDataRecordItens = dataRecordItensToSink.getDataRecordTimes();
+								}
+							}
+						
+//						if (SinkNode.rPPMIntraNode && rPPMIntraNodeLocal){
+							Correlation attributes = new Correlation();
+							attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedTypes.length);
+							dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);	
+							int j=0;
+							for (int i=0 ; i < dataSensedTypes.length-1; i++){
+								if (i != attributes.independentIndex){
+									if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
+										dataRecordItensToSink.setThereIsCoefficients(true);
+										dataRecordItensToSink.clearValues(i);
+										j++;
+									}
+								}
+							}
+							// b = Sum(ti - t_)(Si - S_)/Sum(ti-t_)^2
+							// t -> tempo ; S -> Valores
+							// a = (1/N)(Sum(Si - b*Sum(ti)) = S_ - b * t_
+							//dataRecordItens = dataRecordItensToSink;
+							wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItensToSink));
+							rPPMIntraNodeLocal = false;
+						}
+
 						
 						SelectionTimer selectionTimer = new SelectionTimer(wsnMsgResp2);
 						selectionTimer.startRelative(((wsnMessage.sizeTimeSlot*SinkNode.sensorTimeSlot)+SinkNode.sensorTimeSlot), this); // Espera por (wsnMessage.sizeTimeSlot*SinkNode.sensorTimeSlot)+SinkNode.sensorTimeSlot rounds e testa se o nó já recebeu seus coeficientes ()
@@ -1049,40 +1091,6 @@ public class SimpleNode extends Node
 			triggerReadings(wsnMsgResp, sizeTimeSlot);
 			
 			//Aqui: Analisar qual o momento a ser chamado o método para cálculo do rPearsonProductMoment(), pois é necessário que todas as leituras iniciais já tenham sido realizadas!
-			DataRecordItens dataRecordItensToSink = new DataRecordItens();
-			double[][] valuesFromDataRecordItens = new double [sizeTimeSlot][dataSensedTypes.length];
-			double[] timesFromDataRecordItens = new double [sizeTimeSlot];
-			if (wsnMsgResp.messageItemsToSink != null) {
-				for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
-					//for (int j = 0; j < dataSensedTypes.length; j++){
-						dataRecordItensToSink = ((DataRecordItens)wsnMsgResp.messageItemsToSink.get(i).getDataRecordItens());
-						valuesFromDataRecordItens = dataRecordItensToSink.getDataRecordValues2();
-					//}
-					timesFromDataRecordItens = dataRecordItensToSink.getDataRecordTimes();
-				}
-			}
-			
-			if (SinkNode.rPPMIntraNode){
-				Correlation attributes = new Correlation();
-				attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, sizeTimeSlot, dataSensedTypes.length);
-				dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);	
-				int j=0;
-				for (int i=0 ; i < dataSensedTypes.length-1; i++){
-					if (i != attributes.independentIndex){
-						if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
-							dataRecordItensToSink.setThereIsCoefficients(true);
-							dataRecordItensToSink.clearValues(i);
-							j++;
-						}
-					}
-				}
-				// b = Sum(ti - t_)(Si - S_)/Sum(ti-t_)^2
-				// t -> tempo ; S -> Valores
-				// a = (1/N)(Sum(Si - b*Sum(ti)) = S_ - b * t_
-				//dataRecordItens = dataRecordItensToSink;
-				wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItensToSink));
-				SinkNode.rPPMIntraNode = false;
-			}
 		} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)	 
 
 	public void oneReading(WsnMsgResponse wsnMsgResp) {
