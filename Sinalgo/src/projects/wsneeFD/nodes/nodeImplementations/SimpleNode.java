@@ -509,7 +509,7 @@ public class SimpleNode extends Node
 						WsnMessageResponseTimer timer = new WsnMessageResponseTimer(wsnMsgResp, nextNodeToBaseStation);
 						timer.startRelative((wsnMessage.sizeTimeSlot*SinkNode.sensorTimeSlot), this); // Espera por (wsnMessage.sizeTimeSlot*SinkNode.sensorTimeSlot) rounds e envia a mensagem para o nó sink (próximo nó no caminho do sink)
 						
-						// Linhas 506 a 540 devem ser investigadas!
+						// Linhas 513 a 544 devem ser investigadas!
 						if (SinkNode.rPPMIntraNode && rPPMIntraNodeLocal){
 							DataRecordItens dataRecordItensToSink = new DataRecordItens();
 							double[][] valuesFromDataRecordItens = new double[wsnMessage.sizeTimeSlot][wsnMessage.dataSensedTypes.length];
@@ -522,7 +522,6 @@ public class SimpleNode extends Node
 								}
 							}
 						
-//						if (SinkNode.rPPMIntraNode && rPPMIntraNodeLocal){
 							Correlation attributes = new Correlation();
 							attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMessage.sizeTimeSlot, wsnMessage.dataSensedTypes.length);
 							dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);	
@@ -1204,6 +1203,10 @@ public class SimpleNode extends Node
 	{
 		Global.sensorReadingsCount++; // Increments the global count of sensor readings
 		numTotalSensorReadings++; // Increments the local count of sensor readings
+//		if (numTotalSensorReadings == 70)
+//		{
+//			int i = 70;
+//		}
 /*
 		if (Global.currentTime > 100 && numTotalSensorReadings > Global.currentTime + 1) {
 			System.out.println(" * * * Sensor ID = "+this.ID+": numTotalSensorReadings (performSensorReading) = "+numTotalSensorReadings+" and Global.currentTime = "+Global.currentTime);
