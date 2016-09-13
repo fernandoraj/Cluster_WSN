@@ -18,17 +18,17 @@ public class DataRecordItens
 	public Vector<DataRecord> dataRecords;
 
 	private boolean nonRead = true;
-	
-	private int[][] types2;
-	
-	private double[][] values2; // deverá conter somente a variavel independente e os valores não correlacionados
-	
-	private double[] times;	// deverá conter somente a variavel independente e os valores não correlacionados
-	
-	private double[] batLevels;
-	
-	private int[] rounds;
-	//TODO Colocar um flag(e/ou array de flags) indicando a presença(e/ou a quantidade) de coeficientes no dataRecordItensToSink para a remontagem de dados no sink
+//	
+//	private int[][] types2;
+//	
+//	private double[][] values2; // deverá conter somente a variavel independente e os valores não correlacionados
+//	
+//	private double[] times;	// deverá conter somente a variavel independente e os valores não correlacionados
+//	
+//	private double[] batLevels;
+//	
+//	private int[] rounds;
+//	//TODO Colocar um flag(e/ou array de flags) indicando a presença(e/ou a quantidade) de coeficientes no dataRecordItensToSink para a remontagem de dados no sink
 	private boolean thereIsCoefficients;
 	
 	private boolean[] correlationFlags;
@@ -98,7 +98,6 @@ public class DataRecordItens
 		}
 		nonRead = true;
 	} // end add(char typ, double val, double tim, double bat, int rnd, int windowSize)
-
 	/**
 	 * Adiciona os respectivos valores para o atributo dataRecords do sensor (SimpleNode)<p>[Eng] Adds the respective values to dataRecords attribute from this sensor (SimpleNode)
 	 * @param dataRecord O registo de dados com os dados a serem adicionados ao "dataRecords" vector a partir do sensor atual <p> [Eng] Data record with the data to be add to "dataRecords" vector from the current sensor
@@ -135,72 +134,72 @@ public class DataRecordItens
 			{
 				tam = dataRecords.size();
 			}
-			// AQUI! verificar motivo do types2 ser um array bidimensional
-			types2 = new int[tam][];
-			values2 = new double[tam][];
-			times = new double[tam];
-			batLevels = new double[tam];
-			rounds = new int[tam];
-			
-			for (int i=0; i<tam; i++)
-			{
-				if (dataRecords.get(i) != null)
-				{
-					types2[i] = ((DataRecord)dataRecords.get(i)).typs;
-					values2[i] = ((DataRecord)dataRecords.get(i)).values;
-					times[i] = ((DataRecord)dataRecords.get(i)).time;
-					batLevels[i] = ((DataRecord)dataRecords.get(i)).batLevel;
-					rounds[i] = ((DataRecord)dataRecords.get(i)).round;
-				}
-				else
-				{
-					types2[i] = null;
-					values2[i] = null;
-					times[i] = 0.0;
-					batLevels[i] = 0.0;
-					rounds[i] = 0;
-				}
-			}
-			
-			nonRead = false;
+//			// AQUI! verificar motivo do types2 ser um array bidimensional
+//			types2 = new int[tam][];
+//			values2 = new double[tam][];
+//			times = new double[tam];
+//			batLevels = new double[tam];
+//			rounds = new int[tam];
+//			
+//			for (int i=0; i<tam; i++)
+//			{
+//				if (dataRecords.get(i) != null)
+//				{
+//					types2[i] = ((DataRecord)dataRecords.get(i)).typs;
+//					values2[i] = ((DataRecord)dataRecords.get(i)).values;
+//					times[i] = ((DataRecord)dataRecords.get(i)).time;
+//					batLevels[i] = ((DataRecord)dataRecords.get(i)).batLevel;
+//					rounds[i] = ((DataRecord)dataRecords.get(i)).round;
+//				}
+//				else
+//				{
+//					types2[i] = null;
+//					values2[i] = null;
+//					times[i] = 0.0;
+//					batLevels[i] = 0.0;
+//					rounds[i] = 0;
+//				}
+//			}
+//			
+//			nonRead = false;
 		}
 	}
-	
-	public int[] getDataRecordTypes(int ind)
-	{
-		readData();
-		return types2[ind];
-	}
-	
-	public double[] getDataRecordValues(int ind)
-	{
-		readData();
-		return values2[ind];
-	}
-	
-	public double[][] getDataRecordValues2()
-	{
-		readData();
-		return values2;
-	}
-
-	public double[] getDataRecordTimes()
-	{
-		readData();
-		return times;
-	}
-
-	public double[] getDataRecordBatLevels()
-	{
-		readData();
-		return batLevels;
-	}
-	
-	public int[] getDataRecordRounds()
-	{
-		readData();
-		return rounds;
-	}
+//	
+//	public int[] getDataRecordTypes(int ind)
+//	{
+//		readData();
+//		return types2[ind];
+//	}
+//	
+//	public double[] getDataRecordValues(int ind)
+//	{
+//		readData();
+//		return values2[ind];
+//	}
+//	
+//	public double[][] getDataRecordValues2()
+//	{
+//		readData();
+//		return values2;
+//	}
+//
+//	public double[] getDataRecordTimes()
+//	{
+//		readData();
+//		return times;
+//	}
+//
+//	public double[] getDataRecordBatLevels()
+//	{
+//		readData();
+//		return batLevels;
+//	}
+//	
+//	public int[] getDataRecordRounds()
+//	{
+//		readData();
+//		return rounds;
+//	}
 	public boolean getThereIsCoefficients(){
 		return thereIsCoefficients;
 	}
@@ -231,9 +230,9 @@ public class DataRecordItens
 		regressionA = a;
 
 	}
-
-	public void clearValues (int index){
-
-		values2[index] = null;
-	}
+//
+//	public void clearValues (int index){
+//
+//		values2[index] = null;
+//	}
 } // end dataRecords
