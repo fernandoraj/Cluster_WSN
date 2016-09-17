@@ -166,7 +166,7 @@ public class WsnMsgResponse extends Message {
 */	
 	public MessageItem messageItemToCH;
 	
-	public MessageItem messageItemsToSink;
+	public Vector<MessageItem> messageItemsToSink;
 
 /*
 	public void addDataRecordItens(int[] typs, double[] vals, double tim, double bat, int rnd)
