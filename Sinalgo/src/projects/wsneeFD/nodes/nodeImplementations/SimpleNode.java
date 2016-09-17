@@ -199,7 +199,8 @@ public class SimpleNode extends Node
 	 * Vetor (array / conjunto) de itens de mensagem usado para armazenar os dados lidos por cada sensor, para envio para o seu CH e, posteriormente, para o Sink.
 	 * [Eng] Array / Vector of message items used to store the data read by each sensor, for sending to its CH and subsequently to the Sink.
 	 */
-	public MessageItem messageItensPackage;
+	public Vector<MessageItem> messageItensPackage;
+	//public MessageItem messageItensPackage;
 	
 	/**
 	 * Conjunto de itens de leituras de dados.
@@ -614,7 +615,8 @@ public class SimpleNode extends Node
 		}
 */		
 		if (messageItensPackage == null) {
-			messageItensPackage = new MessageItem();
+			messageItensPackage = new Vector<MessageItem>();
+			//messageItensPackage = new MessageItem();
 		}
 		
 		if (wsnMsgResp.messageItemToCH != null) {
@@ -806,18 +808,23 @@ public class SimpleNode extends Node
 				//	dataRecordItens = new DataRecordItens();
 				//}
 				//dataRecordItens.add(dataSensedTypes, values, quantTime, batLevel, round, windowSize);
-				DataRecord dr = new DataRecord();
-				dr.typs = dataSensedTypes;
-				dr.values = values;
-				dr.time = quantTime;
-				dr.batLevel = batLevel;
-				dr.round = round;
+//				DataRecord dr = new DataRecord();
+//				dr.typs = dataSensedTypes;
+//				dr.values = values;
+//				dr.time = quantTime;
+//				dr.batLevel = batLevel;
+//				dr.round = round;
 				
 				
 				if (wsnMsgResp.messageItemsToSink == null) {
-					wsnMsgResp.messageItemsToSink = new MessageItem();
+					wsnMsgResp.messageItemsToSink = new Vector<MessageItem>();
+					dataRecordItens = new DataRecordItens();
 				}
-				wsnMsgResp.messageItemsToSink.add(dr,windowSize);
+				dataRecordItens.add(dataSensedTypes, values, quantTime, batLevel, round, windowSize);
+				wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItens));
+//					wsnMsgResp.messageItemsToSink = new MessageItem();
+//				}
+//				wsnMsgResp.messageItemsToSink.add(dr,windowSize);
 				
 			}//if (linhas.length > 4)
 		}//if (dataLine != null && dataSensedType != null && medida != 0)
@@ -834,15 +841,25 @@ public class SimpleNode extends Node
 		else{
 			// Linhas 513 a 544 devem ser investigadas!
 			if (SinkNode.rPPMIntraNode && rPPMIntraNodeLocal){
-				valuesFromDataRecordItens = null;
-				timesFromDataRecordItens = null;
-				DataRecordItens dataRecordItensToSink = wsnMsgResp.messageItemsToSink.getDataRecordItens();
-				Vector<DataRecord> dr = dataRecordItensToSink.dataRecords;
+				DataRecordItens dataRecordItensToSink = new DataRecordItens();
+				//TODO: wsnMessage foi substituído por wsnMsgResp, verificar se esta substituição está correta.
+				/*aqui*/double[][] valuesFromDataRecordItens = new double[wsnMsgResp.sizeTimeSlot][wsnMsgResp.dataSensedTypes.length];
+				/*aqui*/double[] timesFromDataRecordItens = new double[wsnMsgResp.sizeTimeSlot];
+//				valuesFromDataRecordItens = null;
+//				timesFromDataRecordItens = null;
+//				DataRecordItens dataRecordItensToSink = wsnMsgResp.messageItemsToSink.getDataRecordItens();
+//				Vector<DataRecord> dr = dataRecordItensToSink.dataRecords;
 				if (wsnMsgResp.messageItemsToSink != null) {
-				for (int i=0; i < dr.size(); i++){
-					valuesFromDataRecordItens[i] = dr.get(i).values;
-					timesFromDataRecordItens[i] = dr.get(i).time;
-				}
+					for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
+						dataRecordItensToSink = ((DataRecordItens)wsnMsgResp.messageItemsToSink.get(i).getDataRecordItens());
+						valuesFromDataRecordItens[i] = dataRecordItensToSink.getDataRecordValues(i);
+//						valuesFromDataRecordItens = dataRecordItensToSink.getDataRecordValues2();
+						timesFromDataRecordItens[i] = dataRecordItensToSink.getDataRecordTimes(i);
+						}
+//				for (int i=0; i < dr.size(); i++){
+//					valuesFromDataRecordItens[i] = dr.get(i).values;
+//					timesFromDataRecordItens[i] = dr.get(i).time;
+//				}
 				//TODO: wsnMessage foi substituído por wsnMsgResp, verificar se esta substituição está correta.
 				/*aqui*/
 //					for (int i = 0; i < wsnMsgResp.messageItemsToSink.size(); i++) {
@@ -853,23 +870,32 @@ public class SimpleNode extends Node
 //					}
 				//TODO:Discutir esse trecho, dr.remove(i).
 				Correlation attributes = new Correlation();
-				attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
+				/*aqui*/attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
+				//attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
 				dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);	
 				int j=0;
-					for (int i=0 ; i < dataSensedTypes.length-1; i++){
-						if (i != attributes.independentIndex){
-							if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
-								dataRecordItensToSink.setThereIsCoefficients(true);
-								dr.remove(i);
-								j++;
-							}
+				for (int i=0 ; i < dataSensedTypes.length-1; i++){
+					if (i != attributes.independentIndex){
+						if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
+						dataRecordItensToSink.setThereIsCoefficients(true);
+						dataRecordItensToSink.clearValues(i);
+						j++;
+						}
+//					for (int i=0 ; i < dataSensedTypes.length-1; i++){
+//						if (i != attributes.independentIndex){
+//							if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
+//								dataRecordItensToSink.setThereIsCoefficients(true);
+//								dr.remove(i);
+//								j++;
+//							}
 						}
 					}
 				// b = Sum(ti - t_)(Si - S_)/Sum(ti-t_)^2
 				// t -> tempo ; S -> Valores
 				// a = (1/N)(Sum(Si - b*Sum(ti)) = S_ - b * t_
 				//dataRecordItens = dataRecordItensToSink;
-				wsnMsgResp.messageItemsToSink = (MessageItem) dr.elements();
+				wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItensToSink));
+				//wsnMsgResp.messageItemsToSink = (MessageItem) dr.elements();
 				rPPMIntraNodeLocal = false;
 				}
 			}
@@ -927,7 +953,7 @@ public class SimpleNode extends Node
 					nCorrelations++;
 				}
 			}
-			double[][] preparedValuesForRegression = new double[sizeTimeSlot][];
+			double[][] preparedValuesForRegression = new double[sizeTimeSlot][table.length];
 			int index = whoIsIndependent(score);
 			for (int i=0; i < dataLength; i++){
 				if (index != i){
@@ -941,6 +967,9 @@ public class SimpleNode extends Node
 						isCorrelated[i] = true;
 						preparedValuesForRegression[i] = table[i];
 					}else{
+						for(int j=0; j< table.length;j++){
+						preparedValuesForRegression[i][j]= 0.0;
+						}
 						isCorrelated[i] = false;
 					}
 				}
@@ -989,19 +1018,19 @@ public class SimpleNode extends Node
 		
 		private double[] calculatesAverage(double[][] values)
 		{
-			double means[] = new double[values[0].length];
-			for (int secondDim = 0; secondDim < values[0].length; secondDim++)
-			{
-				double mean = 0, sum = 0;
-				for (int firstDim = 0; firstDim < values.length; firstDim++) {
-					sum += values[firstDim][secondDim];
-				}
-				if (values.length > 0)
+			double means[] = new double[values[0].length];			
+				for (int secondDim = 0; secondDim < values[0].length; secondDim++)
 				{
-					mean = sum/values.length;
+					double mean = 0, sum = 0;
+					for (int firstDim = 0; firstDim < values.length; firstDim++) {
+						sum += values[firstDim][secondDim];
+					}
+					if (values.length > 0)
+					{
+						mean = sum/values.length;
+					}
+					means[secondDim] = mean;
 				}
-				means[secondDim] = mean;
-			}
 			return means;
 		} // end calculaMedia(double[] values)
 		/**
@@ -1068,8 +1097,8 @@ public class SimpleNode extends Node
 					b[i]=0.0;
 				}
 			}
-			double a[] = new double[averageValues.length];
-			for (int i = 0; i < averageValues.length; i++) {
+			double a[] = new double[dataLength-1];
+			for (int i = 0; i < a.length; i++) {
 				a[i] = (averageValues[i] - b[i]* averageTimes);
 			}
 			regressionCoefs coeficientes = new regressionCoefs();
@@ -1178,7 +1207,8 @@ public class SimpleNode extends Node
 				dataRecordItens.add(dataSensedTypes, values, quantTime, batLevel, round, windowSize);
 				
 				if (wsnMsgResp.messageItemsToSink == null) {
-					wsnMsgResp.messageItemsToSink = new MessageItem();
+					wsnMsgResp.messageItemsToSink = new Vector<MessageItem>();
+//					wsnMsgResp.messageItemsToSink = new MessageItem();
 				}
 				wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItens));
 				
@@ -1747,7 +1777,8 @@ public class SimpleNode extends Node
 							// MAIS as leituras feitas por este mesmo sensor (CH) [messageItensPackage.add(new MessageItem(this, dataRecordItens))]
 							
 							if (messageItensPackage == null) {
-								messageItensPackage = new MessageItem();
+								messageItensPackage = new Vector<MessageItem>();
+//								messageItensPackage = new MessageItem();
 							}
 							
 							
@@ -1883,12 +1914,12 @@ public class SimpleNode extends Node
 	 * Search the "sourceNode" from the "miNew" (MessageItem) in package "miPack" (vector of MessageItens): If found, replace the "MessageItem" with the old data with the new one; Otherwise, 
 	 * adds the new MessageItem in "miPack"
 	 * @param miNew MessageItem with the new data from "SourceNode"
-	 * @param miPack Vector (package) of MessageItens to be searched and added / updated
+	 * @param messageItensPackage2 Vector (package) of MessageItens to be searched and added / updated
 	 */
-	private void searchAndReplaceOrAddMessageItemInPackage(MessageItem miNew, MessageItem miPack) {
-		if (miNew != null && miPack != null) {
+	private void searchAndReplaceOrAddMessageItemInPackage(MessageItem miNew, Vector<MessageItem> messageItensPackage2) {
+		if (miNew != null && messageItensPackage2 != null) {
 			boolean foundEqualSourceNode = false;
-			for (MessageItem miCurrent: miPack) {
+			for (MessageItem miCurrent: messageItensPackage2) {
 				if (miCurrent.sourceNode == miNew.sourceNode) {
 					miCurrent = miNew;
 					foundEqualSourceNode = true;
@@ -1896,7 +1927,7 @@ public class SimpleNode extends Node
 				} // end if (miCurrent.sourceNode == miNew.sourceNode)
 			} // end for (MessageItem miCurrent: miPack)
 			if (!foundEqualSourceNode) {
-				miPack.add(miNew);
+				messageItensPackage2.add(miNew);
 			} // end if (!foundEqualSourceNode)
 		} // end if (mi != null && miPack != null)
 	} // end searchAndReplaceOrAddMessageItemInPackage(MessageItem miNew, MessageItem miPack)
