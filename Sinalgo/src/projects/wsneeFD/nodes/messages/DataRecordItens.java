@@ -18,16 +18,16 @@ public class DataRecordItens
 	public Vector<DataRecord> dataRecords;
 
 	private boolean nonRead = true;
-//	
-//	private int[][] types2;
-//	
-//	private double[][] values2; // deverá conter somente a variavel independente e os valores não correlacionados
-//	
-//	private double[] times;	// deverá conter somente a variavel independente e os valores não correlacionados
-//	
-//	private double[] batLevels;
-//	
-//	private int[] rounds;
+	
+	private int[][] types2;
+	
+	private double[][] values2; // deverá conter somente a variavel independente e os valores não correlacionados
+	
+	private double[] times;	// deverá conter somente a variavel independente e os valores não correlacionados
+	
+	private double[] batLevels;
+	
+	private int[] rounds;
 //	//TODO Colocar um flag(e/ou array de flags) indicando a presença(e/ou a quantidade) de coeficientes no dataRecordItensToSink para a remontagem de dados no sink
 	private boolean thereIsCoefficients;
 	
@@ -54,6 +54,25 @@ public class DataRecordItens
 		return dataRecords.get(i);
 	} // end get(int i)
 	
+	public double[] getDataRecordValues(int i){
+		return dataRecords.get(i).values;
+	}
+	
+	public double getDataRecordTimes(int i){
+		return dataRecords.get(i).time;
+	}
+	
+	public int[] getDataRecordTyps(int i){
+		return dataRecords.get(i).typs;
+	}
+	
+	public double getDataRecordBatLevel(int i){
+		return dataRecords.get(i).batLevel;
+	}
+	
+	public int getDataRecordRound(int i){
+		return dataRecords.get(i).round;
+	}
 	/**
 	 * Atualiza o "dataRecords" estrutura do "currentNode" pela leitura de "windowSize" quantidade de dados do tipo "dataType" <p>
 	 * [Eng] Updates the "dataRecords" structure from the "currentNode" by the reading of "windowSize" quantity of data from type "dataType"
@@ -164,42 +183,42 @@ public class DataRecordItens
 //			nonRead = false;
 		}
 	}
-//	
-//	public int[] getDataRecordTypes(int ind)
-//	{
-//		readData();
-//		return types2[ind];
-//	}
-//	
+	
+	public int[] getDataRecordTypes(int ind)
+	{
+		readData();
+		return types2[ind];
+	}
+	
 //	public double[] getDataRecordValues(int ind)
 //	{
 //		readData();
 //		return values2[ind];
 //	}
-//	
-//	public double[][] getDataRecordValues2()
-//	{
-//		readData();
-//		return values2;
-//	}
-//
-//	public double[] getDataRecordTimes()
-//	{
-//		readData();
-//		return times;
-//	}
-//
-//	public double[] getDataRecordBatLevels()
-//	{
-//		readData();
-//		return batLevels;
-//	}
-//	
-//	public int[] getDataRecordRounds()
-//	{
-//		readData();
-//		return rounds;
-//	}
+	
+	public double[][] getDataRecordValues2()
+	{
+		readData();
+		return values2;
+	}
+
+	public double[] getDataRecordTimes()
+	{
+		readData();
+		return times;
+	}
+
+	public double[] getDataRecordBatLevels()
+	{
+		readData();
+		return batLevels;
+	}
+	
+	public int[] getDataRecordRounds()
+	{
+		readData();
+		return rounds;
+	}
 	public boolean getThereIsCoefficients(){
 		return thereIsCoefficients;
 	}
@@ -230,9 +249,9 @@ public class DataRecordItens
 		regressionA = a;
 
 	}
-//
-//	public void clearValues (int index){
-//
-//		values2[index] = null;
-//	}
+
+	public void clearValues (int index){
+
+		values2[index] = null;
+	}
 } // end dataRecords
