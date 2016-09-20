@@ -319,9 +319,9 @@ public class SimpleNode extends Node
 	 * @param sum armazena o somatório.
 	 * @param sqrSum armazena o quadrado das somas.
 	 */
-	class SumPPM {
-		double sum;
-		double sqrSum;
+	class xy {
+		double[] x;
+		double[] y;
 	}
 	/**
 	 * Armazena as informações necessárias para a análise da correlação.
@@ -918,14 +918,16 @@ public class SimpleNode extends Node
 		// trocar para boolean
 		public Correlation rPearsonProductMoment(double[][] table, double[] times, Integer sizeTimeSlot, Integer dataLength){
 			//double[][] pearsonTable = new double [sizeTimeSlot][];
-			double[] means = new double[dataLength];
-			double[] score = new double[dataLength];
-			int nCorrelations = 0;
+			int nCorrelations = 0; 
 			for (int i=0; i < dataLength-1; i++){
 				for(int j=i+1; j < dataLength; j++){
 					nCorrelations++;
 				}
-			} 
+			}
+			double[] numeradores = new double[nCorrelations];
+			double[] denominadores = new double[nCorrelations];
+			double[] means = new double[dataLength];
+			double[] score = new double[dataLength];
 			double[] correlation = new double[nCorrelations];
 			double[] correlationWithIndependent = new double[dataLength-1]; 
 			boolean[] isCorrelated = new boolean[dataLength-1];
@@ -935,46 +937,86 @@ public class SimpleNode extends Node
 			//pearsonTable[][0] = dados de temperatura
 			//pearsonTable[][1] = dados de umidade
 			//pearsonTable[][2] = dados de Luminosidade
+			
 			for (int i=0; i < dataLength; i++){
 				means[i] = mean4PPM(table,i);
 			}
 			nCorrelations = 0;
 			for (int i=0; i < dataLength-1; i++){
 				for(int j=i+1; j < dataLength; j++){
-					if ((attributesPPM(table,means[i],i).sqrSum)*(attributesPPM(table,means[j],j).sqrSum) != 0.0){ // Se o denominador for diferente de zero (para evitar valor indefinido!)
+					for(int k=0; k < sizeTimeSlot; k++){
 						//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
-						correlation[nCorrelations] = ((attributesPPM(table,means[i],i).sum)*(attributesPPM(table,means[j],j).sum))/((attributesPPM(table,means[i],i).sqrSum)*(attributesPPM(table,means[j],j).sqrSum));
-						score[i] += Math.abs(correlation[nCorrelations]);
-						score[j] += Math.abs(correlation[nCorrelations]);
+//						r[i] += (table[k][i] - means[i])*(table[k][j] - means[j]) / Math.sqrt(denominatorCalc(table[i],means[i])) * Math.sqrt(denominatorCalc(table[j],means[j]));
+						numeradores[nCorrelations] += (table[k][i] - means[i])*(table[k][j] - means[j]);
+						denominadores[nCorrelations] += Math.sqrt(denominatorCalc(table[i],means[i])) * Math.sqrt(denominatorCalc(table[j],means[j]));
 					}
-					else{
-						correlation[nCorrelations] = 0.0;
-					}
-					nCorrelations++;
+				if (denominadores[nCorrelations] != 0.0){
+					correlation[nCorrelations] = numeradores[nCorrelations] / denominadores[nCorrelations];
+				}else{
+					correlation[nCorrelations] = 0.0;
 				}
+				score[i] += Math.abs(correlation[nCorrelations]);
+				score[j] += Math.abs(correlation[nCorrelations]);
+				nCorrelations++;
+				}	
 			}
-			double[][] preparedValuesForRegression = new double[sizeTimeSlot][table.length];
+			//numeradores = null;
+			//denominadores = null;
 			int index = whoIsIndependent(score);
+			double[][] preparedValuesForRegression = new double[sizeTimeSlot][table.length];
 			for (int i=0; i < dataLength; i++){
 				if (index != i){
-					if ((attributesPPM(table,means[index],index).sqrSum)*(attributesPPM(table,means[i],i).sqrSum) != 0.0){ // Se o denominador for diferente de zero (para evitar valor indefinido!)
-						correlationWithIndependent[i] = ((attributesPPM(table,means[index],index).sum)*(attributesPPM(table,means[i],i).sum))/((attributesPPM(table,means[index],index).sqrSum)*(attributesPPM(table,means[i],i).sqrSum));
+					for(int k=0; k < sizeTimeSlot; k++){
+						numeradores[i] += (table[k][index] - means[index])*(table[k][i] - means[i]);
+						denominadores[i] += Math.sqrt(denominatorCalc(table[index],means[index])) * Math.sqrt(denominatorCalc(table[i],means[i]));
 					}
-					else{
-						correlationWithIndependent[i] = 0.0;
-					}
-					if (correlationWithIndependent[i] > SinkNode.rPearsonMinimal[i]){
-						isCorrelated[i] = true;
-						preparedValuesForRegression[i] = table[i];
-					}else{
-						for(int j=0; j< table.length;j++){
-						preparedValuesForRegression[i][j]= 0.0;
-						}
-						isCorrelated[i] = false;
-					}
+					correlationWithIndependent[i] = numeradores[i]/denominadores[i];
 				}
-				//comparar aqui a correlação entre a variável independente com as demais variáveis
+				if (correlationWithIndependent[i] > SinkNode.rPearsonMinimal[i]){
+					isCorrelated[i] = true;
+					preparedValuesForRegression[i] = table[i];
+				}else{
+					for(int j=0; j< table.length;j++){
+					preparedValuesForRegression[i][j]= 0.0;
+					}
+					isCorrelated[i] = false;
+				}
 			}
+			
+
+//			for (int i=0; i < dataLength-1; i++){
+//				for(int j=i+1; j < dataLength; j++){
+//					if ((attributesPPM(table,means[i],i).sqrSum)*(attributesPPM(table,means[j],j).sqrSum) != 0.0){ // Se o denominador for diferente de zero (para evitar valor indefinido!)
+//						//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
+//						//correlation[nCorrelations] = ((attributesPPM(table,means[i],i).sum)*(attributesPPM(table,means[j],j).sum))/((attributesPPM(table,means[i],i).sqrSum)*(attributesPPM(table,means[j],j).sqrSum));
+//						score[i] += Math.abs(correlation[nCorrelations]);
+//						score[j] += Math.abs(correlation[nCorrelations]);
+//					}
+//					else{
+//						correlation[nCorrelations] = 0.0;
+//					}
+//					nCorrelations++;
+//				}
+//			}
+			
+//			int index = whoIsIndependent(score);
+//			for (int i=0; i < dataLength; i++){
+//				if (index != i){
+//					if ((attributesPPM(table,means[index],index).sqrSum)*(attributesPPM(table,means[i],i).sqrSum) != 0.0){ // Se o denominador for diferente de zero (para evitar valor indefinido!)
+//						correlationWithIndependent[i] = ((attributesPPM(table,means[index],index).sum)*(attributesPPM(table,means[i],i).sum))/((attributesPPM(table,means[index],index).sqrSum)*(attributesPPM(table,means[i],i).sqrSum));
+//					}
+//
+//					if (correlationWithIndependent[i] > SinkNode.rPearsonMinimal[i]){
+//						isCorrelated[i] = true;
+//						preparedValuesForRegression[i] = table[i];
+//					}else{
+//						for(int j=0; j< table.length;j++){
+//						preparedValuesForRegression[i][j]= 0.0;
+//						}
+//						isCorrelated[i] = false;
+//					}
+//				}
+				//comparar aqui a correlação entre a variável independente com as demais variáveis
 			Correlation output = new Correlation();
 			output.coeficients.b = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength, isCorrelated).b;
 			output.coeficients.a = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength, isCorrelated).a;
@@ -983,6 +1025,8 @@ public class SimpleNode extends Node
 			output.combinations = nCorrelations;
 			return output;
 		}
+			
+		
 		/**
 		 * Média para a Correlação de Pearson
 		 * [Eng]Mean for Pearson's Product Moment
@@ -1045,14 +1089,12 @@ public class SimpleNode extends Node
 		 * @param mean média do vetor inserido (dado pelo método mean4PPM)
 		 * @return sumPPM
 		 */
-		public SumPPM attributesPPM (double[][] currentDataTypes, double mean, int index){// calcula o somatório de cada índice menos sua média
-			SumPPM sum = new SumPPM();
-			for (int i=0; i < currentDataTypes.length; i++){
-				sum.sum += (currentDataTypes[i][index] - mean);
-				sum.sqrSum += Math.pow((currentDataTypes[i][index] - mean), 2);
+		public double denominatorCalc (double[] x, double mean){// armazena cada índice
+			double factor = 0.0;
+			for (int i=0; i< x.length; i++){
+				factor += Math.pow((x[i] - mean), 2);
 			}
-			
-			return sum;
+			return factor;
 		}
 		/**
 		 * Return the largest index of an array;
