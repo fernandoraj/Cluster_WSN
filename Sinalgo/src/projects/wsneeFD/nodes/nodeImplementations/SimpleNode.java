@@ -856,6 +856,12 @@ public class SimpleNode extends Node
 //						valuesFromDataRecordItens = dataRecordItensToSink.getDataRecordValues2();
 						timesFromDataRecordItens[i] = dataRecordItensToSink.getDataRecordTimes(i);
 						}
+					for (int i=0; i < valuesFromDataRecordItens.length; i++){
+						for(int j =0; j < valuesFromDataRecordItens[0].length; j++){	
+							System.out.print(valuesFromDataRecordItens[i][j]+"\t\t");
+						}
+						System.out.println("");
+					}
 //				for (int i=0; i < dr.size(); i++){
 //					valuesFromDataRecordItens[i] = dr.get(i).values;
 //					timesFromDataRecordItens[i] = dr.get(i).time;
@@ -948,7 +954,7 @@ public class SimpleNode extends Node
 						//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
 //						r[i] += (table[k][i] - means[i])*(table[k][j] - means[j]) / Math.sqrt(denominatorCalc(table[i],means[i])) * Math.sqrt(denominatorCalc(table[j],means[j]));
 						numeradores[nCorrelations] += (table[k][i] - means[i])*(table[k][j] - means[j]);
-						denominadores[nCorrelations] += Math.sqrt(denominatorCalc(table[i],means[i])) * Math.sqrt(denominatorCalc(table[j],means[j]));
+						denominadores[nCorrelations] = Math.sqrt(denominatorCalc(table,means[i],i)) * Math.sqrt(denominatorCalc(table,means[j],j));
 					}
 				if (denominadores[nCorrelations] != 0.0){
 					correlation[nCorrelations] = numeradores[nCorrelations] / denominadores[nCorrelations];
@@ -968,7 +974,7 @@ public class SimpleNode extends Node
 				if (index != i){
 					for(int k=0; k < sizeTimeSlot; k++){
 						numeradores[i] += (table[k][index] - means[index])*(table[k][i] - means[i]);
-						denominadores[i] += Math.sqrt(denominatorCalc(table[index],means[index])) * Math.sqrt(denominatorCalc(table[i],means[i]));
+						denominadores[i] = Math.sqrt(denominatorCalc(table,means[index],index)) * Math.sqrt(denominatorCalc(table,means[i],i));
 					}
 					correlationWithIndependent[i] = numeradores[i]/denominadores[i];
 				}
@@ -1089,10 +1095,11 @@ public class SimpleNode extends Node
 		 * @param mean média do vetor inserido (dado pelo método mean4PPM)
 		 * @return sumPPM
 		 */
-		public double denominatorCalc (double[] x, double mean){// armazena cada índice
+
+		public double denominatorCalc (double[][] x, double mean, int index){
 			double factor = 0.0;
 			for (int i=0; i< x.length; i++){
-				factor += Math.pow((x[i] - mean), 2);
+				factor += Math.pow((x[i][index] - mean), 2);
 			}
 			return factor;
 		}
