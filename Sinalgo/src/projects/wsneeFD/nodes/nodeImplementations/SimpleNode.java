@@ -954,8 +954,8 @@ public class SimpleNode extends Node
 						//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
 //						r[i] += (table[k][i] - means[i])*(table[k][j] - means[j]) / Math.sqrt(denominatorCalc(table[i],means[i])) * Math.sqrt(denominatorCalc(table[j],means[j]));
 						numeradores[nCorrelations] += (table[k][i] - means[i])*(table[k][j] - means[j]);
-						denominadores[nCorrelations] = Math.sqrt(denominatorCalc(table,means[i],i)) * Math.sqrt(denominatorCalc(table,means[j],j));
 					}
+					denominadores[nCorrelations] = Math.sqrt(denominatorCalc(table,means[i],i)) * Math.sqrt(denominatorCalc(table,means[j],j));
 				if (denominadores[nCorrelations] != 0.0){
 					correlation[nCorrelations] = numeradores[nCorrelations] / denominadores[nCorrelations];
 				}else{
@@ -974,8 +974,8 @@ public class SimpleNode extends Node
 				if (index != i){
 					for(int k=0; k < sizeTimeSlot; k++){
 						numeradores[i] += (table[k][index] - means[index])*(table[k][i] - means[i]);
-						denominadores[i] = Math.sqrt(denominatorCalc(table,means[index],index)) * Math.sqrt(denominatorCalc(table,means[i],i));
 					}
+					denominadores[i] = Math.sqrt(denominatorCalc(table,means[index],index)) * Math.sqrt(denominatorCalc(table,means[i],i));
 					correlationWithIndependent[i] = numeradores[i]/denominadores[i];
 				}
 				if (correlationWithIndependent[i] > SinkNode.rPearsonMinimal[i]){
