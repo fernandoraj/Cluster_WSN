@@ -855,7 +855,7 @@ public class SimpleNode extends Node
 						valuesFromDataRecordItens[i] = dataRecordItensToSink.getDataRecordValues(i);
 //						valuesFromDataRecordItens = dataRecordItensToSink.getDataRecordValues2();
 						timesFromDataRecordItens[i] = dataRecordItensToSink.getDataRecordTimes(i);
-						}
+					}
 					for (int i=0; i < valuesFromDataRecordItens.length; i++){
 						for(int j =0; j < valuesFromDataRecordItens[0].length; j++){	
 							System.out.print(valuesFromDataRecordItens[i][j]+"\t\t");
@@ -956,14 +956,14 @@ public class SimpleNode extends Node
 						numeradores[nCorrelations] += (table[k][i] - means[i])*(table[k][j] - means[j]);
 					}
 					denominadores[nCorrelations] = Math.sqrt(denominatorCalc(table,means[i],i)) * Math.sqrt(denominatorCalc(table,means[j],j));
-				if (denominadores[nCorrelations] != 0.0){
-					correlation[nCorrelations] = numeradores[nCorrelations] / denominadores[nCorrelations];
-				}else{
-					correlation[nCorrelations] = 0.0;
-				}
-				score[i] += Math.abs(correlation[nCorrelations]);
-				score[j] += Math.abs(correlation[nCorrelations]);
-				nCorrelations++;
+					if (denominadores[nCorrelations] != 0.0){
+						correlation[nCorrelations] = numeradores[nCorrelations] / denominadores[nCorrelations];
+					}else{
+						correlation[nCorrelations] = 0.0;
+					}
+					score[i] += Math.abs(correlation[nCorrelations]);
+					score[j] += Math.abs(correlation[nCorrelations]);
+					nCorrelations++;
 				}	
 			}
 			//numeradores = null;
