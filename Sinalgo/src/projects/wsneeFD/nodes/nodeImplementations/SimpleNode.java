@@ -966,26 +966,33 @@ public class SimpleNode extends Node
 					nCorrelations++;
 				}	
 			}
+			for (int i=0; i< numeradores.length;i++){
+				numeradores[i] = 0.0;
+				denominadores[i] = 0.0;
+			}
 			//numeradores = null;
 			//denominadores = null;
 			int index = whoIsIndependent(score);
-			double[][] preparedValuesForRegression = new double[sizeTimeSlot][table.length];
+			double[][] preparedValuesForRegression = new double[table.length][dataLength];
+			int aux = 0;
 			for (int i=0; i < dataLength; i++){
 				if (index != i){
 					for(int k=0; k < sizeTimeSlot; k++){
 						numeradores[i] += (table[k][index] - means[index])*(table[k][i] - means[i]);
 					}
 					denominadores[i] = Math.sqrt(denominatorCalc(table,means[index],index)) * Math.sqrt(denominatorCalc(table,means[i],i));
-					correlationWithIndependent[i] = numeradores[i]/denominadores[i];
-				}
-				if (correlationWithIndependent[i] > SinkNode.rPearsonMinimal[i]){
-					isCorrelated[i] = true;
-					preparedValuesForRegression[i] = table[i];
-				}else{
-					for(int j=0; j< table.length;j++){
-					preparedValuesForRegression[i][j]= 0.0;
-					}
-					isCorrelated[i] = false;
+					correlationWithIndependent[aux] = numeradores[i]/denominadores[i];
+						if (Math.abs(correlationWithIndependent[aux]) > SinkNode.rPearsonMinimal[i]){
+							isCorrelated[aux] = true;
+							for(int k=0; k < sizeTimeSlot; k++){
+								preparedValuesForRegression[k][aux] = table[k][i];
+							}
+						}else{
+							for(int j=0; j< table.length;j++){
+							preparedValuesForRegression[i][j]= 0.0;
+							}
+							isCorrelated[i] = false;
+						}aux++;
 				}
 			}
 			
@@ -1068,8 +1075,8 @@ public class SimpleNode extends Node
 		
 		private double[] calculatesAverage(double[][] values)
 		{
-			double means[] = new double[values[0].length];			
-				for (int secondDim = 0; secondDim < values[0].length; secondDim++)
+			double means[] = new double[values[0].length-1];			
+				for (int secondDim = 0; secondDim < values[0].length-1; secondDim++)
 				{
 					double mean = 0, sum = 0;
 					for (int firstDim = 0; firstDim < values.length; firstDim++) {
@@ -1127,7 +1134,7 @@ public class SimpleNode extends Node
 			averageValues = calculatesAverage(table);
 			for (int i=0 ; i < isCorrelated.length; i++){
 				if(isCorrelated[i]){
-					for (int j = 0; j < table.length; j++) {
+					for (int j = 0; j < table[0].length-1; j++) {
 						double numerador = 0.0, denominador = 0.0, x = 0.0;
 						for (int k = 0; k < table.length; k++) {
 							x = times[k] - averageTimes;
