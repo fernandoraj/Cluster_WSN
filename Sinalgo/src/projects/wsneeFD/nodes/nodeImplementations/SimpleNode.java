@@ -331,19 +331,27 @@ public class SimpleNode extends Node
 	 * @param correlationFlag vetor que retorna verdadeiro onde cada correlação entre cada combinação de dois tipos de dados seja maior que rPearsonMinimal[].
 	 */
 	class Correlation {
-		regressionCoefs coeficients;
+		RegressionCoefs coeficients;
 		int independentIndex, combinations; 
 		boolean[] correlationFlag; //Vetor de booleanos de tamanho [dataSensedTypes -1] que indica a correlação da variável independente com os demais variáveis de sensoriamento.
+		Correlation(int dim){
+			coeficients = new RegressionCoefs(dim);
+		}
 	}
 	/**
 	 * Armazena os valores dos coeficiente B e A para cada combinação correlacionada.
 	 * @param a retorna um 'a' para cada combinação;
 	 * @param b retorna um 'b' para cada combinação.
 	 */
-	class regressionCoefs{
+	class RegressionCoefs{
 		double[] a;
 		double[] b;
+		RegressionCoefs(int dim){
+			a = new double[dim];
+			b = new double[dim];
+		}
 	}
+	
 	private double Somatorio;// guarda o somatorio para ajudar no calculo do vizinho mais proximo.
 	
 	int[] dataSensedTypes;
@@ -735,7 +743,7 @@ public class SimpleNode extends Node
 	 * @param sizeTimeSlot Tamanho / quantidade de dados / leituras a serem realizadas (restante)
 	 * @param dataSensedTypes Códigos (posições no array de dados) dos tipos de dados a serem lidos
 	 */
-	public void triggerReading(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot) {
+	public void triggerReading(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot){
 		triggerReadings(wsnMsgResp, sizeTimeSlot);
 	} // end triggerReading(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
 	
@@ -744,7 +752,7 @@ public class SimpleNode extends Node
 	 * @param wsnMsgResp Mensagem de resposta para carga dos dados lidos
 	 * @param sizeTimeSlot Tamanho / quantidade de dados / leituras a serem realizadas
 	 */
-	public void triggerReadings(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot) {
+	public void triggerReadings(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot){
 		
 		int numSequenceVoltageData = 7; //Position of voltage data according the data structure in "data*.txt" file
 		int numSequenceRound = 2;
@@ -875,7 +883,7 @@ public class SimpleNode extends Node
 //						timesFromDataRecordItens = dataRecordItensToSink.getDataRecordTimes();
 //					}
 				//TODO:Discutir esse trecho, dr.remove(i).
-				Correlation attributes = new Correlation();
+				Correlation attributes = new Correlation(wsnMsgResp.sizeTimeSlot-1);
 				/*aqui*/attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
 				//attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
 				dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);	
@@ -914,88 +922,88 @@ public class SimpleNode extends Node
 	} // end triggerReadings(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot)
 	
 	// AQUI!
-		/**
-		 * Calcula o coeficiente de correlação de pearson "r" entre os tipos de dados em dataRecordItens 
-		 * [Eng] Calculates the "r" pearson's product moment coefficient between the data types in dataRecordItens 
-		 * @param currentDataTypeX vetor de leituras da variável Temperatura (dataRecordItens.getDataRecordValues(4))
-		 * @param currentDataTypeY vetor de leituras da variável Umidade (dataRecordItens.getDataRecordValues(5))
-		 * @param currentDataTypeZ vetor de leituras da variável Luminosidade (dataRecordItens.getDataRecordValues(6))
-		 */
-		// trocar para boolean
-		public Correlation rPearsonProductMoment(double[][] table, double[] times, Integer sizeTimeSlot, Integer dataLength){
-			//double[][] pearsonTable = new double [sizeTimeSlot][];
-			int nCorrelations = 0; 
-			for (int i=0; i < dataLength-1; i++){
-				for(int j=i+1; j < dataLength; j++){
-					nCorrelations++;
-				}
+	/**
+	 * Calcula o coeficiente de correlação de pearson "r" entre os tipos de dados em dataRecordItens 
+	 * [Eng] Calculates the "r" pearson's product moment coefficient between the data types in dataRecordItens 
+	 * @param currentDataTypeX vetor de leituras da variável Temperatura (dataRecordItens.getDataRecordValues(4))
+	 * @param currentDataTypeY vetor de leituras da variável Umidade (dataRecordItens.getDataRecordValues(5))
+	 * @param currentDataTypeZ vetor de leituras da variável Luminosidade (dataRecordItens.getDataRecordValues(6))
+	 */
+	// trocar para boolean
+	public Correlation rPearsonProductMoment(double[][] table, double[] times, Integer sizeTimeSlot, Integer dataLength){
+		//double[][] pearsonTable = new double [sizeTimeSlot][];
+		int nCorrelations = 0; 
+		for (int i=0; i < dataLength-1; i++){
+			for(int j=i+1; j < dataLength; j++){
+				nCorrelations++;
 			}
-			double[] numeradores = new double[nCorrelations];
-			double[] denominadores = new double[nCorrelations];
-			double[] means = new double[dataLength];
-			double[] score = new double[dataLength];
-			double[] correlation = new double[nCorrelations];
-			double[] correlationWithIndependent = new double[dataLength-1]; 
-			boolean[] isCorrelated = new boolean[dataLength-1];
-			//for (int i=0; i<sizeTimeSlot; i++){
-			//	pearsonTable[i] = ((SimpleNode) wsnMsgResp.source).dataRecordItens.getDataRecordValues(i);
-			//}
-			//pearsonTable[][0] = dados de temperatura
-			//pearsonTable[][1] = dados de umidade
-			//pearsonTable[][2] = dados de Luminosidade
-			
-			for (int i=0; i < dataLength; i++){
-				means[i] = mean4PPM(table,i);
-			}
-			nCorrelations = 0;
-			for (int i=0; i < dataLength-1; i++){
-				for(int j=i+1; j < dataLength; j++){
-					for(int k=0; k < sizeTimeSlot; k++){
-						//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
+		}
+		double[] numeradores = new double[nCorrelations];
+		double[] denominadores = new double[nCorrelations];
+		double[] means = new double[dataLength];
+		double[] score = new double[dataLength];
+		double[] correlation = new double[nCorrelations];
+		double[] correlationWithIndependent = new double[dataLength-1]; 
+		boolean[] isCorrelated = new boolean[dataLength-1];
+		//for (int i=0; i<sizeTimeSlot; i++){
+		//	pearsonTable[i] = ((SimpleNode) wsnMsgResp.source).dataRecordItens.getDataRecordValues(i);
+		//}
+		//pearsonTable[][0] = dados de temperatura
+		//pearsonTable[][1] = dados de umidade
+		//pearsonTable[][2] = dados de Luminosidade
+		
+		for (int i=0; i < dataLength; i++){
+			means[i] = mean4PPM(table,i);
+		}
+		nCorrelations = 0;
+		for (int i=0; i < dataLength-1; i++){
+			for(int j=i+1; j < dataLength; j++){
+				for(int k=0; k < sizeTimeSlot; k++){
+					//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
 //						r[i] += (table[k][i] - means[i])*(table[k][j] - means[j]) / Math.sqrt(denominatorCalc(table[i],means[i])) * Math.sqrt(denominatorCalc(table[j],means[j]));
-						numeradores[nCorrelations] += (table[k][i] - means[i])*(table[k][j] - means[j]);
-					}
-					denominadores[nCorrelations] = Math.sqrt(denominatorCalc(table,means[i],i)) * Math.sqrt(denominatorCalc(table,means[j],j));
-					if (denominadores[nCorrelations] != 0.0){
-						correlation[nCorrelations] = numeradores[nCorrelations] / denominadores[nCorrelations];
-					}else{
-						correlation[nCorrelations] = 0.0;
-					}
-					score[i] += Math.abs(correlation[nCorrelations]);
-					score[j] += Math.abs(correlation[nCorrelations]);
-					nCorrelations++;
-				}	
-			}
-			for (int i=0; i< numeradores.length;i++){
-				numeradores[i] = 0.0;
-				denominadores[i] = 0.0;
-			}
-			//numeradores = null;
-			//denominadores = null;
-			int index = whoIsIndependent(score);
-			double[][] preparedValuesForRegression = new double[table.length][dataLength];
-			int aux = 0;
-			for (int i=0; i < dataLength; i++){
-				if (index != i){
-					for(int k=0; k < sizeTimeSlot; k++){
-						numeradores[i] += (table[k][index] - means[index])*(table[k][i] - means[i]);
-					}
-					denominadores[i] = Math.sqrt(denominatorCalc(table,means[index],index)) * Math.sqrt(denominatorCalc(table,means[i],i));
-					correlationWithIndependent[aux] = numeradores[i]/denominadores[i];
-						if (Math.abs(correlationWithIndependent[aux]) > SinkNode.rPearsonMinimal[i]){
-							isCorrelated[aux] = true;
-							for(int k=0; k < sizeTimeSlot; k++){
-								preparedValuesForRegression[k][aux] = table[k][i];
-							}
-						}else{
-							for(int j=0; j< table.length;j++){
-							preparedValuesForRegression[i][j]= 0.0;
-							}
-							isCorrelated[i] = false;
-						}aux++;
+					numeradores[nCorrelations] += (table[k][i] - means[i])*(table[k][j] - means[j]);
 				}
+				denominadores[nCorrelations] = Math.sqrt(denominatorCalc(table,means[i],i)) * Math.sqrt(denominatorCalc(table,means[j],j));
+				if (denominadores[nCorrelations] != 0.0){
+					correlation[nCorrelations] = numeradores[nCorrelations] / denominadores[nCorrelations];
+				}else{
+					correlation[nCorrelations] = 0.0;
+				}
+				score[i] += Math.abs(correlation[nCorrelations]);
+				score[j] += Math.abs(correlation[nCorrelations]);
+				nCorrelations++;
+			}	
+		}
+		for (int i=0; i< numeradores.length;i++){
+			numeradores[i] = 0.0;
+			denominadores[i] = 0.0;
+		}
+		//numeradores = null;
+		//denominadores = null;
+		int index = whoIsIndependent(score);
+		double[][] preparedValuesForRegression = new double[table.length][dataLength];
+		int aux = 0;
+		for (int i=0; i < dataLength; i++){
+			if (index != i){
+				for(int k=0; k < sizeTimeSlot; k++){
+					numeradores[i] += (table[k][index] - means[index])*(table[k][i] - means[i]);
+				}
+				denominadores[i] = Math.sqrt(denominatorCalc(table,means[index],index)) * Math.sqrt(denominatorCalc(table,means[i],i));
+				correlationWithIndependent[aux] = numeradores[i]/denominadores[i];
+					if (Math.abs(correlationWithIndependent[aux]) > SinkNode.rPearsonMinimal[i]){
+						isCorrelated[aux] = true;
+						for(int k=0; k < sizeTimeSlot; k++){
+							preparedValuesForRegression[k][aux] = table[k][i];
+						}
+					}else{
+						for(int j=0; j< table.length;j++){
+						preparedValuesForRegression[i][j]= 0.0;
+						}
+						isCorrelated[i] = false;
+					}aux++;
 			}
-			
+		}
+		
 
 //			for (int i=0; i < dataLength-1; i++){
 //				for(int j=i+1; j < dataLength; j++){
@@ -1011,7 +1019,7 @@ public class SimpleNode extends Node
 //					nCorrelations++;
 //				}
 //			}
-			
+		
 //			int index = whoIsIndependent(score);
 //			for (int i=0; i < dataLength; i++){
 //				if (index != i){
@@ -1029,172 +1037,172 @@ public class SimpleNode extends Node
 //						isCorrelated[i] = false;
 //					}
 //				}
-				//comparar aqui a correlação entre a variável independente com as demais variáveis
-			Correlation output = new Correlation();
-			output.coeficients.b = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength, isCorrelated).b;
-			output.coeficients.a = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength, isCorrelated).a;
-			output.independentIndex = whoIsIndependent(correlation);
-			output.correlationFlag = isCorrelated;
-			output.combinations = nCorrelations;
-			return output;
+			//comparar aqui a correlação entre a variável independente com as demais variáveis
+		Correlation output = new Correlation(dataLength-1);
+		output.coeficients.b = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength, isCorrelated).b;
+		output.coeficients.a = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength, isCorrelated).a;
+		output.independentIndex = whoIsIndependent(correlation);
+		output.correlationFlag = isCorrelated;
+		output.combinations = nCorrelations;
+		return output;
+	} // end rPearsonProductMoment(double[][] table, double[] times, Integer sizeTimeSlot, Integer dataLength)
+			
+		
+	/**
+	 * Média para a Correlação de Pearson
+	 * [Eng]Mean for Pearson's Product Moment
+	 * @param currentDataTypes Tipo de dado onde a média será calculada
+	 * @return retorna a média
+	 */
+	public double mean4PPM(double[][] currentDataTypes, int index){ // calcula a média das leituras
+		double mean = 0.0;
+		int count = 0;
+		
+		for (int i=0; i < currentDataTypes.length; i++){
+			mean += currentDataTypes[i][index];
+			count++;
 		}
-			
+		mean = mean/count;
+		return mean;
+	} // end mean4PPM(double[][] currentDataTypes, int index)
 		
-		/**
-		 * Média para a Correlação de Pearson
-		 * [Eng]Mean for Pearson's Product Moment
-		 * @param currentDataTypes Tipo de dado onde a média será calculada
-		 * @return retorna a média
-		 */
-		public double mean4PPM(double[][] currentDataTypes, int index){ // calcula a média das leituras
-			double mean = 0.0;
-			int count = 0;
-			
-			for (int i=0; i < currentDataTypes.length; i++){
-				mean += currentDataTypes[i][index];
-				count++;
-			}
-			mean = mean/count;
-			return mean;
-			
+	private double calculatesAverage(double[] values)
+	{
+		double mean = 0, sum = 0;
+		for (int i=0; i<values.length; i++)
+		{
+			sum += values[i];
 		}
-		
-		private double calculatesAverage(double[] values)
+		if (values.length > 0)
 		{
-			double mean = 0, sum = 0;
-			for (int i=0; i<values.length; i++)
-			{
-				sum += values[i];
-			}
-			if (values.length > 0)
-			{
-				mean = sum/values.length;
-			}
-			return mean;
-		} // end calculaMedia(double[] values)
+			mean = sum/values.length;
+		}
+		return mean;
+	} // end calculatesAverage(double[] values)
 		
-		private double[] calculatesAverage(double[][] values)
-		{
-			double means[] = new double[values[0].length-1];			
-				for (int secondDim = 0; secondDim < values[0].length-1; secondDim++)
+	private double[] calculatesAverage(double[][] values)
+	{
+		double means[] = new double[values[0].length-1];			
+			for (int secondDim = 0; secondDim < values[0].length-1; secondDim++)
+			{
+				double mean = 0, sum = 0;
+				for (int firstDim = 0; firstDim < values.length; firstDim++) {
+					sum += values[firstDim][secondDim];
+				}
+				if (values.length > 0)
 				{
-					double mean = 0, sum = 0;
-					for (int firstDim = 0; firstDim < values.length; firstDim++) {
-						sum += values[firstDim][secondDim];
-					}
-					if (values.length > 0)
-					{
-						mean = sum/values.length;
-					}
-					means[secondDim] = mean;
+					mean = sum/values.length;
 				}
-			return means;
-		} // end calculaMedia(double[] values)
-		/**
-		 * Calcula o somatórios(i=0; K) (N1 - N) + (N2 - N) +...+ (NK - N);
-		 * 					   (i=0; K) (N1 - N)² + (N2 - N)² +...+ (NK - N)²; 
-		 * onde N corresponde à media média
-		 * [Eng]Calculates the somation (i=0; K) (N1 - N) + (N2 - N) +...+ (NK - N);
-		 * 					   			(i=0; K) (N1 - N)² + (N2 - N)² +...+ (NK - N)²;
-		 *  where N corresponds to the mean
-		 * 
-		 * @param currentDataTypes vetor a ser calculado
-		 * @param mean média do vetor inserido (dado pelo método mean4PPM)
-		 * @return sumPPM
-		 */
-
-		public double denominatorCalc (double[][] x, double mean, int index){
-			double factor = 0.0;
-			for (int i=0; i< x.length; i++){
-				factor += Math.pow((x[i][index] - mean), 2);
+				means[secondDim] = mean;
 			}
-			return factor;
-		}
-		/**
-		 * Return the largest index of an array;
-		 * @param score array with the sum of correlations
-		 * @return indie who is the most independant index; 
-		 */
-		public int whoIsIndependent (double[] score){
-			int indie = 0;
-			double maior = score[0];
-				for (int i=0;i<score.length;i++){
-					if (score[i] > maior){
-						maior = score[i];
-						indie = i;
-					}
-				}
-			return indie;
-		}
-		public regressionCoefs regression (double[][] table, double [] times, Integer sizeTimeSlot, Integer dataLength, boolean[]isCorrelated){
-			
-			double b[] = new double[dataLength-1];
-			double averageTimes, averageValues[];
-			averageTimes = calculatesAverage(times);
-			averageValues = calculatesAverage(table);
-			for (int i=0 ; i < isCorrelated.length; i++){
-				if(isCorrelated[i]){
-					for (int j = 0; j < table[0].length-1; j++) {
-						double numerador = 0.0, denominador = 0.0, x = 0.0;
-						for (int k = 0; k < table.length; k++) {
-							x = times[k] - averageTimes;
-							numerador += x*(table[k][j] - averageValues[j]);
-							denominador += x*x;
-						}
-						if (denominador != 0) {
-							b[j] = (numerador/denominador);
-						}
-						else {
-							b[j] = 0.0;
-						}
-					}
-				}
-				else{
-					b[i]=0.0;
-				}
-			}
-			double a[] = new double[dataLength-1];
-			for (int i = 0; i < a.length; i++) {
-				a[i] = (averageValues[i] - b[i]* averageTimes);
-			}
-			regressionCoefs coeficientes = new regressionCoefs();
-			
-			coeficientes.b = b;
-			coeficientes.a = a;
-			
-			return coeficientes;
-			//pegar a variavel independente e comparar com o resto
-			//int index = rPearsonProductMoment(table, sizeTimeSlot, dataLength).independentIndex;
-			//	for (int i = 0; i < combinationsLength; i++){
-				
-			//	}
-			//for (int i = 0; i < combinationsLength; i++){
-			//	if (rPearsonProductMoment(table, sizeTimeSlot, dataLength).correlationFlag[i]){
-			//		for (int j = i+1; j < combinationsLength ; j++){
-			//			if (j < (combinationsLength)){
-			//				
-			//			}
-			//		}
-					// b = Sum(ti - t_)(Si - S_)/Sum(ti-t_)^2
-					// t -> tempo ; S -> Valores
-					// a = (1/N)(Sum(Si - b*Sum(ti)) = S_ - b * t_
-
-			
-		}
+		return means;
+	} // end calculatesAverage(double[][] values)
 		
-		/**
-		 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual<p>[Eng] Prepare the message "wsnMsgResp" to be sended for the sink increasing the data read by the actual node.
-		 * @param wsnMsgResp Mensagem a ser preparada para envio<p>[Eng] Message to be prepared for sending.
-		 * @param sizeTimeSlot Tamanho do slot de tempo (intervalo) a ser lido pelo nó sensor, ou tamanho da quantidade de dados a ser enviado para o sink<p>[Eng] Size of time slot(interval) to be read by sensor node, or size of data quantity to be sended to the sink.
-		 * @param dataSensedTypes Tipos de dados (temperatura, umidade, luminosidade, etc) a serem sensoreados (lidos) pelo nó sensor.<p>[Eng] Types of data( temperature, humidity, luminosity, etc) to ber sensored(read) by the sensor node.
-		 */
-		private void prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
-		{
-			this.dataSensedTypes = dataSensedTypes;
-			triggerReadings(wsnMsgResp, sizeTimeSlot);
+	/**
+	 * Calcula o somatórios(i=0; K) (N1 - N) + (N2 - N) +...+ (NK - N);
+	 * 					   (i=0; K) (N1 - N)² + (N2 - N)² +...+ (NK - N)²; 
+	 * onde N corresponde à media média
+	 * [Eng]Calculates the somation (i=0; K) (N1 - N) + (N2 - N) +...+ (NK - N);
+	 * 					   			(i=0; K) (N1 - N)² + (N2 - N)² +...+ (NK - N)²;
+	 *  where N corresponds to the mean
+	 * 
+	 * @param currentDataTypes vetor a ser calculado
+	 * @param mean média do vetor inserido (dado pelo método mean4PPM)
+	 * @return sumPPM
+	 */
+
+	public double denominatorCalc(double[][] x, double mean, int index){
+		double factor = 0.0;
+		for (int i=0; i< x.length; i++){
+			factor += Math.pow((x[i][index] - mean), 2);
+		}
+		return factor;
+	} // end denominatorCalc(double[][] x, double mean, int index)
+		
+	/**
+	 * Return the largest index of an array;
+	 * @param score array with the sum of correlations
+	 * @return indie who is the most independant index; 
+	 */
+	public int whoIsIndependent(double[] score){
+		int indie = 0;
+		double maior = score[0];
+			for (int i=0;i<score.length;i++){
+				if (score[i] > maior){
+					maior = score[i];
+					indie = i;
+				}
+			}
+		return indie;
+	} // end whoIsIndependent(double[] score)
+		
+	public RegressionCoefs regression(double[][] table, double [] times, Integer sizeTimeSlot, Integer dataLength, boolean[]isCorrelated){
+		double b[] = new double[dataLength-1];
+		double averageTimes, averageValues[];
+		averageTimes = calculatesAverage(times);
+		averageValues = calculatesAverage(table);
+		for (int i=0 ; i < isCorrelated.length; i++){
+			if(isCorrelated[i]){
+				for (int j = 0; j < table[0].length-1; j++) {
+					double numerador = 0.0, denominador = 0.0, x = 0.0;
+					for (int k = 0; k < table.length; k++) {
+						x = times[k] - averageTimes;
+						numerador += x*(table[k][j] - averageValues[j]);
+						denominador += x*x;
+					}
+					if (denominador != 0) {
+						b[j] = (numerador/denominador);
+					}
+					else {
+						b[j] = 0.0;
+					}
+				}
+			}
+			else{
+				b[i]=0.0;
+			}
+		}
+		double a[] = new double[dataLength-1];
+		for (int i = 0; i < a.length; i++) {
+			a[i] = (averageValues[i] - b[i]* averageTimes);
+		}
+		RegressionCoefs coeficientes = new RegressionCoefs(dataLength-1);
+		
+		coeficientes.b = b;
+		coeficientes.a = a;
+		
+		return coeficientes;
+		//pegar a variavel independente e comparar com o resto
+		//int index = rPearsonProductMoment(table, sizeTimeSlot, dataLength).independentIndex;
+		//	for (int i = 0; i < combinationsLength; i++){
 			
-			//Aqui: Analisar qual o momento a ser chamado o método para cálculo do rPearsonProductMoment(), pois é necessário que todas as leituras iniciais já tenham sido realizadas!
-		} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)	 
+		//	}
+		//for (int i = 0; i < combinationsLength; i++){
+		//	if (rPearsonProductMoment(table, sizeTimeSlot, dataLength).correlationFlag[i]){
+		//		for (int j = i+1; j < combinationsLength ; j++){
+		//			if (j < (combinationsLength)){
+		//				
+		//			}
+		//		}
+				// b = Sum(ti - t_)(Si - S_)/Sum(ti-t_)^2
+				// t -> tempo ; S -> Valores
+				// a = (1/N)(Sum(Si - b*Sum(ti)) = S_ - b * t_
+
+	} // end regression(double[][] table, double [] times, Integer sizeTimeSlot, Integer dataLength, boolean[]isCorrelated)
+		
+	/**
+	 * Prepara a mensagem "wsnMsgResp" para ser enviada para o sink acrescentando os dados lidos pelo nó atual<p>[Eng] Prepare the message "wsnMsgResp" to be sended for the sink increasing the data read by the actual node.
+	 * @param wsnMsgResp Mensagem a ser preparada para envio<p>[Eng] Message to be prepared for sending.
+	 * @param sizeTimeSlot Tamanho do slot de tempo (intervalo) a ser lido pelo nó sensor, ou tamanho da quantidade de dados a ser enviado para o sink<p>[Eng] Size of time slot(interval) to be read by sensor node, or size of data quantity to be sended to the sink.
+	 * @param dataSensedTypes Tipos de dados (temperatura, umidade, luminosidade, etc) a serem sensoreados (lidos) pelo nó sensor.<p>[Eng] Types of data( temperature, humidity, luminosity, etc) to ber sensored(read) by the sensor node.
+	 */
+	private void prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, int[] dataSensedTypes)
+	{
+		this.dataSensedTypes = dataSensedTypes;
+		triggerReadings(wsnMsgResp, sizeTimeSlot);
+		
+		//Aqui: Analisar qual o momento a ser chamado o método para cálculo do rPearsonProductMoment(), pois é necessário que todas as leituras iniciais já tenham sido realizadas!
+	} // end prepareMessage(WsnMsgResponse wsnMsgResp, Integer sizeTimeSlot, String dataSensedType)	 
 
 	public void oneReading(WsnMsgResponse wsnMsgResp) {
 		
