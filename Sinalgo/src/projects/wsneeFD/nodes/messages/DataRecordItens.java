@@ -251,7 +251,8 @@ public class DataRecordItens
 	}
 
 	public void clearValues (int index){
-
-		values2[index] = null;
+		if (dataRecords != null && dataRecords.get(index) != null){
+			dataRecords.remove(index);
+		}
 	}
 } // end dataRecords
