@@ -883,18 +883,19 @@ public class SimpleNode extends Node
 //						timesFromDataRecordItens = dataRecordItensToSink.getDataRecordTimes();
 //					}
 				//TODO:Discutir esse trecho, dr.remove(i).
-				Correlation attributes = new Correlation(wsnMsgResp.sizeTimeSlot-1);
+				Correlation attributes = new Correlation(wsnMsgResp.dataSensedTypes.length-1);
 				/*aqui*/attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
 				//attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
 				dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);	
 				int j=0;
-				for (int i=0 ; i < dataSensedTypes.length-1; i++){
+				for (int i=0 ; i < dataSensedTypes.length; i++){
 					if (i != attributes.independentIndex){
 						if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
-						dataRecordItensToSink.setThereIsCoefficients(true);
-						dataRecordItensToSink.clearValues(i);
-						j++;
+							dataRecordItensToSink.setThereIsCoefficients(true);
+							//TODO procurar remover o values[i] de cada instância do DataRecord.
+							//dataRecordItensToSink.clearValues(i);
 						}
+						j++;
 //					for (int i=0 ; i < dataSensedTypes.length-1; i++){
 //						if (i != attributes.independentIndex){
 //							if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
@@ -996,7 +997,7 @@ public class SimpleNode extends Node
 							preparedValuesForRegression[k][aux] = table[k][i];
 						}
 					}else{
-						for(int j=0; j< table.length;j++){
+						for(int j=0; j< sizeTimeSlot;j++){
 						preparedValuesForRegression[i][j]= 0.0;
 						}
 						isCorrelated[i] = false;
