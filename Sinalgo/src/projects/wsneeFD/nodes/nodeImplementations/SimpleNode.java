@@ -887,11 +887,19 @@ public class SimpleNode extends Node
 				/*aqui*/attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
 				//attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
 				dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);	
+				int bl =0;
+				for (int i=0; i < attributes.correlationFlag.length; i++){ 
+					if (attributes.correlationFlag[i]){
+						bl++;
+					}
+				}
+				int[] blacklist = new int[bl];
 				int j=0;
 				for (int i=0 ; i < dataSensedTypes.length; i++){
 					if (i != attributes.independentIndex){
 						if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
 							dataRecordItensToSink.setThereIsCoefficients(true);
+							blacklist[j]=i;
 							//TODO procurar remover o values[i] de cada instância do DataRecord.
 							//dataRecordItensToSink.clearValues(i);
 						}
