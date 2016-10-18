@@ -250,9 +250,26 @@ public class DataRecordItens
 
 	}
 
-	public void clearValues (int index){
-		if (dataRecords != null && dataRecords.get(index) != null){
-			dataRecords.remove(index);
+	public void clearDRValuesOf (int index[]){
+		double tempValues[] = new double[(dataRecords.get(0).values.length)-(index.length)];
+		int aux = 0;
+		for (int i=0; i < dataRecords.size(); i++){
+			for (int j=0; j < dataRecords.get(0).values.length; j++){
+				for(int k=0; k < index.length; k++){
+					if(k != index[j]){
+						tempValues[aux]= dataRecords.get(i).values[k];
+						aux++;
+					}
+				}
+			}
+			//dataRecords.get(i).values = new double[(dataRecords.get(0).values.length)-(index.length)];
+			dataRecords.get(i).values = tempValues;
 		}
-	}
-} // end dataRecords
+		
+//		if (dataRecords != null && dataRecords.get(index[i]) != null){
+//			for (int j=0; j < dataRecords.size(); j++){
+//				dataRecords.get(i).values[index[i]] = 0.0;
+//			}
+//		}
+	} // end dataRecords
+}
