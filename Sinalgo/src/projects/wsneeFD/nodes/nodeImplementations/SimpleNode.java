@@ -333,6 +333,7 @@ public class SimpleNode extends Node
 	class Correlation {
 		RegressionCoefs coeficients;
 		int independentIndex, combinations; 
+		//TODO lembrar de converter o independent index [0,1,2] para indicar as posiçoes originais [4,5,6]
 		boolean[] correlationFlag; //Vetor de booleanos de tamanho [dataSensedTypes -1] que indica a correlação da variável independente com os demais variáveis de sensoriamento.
 		Correlation(int dim){
 			coeficients = new RegressionCoefs(dim);
