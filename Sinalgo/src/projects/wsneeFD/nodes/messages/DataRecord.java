@@ -18,4 +18,13 @@ public class DataRecord
 	public double time;
 	public double batLevel;
 	public int round;
+	
+	public DataRecord clone(){
+		DataRecord dr = new DataRecord();
+		dr.time = this.time;
+		dr.batLevel = this.batLevel;
+		dr.round = this.round;
+		return dr;
+	}
+
 } // end dataRecord
