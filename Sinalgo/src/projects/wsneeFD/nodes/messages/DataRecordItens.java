@@ -33,6 +33,8 @@ public class DataRecordItens
 	
 	private boolean[] correlationFlags;
 	
+	private int independentIndex;
+	
 	private double[] regressionB;
 	
 	private double[] regressionA;
@@ -233,6 +235,11 @@ public class DataRecordItens
 	
 	public void setCorrelationFlags(boolean[] results){
 		correlationFlags = results;
+	}
+	
+	public void setIndependentIndex(int ind){
+		
+		independentIndex = ind;
 	}
 	
 	public double[] getRegreesionCoefA(){
