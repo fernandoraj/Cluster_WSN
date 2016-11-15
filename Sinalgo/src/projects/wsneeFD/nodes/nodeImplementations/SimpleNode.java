@@ -915,6 +915,7 @@ public class SimpleNode extends Node
 //							}
 						}
 					}
+				dataRecordItensToSink.clearDRValuesOf(blacklist);
 				// b = Sum(ti - t_)(Si - S_)/Sum(ti-t_)^2
 				// t -> tempo ; S -> Valores
 				// a = (1/N)(Sum(Si - b*Sum(ti)) = S_ - b * t_
