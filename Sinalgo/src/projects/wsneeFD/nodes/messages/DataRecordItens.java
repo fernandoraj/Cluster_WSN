@@ -266,6 +266,7 @@ public class DataRecordItens
 				int k = 0;
 				DataRecord myDR = dataRecords.get(i).clone();
 				for (int j=0; j < dataRecords.get(i).values.length; j++){
+					//corigir lógica do for
 					//for(int k=0; k < index.length; k++){
 						if(k != index[aux]){
 							tempValues[k]= dataRecords.get(i).values[j];
