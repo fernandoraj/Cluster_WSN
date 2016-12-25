@@ -262,30 +262,32 @@ public class DataRecordItens
 			if (dataRecords.get(i) != null){
 				double tempValues[] = new double[(dataRecords.get(i).values.length)-(index.length)];
 				int tempTypes[] = new int[(dataRecords.get(i).values.length)-(index.length)];
-				int aux = 0;
 				int k = 0;
 				DataRecord myDR = dataRecords.get(i).clone();
 				for (int j=0; j < dataRecords.get(i).values.length; j++){
-					//corigir lógica do for
-					//for(int k=0; k < index.length; k++){
-						if(k != index[aux]){
-							tempValues[k]= dataRecords.get(i).values[j];
-							tempTypes[k]= dataRecords.get(i).typs[j];
-							k++;
-						}else{
+					int aux = 0;
+					boolean notFound = true;
+					while (aux < index.length && notFound){
+						if(j == index[aux]){
+							notFound = false;
+						} // end if(j == index[aux])
+						else{
 							aux++;
-						}
+						} // end else do if(j == index[aux])
+					} // end while(aux < index.length && notFound)
+					if (notFound){
+						tempValues[k]= dataRecords.get(i).values[j];
+						tempTypes[k]= dataRecords.get(i).typs[j];
+						k++;
+					} // end if (notFound)
 					//}
 				
-				}
-				//dataRecords.get(i).values = new double[(dataRecords.get(0).values.length)-(index.length)];
-				//myDR.values = tempValues;
+				} // end for (int j=0; j < dataRecords.get(i).values.length; j++)
 				myDR.values = tempValues;
 				myDR.typs = tempTypes;
 				dataRecords.set(i, myDR);
-				//dataRecords.get(i).values = tempValues;
-			}
-		}
+			} // end if (dataRecords.get(i) != null)
+		} // end for (int i=0; i < dataRecords.size(); i++)
 		
 //		if (dataRecords != null && dataRecords.get(index[i]) != null){
 //			for (int j=0; j < dataRecords.size(); j++){

@@ -1002,17 +1002,18 @@ public class SimpleNode extends Node
 				}
 				denominadores[i] = Math.sqrt(denominatorCalc(table,means[index],index)) * Math.sqrt(denominatorCalc(table,means[i],i));
 				correlationWithIndependent[aux] = numeradores[i]/denominadores[i];
-					if (Math.abs(correlationWithIndependent[aux]) > SinkNode.rPearsonMinimal[i]){
-						isCorrelated[aux] = true;
-						for(int k=0; k < sizeTimeSlot; k++){
-							preparedValuesForRegression[k][aux] = table[k][i];
-						}
-					}else{
-						for(int j=0; j< sizeTimeSlot;j++){
-						preparedValuesForRegression[i][j]= 0.0;
-						}
-						isCorrelated[i] = false;
-					}aux++;
+				if (Math.abs(correlationWithIndependent[aux]) > SinkNode.rPearsonMinimal[i]){
+					isCorrelated[aux] = true;
+					for(int k=0; k < sizeTimeSlot; k++){
+						preparedValuesForRegression[k][aux] = table[k][i];
+					}
+				}else{
+					for(int j=0; j< sizeTimeSlot;j++){
+						preparedValuesForRegression[i][j]= 0.0; // VERIFICAR AQUI! - Está ocorrendo erro do tipo ArrayIndexOutOfBoundsException
+					}
+					isCorrelated[i] = false;
+				}
+				aux++;
 			}
 		}
 		
