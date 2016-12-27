@@ -1009,7 +1009,7 @@ public class SimpleNode extends Node
 					}
 				}else{
 					for(int j=0; j< sizeTimeSlot;j++){
-						preparedValuesForRegression[i][j]= 0.0; // VERIFICAR AQUI! - Está ocorrendo erro do tipo ArrayIndexOutOfBoundsException
+						preparedValuesForRegression[j][i]= 0.0; // VERIFICAR AQUI! - Está ocorrendo erro do tipo ArrayIndexOutOfBoundsException
 					}
 					isCorrelated[i] = false;
 				}
