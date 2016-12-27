@@ -902,10 +902,10 @@ public class SimpleNode extends Node
 						if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
 							dataRecordItensToSink.setThereIsCoefficients(true);
 							blacklist[j]=i;
+							j++;
 							//TODO procurar remover o values[i] de cada instância do DataRecord.
 							//dataRecordItensToSink.clearValues(i);
 						}
-						j++;
 //					for (int i=0 ; i < dataSensedTypes.length-1; i++){
 //						if (i != attributes.independentIndex){
 //							if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
