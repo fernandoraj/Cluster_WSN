@@ -1946,6 +1946,16 @@ public class SinkNode extends SimpleNode
 	 */
 	private void receiveMessage(SimpleNode receivedNode, Node clusterHeadNode)
 	{
+		if (rPPMIntraNode){
+			int size = receivedNode.dataRecordItens.size();
+			double[][] values = new double[size][];
+			double[] times = new double[size];
+			if (receivedNode.dataRecordItens.getThereIsCoefficients()){
+				for (int i=0; i < receivedNode.dataRecordItens.size() ;i++){
+					
+				}
+			}
+		}
 		if (receivedNode != null && receivedNode.dataRecordItens != null)
 		{
 			int size = receivedNode.dataRecordItens.size();
