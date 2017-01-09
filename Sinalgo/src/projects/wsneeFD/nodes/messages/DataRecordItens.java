@@ -68,10 +68,6 @@ public class DataRecordItens
 		return dataRecords.get(i).typs;
 	}
 	
-	public int[] getAllDataRecordTyps(int i){
-		return dataRecords.get(i).typs;
-	}
-	
 	public double getDataRecordBatLevel(int i){
 		return dataRecords.get(i).batLevel;
 	}
