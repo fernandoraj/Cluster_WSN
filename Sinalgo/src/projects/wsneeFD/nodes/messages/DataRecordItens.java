@@ -68,6 +68,10 @@ public class DataRecordItens
 		return dataRecords.get(i).typs;
 	}
 	
+	public int[] getAllDataRecordTyps(int i){
+		return dataRecords.get(i).typs;
+	}
+	
 	public double getDataRecordBatLevel(int i){
 		return dataRecords.get(i).batLevel;
 	}
@@ -240,6 +244,10 @@ public class DataRecordItens
 	public void setIndependentIndex(int ind){
 		
 		independentIndex = ind;
+	}
+	
+	public int getIndependentIndex(){
+		return independentIndex;
 	}
 	
 	public double[] getRegreesionCoefA(){
