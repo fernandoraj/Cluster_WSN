@@ -664,11 +664,40 @@ public class SinkNode extends SimpleNode
 					numMessagesReceived++;
 					
 					if (stillNonclustered) { // If the sink still not clustered all nodes for the first time
-						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!
-						((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
-						if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getThereIsCoefficients()){
-							//TODO: continuar aqui.
+						if (rPPMIntraNode){
+							int size = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().size();
+							int numOfTypesToBeRestored = 0;
+							boolean[] flag = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getCorrelationFlags();
+							for (int i=0; i < flag.length; i++){
+								if (flag[i]){
+									numOfTypesToBeRestored++;
+								}
+							}
+							double[] as = new double[numOfTypesToBeRestored];
+							double[] bs = new double[numOfTypesToBeRestored];
+							double[][] values = new double[size][numOfTypesToBeRestored];
+							double[] times = new double[size];
+							int indie = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getIndependentIndex()+4;
+							for(int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).typs.length; i++){
+										if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[i] == indie){
+										indie = i;
+										break;
+										}
+							}
+							double[][] nonCorrelatedValues = new double[size][numOfTypesToBeRestored];
+							nonCorrelatedValues = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordValues2();
+							
+							
+							
+							((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
+							if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getThereIsCoefficients()){
+								as = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegreesionCoefA();
+								bs = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegressionCoefB();
+							}
+							for (int i=0; i<size; i++){
+							}
 						}
+						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!					
 						if(VMP){//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
 							if(numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todos os 54 primeiros nós com as 70 leituras iniciais.
 								if(((SimpleNode)wsnMsgResp.source).dataRecordItens.size() == 70){
@@ -1946,16 +1975,6 @@ public class SinkNode extends SimpleNode
 	 */
 	private void receiveMessage(SimpleNode receivedNode, Node clusterHeadNode)
 	{
-		if (rPPMIntraNode){
-			int size = receivedNode.dataRecordItens.size();
-			double[][] values = new double[size][];
-			double[] times = new double[size];
-			if (receivedNode.dataRecordItens.getThereIsCoefficients()){
-				for (int i=0; i < receivedNode.dataRecordItens.size() ;i++){
-					
-				}
-			}
-		}
 		if (receivedNode != null && receivedNode.dataRecordItens != null)
 		{
 			int size = receivedNode.dataRecordItens.size();
