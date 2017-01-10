@@ -206,18 +206,7 @@ public class SinkNode extends SimpleNode
 	 * e.g.: for two types of data (temperature and humidity) the vector will have one position, for three types of data, three positions
 	 */
 	
-	/*
-	public int correlations(){
-		int sizeOfCorrelations = 0;
-		//double[] //criar vetor para armazenar limiares para passar quaisquer que sejam os valores. 
-		for (int i=0; i < dataSensedTypes.length-1; i++){
-			for(int j=i+1; j < dataSensedTypes.length; j++){
-				sizeOfCorrelations++;
-			}
-		}
-		return sizeOfCorrelations;
-	}
-	*/
+
 	public static final double[] rPearsonMinimal = {0.7,0.7,0.7}; //graus mínimos de correlação a ser verificado entre as combinações de grandeza.
 	//e.g.: [0] indica o grau mínimo de corelação entre temperatura e umidade, [1] indica o grau mínimo de corelação entre temperatura e luminosidade, [2]indica o grau mínimo de corelação entre umidade e luminosidade,
  	
@@ -675,8 +664,8 @@ public class SinkNode extends SimpleNode
 							}
 							double[] as = new double[numOfTypesToBeRestored];
 							double[] bs = new double[numOfTypesToBeRestored];
-							double[][] values = new double[size][numOfTypesToBeRestored];
-							double[] times = new double[size];
+							double[][] values = new double[size][dataSensedTypes.length];
+							//double[] times = new double[size];
 							int indie = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getIndependentIndex()+4;
 							for(int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).typs.length; i++){
 										if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[i] == indie){
@@ -694,9 +683,23 @@ public class SinkNode extends SimpleNode
 								as = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegreesionCoefA();
 								bs = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegressionCoefB();
 							}
-							for (int i=0; i<size; i++){
+							
+							int count1 = 0;
+							int count2 = 0;
+							int countCoefs = 0;
+							while ((count1 < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0).length) && count2 < (dataSensedTypes.length)){
+									if (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[count1] == dataSensedTypes[count2]){
+										values[count2] = nonCorrelatedValues[count1];
+										count1++;
+										count2++;
+									}else{
+										values[count2] = restoredValuesByRegression(as[countCoefs], bs[countCoefs], nonCorrelatedValues[indie]);
+										count2++;
+										countCoefs++;
+									}
 							}
 						}
+						
 						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!					
 						if(VMP){//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
 							if(numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todos os 54 primeiros nós com as 70 leituras iniciais.
@@ -805,7 +808,20 @@ public class SinkNode extends SimpleNode
 			}// end if (message instanceof WsnMsg)
 		} //end while (inbox.hasNext())
 	} //end handleMessages()
-	
+	/**
+	 * retorna os valores iniciais através da equação de regressão linear
+	 * @param a Coeficiente a.
+	 * @param b Coeficiente b.
+	 * @param values array de valores da variável independente.
+	 * @return
+	 */
+	private double[] restoredValuesByRegression (double a, double b, double[] values){
+		double[] restoredValues = new double[values.length];
+		for (int i=0; i<values.length; i++){
+			restoredValues[i] = a*values[i]+b;
+		}
+		return restoredValues;
+	}
 	/**
 	 * Adds the nodes from the ArrayList "sensores" (removing from it) to the cluster in position "cluster"(param) of ArrayList2d nodeGroups, representing all clusters
 	 * @param cluster Indicates the number of cluster to be assembled (set)
