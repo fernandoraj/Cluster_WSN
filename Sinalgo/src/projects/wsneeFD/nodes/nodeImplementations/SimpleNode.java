@@ -887,6 +887,7 @@ public class SimpleNode extends Node
 				Correlation attributes = new Correlation(wsnMsgResp.dataSensedTypes.length-1);
 				/*aqui*/attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
 				//attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
+				dataRecordItensToSink.setCorrelationFlags(attributes.correlationFlag);
 				dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);
 				dataRecordItensToSink.setIndependentIndex(attributes.independentIndex);
 				int bl =0;
