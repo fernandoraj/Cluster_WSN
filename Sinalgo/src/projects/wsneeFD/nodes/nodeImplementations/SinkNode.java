@@ -673,10 +673,7 @@ public class SinkNode extends SimpleNode
 										break;
 										}
 							}
-							double[][] nonCorrelatedValues = new double[size][numOfTypesToBeRestored];
-							nonCorrelatedValues = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordValues2();
-							
-							
+							double[][] nonCorrelatedValues = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordValues2();					
 							
 							((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
 							if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getThereIsCoefficients()){
