@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.Vector;
 
+import projects.wsneeFD.nodes.messages.DataRecord;
 import projects.wsneeFD.nodes.messages.WsnMsg;
 import projects.wsneeFD.nodes.messages.WsnMsgResponse;
 import projects.wsneeFD.nodes.timers.FreeTimer;
@@ -694,6 +695,12 @@ public class SinkNode extends SimpleNode
 									count2++;
 									countCoefs++;
 								}
+							}
+							for(int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size(); i++){
+								DataRecord myDR = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(i).clone();
+								myDR.values = values[i];
+								myDR.typs = dataSensedTypes;
+								wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.set(i, myDR);
 							}
 						}
 						
