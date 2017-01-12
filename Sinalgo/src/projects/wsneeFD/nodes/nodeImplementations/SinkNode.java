@@ -668,10 +668,10 @@ public class SinkNode extends SimpleNode
 							//double[] times = new double[size];
 							int indie = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getIndependentIndex()+4;
 							for(int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).typs.length; i++){
-										if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[i] == indie){
-										indie = i;
-										break;
-										}
+									if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[i] == indie){
+									indie = i;
+									break;
+									}
 							}
 							double[][] nonCorrelatedValues = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordValues2();					
 							
@@ -685,15 +685,15 @@ public class SinkNode extends SimpleNode
 							int count2 = 0;
 							int countCoefs = 0;
 							while ((count1 < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0).length) && count2 < (dataSensedTypes.length)){
-									if (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[count1] == dataSensedTypes[count2]){
-										values[count2] = nonCorrelatedValues[count1];
-										count1++;
-										count2++;
-									}else{
-										values[count2] = restoredValuesByRegression(as[countCoefs], bs[countCoefs], nonCorrelatedValues[indie]);
-										count2++;
-										countCoefs++;
-									}
+								if (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[count1] == dataSensedTypes[count2]){
+									values[count2] = nonCorrelatedValues[count1];
+									count1++;
+									count2++;
+								}else{
+									values[count2] = restoredValuesByRegression(as[countCoefs], bs[countCoefs], nonCorrelatedValues[indie]);
+									count2++;
+									countCoefs++;
+								}
 							}
 						}
 						
