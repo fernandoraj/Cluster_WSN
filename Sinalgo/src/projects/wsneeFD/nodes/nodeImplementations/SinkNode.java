@@ -674,8 +674,10 @@ public class SinkNode extends SimpleNode
 									break;
 									}
 							}
-							double[][] nonCorrelatedValues = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordValues2();					
-							
+							double[][] nonCorrelatedValues = new double[size][];
+							for (int i=0; i< wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size(); i++){
+								nonCorrelatedValues[i] = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(i).values;					
+							}
 							((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
 							if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getThereIsCoefficients()){
 								as = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegreesionCoefA();
