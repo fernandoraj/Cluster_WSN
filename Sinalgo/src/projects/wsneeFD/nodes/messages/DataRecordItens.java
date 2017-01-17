@@ -158,31 +158,31 @@ public class DataRecordItens
 //			// AQUI! verificar motivo do types2 ser um array bidimensional
 //			types2 = new int[tam][];
 //			values2 = new double[tam][];
-//			times = new double[tam];
-//			batLevels = new double[tam];
-//			rounds = new int[tam];
-//			
-//			for (int i=0; i<tam; i++)
-//			{
-//				if (dataRecords.get(i) != null)
-//				{
+			times = new double[tam];
+			batLevels = new double[tam];
+			rounds = new int[tam];
+			
+			for (int i=0; i<tam; i++)
+			{
+				if (dataRecords.get(i) != null)
+				{
 //					types2[i] = ((DataRecord)dataRecords.get(i)).typs;
 //					values2[i] = ((DataRecord)dataRecords.get(i)).values;
-//					times[i] = ((DataRecord)dataRecords.get(i)).time;
-//					batLevels[i] = ((DataRecord)dataRecords.get(i)).batLevel;
-//					rounds[i] = ((DataRecord)dataRecords.get(i)).round;
-//				}
-//				else
-//				{
+					times[i] = ((DataRecord)dataRecords.get(i)).time;
+					batLevels[i] = ((DataRecord)dataRecords.get(i)).batLevel;
+					rounds[i] = ((DataRecord)dataRecords.get(i)).round;
+				}
+				else
+				{
 //					types2[i] = null;
 //					values2[i] = null;
-//					times[i] = 0.0;
-//					batLevels[i] = 0.0;
-//					rounds[i] = 0;
-//				}
-//			}
-//			
-//			nonRead = false;
+					times[i] = 0.0;
+					batLevels[i] = 0.0;
+					rounds[i] = 0;
+				}
+			}
+			
+			nonRead = false;
 		}
 	}
 	
