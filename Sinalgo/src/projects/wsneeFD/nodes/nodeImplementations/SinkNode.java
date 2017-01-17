@@ -655,56 +655,60 @@ public class SinkNode extends SimpleNode
 					
 					if (stillNonclustered) { // If the sink still not clustered all nodes for the first time
 						if (rPPMIntraNode){
-							int size = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().size();
-							int numOfTypesToBeRestored = 0;
-							boolean[] flag = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getCorrelationFlags();
-							for (int i=0; i < flag.length; i++){
-								if (flag[i]){
-									numOfTypesToBeRestored++;
-								}
-							}
-							double[] as = new double[numOfTypesToBeRestored];
-							double[] bs = new double[numOfTypesToBeRestored];
-							double[][] values = new double[size][dataSensedTypes.length];
-							//double[] times = new double[size];
-							int indie = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getIndependentIndex()+4;
-							for(int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).typs.length; i++){
-									if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[i] == indie){
-									indie = i;
-									break;
+								int size = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().size();
+								int numOfTypesToBeRestored = 0;
+								boolean[] flag = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getCorrelationFlags();
+								for (int i=0; i < flag.length; i++){
+									if (flag[i]){
+										numOfTypesToBeRestored++;
 									}
-							}
-							double[][] nonCorrelatedValues = new double[size][];
-							for (int i=0; i< wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size(); i++){
-								nonCorrelatedValues[i] = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(i).values;					
-							}
-							((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
-							if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getThereIsCoefficients()){
-								as = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegreesionCoefA();
-								bs = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegressionCoefB();
-							}
-							
-							int count1 = 0;
-							int count2 = 0;
-							int countCoefs = 0;
-							while ((count1 < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0).length) && count2 < (dataSensedTypes.length)){
-								if (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[count1] == dataSensedTypes[count2]){
-									values[count2] = nonCorrelatedValues[count1];
-									count1++;
-									count2++;
-								}else{
-									values[count2] = restoredValuesByRegression(as[countCoefs], bs[countCoefs], nonCorrelatedValues[indie]);
-									count2++;
-									countCoefs++;
 								}
-							}
-							for(int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size(); i++){
-								DataRecord myDR = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(i).clone();
-								myDR.values = values[i];
-								myDR.typs = dataSensedTypes;
-								wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.set(i, myDR);
-							}
-						}
+								double[] as = new double[numOfTypesToBeRestored];
+								double[] bs = new double[numOfTypesToBeRestored];
+								double[][] values = new double[size][dataSensedTypes.length];
+								//double[] times = new double[size];
+								int indie = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getIndependentIndex()+4;
+								for(int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).typs.length; i++){
+										if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[i] == indie){
+										indie = i;
+										break;
+										}
+								}
+								double[][] nonCorrelatedValues = new double[size][];
+								for (int i=0; i< wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size(); i++){
+									nonCorrelatedValues[i] = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(i).values;					
+								}
+								((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
+								if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getThereIsCoefficients()){
+									as = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegreesionCoefA();
+									bs = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegressionCoefB();
+								}
+								
+								int count1 = 0;
+								int count2 = 0;
+								int countCoefs = 0;
+								while ((count1 < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0).length) && count2 < (dataSensedTypes.length)){
+									if (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[count1] == dataSensedTypes[count2]){
+										for(int i=0; i<size; i++){
+											values[i][count2] = nonCorrelatedValues[i][count1];
+										}
+										count1++;
+										count2++;
+									}else{
+										for(int i=0; i<size; i++){
+											values[i][count2] = restoredValuesByRegression(as[countCoefs], bs[countCoefs], nonCorrelatedValues[i][indie]);
+										}
+										count2++;
+										countCoefs++;
+									}
+								}
+								for(int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size(); i++){
+									DataRecord myDR = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(i).clone();
+									myDR.values = values[i];
+									myDR.typs = dataSensedTypes;
+									wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.set(i, myDR);
+								}
+						} // if (rPPMIntraNode)
 						
 						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!					
 						if(VMP){//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
@@ -821,11 +825,8 @@ public class SinkNode extends SimpleNode
 	 * @param values array de valores da variável independente.
 	 * @return
 	 */
-	private double[] restoredValuesByRegression (double a, double b, double[] values){
-		double[] restoredValues = new double[values.length];
-		for (int i=0; i<values.length; i++){
-			restoredValues[i] = a*values[i]+b;
-		}
+	private double restoredValuesByRegression (double a, double b, double values){
+		double restoredValues = a * values + b;
 		return restoredValues;
 	}
 	/**
