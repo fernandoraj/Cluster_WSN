@@ -846,10 +846,10 @@ public class SimpleNode extends Node
 		{
 			ReadingTimer newReadingTimer = new ReadingTimer(wsnMsgResp, sizeTimeSlot); // Então dispara uma nova predição - laço de predições
 			newReadingTimer.startRelative(SinkNode.sensorTimeSlot, this); 
-		} // end while (sizeTimeSlot>0)
-		else{
+		} else {// end if (sizeTimeSlot>0)
+		
 			// Linhas 513 a 544 devem ser investigadas!
-			if (SinkNode.rPPMIntraNode && rPPMIntraNodeLocal){
+			if (SinkNode.rPPMIntraNode && rPPMIntraNodeLocal) {
 				DataRecordItens dataRecordItensToSink = new DataRecordItens();
 				//TODO: wsnMessage foi substituído por wsnMsgResp, verificar se esta substituição está correta.
 				/*aqui*/double[][] valuesFromDataRecordItens = new double[wsnMsgResp.sizeTimeSlot][wsnMsgResp.dataSensedTypes.length];
@@ -865,8 +865,8 @@ public class SimpleNode extends Node
 //						valuesFromDataRecordItens = dataRecordItensToSink.getDataRecordValues2();
 						timesFromDataRecordItens[i] = dataRecordItensToSink.getDataRecordTimes(i);
 					}
-					for (int i=0; i < valuesFromDataRecordItens.length; i++){
-						for(int j =0; j < valuesFromDataRecordItens[0].length; j++){	
+					for (int i=0; i < valuesFromDataRecordItens.length; i++) {
+						for (int j =0; j < valuesFromDataRecordItens[0].length; j++) {	
 							System.out.print(valuesFromDataRecordItens[i][j]+"\t\t");
 						}
 						System.out.println("");
@@ -885,7 +885,7 @@ public class SimpleNode extends Node
 //					}
 				//TODO:Discutir esse trecho, dr.remove(i).
 				Correlation attributes = new Correlation(wsnMsgResp.dataSensedTypes.length-1);
-				/*aqui*/attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
+				/*aqui*/attributes = rPearsonProductMoment(valuesFromDataRecordItens, timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
 				//attributes = rPearsonProductMoment(valuesFromDataRecordItens ,timesFromDataRecordItens, wsnMsgResp.sizeTimeSlot, wsnMsgResp.dataSensedTypes.length);
 				dataRecordItensToSink.setCorrelationFlags(attributes.correlationFlag);
 				dataRecordItensToSink.setRegressionCoefs(attributes.coeficients.b, attributes.coeficients.a);
@@ -936,18 +936,19 @@ public class SimpleNode extends Node
 	
 	// AQUI!
 	/**
-	 * Calcula o coeficiente de correlação de pearson "r" entre os tipos de dados em dataRecordItens 
-	 * [Eng] Calculates the "r" pearson's product moment coefficient between the data types in dataRecordItens 
+	 * Calcula o Coeficiente de Correlação de Pearson "r" entre os tipos de dados em dataRecordItens 
+	 * [Eng] Calculates the "r" Pearson's Product Moment Coefficient between the data types in dataRecordItens 
+	 * A SER ATUALIZADO!
 	 * @param currentDataTypeX vetor de leituras da variável Temperatura (dataRecordItens.getDataRecordValues(4))
 	 * @param currentDataTypeY vetor de leituras da variável Umidade (dataRecordItens.getDataRecordValues(5))
 	 * @param currentDataTypeZ vetor de leituras da variável Luminosidade (dataRecordItens.getDataRecordValues(6))
 	 */
 	// trocar para boolean
-	public Correlation rPearsonProductMoment(double[][] table, double[] times, Integer sizeTimeSlot, Integer dataLength){
+	public Correlation rPearsonProductMoment(double[][] table, double[] times, Integer sizeTimeSlot, Integer dataLength) {
 		//double[][] pearsonTable = new double [sizeTimeSlot][];
 		int nCorrelations = 0; 
-		for (int i=0; i < dataLength-1; i++){
-			for(int j=i+1; j < dataLength; j++){
+		for (int i=0; i < dataLength-1; i++) {
+			for (int j=i+1; j < dataLength; j++) {
 				nCorrelations++;
 			}
 		}
@@ -965,21 +966,21 @@ public class SimpleNode extends Node
 		//pearsonTable[][1] = dados de umidade
 		//pearsonTable[][2] = dados de Luminosidade
 		
-		for (int i=0; i < dataLength; i++){
-			means[i] = mean4PPM(table,i);
+		for (int i=0; i < dataLength; i++) {
+			means[i] = mean4PPM(table, i);
 		}
 		nCorrelations = 0;
-		for (int i=0; i < dataLength-1; i++){
-			for(int j=i+1; j < dataLength; j++){
-				for(int k=0; k < sizeTimeSlot; k++){
+		for (int i=0; i < dataLength-1; i++) {
+			for (int j=i+1; j < dataLength; j++) {
+				for (int k=0; k < sizeTimeSlot; k++) {
 					//(Sum((Xi-X)*(Yi-Y)))/(Sqrt(Sum((Xi-X)²*(Yi-Y)²)))
 //						r[i] += (table[k][i] - means[i])*(table[k][j] - means[j]) / Math.sqrt(denominatorCalc(table[i],means[i])) * Math.sqrt(denominatorCalc(table[j],means[j]));
-					numeradores[nCorrelations] += (table[k][i] - means[i])*(table[k][j] - means[j]);
+					numeradores[nCorrelations] += (table[k][i] - means[i]) * (table[k][j] - means[j]);
 				}
 				denominadores[nCorrelations] = Math.sqrt(denominatorCalc(table,means[i],i)) * Math.sqrt(denominatorCalc(table,means[j],j));
-				if (denominadores[nCorrelations] != 0.0){
+				if (denominadores[nCorrelations] != 0.0) {
 					correlation[nCorrelations] = numeradores[nCorrelations] / denominadores[nCorrelations];
-				}else{
+				} else {
 					correlation[nCorrelations] = 0.0;
 				}
 				score[i] += Math.abs(correlation[nCorrelations]);
@@ -987,7 +988,7 @@ public class SimpleNode extends Node
 				nCorrelations++;
 			}	
 		}
-		for (int i=0; i< numeradores.length;i++){
+		for (int i=0; i < numeradores.length; i++) {
 			numeradores[i] = 0.0;
 			denominadores[i] = 0.0;
 		}

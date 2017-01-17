@@ -654,85 +654,84 @@ public class SinkNode extends SimpleNode
 					numMessagesReceived++;
 					
 					if (stillNonclustered) { // If the sink still not clustered all nodes for the first time
-						if (rPPMIntraNode){
-								int size = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().size();
-								int numOfTypesToBeRestored = 0;
-								boolean[] flag = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getCorrelationFlags();
-								for (int i=0; i < flag.length; i++){
-									if (flag[i]){
-										numOfTypesToBeRestored++;
+						if (rPPMIntraNode) {
+							int size = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().size();
+							int numOfTypesToBeRestored = 0;
+							boolean[] flag = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getCorrelationFlags();
+							for (int i=0; i < flag.length; i++) {
+								if (flag[i]) {
+									numOfTypesToBeRestored++;
+								}
+							}
+							double[] as = new double[numOfTypesToBeRestored];
+							double[] bs = new double[numOfTypesToBeRestored];
+							double[][] values = new double[size][dataSensedTypes.length];
+							//double[] times = new double[size];
+							int indie = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getIndependentIndex() + 4;
+							for (int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).typs.length; i++) {
+								if (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[i] == indie) {
+									indie = i;
+									break;
+								}
+							}
+							double[][] nonCorrelatedValues = new double[size][];
+							for (int i=0; i< wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size(); i++) {
+								nonCorrelatedValues[i] = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(i).values;					
+							}
+							((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
+							if (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getThereIsCoefficients()) {
+								as = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegreesionCoefA();
+								bs = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegressionCoefB();
+							}
+							
+							int count1 = 0;
+							int count2 = 0;
+							int countCoefs = 0;
+							while ((count1 < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0).length) && count2 < (dataSensedTypes.length)) {
+								if (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[count1] == dataSensedTypes[count2]) {
+									for (int i=0; i<size; i++) {
+										values[i][count2] = nonCorrelatedValues[i][count1];
 									}
-								}
-								double[] as = new double[numOfTypesToBeRestored];
-								double[] bs = new double[numOfTypesToBeRestored];
-								double[][] values = new double[size][dataSensedTypes.length];
-								//double[] times = new double[size];
-								int indie = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getIndependentIndex()+4;
-								for(int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).typs.length; i++){
-										if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[i] == indie){
-										indie = i;
-										break;
-										}
-								}
-								double[][] nonCorrelatedValues = new double[size][];
-								for (int i=0; i< wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size(); i++){
-									nonCorrelatedValues[i] = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(i).values;					
-								}
-								((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
-								if(wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getThereIsCoefficients()){
-									as = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegreesionCoefA();
-									bs = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegressionCoefB();
-								}
-								
-								int count1 = 0;
-								int count2 = 0;
-								int countCoefs = 0;
-								while ((count1 < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0).length) && count2 < (dataSensedTypes.length)){
-									if (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[count1] == dataSensedTypes[count2]){
-										for(int i=0; i<size; i++){
-											values[i][count2] = nonCorrelatedValues[i][count1];
-										}
-										count1++;
-										count2++;
-									}else{
-										for(int i=0; i<size; i++){
-											values[i][count2] = restoredValuesByRegression(as[countCoefs], bs[countCoefs], nonCorrelatedValues[i][indie]);
-										}
-										count2++;
-										countCoefs++;
+									count1++;
+									count2++;
+								} else {
+									for (int i=0; i<size; i++) {
+										values[i][count2] = restoredValuesByRegression(as[countCoefs], bs[countCoefs], nonCorrelatedValues[i][indie]);
 									}
+									count2++;
+									countCoefs++;
 								}
-								for(int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size(); i++){
-									DataRecord myDR = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(i).clone();
-									myDR.values = values[i];
-									myDR.typs = dataSensedTypes;
-									wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.set(i, myDR);
-								}
+							}
+							for (int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size(); i++) {
+								DataRecord myDR = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(i).clone();
+								myDR.values = values[i];
+								myDR.typs = dataSensedTypes;
+								wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.set(i, myDR);
+							}
 						} // if (rPPMIntraNode)
 						
 						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!					
-						if(VMP){//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
-							if(numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todos os 54 primeiros nós com as 70 leituras iniciais.
-								if(((SimpleNode)wsnMsgResp.source).dataRecordItens.size() == 70){
+						if (VMP) {//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
+							if (numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todos os 54 primeiros nós com as 70 leituras iniciais.
+								if(((SimpleNode)wsnMsgResp.source).dataRecordItens.size() == 70) {
 									sensores.add((SimpleNode)wsnMsgResp.source);
 								}
 							}
 							int Cluster = 0;
-							if(numMessagesReceived == numTotalOfSensors){//quando os 54 nodes forem guardados, todos eles são clusterizados com o algoritmo do vizinho mais proximo
+							if (numMessagesReceived == numTotalOfSensors) {//quando os 54 nodes forem guardados, todos eles são clusterizados com o algoritmo do vizinho mais proximo
 								boolean newCluster = true, quit = false;
 								Double initialFracDim = new Double(0.0);
 								
-								while(!quit){//O calculo não para ate que todos os nodes forem clusterizados
+								while (!quit) {//O calculo não para ate que todos os nodes forem clusterizados
 									if (nodeGroups == null) { // If there isn't a message group yet, then it does create one and adds the message to it
 										nodeGroups = new ArrayList2d<Double, SimpleNode>();
 										nodeGroups.ensureCapacity(numTotalOfSensors); // Ensure the capacity as the total number of sensors (nodes) in the data set
 										nodeGroups.add(sensores.remove(0), Cluster, initialFracDim); // Add the initial sensor node(SimpleNode) to the group 0 - line 0 (ArrayList2d of SimpleNode)
 										newCluster = false;
-									}
-									else if(newCluster){//Pega o primeiro da lista ordenada do menor numero para o maior em relação ao primeiro da ultima clusterização
+									} else if(newCluster) {//Pega o primeiro da lista ordenada do menor numero para o maior em relação ao primeiro da ultima clusterização
 										nodeGroups.add(sensores.remove(0), Cluster, initialFracDim); // Add the initial sensor node(SimpleNode) to the group 0 - line 0 (ArrayList2d of SimpleNode)
 										newCluster = false;
-									}else{
+									} else {
 										quit = addNodesInCluster(Cluster);//algoritmo do vizinho mais proximo
 										Cluster++;//proximo cluster da lista 2d(proxima linha)
 										newCluster = true;
