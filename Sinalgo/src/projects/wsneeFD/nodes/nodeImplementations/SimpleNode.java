@@ -995,8 +995,9 @@ public class SimpleNode extends Node
 		//numeradores = null;
 		//denominadores = null;
 		int index = whoIsIndependent(score);
-		double[][] preparedValuesForRegression = new double[table.length][dataLength];
+		double[][] temp = new double[table.length][dataLength];
 		int aux = 0;
+		int aux2 =0;
 		for (int i=0; i < dataLength; i++){
 			if (index != i){
 				for(int k=0; k < sizeTimeSlot; k++){
@@ -1006,16 +1007,22 @@ public class SimpleNode extends Node
 				correlationWithIndependent[aux] = numeradores[i]/denominadores[i];
 				if (Math.abs(correlationWithIndependent[aux]) > SinkNode.rPearsonMinimal[i]){
 					isCorrelated[aux] = true;
-					for(int k=0; k < sizeTimeSlot; k++){
-						preparedValuesForRegression[k][aux] = table[k][i];
+					for(int j=0; j < sizeTimeSlot; j++){
+						temp[j][aux2] = table[j][i];
 					}
+					aux2++;
 				}else{
-					for(int j=0; j< sizeTimeSlot;j++){
-						preparedValuesForRegression[j][i]= 0.0; // VERIFICAR AQUI! - Está ocorrendo erro do tipo ArrayIndexOutOfBoundsException
-					}
 					isCorrelated[aux] = false;
 				}
 				aux++;
+			}
+		}
+		double[][] preparedValuesForRegression = new double[table.length][aux2];
+		for (int i=0; i< aux2; i++){
+			if (temp[i] != null){
+				for(int j=0; j < sizeTimeSlot; j++){
+					preparedValuesForRegression[j][i] = temp[j][i];
+				}
 			}
 		}
 		
@@ -1097,8 +1104,8 @@ public class SimpleNode extends Node
 		
 	private double[] calculatesAverage(double[][] values)
 	{
-		double means[] = new double[values[0].length-1];			
-			for (int secondDim = 0; secondDim < values[0].length-1; secondDim++)
+		double means[] = new double[values[0].length];			
+			for (int secondDim = 0; secondDim < values[0].length; secondDim++)
 			{
 				double mean = 0, sum = 0;
 				for (int firstDim = 0; firstDim < values.length; firstDim++) {
@@ -1152,13 +1159,19 @@ public class SimpleNode extends Node
 	} // end whoIsIndependent(double[] score)
 		
 	public RegressionCoefs regression(double[][] table, double [] times, Integer sizeTimeSlot, Integer dataLength, boolean[]isCorrelated){
-		double b[] = new double[dataLength-1];
+		int count=0;
+		for (int i=0 ; i < isCorrelated.length; i++){
+			if(isCorrelated[i]){
+				count++;
+			}
+		}
+		double b[] = new double[count];
 		double averageTimes, averageValues[];
 		averageTimes = calculatesAverage(times);
 		averageValues = calculatesAverage(table);
+		int j = 0;
 		for (int i=0 ; i < isCorrelated.length; i++){
 			if(isCorrelated[i]){
-				for (int j = 0; j < table[0].length-1; j++) {
 					double numerador = 0.0, denominador = 0.0, x = 0.0;
 					for (int k = 0; k < table.length; k++) {
 						x = times[k] - averageTimes;
@@ -1167,19 +1180,20 @@ public class SimpleNode extends Node
 					}
 					if (denominador != 0) {
 						b[j] = (numerador/denominador);
+						
 					}
 					else {
 						b[j] = 0.0;
-					}
-				}
-			}
-			else{
-				b[i]=0.0;
+					}j++;
 			}
 		}
-		double a[] = new double[dataLength-1];
+		double a[] = new double[count];
 		for (int i = 0; i < a.length; i++) {
-			a[i] = (averageValues[i] - b[i]* averageTimes);
+			if (b[i] != 0 ){
+				a[i] = (averageValues[i] - b[i]* averageTimes);
+			}else{
+				a[i] = 0.0;
+			}
 		}
 		RegressionCoefs coeficientes = new RegressionCoefs(dataLength-1);
 		
