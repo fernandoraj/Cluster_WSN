@@ -667,7 +667,7 @@ public class SinkNode extends SimpleNode
 							double[] bs = new double[numOfTypesToBeRestored];
 							double[][] values = new double[size][dataSensedTypes.length];
 							//double[] times = new double[size];
-							int indie = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getIndependentIndex() + 4;
+							int indie = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getIndependentIndex() + dataSensedTypes[0];
 							for (int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).typs.length; i++) {
 								if (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getDataRecordTyps(0)[i] == indie) {
 									indie = i;
@@ -825,7 +825,7 @@ public class SinkNode extends SimpleNode
 	 * @return
 	 */
 	private double restoredValuesByRegression (double a, double b, double values){
-		double restoredValues = a * values + b;
+		double restoredValues = a + b * values;
 		return restoredValues;
 	}
 	/**
