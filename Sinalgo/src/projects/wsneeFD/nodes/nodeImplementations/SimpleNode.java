@@ -1060,15 +1060,26 @@ public class SimpleNode extends Node
 //					}
 //				}
 			//comparar aqui a correlação entre a variável independente com as demais variáveis
+		table = matrizTransposta(table);
 		Correlation output = new Correlation(dataLength-1);
-		output.coeficients.b = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength, isCorrelated).b;
-		output.coeficients.a = regression(preparedValuesForRegression, times, sizeTimeSlot, dataLength, isCorrelated).a;
+		output.coeficients.b = regression(preparedValuesForRegression, table[whoIsIndependent(correlation)], sizeTimeSlot, dataLength, isCorrelated).b;
+		output.coeficients.a = regression(preparedValuesForRegression, table[whoIsIndependent(correlation)], sizeTimeSlot, dataLength, isCorrelated).a;
 		output.independentIndex = whoIsIndependent(correlation);
 		output.correlationFlag = isCorrelated;
 		output.combinations = nCorrelations;
 		return output;
 	} // end rPearsonProductMoment(double[][] table, double[] times, Integer sizeTimeSlot, Integer dataLength)
-			
+	
+	public double[][] matrizTransposta(double[][] m){
+		double[][] transposta=new double[m[0].length][m.length];
+		
+		for(int linha=0;linha<m.length;linha++){  
+	        for(int coluna=0;coluna<m[linha].length;coluna++){  
+	            	transposta[coluna][linha]=m[linha][coluna];
+	        }  
+	    } 
+		return transposta;
+	}
 		
 	/**
 	 * Média para a Correlação de Pearson
@@ -1158,7 +1169,7 @@ public class SimpleNode extends Node
 		return indie;
 	} // end whoIsIndependent(double[] score)
 		
-	public RegressionCoefs regression(double[][] table, double [] times, Integer sizeTimeSlot, Integer dataLength, boolean[]isCorrelated){
+	public RegressionCoefs regression(double[][] table, double[] indValues, Integer sizeTimeSlot, Integer dataLength, boolean[]isCorrelated){
 		int count=0;
 		for (int i=0 ; i < isCorrelated.length; i++){
 			if(isCorrelated[i]){
@@ -1166,36 +1177,33 @@ public class SimpleNode extends Node
 			}
 		}
 		double b[] = new double[count];
-		double averageTimes, averageValues[];
-		averageTimes = calculatesAverage(times);
+		double averageIndValues, averageValues[];
+		averageIndValues = calculatesAverage(indValues);
 		averageValues = calculatesAverage(table);
 		int j = 0;
 		for (int i=0 ; i < isCorrelated.length; i++){
 			if(isCorrelated[i]){
-					double numerador = 0.0, denominador = 0.0, x = 0.0;
-					for (int k = 0; k < table.length; k++) {
-						x = times[k] - averageTimes;
-						numerador += x*(table[k][j] - averageValues[j]);
-						denominador += x*x;
-					}
-					if (denominador != 0) {
-						b[j] = (numerador/denominador);
-						
-					}
-					else {
-						b[j] = 0.0;
-					}j++;
+				double numerador = 0.0, denominador = 0.0, x = 0.0;
+				for (int k = 0; k < table.length; k++) {
+					x = indValues[k] - averageIndValues; // Sum(Xi - _X)
+					numerador += x * (table[k][j] - averageValues[j]); // Sum[(Xi-_X) * (Yi - _Y)]
+					denominador += x * x; // Sum[(Xi - _X)²]
+				}
+				if (denominador != 0) {
+					b[j] = (numerador/denominador);
+					
+				}
+				else {
+					b[j] = 0.0;
+				}
+				j++;
 			}
 		}
 		double a[] = new double[count];
 		for (int i = 0; i < a.length; i++) {
-			if (b[i] != 0 ){
-				a[i] = (averageValues[i] - b[i]* averageTimes);
-			}else{
-				a[i] = 0.0;
-			}
+			a[i] = (averageValues[i] - b[i]* averageIndValues);
 		}
-		RegressionCoefs coeficientes = new RegressionCoefs(dataLength-1);
+		RegressionCoefs coeficientes = new RegressionCoefs(count);
 		
 		coeficientes.b = b;
 		coeficientes.a = a;
