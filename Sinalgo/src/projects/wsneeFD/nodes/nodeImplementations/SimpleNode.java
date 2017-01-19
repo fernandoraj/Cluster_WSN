@@ -896,17 +896,19 @@ public class SimpleNode extends Node
 						bl++;
 					}
 				}
+				
 				int[] blacklist = new int[bl];
-				int j=0;
+				int j=0, k=0;
 				for (int i=0 ; i < dataSensedTypes.length; i++){
 					if (i != attributes.independentIndex){
 						if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
 							dataRecordItensToSink.setThereIsCoefficients(true);
-							blacklist[j]=i;
-							j++;
+							blacklist[k]=i;
+							k++;
 							//TODO procurar remover o values[i] de cada instância do DataRecord.
 							//dataRecordItensToSink.clearValues(i);
 						}
+						j++;
 //					for (int i=0 ; i < dataSensedTypes.length-1; i++){
 //						if (i != attributes.independentIndex){
 //							if (attributes.correlationFlag[j]){ // se houve correlação do primeiro valor que não seja a variavel independente
@@ -945,6 +947,7 @@ public class SimpleNode extends Node
 	 */
 	// trocar para boolean
 	public Correlation rPearsonProductMoment(double[][] table, double[] times, Integer sizeTimeSlot, Integer dataLength) {
+		//https://en.wikipedia.org/wiki/Pearson_correlation_coefficient - Pearson Product Moment
 		//double[][] pearsonTable = new double [sizeTimeSlot][];
 		int nCorrelations = 0; 
 		for (int i=0; i < dataLength-1; i++) {
@@ -997,7 +1000,7 @@ public class SimpleNode extends Node
 		int index = whoIsIndependent(score);
 		double[][] temp = new double[table.length][dataLength];
 		int aux = 0;
-		int aux2 =0;
+		int aux2 = 0;
 		for (int i=0; i < dataLength; i++){
 			if (index != i){
 				for(int k=0; k < sizeTimeSlot; k++){
@@ -1019,14 +1022,10 @@ public class SimpleNode extends Node
 		}
 		double[][] preparedValuesForRegression = new double[table.length][aux2];
 		for (int i=0; i< aux2; i++){
-			if (temp[i] != null){
-				for(int j=0; j < sizeTimeSlot; j++){
-					preparedValuesForRegression[j][i] = temp[j][i];
-				}
+			for(int j=0; j < sizeTimeSlot; j++){
+				preparedValuesForRegression[j][i] = temp[j][i];
 			}
 		}
-		
-
 //			for (int i=0; i < dataLength-1; i++){
 //				for(int j=i+1; j < dataLength; j++){
 //					if ((attributesPPM(table,means[i],i).sqrSum)*(attributesPPM(table,means[j],j).sqrSum) != 0.0){ // Se o denominador for diferente de zero (para evitar valor indefinido!)
@@ -1062,9 +1061,9 @@ public class SimpleNode extends Node
 			//comparar aqui a correlação entre a variável independente com as demais variáveis
 		table = matrizTransposta(table);
 		Correlation output = new Correlation(dataLength-1);
-		output.coeficients.b = regression(preparedValuesForRegression, table[whoIsIndependent(correlation)], sizeTimeSlot, dataLength, isCorrelated).b;
-		output.coeficients.a = regression(preparedValuesForRegression, table[whoIsIndependent(correlation)], sizeTimeSlot, dataLength, isCorrelated).a;
-		output.independentIndex = whoIsIndependent(correlation);
+		output.coeficients.b = regression(preparedValuesForRegression, table[index], sizeTimeSlot, dataLength, isCorrelated).b;
+		output.coeficients.a = regression(preparedValuesForRegression, table[index], sizeTimeSlot, dataLength, isCorrelated).a;
+		output.independentIndex = index;
 		output.correlationFlag = isCorrelated;
 		output.combinations = nCorrelations;
 		return output;
