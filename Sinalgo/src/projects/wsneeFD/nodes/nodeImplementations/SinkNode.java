@@ -702,6 +702,13 @@ public class SinkNode extends SimpleNode
 									countCoefs++;
 								}
 							}
+							while (count2 < (dataSensedTypes.length)){
+									for (int i=0; i<size; i++) {
+										values[i][count2] = restoredValuesByRegression(as[countCoefs], bs[countCoefs], nonCorrelatedValues[i][indie]);
+									}
+									count2++;
+									countCoefs++;
+							}
 							for (int i=0; i < wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size(); i++) {
 								DataRecord myDR = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(i).clone();
 								myDR.values = values[i];
@@ -710,7 +717,10 @@ public class SinkNode extends SimpleNode
 							}
 						} // if (rPPMIntraNode)
 						
-						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!					
+						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!	
+						if (wsnMsgResp.messageItemsToSink.get(0).sourceNode.ID == 5){
+							System.out.println();
+						}
 						if (VMP) {//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
 							if (numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todos os 54 primeiros nós com as 70 leituras iniciais.
 								if(((SimpleNode)wsnMsgResp.source).dataRecordItens.size() == 70) {
