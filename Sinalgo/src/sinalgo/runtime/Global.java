@@ -329,5 +329,10 @@ public class Global {
 	public static void disposeRecycledObjects() {
 		Tools.disposeRecycledObjects(Tools.getTextOutputPrintStream()); 	
 	}
+	
+	public static long totalWsnMsgRespSizeBefore; // Calcula em Bytes o tamanho total dos DataRecord.values[] recebidos pelo sink (Abordagem usando Pearson)
+	
+	public static long totalWsnMsgRespSizeAfter;// Calcula em Bytes o tamanho total dos DataRecord.values[] recebidos pelo sink (Abordagem Tradicional)
+	
 
 }
