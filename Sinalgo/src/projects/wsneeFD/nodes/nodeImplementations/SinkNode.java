@@ -225,6 +225,7 @@ public class SinkNode extends SimpleNode
 											// se 2, teste com coeficiente de Pearson (se 3, teste com covariância)
 
 	
+	
 	/**
 	 * This method builds a new SinkNode
 	 */
@@ -654,6 +655,7 @@ public class SinkNode extends SimpleNode
 					numMessagesReceived++;
 					
 					if (stillNonclustered) { // If the sink still not clustered all nodes for the first time
+						Global.totalWsnMsgRespSizeBefore += (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size() * wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).values.length * Double.SIZE);
 						if (rPPMIntraNode) {
 							int size = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().size();
 							int numOfTypesToBeRestored = 0;
@@ -715,6 +717,8 @@ public class SinkNode extends SimpleNode
 								myDR.typs = dataSensedTypes;
 								wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.set(i, myDR);
 							}
+							Global.totalWsnMsgRespSizeAfter += (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size() * wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).values.length * Double.SIZE);
+
 						} // if (rPPMIntraNode)
 						
 						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!	
@@ -1099,6 +1103,9 @@ public class SinkNode extends SimpleNode
 				} // end for (int col=0; col < clusterGroup.getNumCols(line); col++)
 			} // end for (int line=0; line < clusterGroup.getNumRows(); line++)
 		} // end if (clusterGroup != null)
+		System.out.println("O tamanho total de mensagens no método Pearson: "+Global.totalWsnMsgRespSizeBefore);
+		System.out.println("O tamanho total de mensagens no método Tradicional: "+Global.totalWsnMsgRespSizeAfter);
+		
 	} // end setClustersFromNodes(ArrayList2d<WsnMsgResponse> clusterGroup)
 	
 	/**
