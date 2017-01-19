@@ -98,6 +98,11 @@ public class SinkNode extends SimpleNode
 	 * [Eng] Limit of acceptable magnitude difference (spatial error) for the readings of sensor nodes / - which can be between 0.0 (no errors accepted) and 1.0 (accepts any error)
 	 */
 	private double[] spacialThresholdErrors = {1.5,1.5,1.5}; //{1.5}; //{1.5,1.5}; //{2.0, 2.5, 70.0};
+	/**
+	 * graus mínimos de correlação a ser verificado entre as combinações de grandeza.
+	 * e.g.: [0] indica o grau mínimo de corelação entre temperatura e umidade, [1] indica o grau mínimo de corelação entre temperatura e luminosidade, [2]indica o grau mínimo de corelação entre umidade e luminosidade,
+	 */
+	public static final double[] rPearsonMinimal = {0.7,0.7,0.7};
 	
 	/**
 	 * Percentual mínimo do número de rounds iguais das medições de 2 sensores para que os mesmos sejam classificados no mesmo cluster <br>
@@ -206,11 +211,6 @@ public class SinkNode extends SimpleNode
 	 * comb(n,p) = n!/(p!*(n-p)!)
 	 * e.g.: for two types of data (temperature and humidity) the vector will have one position, for three types of data, three positions
 	 */
-	
-
-	public static final double[] rPearsonMinimal = {0.7,0.7,0.7}; //graus mínimos de correlação a ser verificado entre as combinações de grandeza.
-	//e.g.: [0] indica o grau mínimo de corelação entre temperatura e umidade, [1] indica o grau mínimo de corelação entre temperatura e luminosidade, [2]indica o grau mínimo de corelação entre umidade e luminosidade,
- 	
 	
 	ArrayList<SimpleNode> sensores = new ArrayList<SimpleNode>(); // Lista de nós sensores que serão guardados, caso VMP seja true
 
