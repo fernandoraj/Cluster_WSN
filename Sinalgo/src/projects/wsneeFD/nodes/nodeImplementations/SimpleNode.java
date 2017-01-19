@@ -1001,13 +1001,15 @@ public class SimpleNode extends Node
 		double[][] temp = new double[table.length][dataLength];
 		int aux = 0;
 		int aux2 = 0;
+		int aux3 = 0;
 		for (int i=0; i < dataLength; i++){
 			if (index != i){
 				for(int k=0; k < sizeTimeSlot; k++){
-					numeradores[i] += (table[k][index] - means[index])*(table[k][i] - means[i]);
+					numeradores[aux3] += (table[k][index] - means[index])*(table[k][i] - means[i]);
 				}
-				denominadores[i] = Math.sqrt(denominatorCalc(table,means[index],index)) * Math.sqrt(denominatorCalc(table,means[i],i));
-				correlationWithIndependent[aux] = numeradores[i]/denominadores[i];
+				denominadores[aux3] = Math.sqrt(denominatorCalc(table,means[index],index)) * Math.sqrt(denominatorCalc(table,means[i],i));
+				correlationWithIndependent[aux] = numeradores[aux3]/denominadores[aux3];
+				aux3++;
 				if (Math.abs(correlationWithIndependent[aux]) > SinkNode.rPearsonMinimal[i]){
 					isCorrelated[aux] = true;
 					for(int j=0; j < sizeTimeSlot; j++){
