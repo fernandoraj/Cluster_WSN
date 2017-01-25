@@ -193,13 +193,15 @@ public class SinkNode extends SimpleNode
 
 	int k = 16; // Número de nós que vão ser colocados em cada cluster, sem contar com o nó pivô
 	
-	boolean VMP = false; // Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP)
+	boolean kNN = true; // Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP) ou k-Nearest Neighbors (KNN)
 	
 	/**
 	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados internamente aos nós <p>
 	 * [Eng] Indicates if r Pearson's Product Moment will be used to correlate the different types of data inside every node
 	 */
 	public static boolean rPPMIntraNode = true;
+	
+	public static boolean resultOfPpmAlreadyPrinted = false;
 	
 	/**
 	 * Define o menor grau de r, em módulo, necessário para que dois sensores sejam ditos correlacionados. Deve-se considerar o tamanho do
@@ -263,7 +265,7 @@ public class SinkNode extends SimpleNode
 		System.out.println("The size of sliding window is "+SimpleNode.slidingWindowSize);
 		System.out.println("The maximum distance between sensors in the same cluster is "+maxDistance);
 //		System.out.println("The type of data sensed is "+dataSensedType);
-		if (VMP) {
+		if (kNN) {
 			System.out.println("The inicialization mode is KNN! K value is "+k);
 		}
 		else {
@@ -725,7 +727,7 @@ public class SinkNode extends SimpleNode
 						if (wsnMsgResp.messageItemsToSink.get(0).sourceNode.ID == 5){
 							System.out.println();
 						}
-						if (VMP) {//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
+						if (kNN) {//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
 							if (numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todos os 54 primeiros nós com as 70 leituras iniciais.
 								if(((SimpleNode)wsnMsgResp.source).dataRecordItens.size() == 70) {
 									sensores.add((SimpleNode)wsnMsgResp.source);
@@ -1103,8 +1105,11 @@ public class SinkNode extends SimpleNode
 				} // end for (int col=0; col < clusterGroup.getNumCols(line); col++)
 			} // end for (int line=0; line < clusterGroup.getNumRows(); line++)
 		} // end if (clusterGroup != null)
-		System.out.println("O tamanho total de mensagens no método Pearson: "+Global.totalWsnMsgRespSizeBefore);
-		System.out.println("O tamanho total de mensagens no método Tradicional: "+Global.totalWsnMsgRespSizeAfter);
+		if (!resultOfPpmAlreadyPrinted){
+			System.out.println("Total size of transmitted messages in Pearson method: "+Global.totalWsnMsgRespSizeBefore);
+			System.out.println("Total size of transmitted messages in traditional method: "+Global.totalWsnMsgRespSizeAfter);
+			resultOfPpmAlreadyPrinted = true;
+		} // end if (!resultOfPpmAlreadyPrinted)
 		
 	} // end setClustersFromNodes(ArrayList2d<WsnMsgResponse> clusterGroup)
 	
