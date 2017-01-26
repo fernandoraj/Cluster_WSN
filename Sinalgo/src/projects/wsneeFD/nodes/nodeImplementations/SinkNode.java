@@ -48,7 +48,7 @@ public class SinkNode extends SimpleNode
 	 * Indica quando o modo de clusterização usando Dimensão Fractal está ligado (ativo = true)
 	 * [Eng] Indicates whether the Fractal Dimension clustering is in ON mode (active = true)
 	 */
-	private final boolean FDmodeOn = true;
+	private final boolean FDmodeOn = false;
 
 	/**
 	 * Indica o limiar de diferença de Dimensão Fractal mínima entre duas medições de um mesmo cluster (antes e depois da adição dos novos dados) para que o mesmo seja válido (não seja considerado "ruído")
@@ -193,7 +193,7 @@ public class SinkNode extends SimpleNode
 
 	int k = 16; // Número de nós que vão ser colocados em cada cluster, sem contar com o nó pivô
 	
-	boolean kNN = true; // Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP) ou k-Nearest Neighbors (KNN)
+	boolean kNN = false; // Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP) ou k-Nearest Neighbors (KNN)
 	
 	/**
 	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados internamente aos nós <p>
@@ -315,7 +315,9 @@ public class SinkNode extends SimpleNode
 				
 				this.setColor(Color.YELLOW);
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
-				
+				if (this.ID == 5){
+					System.out.println();
+				}
 				Utils.printForDebug("@ @ @ Message Received by SINK from the NodeID = "+wsnMsgResp.source.ID +" with MsgType = "+wsnMsgResp.typeMsg+"\n");
 				
 				if (canReceiveMsgResponseError) { // If the other sensor nodes still getting data to send to sink calculates the Equation Regression Coeffs. - e.g.: During the Merge Process Operation
@@ -657,8 +659,8 @@ public class SinkNode extends SimpleNode
 					numMessagesReceived++;
 					
 					if (stillNonclustered) { // If the sink still not clustered all nodes for the first time
-						Global.totalWsnMsgRespSizeBefore += (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size() * wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).values.length * Double.SIZE);
 						if (rPPMIntraNode) {
+							Global.totalWsnMsgRespSizeBefore += (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size() * wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).values.length * Double.SIZE);
 							int size = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().size();
 							int numOfTypesToBeRestored = 0;
 							boolean[] flag = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getCorrelationFlags();
@@ -720,13 +722,10 @@ public class SinkNode extends SimpleNode
 								wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.set(i, myDR);
 							}
 							Global.totalWsnMsgRespSizeAfter += (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size() * wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).values.length * Double.SIZE);
-
 						} // if (rPPMIntraNode)
 						
 						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!	
-						if (wsnMsgResp.messageItemsToSink.get(0).sourceNode.ID == 5){
-							System.out.println();
-						}
+						
 						if (kNN) {//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
 							if (numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todos os 54 primeiros nós com as 70 leituras iniciais.
 								if(((SimpleNode)wsnMsgResp.source).dataRecordItens.size() == 70) {
@@ -792,7 +791,7 @@ public class SinkNode extends SimpleNode
 								Utils.printForDebug(nodeGroups);
 							}
 //							printClusterArray(nodeGroups);
-							
+							rPPMIntraNode = false;
 							stillNonclustered = false;
 							canReceiveMsgResponseError = true;
 						 	
@@ -1106,6 +1105,7 @@ public class SinkNode extends SimpleNode
 			} // end for (int line=0; line < clusterGroup.getNumRows(); line++)
 		} // end if (clusterGroup != null)
 		if (!resultOfPpmAlreadyPrinted){
+			rPPMIntraNode = false;
 			System.out.println("Total size of transmitted messages in Pearson method: "+Global.totalWsnMsgRespSizeBefore);
 			System.out.println("Total size of transmitted messages in traditional method: "+Global.totalWsnMsgRespSizeAfter);
 			resultOfPpmAlreadyPrinted = true;
