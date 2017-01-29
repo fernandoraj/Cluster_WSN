@@ -199,7 +199,7 @@ public class SinkNode extends SimpleNode
 	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados internamente aos nós <p>
 	 * [Eng] Indicates if r Pearson's Product Moment will be used to correlate the different types of data inside every node
 	 */
-	public static boolean rPPMIntraNode = true;
+	public static boolean rPPMIntraNode = false;
 	
 	public static boolean resultOfPpmAlreadyPrinted = false;
 	
@@ -315,9 +315,6 @@ public class SinkNode extends SimpleNode
 				
 				this.setColor(Color.YELLOW);
 				WsnMsgResponse wsnMsgResp = (WsnMsgResponse) message;
-				if (this.ID == 5){
-					System.out.println();
-				}
 				Utils.printForDebug("@ @ @ Message Received by SINK from the NodeID = "+wsnMsgResp.source.ID +" with MsgType = "+wsnMsgResp.typeMsg+"\n");
 				
 				if (canReceiveMsgResponseError) { // If the other sensor nodes still getting data to send to sink calculates the Equation Regression Coeffs. - e.g.: During the Merge Process Operation
@@ -728,7 +725,7 @@ public class SinkNode extends SimpleNode
 						
 						if (kNN) {//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
 							if (numMessagesReceived <= numTotalOfSensors) {//Aqui guarda todos os 54 primeiros nós com as 70 leituras iniciais.
-								if(((SimpleNode)wsnMsgResp.source).dataRecordItens.size() == 70) {
+								if(((SimpleNode)wsnMsgResp.source).dataRecordItens.size() == sizeTimeSlot) { // if(((SimpleNode)wsnMsgResp.source).dataRecordItens.size() == 70)
 									sensores.add((SimpleNode)wsnMsgResp.source);
 								}
 							}
