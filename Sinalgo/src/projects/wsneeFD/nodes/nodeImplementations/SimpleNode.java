@@ -924,9 +924,6 @@ public class SimpleNode extends Node
 				// a = (1/N)(Sum(Si - b*Sum(ti)) = S_ - b * t_
 				//dataRecordItens = dataRecordItensToSink;
 				wsnMsgResp.messageItemsToSink.add(new MessageItem(this, dataRecordItensToSink));
-				if (this.ID == 5){
-					System.out.println();
-				}
 				//wsnMsgResp.messageItemsToSink = (MessageItem) dr.elements();
 				rPPMIntraNodeLocal = false;
 				}
