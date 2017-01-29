@@ -39,16 +39,21 @@ public class SinkNode extends SimpleNode
 	private Integer sizeTimeSlotForMerge = 25;
 	
 	/**
-	 * Indica que o sink node sinaliza para todos os outros nós que deve ficar continuamente com sensoriamento (usando Cluster Heads) <p>
-	 * [Eng] Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
+	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados internamente aos nós <p>
+	 * [Eng] Indicates if r Pearson's Product Moment will be used to correlate the different types of data inside every node
 	 */
-	private final boolean ACS = true; // ACS(allSensorsMustContinuoslySense): false = Representative Nodes; true = Cluster Heads
+	public static boolean rPPMIntraNode = false;
+	
+	/**
+	 * Indica o uso do método kNN (kNN = true) para a clusterização inicial dos sensores da rede; Se kNN = false, o método a ser usado é o Multidimensional Similarity Measure
+	 */
+	boolean kNN = true; // Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP) ou k-Nearest Neighbors (KNN)
 	
 	/**
 	 * Indica quando o modo de clusterização usando Dimensão Fractal está ligado (ativo = true)
 	 * [Eng] Indicates whether the Fractal Dimension clustering is in ON mode (active = true)
 	 */
-	private final boolean FDmodeOn = false;
+	private final boolean FDmodeOn = true;
 
 	/**
 	 * Indica o limiar de diferença de Dimensão Fractal mínima entre duas medições de um mesmo cluster (antes e depois da adição dos novos dados) para que o mesmo seja válido (não seja considerado "ruído")
@@ -66,6 +71,12 @@ public class SinkNode extends SimpleNode
 	 * Número máximo de "ruídos" sequenciais de um sensor antes de o mesmo disparar um split de cluster
 	 */
 	private final int FDnumMaxSeqNoiseForSplit = 3; // Experimental value - It is only a suggestion!
+	
+	/**
+	 * Indica que o sink node sinaliza para todos os outros nós que deve ficar continuamente com sensoriamento (usando Cluster Heads) <p>
+	 * [Eng] Indicates that sink node signalize to all other nodes must continuously sensing (using Cluster Heads)
+	 */
+	private final boolean ACS = true; // ACS(allSensorsMustContinuoslySense): false = Representative Nodes; true = Cluster Heads
 	
 	/**
 	 * Quantidade de rounds (ciclos) a ser saltado para cada leitura sequencial dos sensores, no caso de uso da abordagem de ClusterHeads (ACS=True) <br>
@@ -191,16 +202,15 @@ public class SinkNode extends SimpleNode
 	
 	private double minimumOccupancyRatePerCluster = 1.35; // MORPC: #TotalSensors = 54 / #CLusters = 40 => 54/40 = 1.35
 
-	int k = 16; // Número de nós que vão ser colocados em cada cluster, sem contar com o nó pivô
-	
-	boolean kNN = false; // Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP) ou k-Nearest Neighbors (KNN)
+	/**
+	 * Para o caso de uso do método kNN (kNN = true), indica o número de nós que vão ser colocados em cada cluster, sem contar com o nó pivô
+	 */
+	int k = 16;
 	
 	/**
-	 * Indica se o Coeficiente de correlação de pearson r será usado para correlacionar os diferentes tipos dados internamente aos nós <p>
-	 * [Eng] Indicates if r Pearson's Product Moment will be used to correlate the different types of data inside every node
+	 * Para o caso em que se utiliza Pearson Product Moment (rPPMIntraNode = true), indica se o indicador da quantidade de dados enviados pelos sensores através de mensagens já foi impresso ou não <p>
+	 * [Eng] Indicates if the number (amount) of data sent by every nodes is already printed
 	 */
-	public static boolean rPPMIntraNode = false;
-	
 	public static boolean resultOfPpmAlreadyPrinted = false;
 	
 	/**
@@ -242,15 +252,6 @@ public class SinkNode extends SimpleNode
 		else {
 			System.out.println("Using Representative Nodes approach...  ACS = false");
 		}
-		System.out.println("The FDmode is "+FDmodeOn);
-		if (FDmodeOn) {
-			System.out.println("   The FDthreshold is "+FDNoiseThreshold);
-			System.out.println("   The FDdiffForSplitThreshold is "+FDdiffForSplitThreshold);
-			System.out.println("   The FDnumMaxSeqNoiseForSplit is "+FDnumMaxSeqNoiseForSplit);
-		}
-		else {
-			System.out.println("The minimum occupancy rate per cluster (for Merge) is "+minimumOccupancyRatePerCluster);
-		}
 		System.out.println("The sensor delay is "+SimpleNode.sensorDelay);
 		System.out.println("The cluster delay is "+SimpleNode.clusterDelay);
 		System.out.println("The sensor time slot is "+sensorTimeSlot);
@@ -265,11 +266,27 @@ public class SinkNode extends SimpleNode
 		System.out.println("The size of sliding window is "+SimpleNode.slidingWindowSize);
 		System.out.println("The maximum distance between sensors in the same cluster is "+maxDistance);
 //		System.out.println("The type of data sensed is "+dataSensedType);
-		if (kNN) {
-			System.out.println("The inicialization mode is KNN! K value is "+k);
+		if (rPPMIntraNode) {
+			System.out.println("Pearson Correlation (PCLR) in learning phase is On!");
 		}
 		else {
-			System.out.println("The inicialization mode is SM!");
+			System.out.println("No Pearson Correlation (PCLR) in learning phase!");
+		}
+		if (kNN) {
+			System.out.println("The cluster inicialization mode is kNN! K value is "+k);
+		}
+		else {
+			System.out.println("The cluster inicialization mode is MSM (Multidimensional Similarity Measure)!");
+		}
+		if (FDmodeOn) {
+			System.out.println("The cluster maintenance mode is Fractal Dimension (FDmodeOn is "+FDmodeOn+")");
+			System.out.println("   The FDthreshold is "+FDNoiseThreshold);
+			System.out.println("   The FDdiffForSplitThreshold is "+FDdiffForSplitThreshold);
+			System.out.println("   The FDnumMaxSeqNoiseForSplit is "+FDnumMaxSeqNoiseForSplit);
+		}
+		else {
+			System.out.println("The cluster maintenance mode is Similarity Measure in Multidimensional WSN (FDmodeOn is "+FDmodeOn+")");
+			System.out.println("   The minimum occupancy rate per cluster (for Merge) is "+minimumOccupancyRatePerCluster);
 		}
 		
 		
@@ -681,7 +698,9 @@ public class SinkNode extends SimpleNode
 							for (int i=0; i< wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size(); i++) {
 								nonCorrelatedValues[i] = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(i).values;					
 							}
-							((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
+
+//							((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
+							
 							if (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getThereIsCoefficients()) {
 								as = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegreesionCoefA();
 								bs = wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().getRegressionCoefB();
@@ -721,6 +740,8 @@ public class SinkNode extends SimpleNode
 							Global.totalWsnMsgRespSizeAfter += (wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.size() * wsnMsgResp.messageItemsToSink.get(0).getDataRecordItens().dataRecords.get(0).values.length * Double.SIZE);
 						} // if (rPPMIntraNode)
 						
+						((SimpleNode)wsnMsgResp.source).setPathToSenderNode(wsnMsgResp.clonePath(), wsnMsgResp.hopsToTarget);
+
 						// ((SimpleNode)wsnMsgResp.source).hopsToTarget = wsnMsgResp.hopsToTarget; // TESTAR AQUI!!!	
 						
 						if (kNN) {//Aqui Faz o algoritmo do vizinho mais proximo, substituindo a medida de similaridade quando a variavel for true.
