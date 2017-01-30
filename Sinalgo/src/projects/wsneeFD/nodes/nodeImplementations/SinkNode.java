@@ -47,7 +47,7 @@ public class SinkNode extends SimpleNode
 	/**
 	 * Indica o uso do método kNN (kNN = true) para a clusterização inicial dos sensores da rede; Se kNN = false, o método a ser usado é o Multidimensional Similarity Measure
 	 */
-	boolean kNN = true; // Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP) ou k-Nearest Neighbors (KNN)
+	boolean kNN = false; // Se valor = true: habilita o uso do Algoritmo do Vizinho Mais Próximo (VMP) ou k-Nearest Neighbors (KNN)
 	
 	/**
 	 * Indica quando o modo de clusterização usando Dimensão Fractal está ligado (ativo = true)
@@ -96,24 +96,24 @@ public class SinkNode extends SimpleNode
 	 * [Eng] Types of data to be sensed (read in the sensor nodes), which, for Intel Lab Data, can be: 
 	 * temperature(t) = 4; humidity(h) = 5; brightness(l) = 6 or voltage(v) = 7;
 	 */
-	public static int[] dataSensedTypes = {4,5,6}; //{4}; //{4,5}; //{4,5,6};
+	public static int[] dataSensedTypes = {5,6}; //{4}; //{4,5}; //{4,5,6};
 	
 	/**
 	 * Percentual do limiar de erro temporal aceitável para as leituras dos nós sensores, que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
 	 * [Eng] Percentage of temporal acceptable error threshold for the readings of sensor nodes, which may be between 0.0 (accepts no errors) and 1.0 (accepts any error)
 	 */
-	private double[] thresholdErrors = {0.05,0.05,0.05}; //{0.05}; //{0.05,0.05}; //{0.05,0.05,0.05}; // thresholdErr: 0.05 = 5%
+	private double[] thresholdErrors = {0.05,0.05}; //{0.05}; //{0.05,0.05}; //{0.05,0.05,0.05}; // thresholdErr: 0.05 = 5%
 	
 	/**
 	 * Limite de diferença de magnitude aceitável (erro espacial) para as leituras dos nós sensores /--que pode estar entre 0.0 (não aceita erros) e 1.0 (aceita todo e qualquer erro) <br>
 	 * [Eng] Limit of acceptable magnitude difference (spatial error) for the readings of sensor nodes / - which can be between 0.0 (no errors accepted) and 1.0 (accepts any error)
 	 */
-	private double[] spacialThresholdErrors = {1.5,1.5,1.5}; //{1.5}; //{1.5,1.5}; //{2.0, 2.5, 70.0};
+	private double[] spacialThresholdErrors = {1.5,1.5}; //{1.5}; //{1.5,1.5}; //{2.0, 2.5, 70.0};
 	/**
 	 * graus mínimos de correlação a ser verificado entre as combinações de grandeza.
 	 * e.g.: [0] indica o grau mínimo de corelação entre temperatura e umidade, [1] indica o grau mínimo de corelação entre temperatura e luminosidade, [2]indica o grau mínimo de corelação entre umidade e luminosidade,
 	 */
-	public static final double[] rPearsonMinimal = {0.7,0.7,0.7};
+	public static final double[] rPearsonMinimal = {0.7,0.7}; // {0.7,0.7,0.7}; //{0.7,0.7};
 	
 	/**
 	 * Percentual mínimo do número de rounds iguais das medições de 2 sensores para que os mesmos sejam classificados no mesmo cluster <br>
